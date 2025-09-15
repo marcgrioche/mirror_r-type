@@ -1,0 +1,62 @@
+name: R-Type
+
+env:
+  MIRROR_URL: "git@github.com:EpitechPGE3-2025/G-CPP-500-TLS-5-1-rtype-6.git"
+  MIRROR_REPO: "EpitechPGE3-2025/G-CPP-500-TLS-5-1-rtype-6"
+  EXECUTABLES: "r-type_server,r-type_client"
+
+on:
+  push:
+    branches-ignore:
+      - 'ga-ignore-*'
+  pull_request:
+    branches-ignore:
+      - 'ga-ignore-*'
+
+jobs:
+
+  check_program_compilation:
+    if: ${{ github.repository }} != MIRROR_REPO
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Raylib from source
+        run: |
+          apt-get update
+          apt-get install -y git build-essential cmake
+          git clone https://github.com/raysan5/raylib.git
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON ..
+          make -j$(nproc)
+          make install
+          ldconfig
+      - name: Compile program
+        run: make
+      - name: Verify executables
+        run: |
+          EXECUTABLE_LIST=$(echo "${{ env.EXECUTABLES }}" | tr ',' ' ')
+          for EXECUTABLE in $EXECUTABLE_LIST; do
+            if [ ! -x "$EXECUTABLE" ]; then
+              echo "Failed to find $EXECUTABLE"
+              exit 1
+            fi
+          done
+      - name: Clean
+        run: make fclean
+
+  push_to_mirror:
+    if: ${{ github.repository }} != MIRROR_REPO && ${{ github.event_name == 'push' }}
+    needs: [check_program_compilation]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push to mirror
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: ${{ env.MIRROR_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
