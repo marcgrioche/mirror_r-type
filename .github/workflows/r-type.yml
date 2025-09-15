@@ -33,19 +33,21 @@ jobs:
           make -j$(nproc)
           make install
           ldconfig
-      - name: Compile program
-        run: make
+      - name: Configure and build with CMake
+        run: |
+          cmake -S . -B build
+          cmake --build build
       - name: Verify executables
         run: |
           EXECUTABLE_LIST=$(echo "${{ env.EXECUTABLES }}" | tr ',' ' ')
           for EXECUTABLE in $EXECUTABLE_LIST; do
-            if [ ! -x "$EXECUTABLE" ]; then
+            if [ ! -x "build/$EXECUTABLE" ]; then
               echo "Failed to find $EXECUTABLE"
               exit 1
             fi
           done
       - name: Clean
-        run: make fclean
+        run: rm -rf build
 
   push_to_mirror:
     if: ${{ github.repository }} != MIRROR_REPO && ${{ github.event_name == 'push' }}
