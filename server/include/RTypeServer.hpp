@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Message.hpp"
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -22,8 +23,14 @@ public:
 
     /**
      * Start the server (begin receiving and processing messages).
+     * Runs the main loop until stop is requested.
      */
     void start();
+
+    /**
+     * Request the server to stop (sets running flag to false).
+     */
+    void requestStop();
 
     /**
      * Stop the server and release resources.
@@ -50,6 +57,9 @@ public:
 private:
     uint16_t port_;
     std::unordered_map<uint32_t, ClientInfo> clients_;
+    std::atomic<bool> _running { true };
+
+    static void handleSignal(int);
 
     // Add socket and protocol handling members here (e.g., UdpSocket)
     // Add extensibility hooks for game logic

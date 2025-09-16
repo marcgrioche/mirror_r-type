@@ -34,7 +34,7 @@ public:
      *
      * Args:
      *     data (const std::vector<uint8_t>&): Data to send.
-     *     recipient (/* endpoint type ): Recipient endpoint.
+     *     recipient: Recipient endpoint (type to be defined).
      */
     void send(const std::vector<uint8_t>& data);
 
