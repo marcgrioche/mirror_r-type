@@ -30,7 +30,8 @@ void RTypeServer::start()
     std::cout << "Server started on port " << _port << std::endl;
     _running = true;
 
-    _socket->asyncReceive([this](const std::vector<uint8_t>& data) {
+    _socket->asyncReceive([this](const std::vector<uint8_t>& data, const asio::ip::udp::endpoint& sender) {
+        (void)sender; // Unused parameter for now
         Message msg = Message::deserialize(data);
         handleReceive(msg);
     });
@@ -73,16 +74,6 @@ void RTypeServer::handleReceive(const Message& msg)
     } else {
         std::cerr << "Unknown message type received: " << static_cast<int>(msg.getType()) << std::endl;
     }
-}
-
-void RTypeServer::handleConnect(const Message& msg)
-{
-    // Handle CONNECT message (example logic)
-    std::cout << "Client " << msg.player_id << " connected." << std::endl;
-    if (_clients.find(msg.player_id) == _clients.end()) {
-        _clients[msg.player_id] = ClientInfo { msg.player_id };
-    }
-    // Send CONNECT_ACK (not implemented here)
 }
 
 void RTypeServer::registerHandlers()

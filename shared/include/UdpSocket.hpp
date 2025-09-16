@@ -1,15 +1,9 @@
 #pragma once
 
+#include <asio.hpp>
 #include <cstdint>
 #include <functional>
 #include <vector>
-
-// TODO : Forward declaration for ASIO types (replace with actual includes in implementation)
-namespace asio {
-namespace ip {
-    class udp;
-}
-}
 
 /**
  * UdpSocket wraps UDP socket operations using asio.
@@ -27,16 +21,16 @@ public:
      * Args:
      *     handler (function): Callback for received data and sender info.
      */
-    void asyncReceive(std::function<void(const std::vector<uint8_t>& /*data*/)> handler);
+    void asyncReceive(std::function<void(const std::vector<uint8_t>&, const asio::ip::udp::endpoint&)> handler);
 
     /**
      * Send data to a recipient.
      *
      * Args:
      *     data (const std::vector<uint8_t>&): Data to send.
-     *     recipient: Recipient endpoint (type to be defined).
+     *     recipient (const asio::ip::udp::endpoint&): Recipient endpoint.
      */
-    void send(const std::vector<uint8_t>& data);
+    void send(const std::vector<uint8_t>& data, const asio::ip::udp::endpoint& recipient);
 
     /**
      * Close the socket and release resources.
@@ -44,6 +38,7 @@ public:
     void close();
 
 private:
-    uint16_t port_;
-    // TODO : Add socket member here (e.g., asio::ip::udp::socket)
+    uint16_t _port;
+    asio::io_context _ioContext;
+    asio::ip::udp::socket _socket;
 };

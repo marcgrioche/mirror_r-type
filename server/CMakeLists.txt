@@ -3,10 +3,14 @@ cmake_minimum_required(VERSION 3.16)
 project(r-type_server)
 
 file(GLOB SERVER_SOURCES src/*.cpp)
+file(GLOB SHARED_SOURCES ../shared/src/*.cpp)
 include_directories(src include)
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(../shared/include)
 
-add_executable(r-type_server ${SERVER_SOURCES})
+add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
+
+target_link_libraries(r-type_server PRIVATE asio)
 
 set_target_properties(r-type_server PROPERTIES
     CXX_STANDARD 17

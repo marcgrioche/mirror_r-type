@@ -16,17 +16,23 @@
  * ------------------------------------------------------------------------------------ */
 
 #include "Message.hpp"
-#include <arpa/inet.h>
 #include <cstring>
 #include <stdexcept>
 
 Message::Message(MessageType type, uint16_t seq, uint32_t pid, uint8_t ver)
-    : type(type), sequence_number(seq), player_id(pid), version(ver)
+    : sequence_number(seq)
+    , player_id(pid)
+    , version(ver)
+    , type(type)
 {
 }
 
 Message::Message(MessageType type, const std::vector<uint8_t>& payload, uint16_t seq, uint32_t pid, uint8_t ver)
-    : type(type), payload(payload), sequence_number(seq), player_id(pid), version(ver)
+    : sequence_number(seq)
+    , player_id(pid)
+    , version(ver)
+    , type(type)
+    , payload(payload)
 {
 }
 
@@ -197,23 +203,32 @@ Message Message::deserialize(const std::vector<uint8_t>& data)
     return Message(type, payload, seq, pid, version);
 }
 
-uint16_t Message::htons(uint16_t value) { return ::htons(value); }
-uint16_t Message::ntohs(uint16_t value) { return ::ntohs(value); }
-uint32_t Message::htonl(uint32_t value) { return ::htonl(value); }
-uint32_t Message::ntohl(uint32_t value) { return ::ntohl(value); }
+uint16_t Message::htons(uint16_t value)
+{
+    return (value << 8) | (value >> 8);
+}
+
+uint16_t Message::ntohs(uint16_t value)
+{
+    return (value << 8) | (value >> 8);
+}
+
+uint32_t Message::htonl(uint32_t value)
+{
+    return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value & 0xFF0000) >> 8) | ((value & 0xFF000000) >> 24);
+}
+
+uint32_t Message::ntohl(uint32_t value)
+{
+    return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value & 0xFF0000) >> 8) | ((value & 0xFF000000) >> 24);
+}
 
 uint64_t Message::htonll(uint64_t value)
 {
-    if (htonl(1) == 1) {
-        return value;
-    }
-    return ((uint64_t)htonl(value & 0xFFFFFFFF) << 32) | htonl(value >> 32);
+    return ((value & 0xFFULL) << 56) | ((value & 0xFF00ULL) << 40) | ((value & 0xFF0000ULL) << 24) | ((value & 0xFF000000ULL) << 8) | ((value & 0xFF00000000ULL) >> 8) | ((value & 0xFF0000000000ULL) >> 24) | ((value & 0xFF000000000000ULL) >> 40) | ((value & 0xFF00000000000000ULL) >> 56);
 }
 
 uint64_t Message::ntohll(uint64_t value)
 {
-    if (ntohl(1) == 1) {
-        return value;
-    }
-    return ((uint64_t)ntohl(value & 0xFFFFFFFF) << 32) | ntohl(value >> 32);
+    return ((value & 0xFFULL) << 56) | ((value & 0xFF00ULL) << 40) | ((value & 0xFF0000ULL) << 24) | ((value & 0xFF000000ULL) << 8) | ((value & 0xFF00000000ULL) >> 8) | ((value & 0xFF0000000000ULL) >> 24) | ((value & 0xFF000000000000ULL) >> 40) | ((value & 0xFF00000000000000ULL) >> 56);
 }
