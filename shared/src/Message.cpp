@@ -28,11 +28,11 @@ Message::Message(MessageType type, uint16_t seq, uint32_t pid, uint8_t ver)
 }
 
 Message::Message(MessageType type, const std::vector<uint8_t>& payload, uint16_t seq, uint32_t pid, uint8_t ver)
-    : sequence_number(seq)
+    : type(type)
+    , payload(payload)
+    , sequence_number(seq)
     , player_id(pid)
     , version(ver)
-    , type(type)
-    , payload(payload)
 {
 }
 
