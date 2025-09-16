@@ -6,55 +6,90 @@
 */
 
 #pragma once
-#include "Components.hpp"
-#include "SparseArray.hpp"
-#include <any>
-#include <optional>
+#include "ComponentStorage.hpp"
+#include "Entity.hpp"
+#include <algorithm>
+#include <memory>
+#include <tuple>
 #include <typeindex>
 #include <unordered_map>
-#include <vector>
+#include <utility>
 
 class Registry {
 public:
-    Entity spawn_entity() { return _next_entity_id++; }
+    Registry() = default;
 
-    template <typename Component>
-    SparseArray<Component>& register_component()
-    {
-        auto key = std::type_index(typeid(Component));
-        if (_components.find(key) == _components.end())
-            _components[key] = SparseArray<Component>();
-        return std::any_cast<SparseArray<Component>&>(_components[key]);
-    }
-
-    template <typename Component>
-    SparseArray<Component>& get_components()
-    {
-        return std::any_cast<SparseArray<Component>&>(_components[std::type_index(typeid(Component))]);
-    }
-
-    template <typename Component>
-    typename SparseArray<Component>::reference add_component(Entity e, Component&& comp)
-    {
-        auto& array = register_component<Component>();
-        return array.insert_at(e, std::forward<Component>(comp));
-    }
+    Entity create_entity();
+    void kill_entity(Entity e);
 
     template <typename Component, typename... Args>
-    typename SparseArray<Component>::reference emplace_component(Entity e, Args&&... args)
-    {
-        auto& array = register_component<Component>();
-        return array.emplace_at(e, std::forward<Args>(args)...);
-    }
+    void emplace(Entity e, Args&&... args);
 
     template <typename Component>
-    void remove_component(Entity e)
-    {
-        auto& array = get_components<Component>();
-        array.erase(e);
-    }
+    void add(Entity e, Component const& comp);
+
+    template <typename Component>
+    void remove(Entity e);
+
+    template <typename Component>
+    bool has(Entity e) const;
+
+    template <typename Component>
+    Component& get(Entity e);
+
+    template <typename Component>
+    ComponentStorage<Component>& get_or_create_storage();
+
+    template <typename Component>
+    ComponentStorage<Component>* get_storage_if_exists() const;
+
+    template <typename Component>
+    ComponentStorage<Component>* get_storage_if_exists();
+
+    uint32_t get_version(uint32_t id) const;
+
+    // VIEW STRUCT = OPTIMIZED STRUCTURE TO ITERATE OVER ENTITIES HAVING ALL SPECIFIED COMPONENTS
+    template <typename... Components>
+    struct View {
+        std::tuple<ComponentStorage<Components>*...> storages;
+        size_t primary_index;
+        const std::vector<Entity>* primary_entities = nullptr;
+        using value_type = std::tuple<Components&...>;
+
+        View(std::tuple<ComponentStorage<Components>*...> st, size_t primary_idx, const std::vector<Entity>* primary_ent);
+
+        // VIEW ITERATOR
+        struct iterator {
+            View const* parent;
+            size_t idx;
+            mutable bool present_cache = false;
+
+            iterator(View const* p, size_t i);
+            void advance_to_valid();
+            bool all_present(Entity const& e) const;
+
+            template <size_t... Is>
+            void iterate_check(Entity const& e, std::index_sequence<Is...>, int) const;
+
+            iterator& operator++();
+            bool operator!=(iterator const& o) const;
+            value_type operator*() const;
+
+            template <size_t... Is>
+            value_type deref_entity(Entity const& e, std::index_sequence<Is...>) const;
+        };
+
+        iterator begin() const;
+        iterator end() const;
+    };
+
+    template <typename... Components>
+    View<Components...> view();
 
 private:
-    Entity _next_entity_id = 0;
-    std::unordered_map<std::type_index, std::any> _components;
+    std::unordered_map<std::type_index, std::unique_ptr<IComponentStorage>> storages;
+    std::vector<uint32_t> versions;
+    std::vector<uint32_t> free_ids;
 };
+
+#include "Registry.tpp"

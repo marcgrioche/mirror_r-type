@@ -5,41 +5,45 @@
 ** main
 */
 
-#include "Components.hpp"
-#include "Registry.hpp"
+#include "ecs/Components.hpp"
+#include "ecs/Registry.hpp"
 #include <iostream>
 
 int main()
 {
     Registry registry;
 
-    // Crée deux entités
-    Entity e1 = registry.spawn_entity();
-    Entity e2 = registry.spawn_entity();
+    Entity e1 = registry.create_entity();
+    Entity e2 = registry.create_entity();
+    Entity e3 = registry.create_entity();
 
-    // Ajoute des composants
-    registry.add_component<Position>(e1, Position { 0, 0 });
-    registry.add_component<Velocity>(e1, Velocity { 1, 1 });
+    registry.emplace<Position>(e1, 0.0f, 0.0f);
+    registry.emplace<Velocity>(e1, 1.0f, 1.0f);
 
-    registry.add_component<Position>(e2, Position { 10, 5 });
+    registry.emplace<Position>(e2, 10.0f, 5.0f);
 
-    // Accès aux composants
-    auto& positions = registry.get_components<Position>();
-    auto& velocities = registry.get_components<Velocity>();
+    registry.emplace<Position>(e3, 2.0f, 2.0f);
+    registry.emplace<Velocity>(e3, -0.5f, 0.25f);
 
-    for (size_t i = 0; i < positions.size(); i++) {
-        if (positions[i]) {
-            std::cout << "Entity " << i << " has Position("
-                      << positions[i]->x << ", " << positions[i]->y << ")\n";
+    for (int frame = 0; frame < 5; ++frame) {
+        auto view = registry.view<Position, Velocity>();
+        for (auto&& [pos, vel] : view) {
+            pos.x += vel.dx;
+            pos.y += vel.dy;
         }
+
+        auto& ps = registry.get_or_create_storage<Position>();
+        for (size_t i = 0; i < ps.dense_size(); ++i) {
+            auto ent = ps.dense_entities_ref()[i];
+            auto p = ps.get_by_dense_index(i);
+            std::cout << ent << " Position(" << p.x << "," << p.y << ")\n";
+        }
+        std::cout << "----\n";
     }
 
-    for (size_t i = 0; i < velocities.size(); i++) {
-        if (velocities[i]) {
-            std::cout << "Entity " << i << " has Velocity("
-                      << velocities[i]->dx << ", " << velocities[i]->dy << ")\n";
-        }
-    }
+    registry.kill_entity(e1);
+    Entity e4 = registry.create_entity();
+    std::cout << "Created e4 = " << e4 << "\n";
 
     return 0;
 }
