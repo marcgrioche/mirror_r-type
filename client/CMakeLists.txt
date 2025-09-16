@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(r-type_client)
 
 file(GLOB CLIENT_SOURCES src/*.cpp)
-include_directories(src include)
+include_directories(src src/ecs include)
 
 add_executable(r-type_client ${CLIENT_SOURCES})
 
