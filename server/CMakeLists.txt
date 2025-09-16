@@ -4,6 +4,7 @@ project(r-type_server)
 
 file(GLOB SERVER_SOURCES src/*.cpp)
 include_directories(src include)
+include_directories(${CMAKE_SOURCE_DIR})
 
 add_executable(r-type_server ${SERVER_SOURCES})
 
