@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Message.hpp"
+#include "UdpSocket.hpp"
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <unordered_map>
 
@@ -55,17 +57,26 @@ public:
     void broadcast(const Message& msg);
 
 private:
-    uint16_t port_;
-    std::unordered_map<uint32_t, ClientInfo> clients_;
+    uint16_t _port;
+    std::unique_ptr<UdpSocket> _socket;
+    std::unordered_map<uint32_t, ClientInfo> _clients;
     std::atomic<bool> _running { true };
 
-    static void handleSignal(int);
+    // Handler map for event dispatch
+    std::unordered_map<MessageType, std::function<void(const Message&)>> _handlers;
 
-    // Add socket and protocol handling members here (e.g., UdpSocket)
-    // Add extensibility hooks for game logic
+    static void handleSignal(int);
 
     // Message handlers
     void handleReceive(const Message& msg);
     void handleConnect(const Message& msg);
+    void handleInput(const Message& msg);
+    void handlePing(const Message& msg);
+    void handleDisconnect(const Message& msg);
     // ...other handlers per message type
+
+    /**
+     * Register all protocol message handlers in the handler map.
+     */
+    void registerHandlers();
 };

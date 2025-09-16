@@ -16,9 +16,10 @@ void RTypeServer::handleSignal(int)
 }
 
 RTypeServer::RTypeServer(uint16_t port)
-    : port_(port)
+    : _port(port)
 {
-    // TODO: Initialize UdpSocket here
+    _socket = std::make_unique<UdpSocket>(_port);
+    registerHandlers();
 }
 
 void RTypeServer::start()
@@ -26,10 +27,15 @@ void RTypeServer::start()
     currentInstance = this;
     std::signal(SIGINT, handleSignal);
 
-    std::cout << "Server started on port " << port_ << std::endl;
+    std::cout << "Server started on port " << _port << std::endl;
     _running = true;
+
+    _socket->asyncReceive([this](const std::vector<uint8_t>& data) {
+        Message msg = Message::deserialize(data);
+        handleReceive(msg);
+    });
+
     while (_running) {
-        // TODO: Add server tick, event handling, etc.
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     currentInstance = nullptr;
@@ -61,12 +67,29 @@ void RTypeServer::broadcast(const Message& msg)
 
 void RTypeServer::handleReceive(const Message& msg)
 {
-    (void)msg;
-    // TODO: Handle incoming message (dispatch by type)
+    auto it = _handlers.find(msg.getType());
+    if (it != _handlers.end()) {
+        it->second(msg);
+    } else {
+        std::cerr << "Unknown message type received: " << static_cast<int>(msg.getType()) << std::endl;
+    }
 }
 
 void RTypeServer::handleConnect(const Message& msg)
 {
-    (void)msg;
-    // TODO: Handle CONNECT message
+    // Handle CONNECT message (example logic)
+    std::cout << "Client " << msg.player_id << " connected." << std::endl;
+    if (_clients.find(msg.player_id) == _clients.end()) {
+        _clients[msg.player_id] = ClientInfo { msg.player_id };
+    }
+    // Send CONNECT_ACK (not implemented here)
+}
+
+void RTypeServer::registerHandlers()
+{
+    _handlers[MessageType::CONNECT] = [this](const Message& msg) { handleConnect(msg); };
+    _handlers[MessageType::INPUT] = [this](const Message& msg) { handleInput(msg); };
+    _handlers[MessageType::PING] = [this](const Message& msg) { handlePing(msg); };
+    _handlers[MessageType::DISCONNECT] = [this](const Message& msg) { handleDisconnect(msg); };
+    // Add more handlers as needed for other message types
 }
