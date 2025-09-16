@@ -6,16 +6,15 @@
 */
 
 #pragma once
-#include <cstddef>
-
-using Entity = std::size_t;
 
 struct Position {
     float x, y;
 };
+
 struct Velocity {
     float dx, dy;
 };
+
 struct Health {
     int hp;
 };
