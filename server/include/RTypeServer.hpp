@@ -10,7 +10,9 @@
 
 struct ClientInfo {
     uint32_t player_id;
-    // Add more fields as needed (e.g., endpoint, last sequence number)
+    std::string ip_address;
+    uint16_t port;
+    // Add more fields as needed (e.g., last sequence number)
 };
 
 class RTypeServer {
@@ -63,16 +65,16 @@ private:
     std::atomic<bool> _running { true };
 
     // Handler map for event dispatch
-    std::unordered_map<MessageType, std::function<void(const Message&)>> _handlers;
+    std::unordered_map<MessageType, std::function<void(const Message&, ClientInfo&)>> _handlers;
 
     static void handleSignal(int);
 
     // Message handlers
-    void handleReceive(const Message& msg);
-    void handleConnect(const Message& msg);
-    void handleInput(const Message& msg);
-    void handlePing(const Message& msg);
-    void handleDisconnect(const Message& msg);
+    void handleReceive(const Message& msg, const std::string& sender_ip, uint16_t sender_port);
+    void handleConnect(const Message& msg, ClientInfo& clientInfo);
+    void handleInput(const Message& msg, ClientInfo& clientInfo);
+    void handlePing(const Message& msg, ClientInfo& clientInfo);
+    void handleDisconnect(const Message& msg, ClientInfo& clientInfo);
     // ...other handlers per message type
 
     /**

@@ -28,11 +28,11 @@ Message::Message(MessageType type, uint16_t seq, uint32_t pid, uint8_t ver)
 }
 
 Message::Message(MessageType type, const std::vector<uint8_t>& payload, uint16_t seq, uint32_t pid, uint8_t ver)
-    : type(type)
-    , payload(payload)
-    , sequence_number(seq)
+    : sequence_number(seq)
     , player_id(pid)
     , version(ver)
+    , type(type)
+    , payload(payload)
 {
 }
 
@@ -43,21 +43,21 @@ void Message::write(uint8_t value)
 
 void Message::write(uint16_t value)
 {
-    uint16_t netValue = htons(value);
+    uint16_t netValue = byteSwap16(value);
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&netValue);
     payload.insert(payload.end(), bytes, bytes + sizeof(netValue));
 }
 
 void Message::write(uint32_t value)
 {
-    uint32_t netValue = htonl(value);
+    uint32_t netValue = byteSwap32(value);
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&netValue);
     payload.insert(payload.end(), bytes, bytes + sizeof(netValue));
 }
 
 void Message::write(uint64_t value)
 {
-    uint64_t netValue = htonll(value);
+    uint64_t netValue = byteSwap64(value);
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&netValue);
     payload.insert(payload.end(), bytes, bytes + sizeof(netValue));
 }
@@ -99,7 +99,7 @@ uint16_t Message::readU16() const
     uint16_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
     readPos += sizeof(value);
-    return ntohs(value);
+    return byteSwap16(value);
 }
 
 uint32_t Message::readU32() const
@@ -110,7 +110,7 @@ uint32_t Message::readU32() const
     uint32_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
     readPos += sizeof(value);
-    return ntohl(value);
+    return byteSwap32(value);
 }
 
 uint64_t Message::readU64() const
@@ -121,7 +121,7 @@ uint64_t Message::readU64() const
     uint64_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
     readPos += sizeof(value);
-    return ntohll(value);
+    return byteSwap64(value);
 }
 
 float Message::readFloat() const
@@ -158,15 +158,15 @@ std::vector<uint8_t> Message::serialize() const
     data.push_back(static_cast<uint8_t>(type));
     data.push_back(version);
 
-    uint16_t seq = htons(sequence_number);
+    uint16_t seq = byteSwap16(sequence_number);
     const uint8_t* seqBytes = reinterpret_cast<const uint8_t*>(&seq);
     data.insert(data.end(), seqBytes, seqBytes + sizeof(seq));
 
-    uint32_t pid = htonl(player_id);
+    uint32_t pid = byteSwap32(player_id);
     const uint8_t* pidBytes = reinterpret_cast<const uint8_t*>(&pid);
     data.insert(data.end(), pidBytes, pidBytes + sizeof(pid));
 
-    uint16_t length = htons(static_cast<uint16_t>(payload.size()));
+    uint16_t length = byteSwap16(static_cast<uint16_t>(payload.size()));
     const uint8_t* lengthBytes = reinterpret_cast<const uint8_t*>(&length);
     data.insert(data.end(), lengthBytes, lengthBytes + sizeof(length));
 
@@ -185,15 +185,15 @@ Message Message::deserialize(const std::vector<uint8_t>& data)
 
     uint16_t seq;
     std::memcpy(&seq, &data[2], sizeof(seq));
-    seq = ntohs(seq);
+    seq = byteSwap16(seq);
 
     uint32_t pid;
     std::memcpy(&pid, &data[4], sizeof(pid));
-    pid = ntohl(pid);
+    pid = byteSwap32(pid);
 
     uint16_t length;
     std::memcpy(&length, &data[8], sizeof(length));
-    length = ntohs(length);
+    length = byteSwap16(length);
 
     if (data.size() != static_cast<size_t>(length) + 10) {
         throw std::runtime_error("Invalid message length");
@@ -203,32 +203,32 @@ Message Message::deserialize(const std::vector<uint8_t>& data)
     return Message(type, payload, seq, pid, version);
 }
 
-uint16_t Message::htons(uint16_t value)
+uint16_t Message::byteSwap16(uint16_t value)
 {
     return (value << 8) | (value >> 8);
 }
 
-uint16_t Message::ntohs(uint16_t value)
+uint16_t Message::byteSwap16Reverse(uint16_t value)
 {
-    return (value << 8) | (value >> 8);
+    return byteSwap16(value);
 }
 
-uint32_t Message::htonl(uint32_t value)
+uint32_t Message::byteSwap32(uint32_t value)
 {
     return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value & 0xFF0000) >> 8) | ((value & 0xFF000000) >> 24);
 }
 
-uint32_t Message::ntohl(uint32_t value)
+uint32_t Message::byteSwap32Reverse(uint32_t value)
 {
-    return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value & 0xFF0000) >> 8) | ((value & 0xFF000000) >> 24);
+    return byteSwap32(value);
 }
 
-uint64_t Message::htonll(uint64_t value)
+uint64_t Message::byteSwap64(uint64_t value)
 {
     return ((value & 0xFFULL) << 56) | ((value & 0xFF00ULL) << 40) | ((value & 0xFF0000ULL) << 24) | ((value & 0xFF000000ULL) << 8) | ((value & 0xFF00000000ULL) >> 8) | ((value & 0xFF0000000000ULL) >> 24) | ((value & 0xFF000000000000ULL) >> 40) | ((value & 0xFF00000000000000ULL) >> 56);
 }
 
-uint64_t Message::ntohll(uint64_t value)
+uint64_t Message::byteSwap64Reverse(uint64_t value)
 {
-    return ((value & 0xFFULL) << 56) | ((value & 0xFF00ULL) << 40) | ((value & 0xFF0000ULL) << 24) | ((value & 0xFF000000ULL) << 8) | ((value & 0xFF00000000ULL) >> 8) | ((value & 0xFF0000000000ULL) >> 24) | ((value & 0xFF000000000000ULL) >> 40) | ((value & 0xFF00000000000000ULL) >> 56);
+    return byteSwap64(value);
 }

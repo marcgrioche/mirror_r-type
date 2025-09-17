@@ -74,12 +74,12 @@ private:
     MessageType type;
     std::vector<uint8_t> payload;
 
-    static uint16_t htons(uint16_t value);
-    static uint16_t ntohs(uint16_t value);
-    static uint32_t htonl(uint32_t value);
-    static uint32_t ntohl(uint32_t value);
-    static uint64_t htonll(uint64_t value);
-    static uint64_t ntohll(uint64_t value);
+    static uint16_t byteSwap16(uint16_t value);
+    static uint16_t byteSwap16Reverse(uint16_t value);
+    static uint32_t byteSwap32(uint32_t value);
+    static uint32_t byteSwap32Reverse(uint32_t value);
+    static uint64_t byteSwap64(uint64_t value);
+    static uint64_t byteSwap64Reverse(uint64_t value);
 };
 
 #endif // MESSAGE_HPP

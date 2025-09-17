@@ -1,10 +1,25 @@
 #include "RTypeServer.hpp"
 #include "UdpSocket.hpp"
+#include <atomic>
 #include <chrono>
-#include <csignal>
 #include <iostream>
 #include <thread>
 
+#ifdef _WIN32
+#include <windows.h>
+static std::atomic<bool> stop_requested { false };
+
+BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
+{
+    if (ctrlType == CTRL_C_EVENT) {
+        stop_requested = true;
+        std::cout << "\nStopping server gracefully..." << std::endl;
+        return TRUE;
+    }
+    return FALSE;
+}
+#else
+#include <csignal>
 static RTypeServer* currentInstance = nullptr;
 
 void RTypeServer::handleSignal(int)
@@ -14,6 +29,7 @@ void RTypeServer::handleSignal(int)
         std::cout << "\nStopping server gracefully..." << std::endl;
     }
 }
+#endif
 
 RTypeServer::RTypeServer(uint16_t port)
     : _port(port)
@@ -24,22 +40,40 @@ RTypeServer::RTypeServer(uint16_t port)
 
 void RTypeServer::start()
 {
+#ifdef _WIN32
+    SetConsoleCtrlHandler(consoleCtrlHandler, TRUE);
+#else
     currentInstance = this;
     std::signal(SIGINT, handleSignal);
+#endif
 
     std::cout << "Server started on port " << _port << std::endl;
     _running = true;
 
-    _socket->asyncReceive([this](const std::vector<uint8_t>& data, const asio::ip::udp::endpoint& sender) {
-        (void)sender; // Unused parameter for now
-        Message msg = Message::deserialize(data);
-        handleReceive(msg);
-    });
-
     while (_running) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#ifdef _WIN32
+        if (stop_requested) {
+            requestStop();
+            break;
+        }
+#endif
+
+        if (_socket->pollForData(100)) { // TODO : smart timeout
+            std::vector<uint8_t> data;
+            std::string sender_ip;
+            uint16_t sender_port;
+
+            ssize_t received = _socket->receive(data, sender_ip, sender_port);
+            if (received > 0) {
+                Message msg = Message::deserialize(data);
+                handleReceive(msg, sender_ip, sender_port);
+            }
+        }
     }
+
+#ifndef _WIN32
     currentInstance = nullptr;
+#endif
 }
 
 void RTypeServer::requestStop()
@@ -55,22 +89,28 @@ void RTypeServer::stop()
 
 void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 {
-    (void)playerId;
-    (void)msg;
-    // TODO: Serialize message and send via UdpSocket to client endpoint
+    auto it = _clients.find(playerId);
+    if (it != _clients.end()) {
+        std::vector<uint8_t> data = msg.serialize();
+        _socket->send(data, it->second.ip_address, it->second.port);
+    }
 }
 
 void RTypeServer::broadcast(const Message& msg)
 {
-    (void)msg;
-    // TODO: Serialize message and send to all clients
+    std::vector<uint8_t> data = msg.serialize();
+    for (const auto& client : _clients) {
+        _socket->send(data, client.second.ip_address, client.second.port);
+    }
 }
 
-void RTypeServer::handleReceive(const Message& msg)
+void RTypeServer::handleReceive(const Message& msg, const std::string& sender_ip, uint16_t sender_port)
 {
+    ClientInfo clientInfo = { msg.player_id, sender_ip, sender_port };
+
     auto it = _handlers.find(msg.getType());
     if (it != _handlers.end()) {
-        it->second(msg);
+        it->second(msg, clientInfo);
     } else {
         std::cerr << "Unknown message type received: " << static_cast<int>(msg.getType()) << std::endl;
     }
@@ -78,9 +118,9 @@ void RTypeServer::handleReceive(const Message& msg)
 
 void RTypeServer::registerHandlers()
 {
-    _handlers[MessageType::CONNECT] = [this](const Message& msg) { handleConnect(msg); };
-    _handlers[MessageType::INPUT] = [this](const Message& msg) { handleInput(msg); };
-    _handlers[MessageType::PING] = [this](const Message& msg) { handlePing(msg); };
-    _handlers[MessageType::DISCONNECT] = [this](const Message& msg) { handleDisconnect(msg); };
+    _handlers[MessageType::CONNECT] = [this](const Message& msg, ClientInfo& clientInfo) { handleConnect(msg, clientInfo); };
+    _handlers[MessageType::INPUT] = [this](const Message& msg, ClientInfo& clientInfo) { handleInput(msg, clientInfo); };
+    _handlers[MessageType::PING] = [this](const Message& msg, ClientInfo& clientInfo) { handlePing(msg, clientInfo); };
+    _handlers[MessageType::DISCONNECT] = [this](const Message& msg, ClientInfo& clientInfo) { handleDisconnect(msg, clientInfo); };
     // Add more handlers as needed for other message types
 }

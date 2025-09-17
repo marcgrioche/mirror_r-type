@@ -10,7 +10,9 @@ include_directories(../shared/include)
 
 add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
 
-target_link_libraries(r-type_server PRIVATE asio)
+if(WIN32)
+    target_link_libraries(r-type_server PRIVATE ws2_32)
+endif()
 
 set_target_properties(r-type_server PROPERTIES
     CXX_STANDARD 17
