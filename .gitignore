@@ -13,3 +13,4 @@ Makefile
 *.log
 *.user
 .vscode/
+.idea/
