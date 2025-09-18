@@ -69,6 +69,10 @@ void RTypeServer::start()
                 handleReceive(msg, sender_ip, sender_port);
             }
         }
+
+        if (_socket->pollForWrite(0)) {
+            processOutgoingMessages();
+        }
     }
 
 #ifndef _WIN32
@@ -89,18 +93,13 @@ void RTypeServer::stop()
 
 void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 {
-    auto it = _clients.find(playerId);
-    if (it != _clients.end()) {
-        std::vector<uint8_t> data = msg.serialize();
-        _socket->send(data, it->second.ip_address, it->second.port);
-    }
+    queueMessage(msg, playerId);
 }
 
 void RTypeServer::broadcast(const Message& msg)
 {
-    std::vector<uint8_t> data = msg.serialize();
     for (const auto& client : _clients) {
-        _socket->send(data, client.second.ip_address, client.second.port);
+        queueMessage(msg, client.first);
     }
 }
 
@@ -123,4 +122,26 @@ void RTypeServer::registerHandlers()
     _handlers[MessageType::PING] = [this](const Message& msg, ClientInfo& clientInfo) { handlePing(msg, clientInfo); };
     _handlers[MessageType::DISCONNECT] = [this](const Message& msg, ClientInfo& clientInfo) { handleDisconnect(msg, clientInfo); };
     // Add more handlers as needed for other message types
+}
+
+void RTypeServer::queueMessage(const Message& msg, uint32_t clientId)
+{
+    _outgoingQueue.push({ msg, clientId });
+}
+
+void RTypeServer::processOutgoingMessages()
+{
+    std::unordered_map<uint32_t, ClientInfo>::iterator it;
+    std::vector<uint8_t> data;
+
+    while (!_outgoingQueue.empty()) {
+        QueuedMessage qmsg = _outgoingQueue.front();
+        _outgoingQueue.pop();
+
+        it = _clients.find(qmsg.clientId);
+        if (it != _clients.end()) {
+            data = qmsg.msg.serialize();
+            _socket->send(data, it->second.ip_address, it->second.port);
+        }
+    }
 }

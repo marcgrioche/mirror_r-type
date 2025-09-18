@@ -154,6 +154,35 @@ bool UdpSocket::pollForData(int timeout_ms)
 #endif
 }
 
+bool UdpSocket::pollForWrite(int timeout_ms)
+{
+    if (!_is_open)
+        return false;
+
+#ifdef _WIN32
+    fd_set writefds;
+    FD_ZERO(&writefds);
+    FD_SET(_socket, &writefds);
+
+    timeval timeout;
+    if (timeout_ms >= 0) {
+        timeout.tv_sec = timeout_ms / 1000;
+        timeout.tv_usec = (timeout_ms % 1000) * 1000;
+    }
+
+    int result = select(0, nullptr, &writefds, nullptr, timeout_ms >= 0 ? &timeout : nullptr);
+    return result > 0;
+#else
+    pollfd pfd;
+    pfd.fd = _socket;
+    pfd.events = POLLOUT;
+    pfd.revents = 0;
+
+    int result = poll(&pfd, 1, timeout_ms);
+    return result > 0 && (pfd.revents & POLLOUT);
+#endif
+}
+
 void UdpSocket::close()
 {
     if (_is_open) {

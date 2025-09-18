@@ -68,6 +68,17 @@ public:
     bool pollForData(int timeout_ms = -1);
 
     /**
+     * Poll for write readiness with timeout.
+     *
+     * Args:
+     *     timeout_ms (int): Timeout in milliseconds (-1 for infinite).
+     *
+     * Returns:
+     *     bool: True if socket is ready for writing, false otherwise.
+     */
+    bool pollForWrite(int timeout_ms = -1);
+
+    /**
      * Close the socket and release resources.
      */
     void close();

@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <queue>
 #include <unordered_map>
 
 struct ClientInfo {
@@ -13,6 +14,11 @@ struct ClientInfo {
     std::string ip_address;
     uint16_t port;
     // Add more fields as needed (e.g., last sequence number)
+};
+
+struct QueuedMessage {
+    Message msg;
+    uint32_t clientId;
 };
 
 class RTypeServer {
@@ -62,6 +68,7 @@ private:
     uint16_t _port;
     std::unique_ptr<UdpSocket> _socket;
     std::unordered_map<uint32_t, ClientInfo> _clients;
+    std::queue<QueuedMessage> _outgoingQueue;
     std::atomic<bool> _running { true };
 
     // Handler map for event dispatch
@@ -81,4 +88,18 @@ private:
      * Register all protocol message handlers in the handler map.
      */
     void registerHandlers();
+
+    /**
+     * Queue a message for sending to a client.
+     *
+     * Args:
+     *     msg (const Message&): Message to queue.
+     *     clientId (uint32_t): Target client ID.
+     */
+    void queueMessage(const Message& msg, uint32_t clientId);
+
+    /**
+     * Process outgoing messages when socket is ready for writing.
+     */
+    void processOutgoingMessages();
 };
