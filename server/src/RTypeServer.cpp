@@ -1,5 +1,4 @@
 #include "RTypeServer.hpp"
-#include "UdpSocket.hpp"
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -58,21 +57,8 @@ void RTypeServer::start()
         }
 #endif
 
-        if (_socket->pollForData(100)) { // TODO : smart timeout
-            std::vector<uint8_t> data;
-            std::string sender_ip;
-            uint16_t sender_port;
-
-            ssize_t received = _socket->receive(data, sender_ip, sender_port);
-            if (received > 0) {
-                Message msg = Message::deserialize(data);
-                handleReceive(msg, sender_ip, sender_port);
-            }
-        }
-
-        if (_socket->pollForWrite(0)) {
-            processOutgoingMessages();
-        }
+        processIncomingMessages();
+        processOutgoingMessages();
     }
 
 #ifndef _WIN32
@@ -93,55 +79,24 @@ void RTypeServer::stop()
 
 void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 {
-    queueMessage(msg, playerId);
+    auto it = _clients.find(playerId);
+    if (it != _clients.end()) {
+        queueMessage(msg, it->second);
+    }
 }
 
 void RTypeServer::broadcast(const Message& msg)
 {
     for (const auto& client : _clients) {
-        queueMessage(msg, client.first);
-    }
-}
-
-void RTypeServer::handleReceive(const Message& msg, const std::string& sender_ip, uint16_t sender_port)
-{
-    ClientInfo clientInfo = { msg.player_id, sender_ip, sender_port };
-
-    auto it = _handlers.find(msg.getType());
-    if (it != _handlers.end()) {
-        it->second(msg, clientInfo);
-    } else {
-        std::cerr << "Unknown message type received: " << static_cast<int>(msg.getType()) << std::endl;
+        queueMessage(msg, client.second);
     }
 }
 
 void RTypeServer::registerHandlers()
 {
-    _handlers[MessageType::CONNECT] = [this](const Message& msg, ClientInfo& clientInfo) { handleConnect(msg, clientInfo); };
-    _handlers[MessageType::INPUT] = [this](const Message& msg, ClientInfo& clientInfo) { handleInput(msg, clientInfo); };
-    _handlers[MessageType::PING] = [this](const Message& msg, ClientInfo& clientInfo) { handlePing(msg, clientInfo); };
-    _handlers[MessageType::DISCONNECT] = [this](const Message& msg, ClientInfo& clientInfo) { handleDisconnect(msg, clientInfo); };
+    _handlers[MessageType::CONNECT] = [this](const Message& msg, PeerInfo& peerInfo) { handleConnect(msg, peerInfo); };
+    _handlers[MessageType::INPUT] = [this](const Message& msg, PeerInfo& peerInfo) { handleInput(msg, peerInfo); };
+    _handlers[MessageType::PING] = [this](const Message& msg, PeerInfo& peerInfo) { handlePing(msg, peerInfo); };
+    _handlers[MessageType::DISCONNECT] = [this](const Message& msg, PeerInfo& peerInfo) { handleDisconnect(msg, peerInfo); };
     // Add more handlers as needed for other message types
-}
-
-void RTypeServer::queueMessage(const Message& msg, uint32_t clientId)
-{
-    _outgoingQueue.push({ msg, clientId });
-}
-
-void RTypeServer::processOutgoingMessages()
-{
-    std::unordered_map<uint32_t, ClientInfo>::iterator it;
-    std::vector<uint8_t> data;
-
-    while (!_outgoingQueue.empty()) {
-        QueuedMessage qmsg = _outgoingQueue.front();
-        _outgoingQueue.pop();
-
-        it = _clients.find(qmsg.clientId);
-        if (it != _clients.end()) {
-            data = qmsg.msg.serialize();
-            _socket->send(data, it->second.ip_address, it->second.port);
-        }
-    }
 }

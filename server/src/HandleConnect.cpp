@@ -6,14 +6,14 @@
  *
  * Args:
  *     msg (const Message&): The received message.
- *     clientInfo (ClientInfo&): Information about the connecting client.
+ *     peerInfo (PeerInfo&): Information about the connecting client.
  */
-void RTypeServer::handleConnect(const Message& msg, ClientInfo& clientInfo)
+void RTypeServer::handleConnect(const Message& msg, PeerInfo& peerInfo)
 {
     // Handle CONNECT message (example logic)
-    std::cout << "Client " << msg.player_id << " connected from " << clientInfo.ip_address << ":" << clientInfo.port << std::endl;
+    std::cout << "Client " << msg.player_id << " connected from " << peerInfo.ip_address << ":" << peerInfo.port << std::endl;
     if (_clients.find(msg.player_id) == _clients.end()) {
-        _clients[msg.player_id] = clientInfo;
+        _clients[msg.player_id] = peerInfo;
     }
     // Send CONNECT_ACK (not implemented here)
 }

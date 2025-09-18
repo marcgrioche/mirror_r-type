@@ -6,11 +6,11 @@
  *
  * Args:
  *     msg (const Message&): The received message.
- *     clientInfo (ClientInfo&): Information about the client.
+ *     peerInfo (PeerInfo&): Information about the client.
  */
-void RTypeServer::handleDisconnect(const Message& msg, ClientInfo& clientInfo)
+void RTypeServer::handleDisconnect(const Message& msg, PeerInfo& peerInfo)
 {
-    (void)clientInfo; // Unused parameter
+    (void)peerInfo; // Unused parameter
     std::cout << "Player " << msg.player_id << " disconnected." << std::endl;
     _clients.erase(msg.player_id);
     // TODO: Additional cleanup if needed

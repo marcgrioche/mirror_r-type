@@ -1,27 +1,10 @@
 #pragma once
 
-#include "Message.hpp"
-#include "UdpSocket.hpp"
-#include <atomic>
+#include "RTypeNetwork.hpp"
 #include <cstdint>
-#include <functional>
-#include <memory>
-#include <queue>
 #include <unordered_map>
 
-struct ClientInfo {
-    uint32_t player_id;
-    std::string ip_address;
-    uint16_t port;
-    // Add more fields as needed (e.g., last sequence number)
-};
-
-struct QueuedMessage {
-    Message msg;
-    uint32_t clientId;
-};
-
-class RTypeServer {
+class RTypeServer : public RTypeNetwork {
 public:
     /**
      * RTypeServer manages UDP communication and protocol logic for the r-type game server.
@@ -66,40 +49,19 @@ public:
 
 private:
     uint16_t _port;
-    std::unique_ptr<UdpSocket> _socket;
-    std::unordered_map<uint32_t, ClientInfo> _clients;
-    std::queue<QueuedMessage> _outgoingQueue;
-    std::atomic<bool> _running { true };
-
-    // Handler map for event dispatch
-    std::unordered_map<MessageType, std::function<void(const Message&, ClientInfo&)>> _handlers;
+    std::unordered_map<uint32_t, PeerInfo> _clients;
 
     static void handleSignal(int);
 
     // Message handlers
-    void handleReceive(const Message& msg, const std::string& sender_ip, uint16_t sender_port);
-    void handleConnect(const Message& msg, ClientInfo& clientInfo);
-    void handleInput(const Message& msg, ClientInfo& clientInfo);
-    void handlePing(const Message& msg, ClientInfo& clientInfo);
-    void handleDisconnect(const Message& msg, ClientInfo& clientInfo);
+    void handleConnect(const Message& msg, PeerInfo& peerInfo);
+    void handleInput(const Message& msg, PeerInfo& peerInfo);
+    void handlePing(const Message& msg, PeerInfo& peerInfo);
+    void handleDisconnect(const Message& msg, PeerInfo& peerInfo);
     // ...other handlers per message type
 
     /**
      * Register all protocol message handlers in the handler map.
      */
-    void registerHandlers();
-
-    /**
-     * Queue a message for sending to a client.
-     *
-     * Args:
-     *     msg (const Message&): Message to queue.
-     *     clientId (uint32_t): Target client ID.
-     */
-    void queueMessage(const Message& msg, uint32_t clientId);
-
-    /**
-     * Process outgoing messages when socket is ready for writing.
-     */
-    void processOutgoingMessages();
+    void registerHandlers() override;
 };
