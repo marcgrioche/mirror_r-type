@@ -22,17 +22,6 @@ jobs:
       image: epitechcontent/epitest-docker
     steps:
       - uses: actions/checkout@v4
-      - name: Install Raylib from source
-        run: |
-          apt-get update
-          apt-get install -y git build-essential cmake
-          git clone https://github.com/raysan5/raylib.git
-          cd raylib
-          mkdir build && cd build
-          cmake -DBUILD_SHARED_LIBS=ON ..
-          make -j$(nproc)
-          make install
-          ldconfig
       - name: Configure and build with CMake
         run: |
           cmake -S . -B build
@@ -49,9 +38,31 @@ jobs:
       - name: Clean
         run: rm -rf build
 
+  check_program_compilation_windows:
+    if: ${{ github.repository }} != MIRROR_REPO
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure and build with CMake
+        run: |
+          cmake -S . -B build
+          cmake --build build --config Release
+      - name: Verify executables
+        run: |
+          $executables = "${{ env.EXECUTABLES }}" -split ","
+          foreach ($executable in $executables) {
+            $exePath = "build/Release/$executable.exe"
+            if (!(Test-Path $exePath)) {
+              Write-Host "Failed to find $exePath"
+              exit 1
+            }
+          }
+      - name: Clean
+        run: Remove-Item -Recurse -Force build
+
   push_to_mirror:
     if: ${{ github.repository }} != MIRROR_REPO && ${{ github.event_name == 'push' }}
-    needs: [check_program_compilation]
+    needs: [check_program_compilation, check_program_compilation_windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
