@@ -24,5 +24,11 @@ set_target_properties(r-type_client PROPERTIES
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wextra")
+
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /W4")
+    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /W4")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wextra")
+endif()
