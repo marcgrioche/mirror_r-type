@@ -22,6 +22,10 @@ jobs:
       image: epitechcontent/epitest-docker
     steps:
       - uses: actions/checkout@v4
+      - name: Install CPM.cmake
+        run: |
+          mkdir -p cmake
+          wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
       - name: Configure and build with CMake
         run: |
           cmake -S . -B build
@@ -43,6 +47,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install CPM.cmake
+        run: |
+          mkdir -p cmake
+          Invoke-WebRequest -Uri "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake" -OutFile "cmake/CPM.cmake"
       - name: Configure and build with CMake
         run: |
           cmake -S . -B build
