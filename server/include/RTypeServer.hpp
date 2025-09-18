@@ -1,5 +1,6 @@
 #pragma once
 
+#include "LobbyManager.hpp"
 #include "RTypeNetwork.hpp"
 #include <cstdint>
 #include <unordered_map>
@@ -50,6 +51,7 @@ public:
 private:
     uint16_t _port;
     std::unordered_map<uint32_t, PeerInfo> _clients;
+    LobbyManager _lobbyManager;
 
     static void handleSignal(int);
 
@@ -58,6 +60,10 @@ private:
     void handleInput(const Message& msg, PeerInfo& peerInfo);
     void handlePing(const Message& msg, PeerInfo& peerInfo);
     void handleDisconnect(const Message& msg, PeerInfo& peerInfo);
+    void handleCreateLobby(const Message& msg, PeerInfo& peerInfo);
+    void handleJoinLobby(const Message& msg, PeerInfo& peerInfo);
+    void handleStartGame(const Message& msg, PeerInfo& peerInfo);
+    void handleLobbyState(const Message& msg, PeerInfo& peerInfo);
     // ...other handlers per message type
 
     /**

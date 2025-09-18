@@ -12,6 +12,8 @@ void RTypeServer::handleDisconnect(const Message& msg, PeerInfo& peerInfo)
 {
     (void)peerInfo; // Unused parameter
     std::cout << "Player " << msg.player_id << " disconnected." << std::endl;
+
+    _lobbyManager.removePlayer(msg.player_id);
+
     _clients.erase(msg.player_id);
-    // TODO: Additional cleanup if needed
 }

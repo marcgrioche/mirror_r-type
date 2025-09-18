@@ -98,5 +98,9 @@ void RTypeServer::registerHandlers()
     _handlers[MessageType::INPUT] = [this](const Message& msg, PeerInfo& peerInfo) { handleInput(msg, peerInfo); };
     _handlers[MessageType::PING] = [this](const Message& msg, PeerInfo& peerInfo) { handlePing(msg, peerInfo); };
     _handlers[MessageType::DISCONNECT] = [this](const Message& msg, PeerInfo& peerInfo) { handleDisconnect(msg, peerInfo); };
+    _handlers[MessageType::CREATE_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) { handleCreateLobby(msg, peerInfo); };
+    _handlers[MessageType::JOIN_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) { handleJoinLobby(msg, peerInfo); };
+    _handlers[MessageType::START_GAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleStartGame(msg, peerInfo); };
+    _handlers[MessageType::LOBBY_STATE] = [this](const Message& msg, PeerInfo& peerInfo) { handleLobbyState(msg, peerInfo); };
     // Add more handlers as needed for other message types
 }
