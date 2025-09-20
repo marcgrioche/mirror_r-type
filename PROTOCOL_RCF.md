@@ -30,9 +30,16 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 | INPUT        | 2     | Client → Server   | Player input               |
 | PING         | 3     | Client → Server   | Keepalive                  |
 | DISCONNECT   | 4     | Client → Server   | Disconnect request         |
+| CREATE_LOBBY | 5     | Client → Server   | Create a new game lobby    |
+| JOIN_LOBBY   | 6     | Client → Server   | Join an existing lobby     |
+| START_GAME   | 7     | Client → Server   | Start game in lobby        |
+| LOBBY_STATE  | 8     | Client → Server   | Request lobby information  |
 | CONNECT_ACK  | 101   | Server → Client   | Connection accepted        |
 | GAME_STATE   | 102   | Server → Client   | Game state update          |
 | PONG         | 103   | Server → Client   | Keepalive response         |
+| LOBBY_INFO   | 104   | Server → Client   | Lobby creation/join info   |
+| SPAWN_ENTITY | 105   | Server → Client   | Spawn game entity          |
+| ROLLBACK     | 106   | Server → Client   | Rollback game state        |
 
 ## 4. Encoding Rules
 
@@ -59,7 +66,43 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - Keep header format unchanged for backward compatibility.
 - For new features, prefer optional fields in the payload rather than changing the header.
 
-## 7. Example Packet (CONNECT)
+## 7. Payload Layouts
+
+### CREATE_LOBBY
+- **Direction**: Client → Server
+- **Payload**: Empty (0 bytes)
+- **Response**: LOBBY_INFO with lobby ID
+
+### JOIN_LOBBY
+- **Direction**: Client → Server
+- **Payload**: uint32 (lobby ID to join)
+- **Response**: LOBBY_INFO with lobby ID (0 if join failed)
+
+### START_GAME
+- **Direction**: Client → Server
+- **Payload**: Empty (0 bytes)
+- **Response**: None (game starts if successful)
+
+### LOBBY_STATE
+- **Direction**: Client → Server
+- **Payload**: Empty (0 bytes)
+- **Response**: LOBBY_INFO with current lobby state
+
+### LOBBY_INFO
+- **Direction**: Server → Client
+- **Payload**:
+  - uint32: Lobby ID (0 = not in lobby or operation failed)
+  - uint8: Lobby state (0=WAITING, 1=RUNNING, 2=FINISHED)
+
+### SPAWN_ENTITY
+- **Direction**: Server → Client
+- **Payload**: Entity spawn data (TBD - depends on ECS implementation)
+
+### ROLLBACK
+- **Direction**: Server → Client
+- **Payload**: Rollback state data (TBD - depends on game state)
+
+## 8. Example Packet (CONNECT)
 
 | Field           | Example Value | Hex Representation      |
 |-----------------|--------------|-------------------------|

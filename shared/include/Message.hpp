@@ -28,11 +28,18 @@ enum class MessageType : uint8_t {
     INPUT = 2,
     PING = 3,
     DISCONNECT = 4,
+    CREATE_LOBBY = 5,
+    JOIN_LOBBY = 6,
+    START_GAME = 7,
+    LOBBY_STATE = 8,
 
     // Server to Client Messages
     CONNECT_ACK = 101,
     GAME_STATE = 102,
-    PONG = 103
+    PONG = 103,
+    LOBBY_INFO = 104,
+    SPAWN_ENTITY = 105,
+    ROLLBACK = 106
 };
 
 class Message {
