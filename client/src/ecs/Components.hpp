@@ -29,3 +29,8 @@ struct Hitbox {
     // uint32_t mask = 0xFFFFFFFFu; // which layers this hitbox collides with
     // bool one_way = false;
 };
+
+// Tag components for future use
+struct Player { };
+struct Enemy { };
+struct Projectile { };

@@ -47,7 +47,6 @@ bool GraphicsManager::initialize(const char* title, int width, int height)
     }
 
     m_initialized = true;
-    std::cout << "GraphicsManager initialized successfully!" << std::endl;
     return true;
 }
 
