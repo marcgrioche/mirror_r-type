@@ -13,6 +13,13 @@
 #include "managers/InputManager.hpp"
 
 class Game {
+    enum class GameState {
+        MENU,
+        PLAYING,
+        PAUSED,
+        GAME_OVER
+    };
+
 public:
     Game();
     ~Game();
@@ -32,4 +39,5 @@ private:
     InputManager& _inputs;
 
     bool _isRunning;
+    GameState _state = GameState::PLAYING;
 };
