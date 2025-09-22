@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -Wall -Wextra "CMakeFiles/r-type_client.dir/src/Main.cpp.o" "CMakeFiles/r-type_client.dir/src/ecs/Entity.cpp.o" "CMakeFiles/r-type_client.dir/src/ecs/Registry.cpp.o" -o ../r-type_client  -lSDL2 -lSDL2_image -lSDL2 -lSDL2_ttf -lSDL2 -lSDL2_mixer -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer 
