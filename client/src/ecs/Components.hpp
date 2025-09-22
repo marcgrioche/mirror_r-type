@@ -19,6 +19,29 @@ struct Health {
     int hp;
 };
 
+struct Weight {
+    float value;
+};
+
+struct InputControlled {
+};
+
+struct Sprite {
+    int texture_id; // ID referencing a texture in a texture manager, not raw SDL_Texture, too big
+    int width;
+    int height;
+    int offset_x = 0;
+    int offset_y = 0;
+    float scale = 1.0f;
+    float rotation = 0.0f; // in degrees
+    int total_frames = 1; // for animated sprites
+    int current_frame = 0;
+    float frame_duration = 0.1f;
+    float elapsed_time = 0.0f;
+    int frame_width = 0;
+    int frame_height = 0;
+};
+
 struct Hitbox {
     float width = 1.0f;
     float height = 1.0f;
@@ -29,8 +52,3 @@ struct Hitbox {
     // uint32_t mask = 0xFFFFFFFFu; // which layers this hitbox collides with
     // bool one_way = false;
 };
-
-// Tag components for future use
-struct Player { };
-struct Enemy { };
-struct Projectile { };

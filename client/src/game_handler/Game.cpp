@@ -9,6 +9,8 @@
 #include "ecs/Components.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/RenderSystem.hpp"
+#include "player/CreatePlayer.hpp"
+#include "player/HandlePlayerInputs.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>
@@ -31,6 +33,7 @@ bool Game::initialize()
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
+    factories::createPlayer(_registry);
     _timer.start();
     _isRunning = true;
     return true;
@@ -48,12 +51,10 @@ void Game::run()
         float deltaTime = _timer.getDeltaTime();
 
         _inputs.updateInputs(event);
-
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
             break;
         }
-
         update(deltaTime);
         render();
 
@@ -63,11 +64,10 @@ void Game::run()
     std::cout << "Game loop ended." << std::endl;
 }
 
-// Update all ECS systems
 void Game::update(float deltaTime)
 {
+    handlePlayerInputs(_inputs, _registry);
     movementSystem(_registry, deltaTime);
-    boundarySystem(_registry);
 }
 
 void Game::render()

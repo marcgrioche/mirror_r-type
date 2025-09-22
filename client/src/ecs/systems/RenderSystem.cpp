@@ -24,18 +24,17 @@ void renderSystem(Registry& registry)
 
     graphics.setDrawColor(255, 255, 255, 255);
 
-    auto& ps = registry.get_or_create_storage<Position>();
-    for (size_t i = 0; i < ps.dense_size(); ++i) {
-        auto pos = ps.get_by_dense_index(i);
-
+    auto view = registry.view<Position>();
+    for (auto [pos] : view) {
+        std::cout << "Rendering entity at position (" << pos.x << ", " << pos.y << ")\n";
         SDL_Rect rect = {
-            static_cast<int>(pos.x * 20 + 100),
-            static_cast<int>(pos.y * 20 + 100),
+            static_cast<int>(pos.x),
+            static_cast<int>(pos.y),
             15, 15
         };
 
         SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderDrawRect(renderer, &rect);
     }
-
     graphics.present();
 }
