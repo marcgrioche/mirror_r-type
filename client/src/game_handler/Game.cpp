@@ -1,0 +1,85 @@
+/*
+** EPITECH PROJECT, 2025
+** mirror_r-type
+** File description:
+** Game class implementation
+*/
+
+#include "Game.hpp"
+#include "ecs/Components.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/RenderSystem.hpp"
+#include <SDL2/SDL.h>
+#include <iostream>
+#include <random>
+
+Game::Game()
+    : _graphics(GraphicsManager::getInstance())
+    , _inputs(InputManager::getInstance())
+    , _isRunning(false)
+{
+}
+
+Game::~Game()
+{
+    cleanup();
+}
+
+bool Game::initialize()
+{
+    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", 800, 600)) {
+        std::cerr << "Failed to initialize graphics!" << std::endl;
+        return false;
+    }
+    _timer.start();
+    _isRunning = true;
+    return true;
+}
+
+void Game::run()
+{
+    if (!_isRunning) {
+        std::cerr << "Game not initialized! Call initialize() first." << std::endl;
+        return;
+    }
+    SDL_Event event;
+
+    while (_isRunning) {
+        float deltaTime = _timer.getDeltaTime();
+
+        _inputs.updateInputs(event);
+
+        if (_inputs.isActionPressed(GameAction::QUIT)) {
+            _isRunning = false;
+            break;
+        }
+
+        update(deltaTime);
+        render();
+
+        SDL_Delay(16); // ~60 FPS
+    }
+
+    std::cout << "Game loop ended." << std::endl;
+}
+
+// Update all ECS systems
+void Game::update(float deltaTime)
+{
+    movementSystem(_registry, deltaTime);
+    boundarySystem(_registry);
+}
+
+void Game::render()
+{
+    renderSystem(_registry);
+}
+
+void Game::cleanup()
+{
+    if (_isRunning) {
+        _graphics.cleanup();
+        _isRunning = false;
+        std::cout << "Game cleanup completed." << std::endl;
+    }
+}

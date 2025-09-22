@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Registry.hpp"
+#include <stdexcept>
 
 template <typename Component, typename... Args>
 void Registry::emplace(Entity e, Args&&... args)
@@ -90,6 +91,11 @@ Registry::View<Components...>::iterator::iterator(View const* p, size_t i) : par
 template <typename... Components>
 void Registry::View<Components...>::iterator::advance_to_valid()
 {
+    if (!parent->primary_entities) {
+        idx = 0; 
+        return;
+    }
+    
     while (idx < parent->primary_entities->size()) {
         Entity e = (*parent->primary_entities)[idx];
         if (all_present(e)) break;
@@ -128,6 +134,9 @@ bool Registry::View<Components...>::iterator::operator!=(iterator const& o) cons
 template <typename... Components>
 typename Registry::View<Components...>::value_type Registry::View<Components...>::iterator::operator*() const
 {
+    if (!parent->primary_entities) {
+        throw std::runtime_error("Trying to dereference iterator on empty view");
+    }
     Entity e = (*parent->primary_entities)[idx];
     return deref_entity(e, std::make_index_sequence<sizeof...(Components)>{});
 }

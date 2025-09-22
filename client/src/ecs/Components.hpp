@@ -18,3 +18,8 @@ struct Velocity {
 struct Health {
     int hp;
 };
+
+// Tag components for future use
+struct Player { };
+struct Enemy { };
+struct Projectile { };

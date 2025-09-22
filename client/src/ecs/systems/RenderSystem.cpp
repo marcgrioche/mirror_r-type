@@ -6,7 +6,7 @@
 */
 
 #include "RenderSystem.hpp"
-#include "GraphicsManager.hpp"
+#include "../../managers/GraphicsManager.hpp"
 #include "ecs/Components.hpp"
 #include <SDL2/SDL.h>
 
