@@ -5,70 +5,20 @@
 ** main
 */
 
+#include "GraphicsManager.hpp"
 #include "ecs/Components.hpp"
 #include "ecs/Registry.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/RenderSystem.hpp"
 #include <SDL2/SDL.h>
 #include <chrono>
 #include <iostream>
 
-// Render everything
-void renderSystem(Registry& registry, SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, 20, 30, 50, 255);
-    SDL_RenderClear(renderer);
-
-    auto& ps = registry.get_or_create_storage<Position>();
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    for (size_t i = 0; i < ps.dense_size(); ++i) {
-        auto pos = ps.get_by_dense_index(i);
-
-        SDL_Rect rect = {
-            static_cast<int>(pos.x * 20 + 100),
-            static_cast<int>(pos.y * 20 + 100),
-            15, 15
-        };
-
-        SDL_RenderFillRect(renderer, &rect);
-    }
-
-    SDL_RenderPresent(renderer);
-}
-
-// Move everything
-void movementSystem(Registry& registry, float deltaTime)
-{
-    auto view = registry.view<Position, Velocity>();
-    for (auto&& [pos, vel] : view) {
-        pos.x += vel.dx * deltaTime;
-        pos.y += vel.dy * deltaTime;
-    }
-}
-
 int main()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cerr << "SDL could not initialize. SDL_Error: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-
-    SDL_Window* window = SDL_CreateWindow("R-Type - ECS + SDL2 Demo",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        800, 600,
-        SDL_WINDOW_SHOWN);
-
-    if (window == nullptr) {
-        std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        SDL_Quit();
-        return 1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == nullptr) {
-        std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+    // Initialize graphics with the singleton pattern
+    auto& graphics = GraphicsManager::getInstance();
+    if (!graphics.initialize("R-Type - ECS + SDL2 Demo", 800, 600)) {
         return 1;
     }
 
@@ -119,28 +69,13 @@ int main()
         }
 
         movementSystem(registry, deltaTime);
-
-        auto& ps = registry.get_or_create_storage<Position>();
-        for (size_t i = 0; i < ps.dense_size(); ++i) {
-            auto& pos = ps.get_by_dense_index(i);
-            if (pos.x < -5)
-                pos.x = 35;
-            if (pos.x > 35)
-                pos.x = -5;
-            if (pos.y < -5)
-                pos.y = 25;
-            if (pos.y > 25)
-                pos.y = -5;
-        }
-
-        renderSystem(registry, renderer);
+        boundarySystem(registry);
+        renderSystem(registry);
 
         SDL_Delay(16); // ~60 FPS
     }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    graphics.cleanup();
 
     std::cout << "Demo completed successfully!" << std::endl;
     return 0;
