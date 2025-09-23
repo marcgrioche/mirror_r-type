@@ -52,3 +52,22 @@ struct Hitbox {
     // uint32_t mask = 0xFFFFFFFFu; // which layers this hitbox collides with
     // bool one_way = false;
 };
+
+struct Projectile { };
+
+struct Damage {
+    float value = 0.0f;
+};
+
+struct Lifetime {
+    float value = 0.0f;
+};
+
+struct OwnerId {
+    int id;
+};
+
+struct Vector2 {
+    float x = 0.0f;
+    float y = 0.0f;
+};
