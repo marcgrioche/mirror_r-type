@@ -15,22 +15,22 @@ void collisionSystem(Registry& registry, float deltaTime)
 {
     auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
     
-    auto platformView = registry.view<PlatformTag, Position, Hitbox>();
-    auto oneWayPlatformView = registry.view<OneWayPlatform, Position, Hitbox>();
+    auto platformView = registry.view<NoPassPlatform, Position, Hitbox>();
+    auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox>();
     
     for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView)
     {
         
         Position originalPos = {prevPos.x, prevPos.y};
         
-        for (auto&& [platformTag, platformPos, platformHitbox] : platformView) {
+        for (auto&& [p, platformPos, platformHitbox] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump, 
                                        platformPos, platformHitbox, originalPos);
             }
         }
         
-        for (auto&& [oneWayPlatform, platformPos, platformHitbox] : oneWayPlatformView) {
+        for (auto&& [p, platformPos, platformHitbox] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                                              platformPos, platformHitbox, originalPos);

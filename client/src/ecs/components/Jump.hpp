@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr float JUMP_HEIGHT = 80.f;//px
+constexpr float JUMP_HEIGHT = 200.f;//px
 constexpr float JUMP_TIME   = 0.3f;//sec
 constexpr float FALL_MULT   = 2.0f;
 
