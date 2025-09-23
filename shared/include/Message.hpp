@@ -19,6 +19,7 @@
 #define MESSAGE_HPP
 
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -88,5 +89,7 @@ private:
     static uint64_t byteSwap64(uint64_t value);
     static uint64_t byteSwap64Reverse(uint64_t value);
 };
+
+std::ostream& operator<<(std::ostream& cout, MessageType t_type);
 
 #endif // MESSAGE_HPP
