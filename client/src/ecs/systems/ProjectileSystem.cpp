@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Sep 23 1:13:29 PM 2025 jojo
-** Last update Wed Sep 23 1:54:45 PM 2025 jojo
+** Last update Wed Sep 23 2:03:27 PM 2025 jojo
 */
 
 #include "ProjectileSystem.hpp"
@@ -19,9 +19,9 @@ void projectileSystem(Registry& registry, float deltaTime)
 
         lifetime.value -= deltaTime;
         if (lifetime.value <= 0.0f) {
-            // Entity entity_to_kill = it.entity();
+            Entity entity_to_kill = it.entity();
             ++it;
-            // registry.kill_entity(entity_to_kill);
+            registry.kill_entity(entity_to_kill);
         } else {
             ++it;
         }
