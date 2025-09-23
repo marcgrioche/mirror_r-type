@@ -48,8 +48,8 @@ void Game::run()
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
     }
-    SDL_Event event;
     auto netThread = std::thread([this]() { m_clientNetwork->start(); });
+    SDL_Event event;
 
     while (_isRunning) {
         float deltaTime = _timer.getDeltaTime();
@@ -57,6 +57,7 @@ void Game::run()
         _inputs.updateInputs(event);
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
+            m_clientNetwork->disconnectFromServerRequest();
             break;
         }
         update(deltaTime);
