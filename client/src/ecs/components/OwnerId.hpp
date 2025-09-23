@@ -2,10 +2,11 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** RenderSystem
+** OwnerId Component
 */
 
 #pragma once
-#include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+struct OwnerId {
+    int id;
+};
