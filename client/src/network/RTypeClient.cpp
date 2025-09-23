@@ -147,4 +147,7 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::LOBBY_INFO] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleLobbyJoint(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::PONG] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handlePongReceipt(t_msg, t_peerInfo);
+    };
 }
