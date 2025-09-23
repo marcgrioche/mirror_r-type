@@ -7,7 +7,7 @@
 
 #include "RenderSystem.hpp"
 #include "../../managers/GraphicsManager.hpp"
-#include "ecs/Components.hpp"
+#include "ecs/components/Components.hpp"
 #include <SDL2/SDL.h>
 
 void renderSystem(Registry& registry)

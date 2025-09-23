@@ -6,7 +6,7 @@
 */
 
 #include "MovementSystem.hpp"
-#include "ecs/Components.hpp"
+#include "ecs/components/Components.hpp"
 
 void movementSystem(Registry& registry, float deltaTime)
 {

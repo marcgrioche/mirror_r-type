@@ -16,10 +16,10 @@ void createProjectile(Registry& registry, Vector2 position, Vector2 velocity,
 {
     Entity projectile = registry.create_entity();
     registry.emplace<Position>(projectile, position.x, position.y);
-    registry.emplace<Velocity>(projectile, position.x, position.y);
-    registry.emplace<Damage>(projectile, damage);
+    registry.emplace<Velocity>(projectile, velocity.x, velocity.y);
+    registry.emplace<Damage>(projectile, static_cast<float>(damage));
     registry.emplace<Hitbox>(projectile, 50.0f, 50.0f, 0.0f, 0.0f);
-    registry.emplace<OwnerId>(projectile, owner.id);
+    registry.emplace<OwnerId>(projectile, static_cast<int>(owner.id));
     registry.emplace<Lifetime>(projectile, lifetime);
     registry.emplace<Projectile>(projectile);
     // registry.emplace<Sprite>(projectile, 0, 50, 50);

@@ -6,7 +6,7 @@
 */
 
 #include "Game.hpp"
-#include "ecs/Components.hpp"
+#include "ecs/components/Components.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/RenderSystem.hpp"
 #include "player/CreatePlayer.hpp"
