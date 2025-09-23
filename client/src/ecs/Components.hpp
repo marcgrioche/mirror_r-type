@@ -54,6 +54,7 @@ struct Hitbox {
 };
 
 struct Projectile { };
+struct Player { };
 
 struct Damage {
     float value = 0.0f;
