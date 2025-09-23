@@ -10,6 +10,6 @@
 // For backward compatibility, include all components
 #include "AllComponents.hpp"
 
-// NOTE: This file is deprecated. 
-// Use individual component headers (Position.hpp, Velocity.hpp, etc.) 
+// NOTE: This file is deprecated.
+// Use individual component headers (Position.hpp, Velocity.hpp, etc.)
 // or AllComponents.hpp for including everything.
