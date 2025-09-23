@@ -55,6 +55,7 @@ public:
         size_t primary_index;
         const std::vector<Entity>* primary_entities = nullptr;
         using value_type = std::tuple<Components&...>;
+        using entity_value_type = std::tuple<Entity, Components&...>;
 
         View(std::tuple<ComponentStorage<Components>*...> st, size_t primary_idx, const std::vector<Entity>* primary_ent);
 
@@ -74,6 +75,8 @@ public:
             iterator& operator++();
             bool operator!=(iterator const& o) const;
             value_type operator*() const;
+            Entity entity() const;  // Nouvelle méthode pour récupérer l'entité
+            entity_value_type entity_and_components() const;  // Méthode pour récupérer entité + composants
 
             template <size_t... Is>
             value_type deref_entity(Entity const& e, std::index_sequence<Is...>) const;
