@@ -35,6 +35,7 @@ public:
     void joinLobbyRequest(uint32_t t_lobbyId);
     void startGameRequest();
     void lobbyStartRequest();
+    void pingRequest();
 
 private:
     void registerHandlers() override;
@@ -43,10 +44,12 @@ private:
     bool m_debug;
     uint16_t m_msgSequenceNumber;
     uint32_t m_lobbyId = 0;
+    uint64_t m_ping;
 
     // server responses handlers
     void handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyCreation(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }
