@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "RTypeClient.hpp"
 #include <iostream>
 
@@ -10,4 +12,19 @@ void RTypeClient::handleConnectionAccepted(const Message& t_msg, PeerInfo& t_pee
     if (m_serverInfo.ip_address != t_peerInfo.ip_address || m_serverInfo.port != t_peerInfo.port) {
         m_serverInfo = t_peerInfo;
     }
+}
+
+void RTypeClient::pingRequest()
+{
+    sendMessage(MessageType::PING);
+    m_ping = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+void RTypeClient::handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_msg;
+    (void)t_peerInfo;
+
+    const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    m_ping = now - m_ping;
 }
