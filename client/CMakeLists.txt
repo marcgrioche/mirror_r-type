@@ -2,47 +2,117 @@ cmake_minimum_required(VERSION 3.16)
 
 project(r-type_client)
 
+include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
+
 file(GLOB_RECURSE CLIENT_SOURCES src/*.cpp)
 include_directories(src src/ecs include)
 
+
+CPMAddPackage(
+    NAME SDL2
+    GITHUB_REPOSITORY libsdl-org/SDL
+    GIT_TAG release-2.30.0
+    OPTIONS
+        "SDL2_DISABLE_INSTALL ON"
+        "SDL2_DISABLE_UNINSTALL ON"
+
+        "SDL_ALSA OFF"
+        "SDL_PULSEAUDIO OFF"
+        "SDL_JACK OFF"
+        "SDL_PIPEWIRE OFF"
+        "SDL_SNDIO OFF"
+        "SDL_ESD OFF"
+        "SDL_ARTS OFF"
+
+        "SDL_KMSDRM OFF"
+        "SDL_DIRECTFB OFF"
+        "SDL_RPI OFF"
+        "SDL_VIVANTE OFF"
+
+        "SDL_X11 ON"
+        "SDL_WAYLAND ON"
+        "SDL_OSS ON"
+
+        "SDL_LIBUDEV OFF"
+        "SDL_IBUS OFF"
+        "SDL_LIBSAMPLERATE OFF"
+        "SDL_WAYLAND_LIBDECOR OFF"
+)
+
+
+CPMAddPackage(
+    NAME SDL2_image
+    GITHUB_REPOSITORY libsdl-org/SDL_image
+    GIT_TAG release-2.8.2
+    OPTIONS
+        "SDL2IMAGE_INSTALL OFF"
+        "SDL2IMAGE_SAMPLES OFF"
+)
+
+
+CPMAddPackage(
+    NAME SDL2_ttf
+    GITHUB_REPOSITORY libsdl-org/SDL_ttf
+    GIT_TAG release-2.22.0
+    OPTIONS
+        "SDL2TTF_INSTALL OFF"
+        "SDL2TTF_SAMPLES OFF"
+        "SDL2TTF_VENDORED ON"
+)
+
+
+CPMAddPackage(
+    NAME SDL2_mixer
+    GITHUB_REPOSITORY libsdl-org/SDL_mixer
+    GIT_TAG release-2.8.0
+    OPTIONS
+        "SDL2MIXER_INSTALL OFF"
+        "SDL2MIXER_SAMPLES OFF"
+
+        "SDL2MIXER_OPUS OFF"
+        "SDL2MIXER_FLUIDSYNTH OFF"
+        "SDL2MIXER_WAVPACK OFF"
+        "SDL2MIXER_MP3_MPG123 OFF"
+        "SDL2MIXER_MP3_DRMP3 ON"
+        "SDL2MIXER_VORBIS STB"
+        "SDL2MIXER_MOD OFF"
+        "SDL2MIXER_MOD_XMP OFF"
+        "SDL2MIXER_MOD_MODPLUG OFF"
+        "SDL2MIXER_MIDI_FLUIDSYNTH OFF"
+        "SDL2MIXER_MIDI_NATIVE OFF"
+)
+
 add_executable(r-type_client ${CLIENT_SOURCES})
 
-# Link SDL2 libraries
-if(SDL2_FOUND)
-    # Using pkg-config (Linux/macOS with Homebrew)
-    target_include_directories(r-type_client PRIVATE ${SDL2_INCLUDE_DIRS})
-    target_compile_options(r-type_client PRIVATE ${SDL2_CFLAGS_OTHER})
-    target_link_libraries(r-type_client PRIVATE 
-        ${SDL2_LIBRARIES} 
-        ${SDL2_IMAGE_LIBRARIES} 
-        ${SDL2_TTF_LIBRARIES} 
-        ${SDL2_MIXER_LIBRARIES}
-    )
-    target_link_directories(r-type_client PRIVATE ${SDL2_LIBRARY_DIRS})
-else()
-    # Using find_package (Windows/vcpkg or custom installation)
-    target_link_libraries(r-type_client PRIVATE 
-        SDL2::SDL2 
-        SDL2::SDL2main
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
-        SDL2_mixer::SDL2_mixer
-    )
-endif()
+target_link_libraries(r-type_client PRIVATE
+    SDL2::SDL2
+    SDL2::SDL2main
+    SDL2_image::SDL2_image
+    SDL2_ttf::SDL2_ttf
+    SDL2_mixer::SDL2_mixer
+)
 
-# Platform-specific settings
+
 if(WIN32)
-    # Windows-specific settings
+
     set_target_properties(r-type_client PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
-    # Copy SDL2 DLLs to output directory (if using vcpkg or manual installation)
-    if(TARGET SDL2::SDL2)
-        add_custom_command(TARGET r-type_client POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:SDL2::SDL2>
-            $<TARGET_FILE_DIR:r-type_client>)
-    endif()
+    
+    add_custom_command(TARGET r-type_client POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL2::SDL2>
+        $<TARGET_FILE_DIR:r-type_client>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL2_image::SDL2_image>
+        $<TARGET_FILE_DIR:r-type_client>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL2_ttf::SDL2_ttf>
+        $<TARGET_FILE_DIR:r-type_client>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL2_mixer::SDL2_mixer>
+        $<TARGET_FILE_DIR:r-type_client>
+    )
 endif()
 
 set_target_properties(r-type_client PROPERTIES
