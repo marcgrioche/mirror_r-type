@@ -5,6 +5,9 @@
 ** Sprite Component
 */
 
+#include <SDL.h>
+#include <string>
+
 #pragma once
 
 struct Sprite {
