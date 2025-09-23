@@ -14,6 +14,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>
+#include "platform/CreatePlatform.hpp"
 
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
@@ -34,6 +35,7 @@ bool Game::initialize()
         return false;
     }
     factories::createPlayer(_registry);
+    factories::createOneWayPlatform(_registry, 100, 100);
     _timer.start();
     _isRunning = true;
     return true;
