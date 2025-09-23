@@ -8,9 +8,9 @@
 #pragma once
 
 struct Sprite {
-    int texture_id; // ID referencing a texture in a texture manager, not raw SDL_Texture, too big
-    int width;
-    int height;
+    std::string texture_id; // ID referencing a texture in a texture manager, not raw SDL_Texture, too big
+    SDL_Rect srcRect;  // texture rect in sprite-sheet
+    SDL_Rect dstRect;   // position/size on the screen
     int offset_x = 0;
     int offset_y = 0;
     float scale = 1.0f;
