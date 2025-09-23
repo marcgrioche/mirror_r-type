@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "ecs/Components.hpp"
+#include "ecs/components/Components.hpp"
 #include "ecs/Registry.hpp"
 
 namespace factories {

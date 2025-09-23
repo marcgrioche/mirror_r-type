@@ -1,7 +1,7 @@
 #pragma once
-#include "ecs/Components.hpp"
-#include "ecs/Entity.hpp"
-#include "ecs/Registry.hpp"
+#include "Components.hpp"
+#include "../Entity.hpp"
+#include "../Registry.hpp"
 
 // AABB test in world coordinates (Position + Hitbox.offset)
 inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,
