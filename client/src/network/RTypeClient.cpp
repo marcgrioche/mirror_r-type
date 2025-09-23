@@ -131,6 +131,7 @@ void RTypeClient::connectToServerRequest()
 void RTypeClient::disconnectFromServerRequest()
 {
     sendMessage(MessageType::DISCONNECT);
+    requestStop();
 }
 
 void RTypeClient::startGameRequest()

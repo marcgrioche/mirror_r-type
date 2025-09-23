@@ -26,7 +26,7 @@ void renderSystem(Registry& registry)
 
     auto view = registry.view<Position>();
     for (auto [pos] : view) {
-        std::cout << "Rendering entity at position (" << pos.x << ", " << pos.y << ")\n";
+        // std::cout << "Rendering entity at position (" << pos.x << ", " << pos.y << ")\n";
         SDL_Rect rect = {
             static_cast<int>(pos.x),
             static_cast<int>(pos.y),
