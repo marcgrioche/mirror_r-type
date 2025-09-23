@@ -232,3 +232,9 @@ uint64_t Message::byteSwap64Reverse(uint64_t value)
 {
     return byteSwap64(value);
 }
+
+std::ostream& operator<<(std::ostream& t_os, const MessageType t_type)
+{
+    t_os << (static_cast<int>(t_type));
+    return t_os;
+}
