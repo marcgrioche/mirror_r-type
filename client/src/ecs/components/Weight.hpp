@@ -2,10 +2,11 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** RenderSystem
+** Weight Component
 */
 
 #pragma once
-#include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+struct Weight {
+    float value;
+};

@@ -2,10 +2,11 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** RenderSystem
+** Damage Component
 */
 
 #pragma once
-#include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+struct Damage {
+    float value = 0.0f;
+};

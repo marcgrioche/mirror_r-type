@@ -6,11 +6,11 @@
 */
 
 #include "Game.hpp"
-#include "ecs/components/Components.hpp"
-#include "ecs/systems/MovementSystem.hpp"
-#include "ecs/systems/RenderSystem.hpp"
-#include "player/CreatePlayer.hpp"
-#include "player/HandlePlayerInputs.hpp"
+#include "components/AllComponents.hpp"
+#include "systems/MovementSystem.hpp"
+#include "systems/RenderSystem.hpp"
+#include "entities/player/CreatePlayer.hpp"
+#include "entities/player/HandlePlayerInputs.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>

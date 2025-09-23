@@ -15,7 +15,6 @@ namespace factories {
         registry.emplace<Health>(player, 100);
         registry.emplace<Hitbox>(player, 50.0f, 50.0f, 0.0f, 0.0f);
         registry.emplace<Weight>(player, 1.0f);
-        registry.emplace<InputControlled>(player);
         // registry.emplace<Sprite>(player, 0, 50, 50);
     }
 }
