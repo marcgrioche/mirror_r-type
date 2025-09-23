@@ -5,11 +5,14 @@
 #include <memory>
 #include <queue>
 
+#include "NetworkEventQueue.hpp"
+
 namespace Client {
 class RTypeClient : public RTypeNetwork {
 public:
-    explicit RTypeClient(uint16_t t_port);
-    RTypeClient(const std::string& t_serverIpAddress, uint16_t t_serverPort, uint16_t t_port);
+    explicit RTypeClient(uint16_t t_port, NetworkEventQueue& t_eventsQueue);
+    RTypeClient(const std::string& t_serverIpAddress, uint16_t t_serverPort, uint16_t t_port,
+        NetworkEventQueue& t_eventsQueue);
 
     void start() override;
     void stop() override;
@@ -45,6 +48,7 @@ private:
     uint16_t m_msgSequenceNumber;
     uint32_t m_lobbyId = 0;
     uint64_t m_ping;
+    NetworkEventQueue& m_eventsQueue;
 
     // server responses handlers
     void handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo);

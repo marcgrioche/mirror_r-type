@@ -41,19 +41,23 @@ void RTypeClient::requestStop()
 }
 
 RTypeClient::RTypeClient(const std::string& t_serverIpAddress, const uint16_t t_serverPort,
-    const uint16_t t_port)
+    const uint16_t t_port, NetworkEventQueue& t_eventsQueue)
     : m_port(t_port)
     , m_serverInfo { 0, t_serverIpAddress, t_serverPort }
     , m_debug(false)
     , m_msgSequenceNumber(0)
+    , m_ping(0)
+    , m_eventsQueue(t_eventsQueue)
 {
     _socket = std::make_unique<UdpSocket>(m_port);
 }
 
-RTypeClient::RTypeClient(const uint16_t t_port)
+RTypeClient::RTypeClient(const uint16_t t_port, NetworkEventQueue& t_eventsQueue)
     : m_port(t_port)
     , m_debug(false)
     , m_msgSequenceNumber(0)
+    , m_ping(0)
+    , m_eventsQueue(t_eventsQueue)
 {
     m_serverInfo = { 0, "", 4242 };
 }
