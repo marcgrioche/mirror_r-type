@@ -9,6 +9,7 @@
 
 // Individual component includes
 #include "Position.hpp"
+#include "PreviousPosition.hpp"
 #include "Velocity.hpp"
 #include "Health.hpp"
 #include "Weight.hpp"
@@ -20,6 +21,8 @@
 #include "Vector2.hpp"
 #include "InputControlled.hpp"
 #include "Projectile.hpp"
+#include "Jump.hpp"
+#include "Platform.hpp"
 
 // Tags
 #include "Tags.hpp"

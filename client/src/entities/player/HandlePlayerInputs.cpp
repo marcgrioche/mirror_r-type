@@ -6,27 +6,34 @@
 */
 
 #include "HandlePlayerInputs.hpp"
+#include "Jump.hpp"
+#include <iostream>
 
 void handlePlayerInputs(InputManager& _inputs, Registry& registry)
 {
-    auto view = registry.view<PlayerTag, Velocity>();
+    auto view = registry.view<PlayerTag, Velocity, Jump>();
 
-    for (auto [tag, velocity] : view) {
+    for (auto [tag, velocity, jump] : view) {
         velocity.dx = 0.0f;
-        velocity.dy = 0.0f;
-        const float speed = 200.0f; // pixels per second
+        
+        const float speed = 250.0f;
 
         if (_inputs.isUp()) {
-            velocity.dy = -speed;
-        }
-        if (_inputs.isDown()) {
-            velocity.dy = speed;
+            if (!jump.isJumping && jump.canJump) {
+                velocity.dy = -V0;
+                jump.isJumping = true;
+                jump.canJump = false;
+            }
         }
         if (_inputs.isLeft()) {
             velocity.dx = -speed;
         }
         if (_inputs.isRight()) {
             velocity.dx = speed;
+        }
+        
+        if (_inputs.isDown() && jump.isJumping && velocity.dy > 0) {
+            velocity.dy += 300.0f;
         }
     }
 }

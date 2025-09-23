@@ -9,12 +9,14 @@
 #include "components/AllComponents.hpp"
 #include "systems/MovementSystem.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/CollisionSystem.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>
 #include "platform/CreatePlatform.hpp"
+#include "GravitySystem.hpp"
 
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
@@ -34,8 +36,18 @@ bool Game::initialize()
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
+    
     factories::createPlayer(_registry);
-    factories::createOneWayPlatform(_registry, 100, 100);
+    
+    factories::createOneWayPlatform(_registry, 100, 400);
+    factories::createPlatform(_registry, 300, 350);
+    factories::createPlatform(_registry, 500, 300);
+    factories::createOneWayPlatform(_registry, 200, 250);
+    
+    for (int i = 0; i < 8; i++) {
+        factories::createPlatform(_registry, i * 100, 520);
+    }
+    
     _timer.start();
     _isRunning = true;
     return true;
@@ -69,7 +81,9 @@ void Game::run()
 void Game::update(float deltaTime)
 {
     handlePlayerInputs(_inputs, _registry);
+    gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
+    collisionSystem(_registry, deltaTime);
 }
 
 void Game::render()
