@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _MSC_VER
+typedef ptrdiff_t ssize_t;
+#endif
+
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>

@@ -96,8 +96,8 @@ void decodeIp(std::string code, std::string& ip, int& port)
     long long big_number = 0;
     int a, b, c, d;
 
-    for (char c : code) {
-        big_number = big_number * 26 + (c - 'A');
+    for (char ch : code) {
+        big_number = big_number * 26 + (ch - 'A');
     }
 
     port = big_number & 0xFFFF;
