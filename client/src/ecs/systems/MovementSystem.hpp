@@ -10,6 +10,3 @@
 
 // Movement system - updates entity positions based on velocity
 void movementSystem(Registry& registry, float deltaTime);
-
-// Boundary wrapping system - keeps entities within screen bounds
-void boundarySystem(Registry& registry);
