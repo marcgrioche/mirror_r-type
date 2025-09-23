@@ -13,4 +13,9 @@ Makefile
 *.log
 *.user
 .vscode/
+bin/
+CMakeFiles/
+Client/CMakeFiles/
+Server/CMakeFiles/
 .idea/
+
