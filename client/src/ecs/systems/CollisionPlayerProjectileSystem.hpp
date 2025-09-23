@@ -5,12 +5,12 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Sep 23 2:19:54 PM 2025 jojo
-** Last update Wed Sep 23 2:21:55 PM 2025 jojo
+** Last update Wed Sep 23 2:58:57 PM 2025 jojo
 */
 
 #pragma once
-#include "ecs/Components.hpp"
-#include "ecs/Hitbox.hpp"
+#include "components/Components.hpp"
+#include "components/Hitbox.hpp"
 #include "ecs/Registry.hpp"
 #include <algorithm>
 #include <vector>
