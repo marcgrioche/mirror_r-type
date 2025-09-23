@@ -52,6 +52,7 @@ void Game::run()
     SDL_Event event;
 
     while (_isRunning) {
+        processNetworkEvents();
         float deltaTime = _timer.getDeltaTime();
 
         _inputs.updateInputs(event);
@@ -92,5 +93,21 @@ void Game::cleanup()
     }
     if (m_clientNetwork) {
         m_clientNetwork->stop();
+    }
+}
+
+void Game::processNetworkEvents()
+{
+    const auto event = m_events.pop();
+    if (!event)
+        return;
+    const auto value = event.value();
+
+    switch (value.type) {
+    case MessageType::CONNECT_ACK:
+        std::cout << "Connection acknowledged by server" << std::endl;
+        break;
+    default:
+        break;
     }
 }

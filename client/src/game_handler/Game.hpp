@@ -34,6 +34,7 @@ public:
 private:
     void update(float deltaTime);
     void render();
+    void processNetworkEvents();
 
     Registry _registry;
     GameTimer _timer;
