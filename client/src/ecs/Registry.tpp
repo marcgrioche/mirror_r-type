@@ -149,6 +149,25 @@ typename Registry::View<Components...>::value_type Registry::View<Components...>
 }
 
 template <typename... Components>
+Entity Registry::View<Components...>::iterator::entity() const
+{
+    if (!parent->primary_entities) {
+        throw std::runtime_error("Trying to get entity from iterator on empty view");
+    }
+    return (*parent->primary_entities)[idx];
+}
+
+template <typename... Components>
+typename Registry::View<Components...>::entity_value_type Registry::View<Components...>::iterator::entity_and_components() const
+{
+    if (!parent->primary_entities) {
+        throw std::runtime_error("Trying to dereference iterator on empty view");
+    }
+    Entity e = (*parent->primary_entities)[idx];
+    return std::tuple_cat(std::make_tuple(e), deref_entity(e, std::make_index_sequence<sizeof...(Components)>{}));
+}
+
+template <typename... Components>
 typename Registry::View<Components...>::iterator Registry::View<Components...>::begin() const
 {
     if (!primary_entities) return iterator(this, 0);
