@@ -9,9 +9,9 @@
 
 void handlePlayerInputs(InputManager& _inputs, Registry& registry)
 {
-    auto view = registry.view<InputControlled, Velocity>();
+    auto view = registry.view<PlayerTag, Velocity>();
 
-    for (auto [inputCtrl, velocity] : view) {
+    for (auto [tag, velocity] : view) {
         velocity.dx = 0.0f;
         velocity.dy = 0.0f;
         const float speed = 200.0f; // pixels per second

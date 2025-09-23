@@ -8,7 +8,7 @@
 #pragma once
 
 #include "GameTimer.hpp"
-#include "ecs/Registry.hpp"
+#include "Registry.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/InputManager.hpp"
 

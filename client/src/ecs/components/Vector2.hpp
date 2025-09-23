@@ -2,10 +2,12 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** RenderSystem
+** Vector2 Component
 */
 
 #pragma once
-#include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+struct Vector2 {
+    float x = 0.0f;
+    float y = 0.0f;
+};

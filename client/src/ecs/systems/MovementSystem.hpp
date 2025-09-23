@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "ecs/Registry.hpp"
+#include "Registry.hpp"
 
 // Movement system - updates entity positions based on velocity
 void movementSystem(Registry& registry, float deltaTime);
