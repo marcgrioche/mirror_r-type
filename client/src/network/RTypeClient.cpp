@@ -50,6 +50,7 @@ RTypeClient::RTypeClient(const std::string& t_serverIpAddress, const uint16_t t_
     , m_eventsQueue(t_eventsQueue)
 {
     _socket = std::make_unique<UdpSocket>(m_port);
+    registerHandlers();
 }
 
 RTypeClient::RTypeClient(const uint16_t t_port, NetworkEventQueue& t_eventsQueue)
@@ -59,7 +60,9 @@ RTypeClient::RTypeClient(const uint16_t t_port, NetworkEventQueue& t_eventsQueue
     , m_ping(0)
     , m_eventsQueue(t_eventsQueue)
 {
+    _socket = std::make_unique<UdpSocket>(m_port);
     m_serverInfo = { 0, "", 4242 };
+    registerHandlers();
 }
 
 // setters
