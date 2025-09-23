@@ -13,8 +13,38 @@
  * Example: 192.168.1.1:8080 -> "ABCDEF"
  */
 
+#include "IpEncoding.hpp"
+#include <cstring>
 #include <iostream>
 #include <string>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#endif
+
+/**
+ * Gets the local IP address of the machine.
+ *
+ * @return The local IP address as a string (e.g., "192.168.1.1")
+ */
+std::string getLocalIp()
+{
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        return "127.0.0.1";
+    }
+    struct hostent* host = gethostbyname(hostname);
+    if (host && host->h_addr_list[0]) {
+        struct in_addr addr;
+        memcpy(&addr, host->h_addr_list[0], sizeof(struct in_addr));
+        return inet_ntoa(addr);
+    }
+    return "127.0.0.1";
+}
 
 /**
  * Encodes an IP address and port combination into a compact base-26 string.

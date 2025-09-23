@@ -1,4 +1,5 @@
 #include "RTypeServer.hpp"
+#include "IpEncoding.hpp"
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -46,7 +47,9 @@ void RTypeServer::start()
     std::signal(SIGINT, handleSignal);
 #endif
 
-    std::cout << "Server started on port " << _port << std::endl;
+    std::string local_ip = getLocalIp();
+    std::string encoded = encodeIp(local_ip, _port);
+    std::cout << "Server started on " << encoded << std::endl;
     _running = true;
 
     while (_running) {
