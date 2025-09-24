@@ -11,3 +11,4 @@ struct PlayerTag { };
 struct EnemyTag { };
 struct PlatformTag { };
 struct ProjectileTag { };
+struct WeaponTag{ };

@@ -9,6 +9,9 @@
 #include <cstdint>
 #include <iostream>
 
+constexpr Entity INVALID_ENTITY{std::numeric_limits<uint32_t>::max(), 
+                                std::numeric_limits<uint32_t>::max()};
+
 struct Entity {
     uint32_t id;
     uint32_t version;
