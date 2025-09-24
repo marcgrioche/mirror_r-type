@@ -6,7 +6,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 
 file(GLOB_RECURSE CLIENT_SOURCES src/*.cpp)
 file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
-include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components)
+include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)

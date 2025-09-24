@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(r-type)
 
-file(GLOB_RECURSE SERVER_SOURCES src/*.cpp ../shared/*.cpp)
-include_directories(src include ../shared/include)
+file(GLOB_RECURSE SERVER_SOURCES src/*.cpp ../shared/src/*.cpp)
+include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 
 # Add custom cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
