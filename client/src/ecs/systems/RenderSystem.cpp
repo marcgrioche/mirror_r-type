@@ -7,34 +7,29 @@
 
 #include "RenderSystem.hpp"
 #include "managers/GraphicsManager.hpp"
+#include "managers/ResourceManager.hpp"
 #include "components/AllComponents.hpp"
 #include <SDL2/SDL.h>
 
 void renderSystem(Registry& registry)
 {
     auto& graphics = GraphicsManager::getInstance();
+    auto& resourceManager = ResourceManager::getInstance();
 
-    if (!graphics.isInitialized()) {
-        return;
-    }
+    if (!graphics.isInitialized()) return;
 
     SDL_Renderer* renderer = graphics.getRenderer();
-
     graphics.clear(20, 30, 50, 255);
 
-    graphics.setDrawColor(255, 255, 255, 255);
-
-    auto view = registry.view<Position>();
-    for (auto [pos] : view) {
-        std::cout << "Rendering entity at position (" << pos.x << ", " << pos.y << ")\n";
-        SDL_Rect rect = {
-            static_cast<int>(pos.x),
-            static_cast<int>(pos.y),
-            15, 15
-        };
-
-        SDL_RenderFillRect(renderer, &rect);
-        SDL_RenderDrawRect(renderer, &rect);
+    auto view = registry.view<Position, Sprite>();
+    for (auto [pos, sprite] : view) {
+        SDL_Texture* tex = resourceManager.getTexture(sprite.texture_id);
+        sprite.dstRect.x = pos.x;
+        sprite.dstRect.y = pos.y;
+        if (tex) {
+            SDL_RenderCopy(renderer, tex, &sprite.srcRect, &sprite.dstRect);
+        }
     }
+
     graphics.present();
 }

@@ -11,6 +11,7 @@
 #include "systems/RenderSystem.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
+#include "managers/ResourceManager.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>
@@ -33,6 +34,7 @@ bool Game::initialize()
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
+    ResourceManager::getInstance().loadTexture(_graphics.getRenderer(), "player", "client/res/player_sprite.png");
     factories::createPlayer(_registry);
     _timer.start();
     _isRunning = true;
@@ -78,6 +80,7 @@ void Game::render()
 void Game::cleanup()
 {
     if (_isRunning) {
+        ResourceManager::getInstance().unloadAll();
         _graphics.cleanup();
         _isRunning = false;
         std::cout << "Game cleanup completed." << std::endl;
