@@ -6,10 +6,10 @@
 */
 
 #pragma once
-#include "../Position.hpp"
-#include "../Hitbox.hpp"
 #include "../../Entity.hpp"
 #include "../../Registry.hpp"
+#include "../Hitbox.hpp"
+#include "../Position.hpp"
 
 // AABB test in world coordinates (Position + Hitbox.offset)
 inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,

@@ -9,8 +9,8 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Registry.hpp"
+#include "components/AllComponents.hpp"
 
 namespace factories {
 void createProjectile(Registry& registry, Vector2 position, Vector2 velocity,

@@ -6,7 +6,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 
 file(GLOB_RECURSE CLIENT_SOURCES src/*.cpp)
 file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
-include_directories(src src/ecs include ../shared/include)
+include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
@@ -91,13 +91,10 @@ add_executable(r-type_client ${CLIENT_SOURCES} ${SHARED_SOURCES})
 # Set up include directories with proper hierarchy
 target_include_directories(r-type_client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src                    # Root source directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ecs                # ECS core directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ecs/components     # Components directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ecs/systems        # Systems directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/entities           # Entities directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ecs                # ECS systems (RenderSystem)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ecs/systems        # RenderSystem directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/managers           # Managers directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/game_handler       # Game handler directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/levels             # Levels directory
 )
 
 target_link_libraries(r-type_client PRIVATE

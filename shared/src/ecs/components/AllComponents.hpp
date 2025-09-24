@@ -9,24 +9,21 @@
 
 // Individual component includes
 #include "Damage.hpp"
-#include "Position.hpp"
-#include "PreviousPosition.hpp"
-#include "Velocity.hpp"
 #include "Health.hpp"
 #include "Hitbox.hpp"
 #include "InputControlled.hpp"
+#include "Jump.hpp"
 #include "Lifetime.hpp"
 #include "OwnerId.hpp"
+#include "Platform.hpp"
 #include "Player.hpp"
 #include "Position.hpp"
+#include "PreviousPosition.hpp"
 #include "Projectile.hpp"
-#include "Sprite.hpp"
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"
 #include "componentutils/HitboxUtils.hpp"
-#include "Jump.hpp"
-#include "Platform.hpp"
 
 // Tags
 #include "Tags.hpp"

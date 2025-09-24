@@ -16,12 +16,12 @@ void movementSystem(Registry& registry, float deltaTime)
         prevPos.x = pos.x;
         prevPos.y = pos.y;
     }
-    
+
     auto view = registry.view<Position, Velocity>();
     for (auto&& [pos, vel] : view) {
         pos.x += vel.dx * deltaTime;
         pos.y += vel.dy * deltaTime;
-        
+
         // garde le joueur dans l'écran, fait à l'arrache
         if (pos.x < 0) {
             pos.x = 0;

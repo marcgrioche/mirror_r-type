@@ -9,8 +9,8 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Registry.hpp"
+#include "components/AllComponents.hpp"
 #include <algorithm>
 #include <iostream>
 #include <vector>

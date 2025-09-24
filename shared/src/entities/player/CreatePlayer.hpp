@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Registry.hpp"
+#include "components/AllComponents.hpp"
 
 namespace factories {
 void createPlayer(Registry& registry);

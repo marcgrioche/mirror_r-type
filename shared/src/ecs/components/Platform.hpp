@@ -1,5 +1,5 @@
-struct BottomPassPlatform {};
-struct NoPassPlatform{};
+struct BottomPassPlatform { };
+struct NoPassPlatform { };
 
 struct MovingPlatform {
     float min_x, max_x;

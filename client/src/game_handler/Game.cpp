@@ -6,13 +6,13 @@
 */
 
 #include "Game.hpp"
-#include "GravitySystem.hpp"
-#include "components/AllComponents.hpp"
+#include "ecs/components/AllComponents.hpp"
+#include "ecs/systems/CollisionSystem.hpp"
+#include "ecs/systems/GravitySystem.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
-#include "platform/CreatePlatform.hpp"
-#include "systems/CollisionSystem.hpp"
-#include "systems/MovementSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>

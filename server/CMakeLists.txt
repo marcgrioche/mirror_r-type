@@ -3,10 +3,9 @@ cmake_minimum_required(VERSION 3.16)
 project(r-type_server)
 
 file(GLOB SERVER_SOURCES src/*.cpp)
-file(GLOB SHARED_SOURCES ../shared/src/*.cpp)
-include_directories(src include)
+file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
+include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components)
 include_directories(${CMAKE_SOURCE_DIR})
-include_directories(../shared/include)
 
 add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
 
