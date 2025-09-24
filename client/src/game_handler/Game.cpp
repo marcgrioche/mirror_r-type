@@ -14,10 +14,12 @@
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "systems/RenderSystem.hpp"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <iostream>
 #include <random>
 #include <thread>
+#include "systems/WeaponPositionSystem.hpp"
+#include "entities/weapons/HandleWeaponInputs.hpp"
 
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
@@ -90,9 +92,11 @@ void Game::run()
 void Game::update(float deltaTime)
 {
     handlePlayerInputs(_inputs, _registry);
+    handleWeaponInputs(_inputs, _registry, deltaTime);
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
     collisionSystem(_registry, deltaTime);
+    weaponPositionSystem(_registry);
 }
 
 void Game::render()

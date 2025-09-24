@@ -11,8 +11,9 @@
 #pragma once
 #include "Registry.hpp"
 #include "components/AllComponents.hpp"
+#include "Parent.hpp"
 
 namespace factories {
 void createProjectile(Registry& registry, Vector2 position, Vector2 velocity,
-    Entity owner, float lifetime = 3.0f, int damage = 1);
+    Parent parent, float lifetime = 3.0f, int damage = 1);
 }

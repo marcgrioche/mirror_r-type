@@ -8,7 +8,7 @@
 #include "RenderSystem.hpp"
 #include "components/AllComponents.hpp"
 #include "managers/GraphicsManager.hpp"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 void renderSystem(Registry& registry)
 {

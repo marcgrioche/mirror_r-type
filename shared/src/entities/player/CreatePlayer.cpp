@@ -5,6 +5,7 @@
 ** Player
 */
 #include "CreatePlayer.hpp"
+#include "../weapon/CreateWeapon.hpp"
 
 namespace factories {
 void createPlayer(Registry& registry)
@@ -18,5 +19,6 @@ void createPlayer(Registry& registry)
     registry.emplace<Jump>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
+    createWeapon(registry, Parent{player});
 }
 }
