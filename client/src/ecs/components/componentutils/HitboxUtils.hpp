@@ -1,7 +1,15 @@
+/*
+** EPITECH PROJECT, 2025
+** mirror_r-type
+** File description:
+** HitboxUtil - Utilities for hitbox collision detection
+*/
+
 #pragma once
-#include "ecs/Components.hpp"
-#include "ecs/Entity.hpp"
-#include "ecs/Registry.hpp"
+#include "../Position.hpp"
+#include "../Hitbox.hpp"
+#include "../../Entity.hpp"
+#include "../../Registry.hpp"
 
 // AABB test in world coordinates (Position + Hitbox.offset)
 inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,

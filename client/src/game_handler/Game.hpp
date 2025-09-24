@@ -10,7 +10,7 @@
 #include "../../../shared/include/Message.hpp"
 #include "../network/RTypeClient.hpp"
 #include "GameTimer.hpp"
-#include "ecs/Registry.hpp"
+#include "Registry.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/InputManager.hpp"
 #include "network/NetworkEventQueue.hpp"

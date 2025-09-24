@@ -6,11 +6,6 @@
 */
 
 #pragma once
+#include "Registry.hpp"
 
-class GravitySystem {
-private:
-    /* data */
-public:
-    GravitySystem(/* args */);
-    ~GravitySystem();
-};
+void gravitySystem(Registry& registry, float deltaTime);

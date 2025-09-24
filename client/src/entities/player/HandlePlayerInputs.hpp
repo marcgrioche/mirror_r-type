@@ -6,9 +6,9 @@
 */
 
 #pragma once
-#include "../ecs/Components.hpp"
-#include "../ecs/Entity.hpp"
-#include "../ecs/Registry.hpp"
-#include "../managers/InputManager.hpp"
+#include "components/AllComponents.hpp"
+#include "Entity.hpp"
+#include "Registry.hpp"
+#include "managers/InputManager.hpp"
 
 void handlePlayerInputs(InputManager& _inputs, Registry& registry);

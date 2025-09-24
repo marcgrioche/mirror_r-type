@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** RenderSystem
+** Projectile Component - Tag for projectile entities
 */
 
 #pragma once
-#include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+struct Projectile {
+};
