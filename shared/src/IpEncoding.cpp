@@ -20,6 +20,7 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -37,12 +38,20 @@ std::string getLocalIp()
     if (gethostname(hostname, sizeof(hostname)) != 0) {
         return "127.0.0.1";
     }
-    struct hostent* host = gethostbyname(hostname);
-    if (host && host->h_addr_list[0]) {
-        struct in_addr addr;
-        memcpy(&addr, host->h_addr_list[0], sizeof(struct in_addr));
-        return inet_ntoa(addr);
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    struct addrinfo* result = NULL;
+    if (getaddrinfo(hostname, NULL, &hints, &result) == 0 && result) {
+        struct sockaddr_in* addr = (struct sockaddr_in*)result->ai_addr;
+        char ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &addr->sin_addr, ip, sizeof(ip));
+        freeaddrinfo(result);
+        return std::string(ip);
     }
+    if (result)
+        freeaddrinfo(result);
     return "127.0.0.1";
 }
 

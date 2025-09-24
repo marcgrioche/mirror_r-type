@@ -17,8 +17,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Compiler flags
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wextra")
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /W4")
+    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /W4")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wextra")
+endif()
 
 
 
