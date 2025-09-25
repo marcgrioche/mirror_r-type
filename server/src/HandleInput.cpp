@@ -11,6 +11,46 @@
 void RTypeServer::handleInput(const Message& msg, PeerInfo& peerInfo)
 {
     (void)peerInfo; // Unused parameter
-    std::cout << "Received INPUT from player " << msg.player_id << std::endl;
-    // TODO: Process player input
+
+    uint32_t playerLobby = _lobbyManager.getPlayerLobby(msg.player_id);
+    if (playerLobby == 0) {
+        std::cout << "Player " << msg.player_id << " sent input but is not in any lobby" << std::endl;
+        return;
+    }
+
+    const Lobby* lobby = _lobbyManager.getLobby(playerLobby);
+    if (!lobby || lobby->state != LobbyState::RUNNING) {
+        std::cout << "Player " << msg.player_id << " sent input but lobby " << playerLobby << " is not running" << std::endl;
+        return;
+    }
+
+    if (msg.getPayload().size() < 5) {
+        std::cout << "Invalid INPUT message payload size: " << msg.getPayload().size() << std::endl;
+        return;
+    }
+
+    uint32_t clientTick = msg.readU32();
+    uint8_t numInputs = msg.readU8();
+
+    std::vector<std::pair<GameInput, bool>> inputs;
+
+    for (uint8_t i = 0; i < numInputs; ++i) {
+        if (msg.getReadPosition() + 2 > msg.getPayload().size()) {
+            std::cout << "INPUT message truncated, expected more input data" << std::endl;
+            break;
+        }
+
+        uint8_t inputTypeRaw = msg.readU8();
+        uint8_t inputState = msg.readU8();
+
+        GameInput inputType = static_cast<GameInput>(inputTypeRaw);
+        bool isPressed = (inputState != 0);
+        inputs.emplace_back(inputType, isPressed);
+    }
+
+    std::cout << "Queueing " << inputs.size() << " inputs from player " << msg.player_id
+              << " for tick " << clientTick << std::endl;
+
+    PlayerInput playerInput { msg.player_id, clientTick, inputs };
+    const_cast<Lobby*>(lobby)->queueInput(playerInput);
 }

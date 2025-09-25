@@ -8,8 +8,42 @@ Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
     , state(LobbyState::WAITING)
     , maxPlayers(4)
     , gameInstance(nullptr)
+    , threadRunning(false)
 {
     players.push_back(creator);
+}
+
+Lobby::~Lobby()
+{
+    if (threadRunning) {
+        threadRunning = false;
+        if (gameThread.joinable()) {
+            gameThread.join();
+        }
+    }
+}
+
+void Lobby::queueInput(const PlayerInput& input)
+{
+    std::lock_guard<std::mutex> lock(inputMutex);
+    inputQueue.push(input);
+}
+
+bool Lobby::hasPendingInputs() const
+{
+    std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(inputMutex));
+    return !inputQueue.empty();
+}
+
+PlayerInput Lobby::dequeueInput()
+{
+    std::lock_guard<std::mutex> lock(inputMutex);
+    if (inputQueue.empty()) {
+        return { 0, 0, {} };
+    }
+    PlayerInput input = inputQueue.front();
+    inputQueue.pop();
+    return input;
 }
 
 LobbyManager::LobbyManager()
@@ -96,6 +130,9 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
     for (uint32_t player : lobby->players) {
         lobby->gameInstance->addPlayer(player);
     }
+
+    lobby->threadRunning = true;
+    lobby->gameThread = std::thread(&LobbyManager::runLobbyThread, this, lobby);
 
     lobby->state = LobbyState::RUNNING;
     std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << " with " << lobby->players.size() << " players" << std::endl;
@@ -191,4 +228,27 @@ GameInstance* LobbyManager::getGameInstance(uint32_t lobbyId)
     }
 
     return lobby->gameInstance.get();
+}
+
+void LobbyManager::runLobbyThread(Lobby* lobby)
+{
+    std::cout << "Started game thread for lobby " << lobby->id << std::endl;
+
+    while (lobby->threadRunning) {
+        while (lobby->hasPendingInputs()) {
+            PlayerInput input = lobby->dequeueInput();
+            if (input.playerId != 0) {
+                lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
+            }
+        }
+
+        lobby->gameInstance->update();
+
+        // TODO: Send state updates to clients
+
+        // TODO: check if sleep is needed , sleep to maintain ~60 FPS
+        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    }
+
+    std::cout << "Game thread ended for lobby " << lobby->id << std::endl;
 }

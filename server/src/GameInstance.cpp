@@ -88,7 +88,7 @@ void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
     Entity playerEntity = it->second;
 
     (void)playerEntity;
-    // TODO : call to systems that manage movement
+    // TODO : call to systems that manage player inputs
 }
 
 void GameInstance::processInputs()

@@ -1,9 +1,12 @@
 #pragma once
 
 #include "GameInstance.hpp"
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <queue>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -13,6 +16,12 @@ enum class LobbyState {
     FINISHED
 };
 
+struct PlayerInput {
+    uint32_t playerId;
+    uint32_t tick;
+    std::vector<std::pair<GameInput, bool>> inputs;
+};
+
 struct Lobby {
     uint32_t id;
     uint32_t creatorId;
@@ -20,8 +29,17 @@ struct Lobby {
     LobbyState state;
     uint32_t maxPlayers;
     std::unique_ptr<GameInstance> gameInstance;
+    std::thread gameThread;
+    std::atomic<bool> threadRunning;
+    std::queue<PlayerInput> inputQueue;
+    std::mutex inputMutex;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
+    ~Lobby();
+
+    void queueInput(const PlayerInput& input);
+    bool hasPendingInputs() const;
+    PlayerInput dequeueInput();
 };
 
 class LobbyManager {
@@ -132,4 +150,12 @@ private:
      *     uint32_t: New unique lobby ID
      */
     uint32_t generateLobbyId();
+
+    /**
+     * Main loop for a lobby's game thread.
+     *
+     * Args:
+     *     lobby (Lobby*): Pointer to the lobby to run
+     */
+    void runLobbyThread(Lobby* lobby);
 };
