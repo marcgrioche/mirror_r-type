@@ -10,7 +10,7 @@
 #include "Parent.hpp"
 #include "Position.hpp"
 
-void weaponPositionSystem(Registry registry)
+void weaponPositionSystem(Registry& registry)
 {
     auto view = registry.view<WeaponTag, Parent, Position>();
 

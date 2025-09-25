@@ -8,4 +8,4 @@
 #pragma once
 #include "Registry.hpp"
 
-void weaponPositionSystem(Registry registry);
+void weaponPositionSystem(Registry& registry);
