@@ -7,6 +7,7 @@ Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
     , creatorId(creator)
     , state(LobbyState::WAITING)
     , maxPlayers(4)
+    , gameInstance(nullptr)
 {
     players.push_back(creator);
 }
@@ -89,8 +90,15 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
         return false;
     }
 
+    lobby->gameInstance = std::make_unique<GameInstance>(lobbyId);
+    lobby->gameInstance->initialize();
+
+    for (uint32_t player : lobby->players) {
+        lobby->gameInstance->addPlayer(player);
+    }
+
     lobby->state = LobbyState::RUNNING;
-    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << std::endl;
+    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << " with " << lobby->players.size() << " players" << std::endl;
     return true;
 }
 
@@ -166,4 +174,21 @@ std::vector<uint32_t> LobbyManager::getActiveLobbies() const
 uint32_t LobbyManager::generateLobbyId()
 {
     return _nextLobbyId++;
+}
+
+GameInstance* LobbyManager::getGameInstance(uint32_t lobbyId)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    auto it = _lobbies.find(lobbyId);
+    if (it == _lobbies.end()) {
+        return nullptr;
+    }
+
+    Lobby* lobby = it->second.get();
+    if (lobby->state != LobbyState::RUNNING || !lobby->gameInstance) {
+        return nullptr;
+    }
+
+    return lobby->gameInstance.get();
 }

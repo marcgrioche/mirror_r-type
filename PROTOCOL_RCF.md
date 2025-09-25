@@ -88,6 +88,16 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - **Payload**: Empty (0 bytes)
 - **Response**: LOBBY_INFO with current lobby state
 
+### INPUT
+- **Direction**: Client → Server
+- **Payload**:
+  - uint32: Tick number (client's current tick)
+  - uint8: Number of inputs in this message
+  - For each input:
+    - uint8: GameInput enum value (0=UP/jump, 1=DOWN, 2=LEFT, 3=RIGHT, 4=ATTACK, 5=DASH)
+    - uint8: Input state (0=released, 1=pressed)
+- **Response**: None (inputs are processed server-side)
+
 ### LOBBY_INFO
 - **Direction**: Server → Client
 - **Payload**:
