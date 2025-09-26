@@ -90,6 +90,7 @@ void Game::run()
 
 void Game::update(float deltaTime)
 {
+    m_clientNetwork->handleInputs(_inputs);
     handlePlayerInputs(_inputs, _registry);
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
