@@ -94,3 +94,8 @@ void InputManager::updateActionState(GameAction action, bool isPressed)
 {
     actionStates[action] = isPressed;
 }
+
+const std::unordered_map<GameAction, bool>& InputManager::getActions() const
+{
+    return actionStates;
+}

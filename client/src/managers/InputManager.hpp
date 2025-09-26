@@ -39,6 +39,7 @@ public:
     bool isRight() const { return isActionPressed(GameAction::MOVE_RIGHT); }
     bool isShoot() const { return isActionPressed(GameAction::SHOOT); }
     bool isQuit() const { return isActionPressed(GameAction::QUIT); }
+    const std::unordered_map<GameAction, bool>& getActions() const;
 
 private:
     InputManager() { setDefaultKeyBindings(); }
