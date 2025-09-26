@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "NetworkEventQueue.hpp"
+#include "managers/InputManager.hpp"
 
 namespace Client {
 class RTypeClient : public RTypeNetwork {
@@ -32,6 +33,7 @@ public:
     // server communication functions
     void sendMessage(MessageType t_type);
     void sendMessage(MessageType t_type, uint32_t t_payload);
+    void sendMessage(const Message& t_msg);
     void connectToServerRequest();
     void disconnectFromServerRequest();
     void createLobbyRequest();
@@ -39,6 +41,8 @@ public:
     void startGameRequest();
     void lobbyStartRequest();
     void pingRequest();
+    void handleInputs(const InputManager& t_inputs);
+    void handleAllInputs(const InputManager& t_inputs);
 
 private:
     void registerHandlers() override;
