@@ -47,7 +47,7 @@ bool Game::initialize()
     // factories::createPlatform(_registry, 300, 350);
     // factories::createPlatform(_registry, 500, 300);
     // factories::createPlatform(_registry, 200, 250);
-    factories::generateRandomPlatforms(_registry, 10);
+    factories::generateRandomPlatforms(_registry, 8);
 
     // for (int i = 0; i < 8; i++) {
     //     factories::createPlatform(_registry, i * 100, 520);
