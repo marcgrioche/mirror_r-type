@@ -42,6 +42,7 @@ void movementSystem(Registry& registry, float deltaTime)
 
     auto view = registry.view<Position, Velocity, PlayerTag>();
     for (auto&& [pos, vel, tag] : view) {
+        std::cout << "vel = " << vel.dx << std::endl;
         pos.x += vel.dx * deltaTime;
         pos.y += vel.dy * deltaTime;
 

@@ -15,17 +15,19 @@ void collisionSystem(Registry& registry, float deltaTime)
 {
     auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
 
-    auto platformView = registry.view<NoPassPlatform, Position, Hitbox>();
+    auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
     auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox>();
 
     for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView) {
 
         Position originalPos = { prevPos.x, prevPos.y };
 
-        for (auto&& [p, platformPos, platformHitbox] : platformView) {
+        for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos);
+                std::cout << "Player collided with platform " << playerVel.dx << std::endl;
+                playerVel.dx = platformVel.dx;
             }
         }
 
@@ -76,7 +78,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
                 playerVel.dy = 0.0f;
                 playerJump.isJumping = false; // Player can jump again
                 playerJump.canJump = true; // Reset jump ability
-                std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
+                // std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
             }
         } else {
             playerPos.y = platformBottom - playerHitbox.offset_y;
