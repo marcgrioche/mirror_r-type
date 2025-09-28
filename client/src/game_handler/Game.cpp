@@ -13,6 +13,7 @@
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
+#include "../entities/platforms/MovePlatform.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -42,14 +43,15 @@ bool Game::initialize()
 
     factories::createPlayer(_registry);
 
-    factories::createOneWayPlatform(_registry, 100, 400);
-    factories::createPlatform(_registry, 300, 350);
-    factories::createPlatform(_registry, 500, 300);
-    factories::createOneWayPlatform(_registry, 200, 250);
+    // factories::createPlatform(_registry, 100, 400);
+    // factories::createPlatform(_registry, 300, 350);
+    // factories::createPlatform(_registry, 500, 300);
+    // factories::createPlatform(_registry, 200, 250);
+    factories::generateRandomPlatforms(_registry, 10);
 
-    for (int i = 0; i < 8; i++) {
-        factories::createPlatform(_registry, i * 100, 520);
-    }
+    // for (int i = 0; i < 8; i++) {
+    //     factories::createPlatform(_registry, i * 100, 520);
+    // }
 
     _timer.start();
     _isRunning = true;
@@ -89,6 +91,7 @@ void Game::run()
 
 void Game::update(float deltaTime)
 {
+    movePlatform(_registry);
     handlePlayerInputs(_inputs, _registry);
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
