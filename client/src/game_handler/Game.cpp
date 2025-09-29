@@ -89,15 +89,20 @@ void Game::run()
                 m_menu.onConnected();
             }
 
-            // Page 2: Lobby -> Create/Join -> démarre le jeu (hard-coded)
-            bool goPlay = false;
-            if (m_menu.popCreateLobbyRequest())
-                goPlay = true;
-            if (m_menu.popJoinLobbyRequest())
-                goPlay = true;
+            // Page 2: Lobby
+            if (m_menu.popCreateLobbyRequest()) {
+                // Aller à la page Start (attente) via menu
+                m_menu.onCreated();
+            }
+            if (m_menu.popJoinLobbyRequest()) {
+                // Join direct -> jeu
+                m_menu.deactivate(_registry);
+                startGameplay();
+            }
 
-            if (goPlay) {
-                m_menu.deactivate(_registry); // détruit les entités boutons
+            // Page 3: Start -> bouton "Start" lance le jeu
+            if (m_menu.popStartRequest()) {
+                m_menu.deactivate(_registry);
                 startGameplay();
             }
 
