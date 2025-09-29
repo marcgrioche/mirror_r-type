@@ -126,6 +126,11 @@ void RTypeClient::sendMessage(const MessageType t_type, uint32_t t_payload)
     queueMessage(msg, m_serverInfo);
 }
 
+void RTypeClient::sendMessage(const Message& t_msg)
+{
+    queueMessage(t_msg, m_serverInfo);
+}
+
 void RTypeClient::connectToServerRequest()
 {
     sendMessage(MessageType::CONNECT);
