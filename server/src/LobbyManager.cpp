@@ -255,19 +255,15 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
     std::cout << "Started game thread for lobby " << lobby->id << std::endl;
 
     while (lobby->threadRunning) {
-        printf("beginning of loop\n");
         while (lobby->hasPendingInputs()) {
             PlayerInput input = lobby->dequeueInput();
             lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
         }
-        printf("inside loop 1\n");
 
         lobby->gameInstance->update();
-        printf("inside loop 2\n");
 
         // Broadcast newly spawned entities
         if (_server) {
-            printf("inside loop 3\n");
             auto newEntities = lobby->gameInstance->getAndClearNewEntities();
             for (Entity entity : newEntities) {
                 Message spawnMsg = lobby->gameInstance->serializeEntitySpawn(entity);
@@ -276,14 +272,11 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
                 }
             }
         }
-        printf("inside loop 4\n");
         if (_server) {
             std::vector<uint8_t> gameStateData = lobby->gameInstance->serializeGameState();
             Message gameStateMsg(MessageType::GAME_STATE, gameStateData);
-            printf("inside loop 5\n");
             _server->broadcastToLobby(lobby->id, gameStateMsg);
         }
-        printf("End of loop\n");
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
 
