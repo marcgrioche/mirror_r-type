@@ -49,13 +49,15 @@ bool Game::initialize()
     _accumulatedTime = 0.0f;
     _isRunning = true;
     _state = GameState::MENU;
-    m_menu.activate();
+    m_menu.activate(Menu::Page::Connect);
 
     return true;
 }
 
 void Game::run()
 {
+
+    // TODO:: Refactor
     if (!_isRunning) {
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
@@ -93,20 +95,24 @@ void Game::run()
                 m_menu.onConnected();
             }
 
-            // Page 2: Lobby -> Create/Join -> démarre le jeu (hard-coded)
-            bool goPlay = false;
+            // Page 2: Lobby
             if (m_menu.popCreateLobbyRequest()) {
                 m_clientNetwork->createLobbyRequest();
-                m_clientNetwork->startGameRequest();
-                goPlay = true;
+                // Aller à la page Start (attente) via menu
+                m_menu.onCreated();
+                printf("Lobby created, waiting for game start...\n");
             }
             if (m_menu.popJoinLobbyRequest()) {
-                m_clientNetwork->joinLobbyRequest(0);
-                goPlay = true;
+                // Join direct -> jeu
+                m_clientNetwork->joinLobbyRequest(std::stoi(m_menu.m_inputCode));
+                m_menu.deactivate(_registry);
+                startGameplay();
             }
 
-            if (goPlay) {
-                m_menu.deactivate(_registry); // détruit les entités boutons
+            // Page 3: Start -> bouton "Start" lance le jeu
+            if (m_menu.popStartRequest()) {
+                m_clientNetwork->startGameRequest();
+                m_menu.deactivate(_registry);
                 startGameplay();
             }
 

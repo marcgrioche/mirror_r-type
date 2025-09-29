@@ -10,12 +10,14 @@ void Menu::activate(Page page)
 {
     m_active = true;
     m_page = page;
-    m_inputFocused = (page == Page::Connect);
-    m_requestConnect = m_requestCreate = m_requestJoin = false;
+    m_inputFocused = (page == Page::Connect || page == Page::Join);
+    m_requestConnect = m_requestCreate = m_requestJoin = m_requestStart = false;
 
     // reset creation flags
     m_joinButtonCreated = false;
     m_lobbyButtonsCreated = false;
+    m_joinConfirmCreated = false;
+    m_startButtonCreated = false;
 
     ensureFont();
     SDL_StartTextInput();
@@ -39,27 +41,14 @@ void Menu::deactivate(Registry& registry)
         registry.kill_entity(m_joinLobbyButton);
         m_lobbyButtonsCreated = false;
     }
-}
-
-bool Menu::popConnectRequest()
-{
-    bool v = m_requestConnect;
-    m_requestConnect = false;
-    return v;
-}
-
-bool Menu::popCreateLobbyRequest()
-{
-    bool v = m_requestCreate;
-    m_requestCreate = false;
-    return v;
-}
-
-bool Menu::popJoinLobbyRequest()
-{
-    bool v = m_requestJoin;
-    m_requestJoin = false;
-    return v;
+    if (m_joinConfirmCreated) {
+        registry.kill_entity(m_joinConfirmButton);
+        m_joinConfirmCreated = false;
+    }
+    if (m_startButtonCreated) {
+        registry.kill_entity(m_startButton);
+        m_startButtonCreated = false;
+    }
 }
 
 void Menu::handleEvent(const SDL_Event& e)
@@ -74,8 +63,8 @@ void Menu::handleEvent(const SDL_Event& e)
         SDL_StopTextInput();
     }
 
-    // Saisie uniquement sur la page Connect (hard-coded)
-    if (m_page == Page::Connect) {
+    // Saisie sur page Connect ou Join (champ et touche Entrée ont des effets différents)
+    if (m_page == Page::Connect || m_page == Page::Join) {
         if (e.type == SDL_TEXTINPUT && m_inputFocused) {
             m_inputCode += e.text.text;
         }
@@ -84,8 +73,10 @@ void Menu::handleEvent(const SDL_Event& e)
                 if (!m_inputCode.empty())
                     m_inputCode.pop_back();
             } else if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_KP_ENTER) {
-                // Valide la connexion “locale”
-                m_requestConnect = true;
+                if (m_page == Page::Connect) {
+                    // Valide la connexion “locale”
+                    m_requestConnect = true;
+                }
             }
         }
         if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
@@ -108,8 +99,12 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
 
     if (m_page == Page::Connect)
         renderConnectPage(gfx, registry);
-    else
+    else if (m_page == Page::Lobby)
         renderLobbyPage(gfx, registry);
+    else if (m_page == Page::Join)
+        renderJoinPage(gfx, registry);
+    else if (m_page == Page::Start)
+        renderStartPage(gfx, registry);
 
     gfx.present();
 }
@@ -206,7 +201,13 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
             crFill = SDL_Color { 100, 220, 140, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
-            m_requestCreate = true; // hard-coded: lance le jeu
+            // Navigue vers la page Start (simulation d'attente joueurs)
+            m_page = Page::Start;
+            // Nettoyage des entités lobby au profit de la page Start
+            registry.kill_entity(m_createLobbyButton);
+            registry.kill_entity(m_joinLobbyButton);
+            m_lobbyButtonsCreated = false;
+            m_requestCreate = true; // Game consommera et créera la lobby
         }
     }
     gfx.setDrawColor(crFill.r, crFill.g, crFill.b, crFill.a);
@@ -216,7 +217,7 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
     if (m_font)
         renderTextCentered(renderer, m_createBtnRect, "Create Lobby", SDL_Color { 255, 255, 255, 255 });
 
-    // Join
+    // Join -> navigue vers la page Join (même UI que Connect) avec input + bouton valider
     SDL_Color jnFill { 40, 160, 220, 230 }, jnBorder { 255, 255, 255, 255 };
     if (registry.has<Button>(m_joinLobbyButton)) {
         auto& b = registry.get<Button>(m_joinLobbyButton);
@@ -224,7 +225,12 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
             jnFill = SDL_Color { 60, 180, 240, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
-            m_requestJoin = true; // hard-coded: lance le jeu
+            // Aller à la page Join : champ + bouton de validation
+            onJoint();
+            // Nettoyage des entités lobby avant d'afficher la page Join
+            registry.kill_entity(m_createLobbyButton);
+            registry.kill_entity(m_joinLobbyButton);
+            m_lobbyButtonsCreated = false;
         }
     }
     gfx.setDrawColor(jnFill.r, jnFill.g, jnFill.b, jnFill.a);
@@ -233,6 +239,101 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
     SDL_RenderDrawRect(renderer, &m_joinBtnRect);
     if (m_font)
         renderTextCentered(renderer, m_joinBtnRect, "Join Lobby", SDL_Color { 255, 255, 255, 255 });
+}
+
+void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
+{
+    auto* renderer = gfx.getRenderer();
+
+    // Crée le bouton Start si nécessaire
+    if (!m_startButtonCreated) {
+        m_startButton = factories::createButton(
+            registry,
+            static_cast<float>(m_startBtnRect.x),
+            static_cast<float>(m_startBtnRect.y),
+            static_cast<float>(m_startBtnRect.w),
+            static_cast<float>(m_startBtnRect.h),
+            "start_game");
+        m_startButtonCreated = true;
+    }
+
+    SDL_Color stFill { 200, 160, 40, 230 }, stBorder { 255, 255, 255, 255 };
+    if (registry.has<Button>(m_startButton)) {
+        auto& b = registry.get<Button>(m_startButton);
+        if (b.is_hovered)
+            stFill = SDL_Color { 220, 180, 60, 230 };
+        if (b.was_pressed) {
+            b.was_pressed = false;
+            m_requestStart = true; // Game consommera et démarrera le gameplay
+        }
+    }
+
+    gfx.setDrawColor(stFill.r, stFill.g, stFill.b, stFill.a);
+    SDL_RenderFillRect(renderer, &m_startBtnRect);
+    gfx.setDrawColor(stBorder.r, stBorder.g, stBorder.b, stBorder.a);
+    SDL_RenderDrawRect(renderer, &m_startBtnRect);
+    if (m_font)
+        renderTextCentered(renderer, m_startBtnRect, "Start", SDL_Color { 255, 255, 255, 255 });
+}
+
+void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
+{
+    auto* renderer = gfx.getRenderer();
+
+    // Champ d’entrée
+    gfx.setDrawColor(30, 30, 60, 255);
+    SDL_RenderFillRect(renderer, &m_inputRect);
+    gfx.setDrawColor(200, 200, 230, 255);
+    SDL_RenderDrawRect(renderer, &m_inputRect);
+    renderInputText(renderer);
+
+    // Caret
+    if (m_inputFocused) {
+        Uint32 ticks = SDL_GetTicks();
+        if ((ticks / 500) % 2 == 0) {
+            int caretX = m_inputRect.x + 8;
+            if (m_font && !m_inputCode.empty()) {
+                int w = 0, h = 0;
+                TTF_SizeUTF8(m_font, m_inputCode.c_str(), &w, &h);
+                caretX += w;
+            } else {
+                caretX += static_cast<int>(m_inputCode.size()) * 10;
+            }
+            SDL_Rect caret { caretX, m_inputRect.y + 8, 2, m_inputRect.h - 16 };
+            gfx.setDrawColor(255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &caret);
+        }
+    }
+
+    if (!m_joinConfirmCreated) {
+        m_joinConfirmButton = factories::createButton(
+            registry,
+            static_cast<float>(m_connectBtnRect.x),
+            static_cast<float>(m_connectBtnRect.y),
+            static_cast<float>(m_connectBtnRect.w),
+            static_cast<float>(m_connectBtnRect.h),
+            "join_lobby_confirm");
+        m_joinConfirmCreated = true;
+    }
+
+    SDL_Color btnFill { 40, 160, 220, 230 };
+    SDL_Color btnBorder { 255, 255, 255, 255 };
+    if (registry.has<Button>(m_joinConfirmButton)) {
+        auto& b = registry.get<Button>(m_joinConfirmButton);
+        if (b.is_hovered)
+            btnFill = SDL_Color { 60, 180, 240, 230 };
+        if (b.was_pressed) {
+            b.was_pressed = false;
+            m_requestJoin = true;
+        }
+    }
+
+    gfx.setDrawColor(btnFill.r, btnFill.g, btnFill.b, btnFill.a);
+    SDL_RenderFillRect(renderer, &m_connectBtnRect);
+    gfx.setDrawColor(btnBorder.r, btnBorder.g, btnBorder.b, btnBorder.a);
+    SDL_RenderDrawRect(renderer, &m_connectBtnRect);
+    if (m_font)
+        renderTextCentered(renderer, m_connectBtnRect, "Join Lobby", SDL_Color { 255, 255, 255, 255 });
 }
 
 void Menu::ensureFont()

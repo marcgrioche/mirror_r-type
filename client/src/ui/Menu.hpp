@@ -12,7 +12,9 @@ class Registry;
 class Menu {
 public:
     enum class Page { Connect,
-        Lobby };
+        Lobby,
+        Join,
+        Start };
 
     void activate(Page page = Page::Connect);
     void deactivate();
@@ -21,14 +23,42 @@ public:
     void handleEvent(const SDL_Event& e);
     void render(GraphicsManager& gfx, Registry& registry);
 
+    std::string m_inputCode;
     // Navigation “hard-coded”
     void onConnected() { m_page = Page::Lobby; }
+    void onJoint()
+    {
+        m_page = Page::Join;
+        m_inputFocused = true;
+        m_inputCode.clear();
+    }
+    void onCreated() { m_page = Page::Start; }
 
     // Signaux UI (hard-coded)
-    bool popConnectRequest();
-    bool popCreateLobbyRequest();
-    bool popJoinLobbyRequest();
-    std::string m_inputCode;
+    bool popConnectRequest()
+    {
+        bool v = m_requestConnect;
+        m_requestConnect = false;
+        return v;
+    }
+    bool popCreateLobbyRequest()
+    {
+        bool v = m_requestCreate;
+        m_requestCreate = false;
+        return v;
+    }
+    bool popJoinLobbyRequest()
+    {
+        bool v = m_requestJoin;
+        m_requestJoin = false;
+        return v;
+    }
+    bool popStartRequest()
+    {
+        bool v = m_requestStart;
+        m_requestStart = false;
+        return v;
+    }
 
     ~Menu() = default;
 
@@ -36,6 +66,8 @@ private:
     // Pages
     void renderConnectPage(GraphicsManager& gfx, Registry& registry);
     void renderLobbyPage(GraphicsManager& gfx, Registry& registry);
+    void renderJoinPage(GraphicsManager& gfx, Registry& registry);
+    void renderStartPage(GraphicsManager& gfx, Registry& registry);
 
     // Etat global
     bool m_active = false;
@@ -57,6 +89,16 @@ private:
     bool m_lobbyButtonsCreated = false;
     bool m_requestCreate = false;
     bool m_requestJoin = false;
+    bool m_requestStart = false;
+
+    // Page Join (input + confirm)
+    Entity m_joinConfirmButton {};
+    bool m_joinConfirmCreated = false;
+
+    // Page Start (single button)
+    SDL_Rect m_startBtnRect { 800 / 2 - 100, 600 / 2 - 30, 200, 60 };
+    Entity m_startButton {};
+    bool m_startButtonCreated = false;
 
     // Text rendering
     TTF_Font* m_font = nullptr;
