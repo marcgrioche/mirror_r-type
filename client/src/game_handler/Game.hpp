@@ -15,6 +15,8 @@
 #include "managers/InputManager.hpp"
 #include "network/NetworkEventQueue.hpp"
 #include "../ui/Menu.hpp"
+#include "ButtonSystem.hpp"
+
 #include <string>
 
 class Game {

@@ -97,9 +97,11 @@ void Game::run()
                     netThread = std::thread([this]() { m_clientNetwork->start(); });
                     m_networkStarted = true;
                 }
-                m_menu.deactivate();
+                // m_menu.deactivate(); // ancien
+                m_menu.deactivate(_registry); // --- détruit le bouton ECS ---
             }
-            m_menu.render(_graphics);
+            buttonSystem(_registry);
+            m_menu.render(_graphics, _registry);
             SDL_Delay(16);
             continue;
         }
@@ -121,6 +123,7 @@ void Game::update(float deltaTime)
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
     collisionSystem(_registry, deltaTime);
+    buttonSystem(_registry);
 }
 
 void Game::render()

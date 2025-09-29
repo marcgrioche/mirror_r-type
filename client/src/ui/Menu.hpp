@@ -1,17 +1,24 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include "../entities/button/CreateButton.hpp"
+#include "Entity.hpp" // pour stocker l'entité bouton
+
 #include <string>
 
 class GraphicsManager;
+class Registry;
 
 class Menu {
 public:
     void activate();
     void deactivate();
+    // --- ajouté ---
+    void deactivate(Registry& registry);
+    // --- fin ajouté ---
     void handleEvent(const SDL_Event& e);
-    void render(GraphicsManager& gfx);
-    ~Menu() = default; // Font lifetime tied to process; TTF kept initialized until app exit
+    void render(GraphicsManager& gfx, Registry& registry);
+    ~Menu() = default;
 
     bool shouldStart() const { return m_requestStart; }
     void consumeStartSignal() { m_requestStart = false; }
@@ -31,6 +38,11 @@ private:
     TTF_Font* m_font = nullptr;
     int m_fontSize = 22;
     SDL_Color m_textColor { 240, 240, 255, 255 };
+
+    // --- ajouté: entité bouton "join server" ---
+    Entity m_joinServerButton;
+    bool m_joinButtonCreated = false;
+    // --- fin ajouté ---
 
     void ensureFont();
     std::string findFontPath() const;

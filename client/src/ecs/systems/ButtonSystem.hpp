@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "EventManager.hpp"
+#include "../../managers/EventManager.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"

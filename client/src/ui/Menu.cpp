@@ -1,5 +1,8 @@
 #include "Menu.hpp"
 #include "../managers/GraphicsManager.hpp"
+#include "../entities/button/CreateButton.hpp"
+#include "components/AllComponents.hpp"
+
 #include <filesystem>
 #include <iostream>
 
@@ -15,6 +18,16 @@ void Menu::deactivate()
 {
     m_active = false;
     SDL_StopTextInput();
+}
+
+// --- ajouté ---
+void Menu::deactivate(Registry& registry)
+{
+    deactivate();
+    if (m_joinButtonCreated) {
+        registry.kill_entity(m_joinServerButton);
+        m_joinButtonCreated = false;
+    }
 }
 
 void Menu::handleEvent(const SDL_Event& e)
@@ -55,27 +68,18 @@ void Menu::handleEvent(const SDL_Event& e)
     }
 }
 
-void Menu::render(GraphicsManager& gfx)
+void Menu::render(GraphicsManager& gfx, Registry& registry)
 {
-    if (!gfx.isInitialized()) return;
-
     auto* renderer = gfx.getRenderer();
     gfx.clear(10, 10, 30, 255);
 
-    // Input background/border
     gfx.setDrawColor(30, 30, 60, 255);
     SDL_RenderFillRect(renderer, &m_inputRect);
     gfx.setDrawColor(200, 200, 230, 255);
     SDL_RenderDrawRect(renderer, &m_inputRect);
+    renderInputText(renderer);
 
-    // Text content inside input (prefer real text with SDL_ttf)
     bool textDrawn = false;
-    if (m_font) {
-        renderInputText(renderer);
-        textDrawn = true;
-    }
-
-    // Caret (blink) at end of text area
     if (m_inputFocused) {
         Uint32 ticks = SDL_GetTicks();
         if ((ticks / 500) % 2 == 0) {
@@ -93,19 +97,41 @@ void Menu::render(GraphicsManager& gfx)
         }
     }
 
-    // Button
-    gfx.setDrawColor(40, 160, 220, 230);
-    SDL_RenderFillRect(renderer, &m_buttonRect);
-    gfx.setDrawColor(255, 255, 255, 255);
-    SDL_RenderDrawRect(renderer, &m_buttonRect);
-
-    // Button label
-    if (m_font) {
-        SDL_Color btnText { 255, 255, 255, 255 };
-        renderTextCentered(renderer, m_buttonRect, "Join Server", btnText);
+    if (!m_joinButtonCreated) {
+        m_joinServerButton = factories::createButton(
+            registry,
+            static_cast<float>(m_buttonRect.x),
+            static_cast<float>(m_buttonRect.y),
+            static_cast<float>(m_buttonRect.w),
+            static_cast<float>(m_buttonRect.h),
+            "join_server"
+        );
+        m_joinButtonCreated = true;
     }
 
-    // Fallback if no font available: little dots per character
+    SDL_Color btnFill { 40, 160, 220, 230 };
+    SDL_Color btnBorder { 255, 255, 255, 255 };
+    if (registry.has<Button>(m_joinServerButton)) {
+        auto& b = registry.get<Button>(m_joinServerButton);
+        if (b.is_hovered) {
+            btnFill = SDL_Color { 60, 180, 240, 230 };
+        }
+        if (b.was_pressed) {
+            b.was_pressed = false;
+            m_requestStart = true;
+        }
+    }
+
+    gfx.setDrawColor(btnFill.r, btnFill.g, btnFill.b, btnFill.a);
+    SDL_RenderFillRect(renderer, &m_buttonRect);
+    gfx.setDrawColor(btnBorder.r, btnBorder.g, btnBorder.b, btnBorder.a);
+    SDL_RenderDrawRect(renderer, &m_buttonRect);
+
+    if (m_font) {
+        renderTextCentered(renderer, m_buttonRect, "Join Server", SDL_Color { 255, 255, 255, 255 });
+        textDrawn = true;
+    }
+
     if (!textDrawn) {
         int maxBoxes = std::min<int>(static_cast<int>(m_inputCode.size()), 30);
         for (int i = 0; i < maxBoxes; ++i) {
@@ -123,7 +149,6 @@ void Menu::ensureFont()
     if (m_font) return;
     if (TTF_WasInit() == 0) {
         if (TTF_Init() == -1) {
-            // Leave m_font = nullptr; fallback will be used
             return;
         }
     }
@@ -156,11 +181,9 @@ void Menu::renderInputText(SDL_Renderer* renderer)
     }
 
     SDL_Rect dst { m_inputRect.x + 8, m_inputRect.y + (m_inputRect.h - surf->h) / 2, surf->w, surf->h };
-    // Clip if too long (basic clipping to input rect)
     SDL_Rect clip { 0, 0, surf->w, surf->h };
     int maxWidth = m_inputRect.w - 16;
     if (dst.w > maxWidth) {
-        // Show the end of the string when it overflows
         clip.x = dst.w - maxWidth;
         clip.w = maxWidth;
         dst.w = maxWidth;
