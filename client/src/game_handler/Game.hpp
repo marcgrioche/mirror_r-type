@@ -14,6 +14,8 @@
 #include "managers/GraphicsManager.hpp"
 #include "managers/InputManager.hpp"
 #include "network/NetworkEventQueue.hpp"
+#include "../ui/Menu.hpp"
+#include <string>
 
 class Game {
     enum class GameState {
@@ -35,6 +37,9 @@ private:
     void update(float deltaTime);
     void render();
     void processNetworkEvents();
+    void startGameplay();
+
+    Menu m_menu;
 
     Registry _registry;
     GameTimer _timer;
@@ -45,5 +50,6 @@ private:
     std::unique_ptr<Client::RTypeClient> m_clientNetwork;
 
     bool _isRunning;
-    GameState _state = GameState::PLAYING;
+    GameState _state = GameState::MENU;
+    bool m_networkStarted = false;
 };

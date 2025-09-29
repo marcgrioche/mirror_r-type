@@ -25,7 +25,6 @@ Game::Game()
     , m_clientNetwork(std::make_unique<Client::RTypeClient>("127.0.0.1", 4242, 2020, m_events))
     , _isRunning(false)
 {
-    m_clientNetwork->connectToServerRequest();
 }
 
 Game::~Game()
@@ -54,6 +53,8 @@ bool Game::initialize()
 
     _timer.start();
     _isRunning = true;
+    _state = GameState::MENU;
+    m_menu.activate();
     return true;
 }
 
@@ -63,23 +64,49 @@ void Game::run()
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
     }
-    auto netThread = std::thread([this]() { m_clientNetwork->start(); });
+
+    std::thread netThread;
     SDL_Event event;
 
     while (_isRunning) {
         processNetworkEvents();
         float deltaTime = _timer.getDeltaTime();
 
-        _inputs.updateInputs(event);
+        _inputs.beginFrame();
+        while (SDL_PollEvent(&event)) {
+            _inputs.handleSDLEvent(event);
+            if (_state == GameState::MENU) {
+                m_menu.handleEvent(event);
+            }
+        }
+
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
-            m_clientNetwork->disconnectFromServerRequest();
+            if (m_networkStarted) {
+                m_clientNetwork->disconnectFromServerRequest();
+            }
             break;
         }
+
+        if (_state == GameState::MENU) {
+            if (m_menu.shouldStart()) {
+                m_menu.consumeStartSignal();
+                startGameplay();
+                if (!m_networkStarted) {
+                    // m_clientNetwork->connectToServerRequest();
+                    netThread = std::thread([this]() { m_clientNetwork->start(); });
+                    m_networkStarted = true;
+                }
+                m_menu.deactivate();
+            }
+            m_menu.render(_graphics);
+            SDL_Delay(16);
+            continue;
+        }
+
         update(deltaTime);
         render();
-
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
     if (netThread.joinable()) {
@@ -104,6 +131,7 @@ void Game::render()
 void Game::cleanup()
 {
     if (_isRunning) {
+        SDL_StopTextInput();
         _graphics.cleanup();
         _isRunning = false;
         std::cout << "Game cleanup completed." << std::endl;
@@ -127,4 +155,9 @@ void Game::processNetworkEvents()
     default:
         break;
     }
+}
+
+void Game::startGameplay()
+{
+    _state = GameState::PLAYING;
 }
