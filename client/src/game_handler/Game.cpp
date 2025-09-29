@@ -65,11 +65,9 @@ void Game::run()
         return;
     }
 
-    std::thread netThread;
     SDL_Event event;
 
     while (_isRunning) {
-        processNetworkEvents();
         float deltaTime = _timer.getDeltaTime();
 
         _inputs.beginFrame();
@@ -82,38 +80,40 @@ void Game::run()
 
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
-            if (m_networkStarted) {
-                m_clientNetwork->disconnectFromServerRequest();
-            }
             break;
         }
 
         if (_state == GameState::MENU) {
-            if (m_menu.shouldStart()) {
-                m_menu.consumeStartSignal();
-                startGameplay();
-                if (!m_networkStarted) {
-                    // m_clientNetwork->connectToServerRequest();
-                    netThread = std::thread([this]() { m_clientNetwork->start(); });
-                    m_networkStarted = true;
-                }
-                // m_menu.deactivate(); // ancien
-                m_menu.deactivate(_registry); // --- détruit le bouton ECS ---
+            // Page 1: Connect -> passe à la page Lobby (hard-coded)
+            if (m_menu.popConnectRequest()) {
+                m_menu.onConnected();
             }
-            buttonSystem(_registry);
+
+            // Page 2: Lobby -> Create/Join -> démarre le jeu (hard-coded)
+            bool goPlay = false;
+            if (m_menu.popCreateLobbyRequest())
+                goPlay = true;
+            if (m_menu.popJoinLobbyRequest())
+                goPlay = true;
+
+            if (goPlay) {
+                m_menu.deactivate(_registry); // détruit les entités boutons
+                startGameplay();
+            }
+
+            // MAJ ECS boutons + rendu
+            buttonSystem(_registry); // [client/src/ecs/systems/ButtonSystem.hpp](client/src/ecs/systems/ButtonSystem.hpp)
             m_menu.render(_graphics, _registry);
             SDL_Delay(16);
             continue;
         }
 
+        // Etat PLAYING
         update(deltaTime);
         render();
         SDL_Delay(16);
     }
 
-    if (netThread.joinable()) {
-        netThread.join();
-    }
     std::cout << "Game loop ended." << std::endl;
 }
 
