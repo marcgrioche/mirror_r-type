@@ -99,6 +99,12 @@ void Menu::render(GraphicsManager& gfx)
     gfx.setDrawColor(255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &m_buttonRect);
 
+    // Button label
+    if (m_font) {
+        SDL_Color btnText { 255, 255, 255, 255 };
+        renderTextCentered(renderer, m_buttonRect, "Join Server", btnText);
+    }
+
     // Fallback if no font available: little dots per character
     if (!textDrawn) {
         int maxBoxes = std::min<int>(static_cast<int>(m_inputCode.size()), 30);
@@ -164,6 +170,23 @@ void Menu::renderInputText(SDL_Renderer* renderer)
     SDL_RenderCopy(renderer, tex, &clip, &dst);
     SDL_RenderSetClipRect(renderer, nullptr);
 
+    SDL_DestroyTexture(tex);
+    SDL_FreeSurface(surf);
+}
+
+void Menu::renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color)
+{
+    if (!m_font || text.empty()) return;
+    SDL_Surface* surf = TTF_RenderUTF8_Blended(m_font, text.c_str(), color);
+    if (!surf) return;
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+    if (!tex) {
+        SDL_FreeSurface(surf);
+        return;
+    }
+
+    SDL_Rect dst { rect.x + (rect.w - surf->w) / 2, rect.y + (rect.h - surf->h) / 2, surf->w, surf->h };
+    SDL_RenderCopy(renderer, tex, nullptr, &dst);
     SDL_DestroyTexture(tex);
     SDL_FreeSurface(surf);
 }

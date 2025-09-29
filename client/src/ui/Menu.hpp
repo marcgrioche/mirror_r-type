@@ -35,4 +35,5 @@ private:
     void ensureFont();
     std::string findFontPath() const;
     void renderInputText(SDL_Renderer* renderer);
+    void renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color);
 };
