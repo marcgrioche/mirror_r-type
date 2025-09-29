@@ -145,13 +145,6 @@ void GameInstance::simulatePhysics()
     // Run shared physics systems
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
-    printf("Position of entities after movement:\n");
-    auto view = _registry.view<Position>();
-    for (auto it = view.begin(); it != view.end(); ++it) {
-        auto [pos] = *it;
-        Entity entity = it.entity();
-        std::cout << "Entity " << entity.id << ": (" << pos.x << ", " << pos.y << ")\n";
-    }
     projectileSystem(_registry, TICK_DURATION);
 }
 
@@ -181,13 +174,33 @@ void GameInstance::cleanupEntities()
 
 std::vector<uint8_t> GameInstance::serializeGameState() const
 {
-    std::vector<uint8_t> data;
+    Message msg(MessageType::GAME_STATE);
 
-    // Serialize tick number
-    // TODO: Implement full state serialization
-    // This should include positions, velocities, health, etc. for all entities
+    msg.write(static_cast<uint32_t>(_currentTick));
 
-    return data;
+    msg.write(static_cast<uint8_t>(_playerEntities.size()));
+
+    for (const auto& [playerId, entity] : _playerEntities) {
+        msg.write(static_cast<uint32_t>(entity.id));
+
+        if (_registry.has<Position>(entity)) {
+            const auto& pos = _registry.get<Position>(entity);
+            msg.write(pos.x);
+            msg.write(pos.y);
+        } else {
+            msg.write(0.0f);
+            msg.write(0.0f);
+        }
+
+        if (_registry.has<Health>(entity)) {
+            const auto& health = _registry.get<Health>(entity);
+            msg.write(static_cast<uint32_t>(health.hp));
+        } else {
+            msg.write(static_cast<uint32_t>(100));
+        }
+    }
+
+    return msg.getPayload();
 }
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)

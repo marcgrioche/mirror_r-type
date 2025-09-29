@@ -152,6 +152,11 @@ void RTypeClient::lobbyStartRequest()
     sendMessage(MessageType::LOBBY_STATE);
 }
 
+void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
+}
+
 void RTypeClient::registerHandlers()
 {
     _handlers[MessageType::CONNECT_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
@@ -165,5 +170,8 @@ void RTypeClient::registerHandlers()
     };
     _handlers[MessageType::SPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleSpawnEntity(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameState(t_msg, t_peerInfo);
     };
 }

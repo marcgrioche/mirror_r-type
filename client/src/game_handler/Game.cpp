@@ -149,6 +149,12 @@ void Game::processNetworkEvents()
             deserializeAndCreateEntity(msg, _registry);
         }
         break;
+    case MessageType::GAME_STATE:
+        if (std::holds_alternative<Message>(value.payload)) {
+            const Message& msg = std::get<Message>(value.payload);
+            deserializeAndUpdateGameState(msg, _registry);
+        }
+        break;
     default:
         break;
     }
@@ -176,6 +182,8 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
             Position { posX, posY },
             Health { static_cast<int>(healthValue) },
             Hitbox { width, height, offsetX, offsetY });
+
+        registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
 
         // TODO : AUTO Sprite component for rendering
         Sprite sprite;
@@ -233,4 +241,45 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
 
     std::cout << "Created entity ID " << entityId << " of type " << static_cast<int>(entityType)
               << " at position (" << posX << ", " << posY << ")" << std::endl;
+}
+
+void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
+{
+    const_cast<Message&>(msg).resetReadPosition();
+
+    uint32_t tick = msg.readU32();
+    uint8_t numPlayers = msg.readU8();
+
+    for (uint8_t i = 0; i < numPlayers; ++i) {
+        uint32_t entityId = msg.readU32();
+        float posX = msg.readFloat();
+        float posY = msg.readFloat();
+        uint32_t health = msg.readU32();
+
+        auto view = registry.view<ServerEntityId>();
+        for (auto it = view.begin(); it != view.end(); ++it) {
+            Entity entity = it.entity();
+            const auto& serverId = registry.get<ServerEntityId>(entity);
+            if (serverId.id == entityId) {
+                if (registry.has<Position>(entity)) {
+                    auto& position = registry.get<Position>(entity);
+                    position.x = posX;
+                    position.y = posY;
+                }
+
+                if (registry.has<Health>(entity)) {
+                    auto& healthComp = registry.get<Health>(entity);
+                    healthComp.hp = static_cast<int>(health);
+                }
+
+                if (registry.has<Sprite>(entity)) {
+                    auto& sprite = registry.get<Sprite>(entity);
+                    sprite.dstRect.x = static_cast<int>(posX);
+                    sprite.dstRect.y = static_cast<int>(posY);
+                }
+
+                break;
+            }
+        }
+    }
 }

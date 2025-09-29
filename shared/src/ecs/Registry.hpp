@@ -38,6 +38,9 @@ public:
     Component& get(Entity e);
 
     template <typename Component>
+    const Component& get(Entity e) const;
+
+    template <typename Component>
     ComponentStorage<Component>& get_or_create_storage();
 
     template <typename Component>

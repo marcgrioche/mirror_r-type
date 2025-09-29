@@ -98,12 +98,9 @@ void RTypeServer::broadcast(const Message& msg)
 
 void RTypeServer::broadcastToLobby(uint32_t lobbyId, const Message& msg)
 {
-    const Lobby* lobby = _lobbyManager.getLobby(lobbyId);
-    if (!lobby) {
-        return;
-    }
+    std::vector<uint32_t> players = _lobbyManager.getLobbyPlayers(lobbyId);
 
-    for (uint32_t playerId : lobby->players) {
+    for (uint32_t playerId : players) {
         auto it = _clients.find(playerId);
         if (it != _clients.end()) {
             queueMessage(msg, it->second);

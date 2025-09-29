@@ -131,6 +131,17 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - Health: `int32 health`
 - Hitbox: `float width, float height, float offset_x, float offset_y`
 
+### GAME_STATE
+- **Direction**: Server → Client
+- **Payload**:
+  - uint32: Current tick number
+  - uint8: Number of players in this update
+  - For each player:
+    - uint32: Entity ID
+    - float: Position X
+    - float: Position Y
+    - uint32: Health value
+
 ### ROLLBACK
 - **Direction**: Server → Client
 - **Payload**: Rollback state data (TBD - depends on game state)

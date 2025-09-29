@@ -147,6 +147,17 @@ public:
      */
     GameInstance* getGameInstance(uint32_t lobbyId);
 
+    /**
+     * Get the players in a lobby (thread-safe).
+     *
+     * Args:
+     *     lobbyId (uint32_t): ID of the lobby
+     *
+     * Returns:
+     *     std::vector<uint32_t>: List of player IDs in the lobby
+     */
+    std::vector<uint32_t> getLobbyPlayers(uint32_t lobbyId) const;
+
 private:
     std::unordered_map<uint32_t, std::unique_ptr<Lobby>> _lobbies;
     std::unordered_map<uint32_t, uint32_t> _playerToLobby; // playerId -> lobbyId

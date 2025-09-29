@@ -20,6 +20,7 @@
 #include "Position.hpp"
 #include "PreviousPosition.hpp"
 #include "Projectile.hpp"
+#include "ServerEntityId.hpp"
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"

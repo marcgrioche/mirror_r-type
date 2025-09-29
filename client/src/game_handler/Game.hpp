@@ -44,6 +44,7 @@ private:
     void render();
     void processNetworkEvents();
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
+    void deserializeAndUpdateGameState(const Message& msg, Registry& registry);
 
     Registry _registry;
     GameTimer _timer;
