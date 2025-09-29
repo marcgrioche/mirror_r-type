@@ -41,7 +41,8 @@ bool Game::initialize()
         return false;
     }
 
-    factories::createPlayer(_registry);
+    Entity playerEntity = factories::createPlayer(_registry);
+    (void)playerEntity;
 
     // factories::createPlatform(_registry, 100, 400);
     // factories::createPlatform(_registry, 300, 350);

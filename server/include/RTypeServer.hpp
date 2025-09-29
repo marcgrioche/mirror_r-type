@@ -3,6 +3,7 @@
 #include "LobbyManager.hpp"
 #include "RTypeNetwork.hpp"
 #include <cstdint>
+#include <memory>
 #include <unordered_map>
 
 class RTypeServer : public RTypeNetwork {

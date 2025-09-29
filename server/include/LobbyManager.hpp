@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameInstance.hpp"
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -18,6 +19,7 @@ struct Lobby {
     std::vector<uint32_t> players;
     LobbyState state;
     uint32_t maxPlayers;
+    std::unique_ptr<GameInstance> gameInstance;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
 };
@@ -105,6 +107,17 @@ public:
      *     std::vector<uint32_t>: List of active lobby IDs
      */
     std::vector<uint32_t> getActiveLobbies() const;
+
+    /**
+     * Get the GameInstance for a lobby.
+     *
+     * Args:
+     *     lobbyId (uint32_t): ID of the lobby
+     *
+     * Returns:
+     *     GameInstance*: Pointer to the game instance, or nullptr if not running
+     */
+    GameInstance* getGameInstance(uint32_t lobbyId);
 
 private:
     std::unordered_map<uint32_t, std::unique_ptr<Lobby>> _lobbies;
