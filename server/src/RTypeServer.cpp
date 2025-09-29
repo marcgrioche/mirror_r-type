@@ -35,6 +35,7 @@ RTypeServer::RTypeServer(uint16_t port)
     : _port(port)
 {
     _socket = std::make_unique<UdpSocket>(_port);
+    _lobbyManager.setServer(this);
     registerHandlers();
 }
 
@@ -92,6 +93,21 @@ void RTypeServer::broadcast(const Message& msg)
 {
     for (const auto& client : _clients) {
         queueMessage(msg, client.second);
+    }
+}
+
+void RTypeServer::broadcastToLobby(uint32_t lobbyId, const Message& msg)
+{
+    const Lobby* lobby = _lobbyManager.getLobby(lobbyId);
+    if (!lobby) {
+        return;
+    }
+
+    for (uint32_t playerId : lobby->players) {
+        auto it = _clients.find(playerId);
+        if (it != _clients.end()) {
+            queueMessage(msg, it->second);
+        }
     }
 }
 

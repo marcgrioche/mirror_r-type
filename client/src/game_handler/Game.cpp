@@ -40,17 +40,8 @@ bool Game::initialize()
         return false;
     }
 
-    Entity playerEntity = factories::createPlayer(_registry);
-    (void)playerEntity;
-
-    factories::createOneWayPlatform(_registry, 100, 400);
-    factories::createPlatform(_registry, 300, 350);
-    factories::createPlatform(_registry, 500, 300);
-    factories::createOneWayPlatform(_registry, 200, 250);
-
-    for (int i = 0; i < 8; i++) {
-        factories::createPlatform(_registry, i * 100, 520);
-    }
+    // Entities will be created dynamically via SPAWN_ENTITY messages from server
+    // No hardcoded entities needed - client receives all entities from server
 
     _timer.start();
     _isRunning = true;
@@ -124,7 +115,94 @@ void Game::processNetworkEvents()
     case MessageType::CONNECT_ACK:
         std::cout << "Connection acknowledged by server" << std::endl;
         break;
+    case MessageType::SPAWN_ENTITY:
+        if (std::holds_alternative<Message>(value.payload)) {
+            const Message& msg = std::get<Message>(value.payload);
+            deserializeAndCreateEntity(msg, _registry);
+        }
+        break;
     default:
         break;
     }
+}
+
+void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
+{
+    const_cast<Message&>(msg).resetReadPosition();
+
+    uint32_t entityId = msg.readU32();
+    uint8_t entityType = msg.readU8();
+
+    float posX = msg.readFloat();
+    float posY = msg.readFloat();
+
+    switch (entityType) {
+    case 0: { // Player
+        uint32_t healthValue = msg.readU32();
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+
+        Entity entity = factories::createPlayer(registry,
+            Position { posX, posY },
+            Health { static_cast<int>(healthValue) },
+            Hitbox { width, height, offsetX, offsetY });
+
+        // TODO : AUTO Sprite component for rendering
+        Sprite sprite;
+        sprite.texture_id = "player_sprite.png";
+        sprite.frame_width = 32;
+        sprite.frame_height = 32;
+        sprite.srcRect = { 0, 0, 32, 32 };
+        sprite.dstRect = { static_cast<int>(posX), static_cast<int>(posY), 32, 32 };
+        registry.add<Sprite>(entity, sprite);
+        break;
+    }
+
+    case 1: { // Projectile
+        float velX = msg.readFloat();
+        float velY = msg.readFloat();
+        float damageValue = msg.readFloat();
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+        uint32_t ownerId = msg.readU32();
+        float lifetimeValue = msg.readFloat();
+
+        factories::createProjectile(registry,
+            Position { posX, posY },
+            Velocity { velX, velY },
+            Damage { damageValue },
+            Hitbox { width, height, offsetX, offsetY },
+            OwnerId { static_cast<int>(ownerId) },
+            Lifetime { lifetimeValue });
+        break;
+    }
+
+    case 2: { // Platform
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+
+        factories::createPlatform(registry,
+            Position { posX, posY },
+            Hitbox { width, height, offsetX, offsetY });
+        break;
+    }
+
+    case 3: { // Enemy - TODO: Create enemy factory
+        std::cout << "Enemy entity creation not implemented yet" << std::endl;
+        break;
+    }
+
+    default:
+        std::cout << "Unknown entity type: " << static_cast<int>(entityType) << std::endl;
+        break;
+    }
+
+    std::cout << "Created entity ID " << entityId << " of type " << static_cast<int>(entityType)
+              << " at position (" << posX << ", " << posY << ")" << std::endl;
 }

@@ -1,4 +1,6 @@
 #include "LobbyManager.hpp"
+#include "../../shared/include/Message.hpp"
+#include "RTypeServer.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -48,7 +50,13 @@ PlayerInput Lobby::dequeueInput()
 
 LobbyManager::LobbyManager()
     : _nextLobbyId(1)
+    , _server(nullptr)
 {
+}
+
+void LobbyManager::setServer(RTypeServer* server)
+{
+    _server = server;
 }
 
 uint32_t LobbyManager::createLobby(uint32_t creatorId)
@@ -243,6 +251,18 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
         }
 
         lobby->gameInstance->update();
+
+        // Broadcast newly spawned entities
+        if (_server) {
+            auto newEntities = lobby->gameInstance->getAndClearNewEntities();
+            for (Entity entity : newEntities) {
+                auto spawnData = lobby->gameInstance->serializeEntitySpawn(entity);
+                if (!spawnData.empty()) {
+                    Message spawnMsg(MessageType::SPAWN_ENTITY, spawnData);
+                    _server->broadcastToLobby(lobby->id, spawnMsg);
+                }
+            }
+        }
 
         // TODO: Send state updates to clients
 

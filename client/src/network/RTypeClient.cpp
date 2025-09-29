@@ -158,4 +158,7 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::PONG] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handlePongReceipt(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::SPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleSpawnEntity(t_msg, t_peerInfo);
+    };
 }

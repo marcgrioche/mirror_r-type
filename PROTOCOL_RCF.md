@@ -106,7 +106,30 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 
 ### SPAWN_ENTITY
 - **Direction**: Server → Client
-- **Payload**: Entity spawn data (TBD - depends on ECS implementation)
+- **Payload**:
+  - uint32: Entity ID (unique identifier)
+  - uint8: Entity Type (0=Player, 1=Projectile, 2=Platform, 3=Enemy)
+  - Entity-specific component data (see below)
+
+**Entity Type Data Formats:**
+
+**All Entity Types:**
+- Position: `float x, float y` (network byte order)
+
+**Player (Type 0):**
+- Health: `int32 health`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
+
+**Projectile (Type 1):**
+- Velocity: `float vx, float vy`
+- Damage: `float damage`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
+- OwnerId: `int32 owner_entity_id`
+- Lifetime: `float lifetime_seconds`
+
+**Enemy (Type 3):**
+- Health: `int32 health`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
 
 ### ROLLBACK
 - **Direction**: Server → Client

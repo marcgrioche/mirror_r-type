@@ -11,6 +11,10 @@
 #include "../network/RTypeClient.hpp"
 #include "GameTimer.hpp"
 #include "ecs/Registry.hpp"
+#include "ecs/components/Sprite.hpp"
+#include "entities/platform/CreatePlatform.hpp"
+#include "entities/player/CreatePlayer.hpp"
+#include "entities/projectile/CreateProjectile.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/InputManager.hpp"
 #include "network/NetworkEventQueue.hpp"
@@ -35,6 +39,7 @@ private:
     void update(float deltaTime);
     void render();
     void processNetworkEvents();
+    void deserializeAndCreateEntity(const Message& msg, Registry& registry);
 
     Registry _registry;
     GameTimer _timer;

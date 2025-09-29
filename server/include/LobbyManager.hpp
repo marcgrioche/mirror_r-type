@@ -42,6 +42,8 @@ struct Lobby {
     PlayerInput dequeueInput();
 };
 
+class RTypeServer; // Forward declaration
+
 class LobbyManager {
 public:
     /**
@@ -49,6 +51,14 @@ public:
      * Thread-safe for concurrent access from multiple threads.
      */
     LobbyManager();
+
+    /**
+     * Set the server reference for broadcasting messages.
+     *
+     * Args:
+     *     server (RTypeServer*): Pointer to the server instance
+     */
+    void setServer(RTypeServer* server);
 
     /**
      * Create a new lobby with the specified creator.
@@ -142,6 +152,7 @@ private:
     std::unordered_map<uint32_t, uint32_t> _playerToLobby; // playerId -> lobbyId
     mutable std::mutex _mutex;
     uint32_t _nextLobbyId;
+    RTypeServer* _server;
 
     /**
      * Generate a unique lobby ID.

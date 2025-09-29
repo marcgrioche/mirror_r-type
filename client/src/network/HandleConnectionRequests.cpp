@@ -28,3 +28,11 @@ void RTypeClient::handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo)
     const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
     m_ping = now - m_ping;
 }
+
+void RTypeClient::handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_peerInfo;
+
+    // Push the message to the event queue for Game to process
+    m_eventsQueue.push({ MessageType::SPAWN_ENTITY, t_msg });
+}

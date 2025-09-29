@@ -1,4 +1,5 @@
 #include "GameInstance.hpp"
+#include "../../shared/include/Message.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -48,13 +49,13 @@ void GameInstance::updateTick()
 void GameInstance::initializeLevel()
 {
     // TODO: Game levels, (create platforms (same as client for now))
-    factories::createOneWayPlatform(_registry, 100, 400);
-    factories::createPlatform(_registry, 300, 350);
-    factories::createPlatform(_registry, 500, 300);
-    factories::createOneWayPlatform(_registry, 200, 250);
+    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
+    _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
+    _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
+    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
 
     for (int i = 0; i < 8; i++) {
-        factories::createPlatform(_registry, i * 100, 520);
+        _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
     }
 }
 
@@ -63,6 +64,7 @@ void GameInstance::addPlayer(uint32_t playerId)
     std::cout << "Adding player " << playerId << " to game instance" << std::endl;
     Entity playerEntity = factories::createPlayer(_registry);
     _playerEntities[playerId] = playerEntity;
+    _newEntitiesThisTick.push_back(playerEntity);
 
     if (_registry.has<OwnerId>(playerEntity)) {
         _registry.get<OwnerId>(playerEntity).id = playerId;
@@ -143,4 +145,112 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 {
     // TODO: Implement state deserialization for rollback
+}
+
+std::vector<uint8_t> GameInstance::serializeEntitySpawn(Entity entity)
+{
+    uint8_t entityType = 255;
+
+    if (_registry.has<PlayerTag>(entity)) {
+        entityType = 0; // Player
+    } else if (_registry.has<ProjectileTag>(entity)) {
+        entityType = 1; // Projectile
+    } else if (_registry.has<PlatformTag>(entity)) {
+        entityType = 2; // Platform
+    } else if (_registry.has<EnemyTag>(entity)) {
+        entityType = 3; // Enemy
+    }
+
+    if (entityType == 255) {
+        return {};
+    }
+
+    Message msg(MessageType::SPAWN_ENTITY);
+    msg.write(static_cast<uint32_t>(entity.id));
+    msg.write(entityType);
+
+    if (_registry.has<Position>(entity)) {
+        auto& pos = _registry.get<Position>(entity);
+        msg.write(pos.x);
+        msg.write(pos.y);
+    } else {
+        return {};
+    }
+
+    if (entityType == 0) { // Player
+        if (_registry.has<Health>(entity)) {
+            auto& health = _registry.get<Health>(entity);
+            msg.write(static_cast<uint32_t>(health.hp));
+        }
+
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+
+    } else if (entityType == 1) { // Projectile
+        if (_registry.has<Velocity>(entity)) {
+            auto& vel = _registry.get<Velocity>(entity);
+            msg.write(vel.dx);
+            msg.write(vel.dy);
+        }
+
+        if (_registry.has<Damage>(entity)) {
+            auto& damage = _registry.get<Damage>(entity);
+            msg.write(damage.value);
+        }
+
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+
+        if (_registry.has<OwnerId>(entity)) {
+            auto& owner = _registry.get<OwnerId>(entity);
+            msg.write(static_cast<uint32_t>(owner.id));
+        }
+
+        if (_registry.has<Lifetime>(entity)) {
+            auto& lifetime = _registry.get<Lifetime>(entity);
+            msg.write(lifetime.value);
+        }
+
+    } else if (entityType == 2) { // Platform
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+
+    } else if (entityType == 3) { // Enemy
+        if (_registry.has<Health>(entity)) {
+            auto& health = _registry.get<Health>(entity);
+            msg.write(static_cast<uint32_t>(health.hp));
+        }
+
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+    }
+
+    return msg.serialize();
+}
+
+std::vector<Entity> GameInstance::getAndClearNewEntities()
+{
+    std::vector<Entity> entities = std::move(_newEntitiesThisTick);
+    _newEntitiesThisTick.clear();
+    return entities;
 }
