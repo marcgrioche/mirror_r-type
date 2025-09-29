@@ -115,6 +115,22 @@ void Game::processNetworkEvents()
     switch (value.type) {
     case MessageType::CONNECT_ACK:
         std::cout << "Connection acknowledged by server" << std::endl;
+        // Temporary: Create lobby immediately after connecting
+        m_connected = true;
+        m_clientNetwork->createLobbyRequest();
+        break;
+    case MessageType::LOBBY_INFO:
+        if (std::holds_alternative<Message>(value.payload)) {
+            const Message& msg = std::get<Message>(value.payload);
+            const_cast<Message&>(msg).resetReadPosition();
+            uint32_t lobbyId = msg.readU32();
+            if (lobbyId != 0 && !m_lobbyCreated) {
+                std::cout << "Lobby created with ID: " << lobbyId << std::endl;
+                m_lobbyCreated = true;
+                // Temporary: Start game immediately after lobby creation
+                m_clientNetwork->startGameRequest();
+            }
+        }
         break;
     case MessageType::SPAWN_ENTITY:
         if (std::holds_alternative<Message>(value.payload)) {

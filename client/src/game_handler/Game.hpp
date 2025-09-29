@@ -51,4 +51,6 @@ private:
 
     bool _isRunning;
     GameState _state = GameState::PLAYING;
+    bool m_connected = false;
+    bool m_lobbyCreated = false;
 };
