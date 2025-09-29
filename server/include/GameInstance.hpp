@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../shared/include/GameInputs.hpp"
+#include "../../shared/include/Message.hpp"
 #include "../../shared/src/ecs/Registry.hpp"
 #include "../../shared/src/ecs/components/AllComponents.hpp"
 #include "../../shared/src/ecs/systems/CollisionSystem.hpp"
@@ -47,7 +48,7 @@ public:
      * Returns:
      *     std::vector<uint8_t>: Serialized spawn data, or empty if entity type not supported
      */
-    std::vector<uint8_t> serializeEntitySpawn(Entity entity);
+    Message serializeEntitySpawn(Entity entity);
 
     /**
      * Get newly spawned entities from this tick and clear the list.

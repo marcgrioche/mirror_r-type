@@ -147,7 +147,7 @@ void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
     // TODO: Implement state deserialization for rollback
 }
 
-std::vector<uint8_t> GameInstance::serializeEntitySpawn(Entity entity)
+Message GameInstance::serializeEntitySpawn(Entity entity)
 {
     uint8_t entityType = 255;
 
@@ -162,7 +162,7 @@ std::vector<uint8_t> GameInstance::serializeEntitySpawn(Entity entity)
     }
 
     if (entityType == 255) {
-        return {};
+        return Message(MessageType::SPAWN_ENTITY);
     }
 
     Message msg(MessageType::SPAWN_ENTITY);
@@ -174,7 +174,7 @@ std::vector<uint8_t> GameInstance::serializeEntitySpawn(Entity entity)
         msg.write(pos.x);
         msg.write(pos.y);
     } else {
-        return {};
+        return Message(MessageType::SPAWN_ENTITY);
     }
 
     if (entityType == 0) { // Player
@@ -245,7 +245,7 @@ std::vector<uint8_t> GameInstance::serializeEntitySpawn(Entity entity)
         }
     }
 
-    return msg.serialize();
+    return msg;
 }
 
 std::vector<Entity> GameInstance::getAndClearNewEntities()

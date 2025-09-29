@@ -256,9 +256,8 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
         if (_server) {
             auto newEntities = lobby->gameInstance->getAndClearNewEntities();
             for (Entity entity : newEntities) {
-                auto spawnData = lobby->gameInstance->serializeEntitySpawn(entity);
-                if (!spawnData.empty()) {
-                    Message spawnMsg(MessageType::SPAWN_ENTITY, spawnData);
+                Message spawnMsg = lobby->gameInstance->serializeEntitySpawn(entity);
+                if (!spawnMsg.getPayload().empty()) {
                     _server->broadcastToLobby(lobby->id, spawnMsg);
                 }
             }
