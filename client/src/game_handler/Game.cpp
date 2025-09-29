@@ -10,6 +10,7 @@
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/ProjectileSystem.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
@@ -44,6 +45,8 @@ bool Game::initialize()
     // No hardcoded entities needed - client receives all entities from server
 
     _timer.start();
+    _lastTickTime = std::chrono::steady_clock::now();
+    _accumulatedTime = 0.0f;
     _isRunning = true;
     return true;
 }
@@ -81,11 +84,19 @@ void Game::run()
 
 void Game::update(float deltaTime)
 {
-    m_clientNetwork->handleInputs(_inputs);
-    handlePlayerInputs(_inputs, _registry);
-    gravitySystem(_registry, deltaTime);
-    movementSystem(_registry, deltaTime);
-    collisionSystem(_registry, deltaTime);
+    _accumulatedTime += deltaTime;
+
+    while (_accumulatedTime >= TICK_DURATION) {
+        m_clientNetwork->handleInputs(_inputs);
+        m_clientNetwork->incrementTick();
+        handlePlayerInputs(_inputs, _registry);
+        gravitySystem(_registry, TICK_DURATION);
+        movementSystem(_registry, TICK_DURATION);
+        projectileSystem(_registry, TICK_DURATION);
+        collisionSystem(_registry, TICK_DURATION);
+
+        _accumulatedTime -= TICK_DURATION;
+    }
 }
 
 void Game::render()

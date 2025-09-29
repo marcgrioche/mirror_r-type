@@ -48,9 +48,6 @@ void RTypeServer::handleInput(const Message& msg, PeerInfo& peerInfo)
         inputs.emplace_back(inputType, isPressed);
     }
 
-    std::cout << "Queueing " << inputs.size() << " inputs from player " << msg.player_id
-              << " for tick " << clientTick << std::endl;
-
     PlayerInput playerInput { msg.player_id, clientTick, inputs };
     const_cast<Lobby*>(lobby)->queueInput(playerInput);
 }

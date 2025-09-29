@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <memory>
 #include <queue>
+#include <unordered_map>
 
+#include "../../../shared/include/GameInputs.hpp"
 #include "NetworkEventQueue.hpp"
 #include "managers/InputManager.hpp"
 
@@ -44,6 +46,9 @@ public:
     void handleInputs(const InputManager& t_inputs);
     void handleAllInputs(const InputManager& t_inputs);
 
+    uint32_t getCurrentTick() const { return m_currentTick; }
+    void incrementTick() { m_currentTick++; }
+
 private:
     void registerHandlers() override;
     uint16_t m_port;
@@ -52,7 +57,9 @@ private:
     uint16_t m_msgSequenceNumber;
     uint32_t m_lobbyId = 0;
     uint64_t m_ping;
+    uint32_t m_currentTick = 0;
     NetworkEventQueue& m_eventsQueue;
+    std::unordered_map<GameAction, bool> m_previousInputStates;
 
     // server responses handlers
     void handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo);

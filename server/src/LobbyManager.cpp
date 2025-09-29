@@ -245,9 +245,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
     while (lobby->threadRunning) {
         while (lobby->hasPendingInputs()) {
             PlayerInput input = lobby->dequeueInput();
-            if (input.playerId != 0) {
-                lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
-            }
+            lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
         }
 
         lobby->gameInstance->update();

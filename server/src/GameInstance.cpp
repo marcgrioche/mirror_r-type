@@ -83,14 +83,55 @@ void GameInstance::removePlayer(uint32_t playerId)
 
 void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
+    // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
         return;
 
     Entity playerEntity = it->second;
 
-    (void)playerEntity;
-    // TODO : call to systems that manage player inputs
+    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
+        return;
+    }
+
+    auto& velocity = _registry.get<Velocity>(playerEntity);
+    auto& jump = _registry.get<Jump>(playerEntity);
+
+    velocity.dx = 0.0f;
+
+    const float speed = 250.0f;
+
+    for (const auto& [input, isPressed] : inputs) {
+        if (!isPressed)
+            continue;
+
+        switch (input) {
+        case GameInput::UP:
+            if (!jump.isJumping && jump.canJump) {
+                velocity.dy = -V0;
+                jump.isJumping = true;
+                jump.canJump = false;
+            }
+            break;
+        case GameInput::DOWN:
+            if (jump.isJumping && velocity.dy > 0) {
+                velocity.dy += 300.0f; // Fast-fall
+            }
+            break;
+        case GameInput::LEFT:
+            velocity.dx = -speed;
+            break;
+        case GameInput::RIGHT:
+            velocity.dx = speed;
+            break;
+        case GameInput::ATTACK:
+            // TODO: Handle shooting/projectile creation
+            break;
+        case GameInput::DASH:
+            // TODO: Handle dash ability
+            break;
+        }
+    }
 }
 
 void GameInstance::processInputs()
@@ -104,6 +145,13 @@ void GameInstance::simulatePhysics()
     // Run shared physics systems
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
+    printf("Position of entities after movement:\n");
+    auto view = _registry.view<Position>();
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        auto [pos] = *it;
+        Entity entity = it.entity();
+        std::cout << "Entity " << entity.id << ": (" << pos.x << ", " << pos.y << ")\n";
+    }
     projectileSystem(_registry, TICK_DURATION);
 }
 

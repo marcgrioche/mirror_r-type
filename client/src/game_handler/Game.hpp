@@ -18,6 +18,7 @@
 #include "managers/GraphicsManager.hpp"
 #include "managers/InputManager.hpp"
 #include "network/NetworkEventQueue.hpp"
+#include <chrono>
 
 class Game {
     enum class GameState {
@@ -28,6 +29,9 @@ class Game {
     };
 
 public:
+    static constexpr uint32_t TICKS_PER_SECOND = 60;
+    static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND;
+
     Game();
     ~Game();
 
@@ -53,4 +57,7 @@ private:
     GameState _state = GameState::PLAYING;
     bool m_connected = false;
     bool m_lobbyCreated = false;
+
+    std::chrono::steady_clock::time_point _lastTickTime;
+    float _accumulatedTime = 0.0f;
 };
