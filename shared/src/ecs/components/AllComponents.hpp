@@ -8,6 +8,7 @@
 #pragma once
 
 // Individual component includes
+#include "Button.hpp"
 #include "Damage.hpp"
 #include "Health.hpp"
 #include "Hitbox.hpp"

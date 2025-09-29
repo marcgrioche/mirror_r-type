@@ -6,6 +6,7 @@
 */
 
 #include "Game.hpp"
+#include "IpEncoding.hpp"
 #include "ecs/components/AllComponents.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
@@ -23,10 +24,9 @@
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
-    , m_clientNetwork(std::make_unique<Client::RTypeClient>("127.0.0.1", 4242, 2020, m_events))
+    , m_clientNetwork(nullptr)
     , _isRunning(false)
 {
-    m_clientNetwork->connectToServerRequest();
 }
 
 Game::~Game()
@@ -48,6 +48,9 @@ bool Game::initialize()
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;
     _isRunning = true;
+    _state = GameState::MENU;
+    m_menu.activate();
+
     return true;
 }
 
@@ -57,28 +60,69 @@ void Game::run()
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
     }
-    auto netThread = std::thread([this]() { m_clientNetwork->start(); });
+
     SDL_Event event;
 
     while (_isRunning) {
         processNetworkEvents();
         float deltaTime = _timer.getDeltaTime();
 
-        _inputs.updateInputs(event);
+        _inputs.beginFrame();
+        while (SDL_PollEvent(&event)) {
+            _inputs.handleSDLEvent(event);
+            if (_state == GameState::MENU) {
+                m_menu.handleEvent(event);
+            }
+        }
+
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
-            m_clientNetwork->disconnectFromServerRequest();
             break;
         }
+
+        if (_state == GameState::MENU) {
+            // Page 1: Connect -> passe à la page Lobby (hard-coded)
+            if (m_menu.popConnectRequest()) {
+                std::string ip;
+                int port;
+                decodeIp(m_menu.m_inputCode, ip, port);
+                printf("Decoded IP: %s, Port: %d\n", ip.c_str(), port);
+                m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, 2020, m_events);
+                m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
+                m_clientNetwork->connectToServerRequest();
+                m_menu.onConnected();
+            }
+
+            // Page 2: Lobby -> Create/Join -> démarre le jeu (hard-coded)
+            bool goPlay = false;
+            if (m_menu.popCreateLobbyRequest()) {
+                m_clientNetwork->createLobbyRequest();
+                m_clientNetwork->startGameRequest();
+                goPlay = true;
+            }
+            if (m_menu.popJoinLobbyRequest()) {
+                m_clientNetwork->joinLobbyRequest(0);
+                goPlay = true;
+            }
+
+            if (goPlay) {
+                m_menu.deactivate(_registry); // détruit les entités boutons
+                startGameplay();
+            }
+
+            // MAJ ECS boutons + rendu
+            buttonSystem(_registry); // [client/src/ecs/systems/ButtonSystem.hpp](client/src/ecs/systems/ButtonSystem.hpp)
+            m_menu.render(_graphics, _registry);
+            SDL_Delay(16);
+            continue;
+        }
+
+        // Etat PLAYING
         update(deltaTime);
         render();
-
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
-    if (netThread.joinable()) {
-        netThread.join();
-    }
     std::cout << "Game loop ended." << std::endl;
 }
 
@@ -94,6 +138,7 @@ void Game::update(float deltaTime)
         movementSystem(_registry, TICK_DURATION);
         projectileSystem(_registry, TICK_DURATION);
         collisionSystem(_registry, TICK_DURATION);
+        buttonSystem(_registry);
 
         _accumulatedTime -= TICK_DURATION;
     }
@@ -107,12 +152,16 @@ void Game::render()
 void Game::cleanup()
 {
     if (_isRunning) {
+        SDL_StopTextInput();
         _graphics.cleanup();
         _isRunning = false;
         std::cout << "Game cleanup completed." << std::endl;
     }
     if (m_clientNetwork) {
         m_clientNetwork->stop();
+    }
+    if (m_networkThread.joinable()) {
+        m_networkThread.join();
     }
 }
 
@@ -126,22 +175,6 @@ void Game::processNetworkEvents()
     switch (value.type) {
     case MessageType::CONNECT_ACK:
         std::cout << "Connection acknowledged by server" << std::endl;
-        // Temporary: Create lobby immediately after connecting
-        m_connected = true;
-        m_clientNetwork->createLobbyRequest();
-        break;
-    case MessageType::LOBBY_INFO:
-        if (std::holds_alternative<Message>(value.payload)) {
-            const Message& msg = std::get<Message>(value.payload);
-            const_cast<Message&>(msg).resetReadPosition();
-            uint32_t lobbyId = msg.readU32();
-            if (lobbyId != 0 && !m_lobbyCreated) {
-                std::cout << "Lobby created with ID: " << lobbyId << std::endl;
-                m_lobbyCreated = true;
-                // Temporary: Start game immediately after lobby creation
-                m_clientNetwork->startGameRequest();
-            }
-        }
         break;
     case MessageType::SPAWN_ENTITY:
         if (std::holds_alternative<Message>(value.payload)) {
@@ -282,4 +315,9 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
             }
         }
     }
+}
+
+void Game::startGameplay()
+{
+    _state = GameState::PLAYING;
 }
