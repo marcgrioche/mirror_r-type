@@ -1,3 +1,13 @@
+/*
+** ButtonSystem.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/shared/src/ecs/systems
+**
+** Made by jojo
+** Login   <jojo>
+**
+** Started on  Mon Sep 29 1:26:02 PM 2025 jojo
+** Last update Tue Sep 29 1:26:04 PM 2025 jojo
+*/
+
 #include "ButtonSystem.hpp"
 #include "EventManager.hpp"
 #include "components/AllComponents.hpp"
@@ -12,8 +22,17 @@ void buttonSystem(Registry& registry)
     auto& eventMgr = EventManager::getInstance();
 
     auto view = registry.view<Button, Position, Hitbox>();
-    for (auto [button, pos, hitbox] : view) {
-        Entity e = /* récupère l'entité de la view */;
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        Entity e = it.entity();
+
+        // require Position + Hitbox + Button
+        if (!registry.has<Position>(e) || !registry.has<Hitbox>(e) || !registry.has<Button>(e))
+            continue;
+
+        // get component references
+        Button& button = registry.get<Button>(e);
+        Position& pos = registry.get<Position>(e);
+        Hitbox& hitbox = registry.get<Hitbox>(e);
 
         // Test point-in-rect
         bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
