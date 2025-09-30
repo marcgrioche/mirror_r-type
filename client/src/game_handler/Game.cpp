@@ -6,10 +6,12 @@
 */
 
 #include "Game.hpp"
+#include "IpEncoding.hpp"
 #include "ecs/components/AllComponents.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/ProjectileSystem.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
@@ -25,10 +27,9 @@
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
-    , m_clientNetwork(std::make_unique<Client::RTypeClient>("127.0.0.1", 4242, 2020, m_events))
+    , m_clientNetwork(nullptr)
     , _isRunning(false)
 {
-    m_clientNetwork->connectToServerRequest();
 }
 
 Game::~Game()
@@ -43,55 +44,116 @@ bool Game::initialize()
         return false;
     }
 
-    factories::createPlayer(_registry);
-
-    factories::createOneWayPlatform(_registry, 100, 400);
-    factories::createPlatform(_registry, 300, 350);
-    factories::createPlatform(_registry, 500, 300);
-    factories::createOneWayPlatform(_registry, 200, 250);
-
-    for (int i = 0; i < 8; i++) {
-        factories::createPlatform(_registry, i * 100, 520);
-    }
+    // Entities will be created dynamically via SPAWN_ENTITY messages from server
+    // No hardcoded entities needed - client receives all entities from server
 
     _timer.start();
+    _lastTickTime = std::chrono::steady_clock::now();
+    _accumulatedTime = 0.0f;
     _isRunning = true;
+    _state = GameState::MENU;
+    m_menu.activate(Menu::Page::Connect);
+
     return true;
 }
 
 void Game::run()
 {
+
+    // TODO:: Refactor
     if (!_isRunning) {
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
     }
-    auto netThread = std::thread([this]() { m_clientNetwork->start(); });
+
     SDL_Event event;
 
     while (_isRunning) {
         processNetworkEvents();
         float deltaTime = _timer.getDeltaTime();
 
-        _inputs.updateInputs(event);
+        _inputs.beginFrame();
+        while (SDL_PollEvent(&event)) {
+            _inputs.handleSDLEvent(event);
+            if (_state == GameState::MENU) {
+                m_menu.handleEvent(event);
+            }
+        }
+
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
-            m_clientNetwork->disconnectFromServerRequest();
             break;
         }
+
+        if (_state == GameState::MENU) {
+            // Page 1: Connect -> passe à la page Lobby (hard-coded)
+            if (m_menu.popConnectRequest()) {
+                std::string ip;
+                int port;
+                decodeIp(m_menu.m_inputCode, ip, port);
+                ip = ip.empty() ? "127.0.0.1" : ip;
+                port = (port == 0) ? 4242 : port;
+                m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, 2020, m_events);
+                m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
+                m_clientNetwork->connectToServerRequest();
+                m_menu.onConnected();
+            }
+
+            // Page 2: Lobby
+            if (m_menu.popCreateLobbyRequest()) {
+                m_clientNetwork->createLobbyRequest();
+                // Aller à la page Start (attente) via menu
+                m_menu.onCreated();
+                printf("Lobby created, waiting for game start...\n");
+            }
+            if (m_menu.popJoinLobbyRequest()) {
+                // Join direct -> jeu
+                m_clientNetwork->joinLobbyRequest(std::stoi(m_menu.m_inputCode));
+                m_menu.deactivate(_registry);
+                startGameplay();
+            }
+
+            // Page 3: Start -> bouton "Start" lance le jeu
+            if (m_menu.popStartRequest()) {
+                m_clientNetwork->startGameRequest();
+                m_menu.deactivate(_registry);
+                startGameplay();
+            }
+
+            // MAJ ECS boutons + rendu
+            buttonSystem(_registry); // [client/src/ecs/systems/ButtonSystem.hpp](client/src/ecs/systems/ButtonSystem.hpp)
+            m_menu.render(_graphics, _registry);
+            SDL_Delay(16);
+            continue;
+        }
+
+        // Etat PLAYING
         update(deltaTime);
         render();
-
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
-    if (netThread.joinable()) {
-        netThread.join();
-    }
     std::cout << "Game loop ended." << std::endl;
 }
 
 void Game::update(float deltaTime)
 {
+<<<<<<< HEAD
+    _accumulatedTime += deltaTime;
+
+    while (_accumulatedTime >= TICK_DURATION) {
+        m_clientNetwork->handleInputs(_inputs);
+        m_clientNetwork->incrementTick();
+        handlePlayerInputs(_inputs, _registry);
+        gravitySystem(_registry, TICK_DURATION);
+        movementSystem(_registry, TICK_DURATION);
+        projectileSystem(_registry, TICK_DURATION);
+        collisionSystem(_registry, TICK_DURATION);
+        buttonSystem(_registry);
+
+        _accumulatedTime -= TICK_DURATION;
+    }
+=======
     handlePlayerInputs(_inputs, _registry);
     handleWeaponInputs(_inputs, _registry);
     gravitySystem(_registry, deltaTime);
@@ -99,6 +161,7 @@ void Game::update(float deltaTime)
     collisionSystem(_registry, deltaTime);
     projectileSystem(_registry, deltaTime);
     weaponPositionSystem(_registry);
+>>>>>>> 22-basic-weapon
 }
 
 void Game::render()
@@ -109,12 +172,16 @@ void Game::render()
 void Game::cleanup()
 {
     if (_isRunning) {
+        SDL_StopTextInput();
         _graphics.cleanup();
         _isRunning = false;
         std::cout << "Game cleanup completed." << std::endl;
     }
     if (m_clientNetwork) {
         m_clientNetwork->stop();
+    }
+    if (m_networkThread.joinable()) {
+        m_networkThread.join();
     }
 }
 
@@ -129,7 +196,148 @@ void Game::processNetworkEvents()
     case MessageType::CONNECT_ACK:
         std::cout << "Connection acknowledged by server" << std::endl;
         break;
+    case MessageType::SPAWN_ENTITY:
+        if (std::holds_alternative<Message>(value.payload)) {
+            const Message& msg = std::get<Message>(value.payload);
+            deserializeAndCreateEntity(msg, _registry);
+        }
+        break;
+    case MessageType::GAME_STATE:
+        if (std::holds_alternative<Message>(value.payload)) {
+            const Message& msg = std::get<Message>(value.payload);
+            deserializeAndUpdateGameState(msg, _registry);
+        }
+        break;
     default:
         break;
     }
+}
+
+void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
+{
+    const_cast<Message&>(msg).resetReadPosition();
+
+    uint32_t entityId = msg.readU32();
+    uint8_t entityType = msg.readU8();
+
+    float posX = msg.readFloat();
+    float posY = msg.readFloat();
+
+    switch (entityType) {
+    case 0: { // Player
+        uint32_t healthValue = msg.readU32();
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+
+        Entity entity = factories::createPlayer(registry,
+            Position { posX, posY },
+            Health { static_cast<int>(healthValue) },
+            Hitbox { width, height, offsetX, offsetY });
+
+        registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
+
+        // TODO : AUTO Sprite component for rendering
+        Sprite sprite;
+        sprite.texture_id = "player_sprite.png";
+        sprite.frame_width = 32;
+        sprite.frame_height = 32;
+        sprite.srcRect = { 0, 0, 32, 32 };
+        sprite.dstRect = { static_cast<int>(posX), static_cast<int>(posY), 32, 32 };
+        registry.add<Sprite>(entity, sprite);
+        break;
+    }
+
+    case 1: { // Projectile
+        float velX = msg.readFloat();
+        float velY = msg.readFloat();
+        float damageValue = msg.readFloat();
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+        uint32_t ownerId = msg.readU32();
+        float lifetimeValue = msg.readFloat();
+
+        factories::createProjectile(registry,
+            Position { posX, posY },
+            Velocity { velX, velY },
+            Damage { damageValue },
+            Hitbox { width, height, offsetX, offsetY },
+            OwnerId { static_cast<int>(ownerId) },
+            Lifetime { lifetimeValue });
+        break;
+    }
+
+    case 2: { // Platform
+        float width = msg.readFloat();
+        float height = msg.readFloat();
+        float offsetX = msg.readFloat();
+        float offsetY = msg.readFloat();
+
+        factories::createPlatform(registry,
+            Position { posX, posY },
+            Hitbox { width, height, offsetX, offsetY });
+        break;
+    }
+
+    case 3: { // Enemy - TODO: Create enemy factory
+        std::cout << "Enemy entity creation not implemented yet" << std::endl;
+        break;
+    }
+
+    default:
+        std::cout << "Unknown entity type: " << static_cast<int>(entityType) << std::endl;
+        break;
+    }
+
+    std::cout << "Created entity ID " << entityId << " of type " << static_cast<int>(entityType)
+              << " at position (" << posX << ", " << posY << ")" << std::endl;
+}
+
+void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
+{
+    const_cast<Message&>(msg).resetReadPosition();
+
+    uint32_t tick = msg.readU32();
+    uint8_t numPlayers = msg.readU8();
+
+    for (uint8_t i = 0; i < numPlayers; ++i) {
+        uint32_t entityId = msg.readU32();
+        float posX = msg.readFloat();
+        float posY = msg.readFloat();
+        uint32_t health = msg.readU32();
+
+        auto view = registry.view<ServerEntityId>();
+        for (auto it = view.begin(); it != view.end(); ++it) {
+            Entity entity = it.entity();
+            const auto& serverId = registry.get<ServerEntityId>(entity);
+            if (serverId.id == entityId) {
+                if (registry.has<Position>(entity)) {
+                    auto& position = registry.get<Position>(entity);
+                    position.x = posX;
+                    position.y = posY;
+                }
+
+                if (registry.has<Health>(entity)) {
+                    auto& healthComp = registry.get<Health>(entity);
+                    healthComp.hp = static_cast<int>(health);
+                }
+
+                if (registry.has<Sprite>(entity)) {
+                    auto& sprite = registry.get<Sprite>(entity);
+                    sprite.dstRect.x = static_cast<int>(posX);
+                    sprite.dstRect.y = static_cast<int>(posY);
+                }
+
+                break;
+            }
+        }
+    }
+}
+
+void Game::startGameplay()
+{
+    _state = GameState::PLAYING;
 }

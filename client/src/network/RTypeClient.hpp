@@ -4,8 +4,11 @@
 #include <cstdint>
 #include <memory>
 #include <queue>
+#include <unordered_map>
 
+#include "../../../shared/include/GameInputs.hpp"
 #include "NetworkEventQueue.hpp"
+#include "managers/InputManager.hpp"
 
 namespace Client {
 class RTypeClient : public RTypeNetwork {
@@ -32,6 +35,7 @@ public:
     // server communication functions
     void sendMessage(MessageType t_type);
     void sendMessage(MessageType t_type, uint32_t t_payload);
+    void sendMessage(const Message& t_msg);
     void connectToServerRequest();
     void disconnectFromServerRequest();
     void createLobbyRequest();
@@ -39,6 +43,11 @@ public:
     void startGameRequest();
     void lobbyStartRequest();
     void pingRequest();
+    void handleInputs(const InputManager& t_inputs);
+    void handleAllInputs(const InputManager& t_inputs);
+
+    uint32_t getCurrentTick() const { return m_currentTick; }
+    void incrementTick() { m_currentTick++; }
 
 private:
     void registerHandlers() override;
@@ -48,12 +57,16 @@ private:
     uint16_t m_msgSequenceNumber;
     uint32_t m_lobbyId = 0;
     uint64_t m_ping;
+    uint32_t m_currentTick = 0;
     NetworkEventQueue& m_eventsQueue;
+    std::unordered_map<GameAction, bool> m_previousInputStates;
 
     // server responses handlers
     void handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyCreation(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo);
     void handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleGameState(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

@@ -45,6 +45,16 @@ Component& Registry::get(Entity e)
 }
 
 template <typename Component>
+const Component& Registry::get(Entity e) const
+{
+    ComponentStorage<Component>* storage = get_storage_if_exists<Component>();
+    if (!storage) {
+        throw std::runtime_error("Component not found");
+    }
+    return storage->get(e);
+}
+
+template <typename Component>
 ComponentStorage<Component>& Registry::get_or_create_storage()
 {
     std::type_index key(typeid(Component));
@@ -92,10 +102,10 @@ template <typename... Components>
 void Registry::View<Components...>::iterator::advance_to_valid()
 {
     if (!parent->primary_entities) {
-        idx = 0; 
+        idx = 0;
         return;
     }
-    
+
     while (idx < parent->primary_entities->size()) {
         Entity e = (*parent->primary_entities)[idx];
         if (all_present(e)) break;
@@ -203,14 +213,14 @@ Registry::View<Components...> Registry::view()
             primary_vec = &storage->dense_entities_ref();
         }
     };
-    
+
     // le lambda reçoit un index à la fois, dans le paramètre pack Is...
     // le parameter pack agit comme une boucle, ça va relancer la fonction pour chaque index de la sequence
     auto check_all = [&]<size_t... Is>(std::index_sequence<Is...>) {
         // check le storage à chaque index du tuple st
         (check_one_storage(std::get<Is>(st), Is), ...); //ces "..." sont une fold expression qui répète l'appel pour chaque index
     };
-    
+
     // sizeof...(Components) = nombre de composants dans la view
     // ex: view<Position, Velocity> → sizeof...(Components) = 2
     // std::make_index_sequence<n>{} génère une séquence d'index de 0 à n-1

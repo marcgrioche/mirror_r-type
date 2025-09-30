@@ -16,7 +16,6 @@ void RTypeServer::handleStartGame(const Message& msg, PeerInfo& peerInfo)
     bool success = _lobbyManager.startGame(playerLobby, msg.player_id);
     if (success) {
         std::cout << "Game started successfully in lobby " << playerLobby << std::endl;
-        // TODO: Start game thread when GameInstance is implemented
     } else {
         std::cout << "Failed to start game in lobby " << playerLobby << std::endl;
     }

@@ -16,21 +16,30 @@ InputManager& InputManager::getInstance()
 
 void InputManager::updateInputs(SDL_Event& e)
 {
-    previousActionStates = actionStates;
-
+    beginFrame();
     while (SDL_PollEvent(&e) != 0) {
-        if (e.type == SDL_QUIT) {
-            updateActionState(GameAction::QUIT, true);
-        } else if (e.type == SDL_KEYDOWN) {
-            auto it = keyToAction.find(e.key.keysym.sym);
-            if (it != keyToAction.end()) {
-                updateActionState(it->second, true);
-            }
-        } else if (e.type == SDL_KEYUP) {
-            auto it = keyToAction.find(e.key.keysym.sym);
-            if (it != keyToAction.end()) {
-                updateActionState(it->second, false);
-            }
+        handleSDLEvent(e);
+    }
+}
+
+void InputManager::beginFrame()
+{
+    previousActionStates = actionStates;
+}
+
+void InputManager::handleSDLEvent(const SDL_Event& e)
+{
+    if (e.type == SDL_QUIT) {
+        updateActionState(GameAction::QUIT, true);
+    } else if (e.type == SDL_KEYDOWN) {
+        auto it = keyToAction.find(e.key.keysym.sym);
+        if (it != keyToAction.end()) {
+            updateActionState(it->second, true);
+        }
+    } else if (e.type == SDL_KEYUP) {
+        auto it = keyToAction.find(e.key.keysym.sym);
+        if (it != keyToAction.end()) {
+            updateActionState(it->second, false);
         }
     }
 }
@@ -93,4 +102,9 @@ void InputManager::setDefaultKeyBindings()
 void InputManager::updateActionState(GameAction action, bool isPressed)
 {
     actionStates[action] = isPressed;
+}
+
+const std::unordered_map<GameAction, bool>& InputManager::getActions() const
+{
+    return actionStates;
 }

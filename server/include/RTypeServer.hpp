@@ -3,6 +3,7 @@
 #include "LobbyManager.hpp"
 #include "RTypeNetwork.hpp"
 #include <cstdint>
+#include <memory>
 #include <unordered_map>
 
 class RTypeServer : public RTypeNetwork {
@@ -47,6 +48,15 @@ public:
      *     msg (const Message&): Message to broadcast.
      */
     void broadcast(const Message& msg);
+
+    /**
+     * Broadcast a message to all players in a specific lobby.
+     *
+     * Args:
+     *     lobbyId (uint32_t): ID of the lobby to broadcast to.
+     *     msg (const Message&): Message to broadcast.
+     */
+    void broadcastToLobby(uint32_t lobbyId, const Message& msg);
 
 private:
     uint16_t _port;

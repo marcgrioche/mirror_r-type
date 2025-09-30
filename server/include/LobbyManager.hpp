@@ -1,8 +1,12 @@
 #pragma once
 
+#include "GameInstance.hpp"
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <queue>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -12,15 +16,33 @@ enum class LobbyState {
     FINISHED
 };
 
+struct PlayerInput {
+    uint32_t playerId;
+    uint32_t tick;
+    std::vector<std::pair<GameInput, bool>> inputs;
+};
+
 struct Lobby {
     uint32_t id;
     uint32_t creatorId;
     std::vector<uint32_t> players;
     LobbyState state;
     uint32_t maxPlayers;
+    std::unique_ptr<GameInstance> gameInstance;
+    std::thread gameThread;
+    std::atomic<bool> threadRunning;
+    std::queue<PlayerInput> inputQueue;
+    std::mutex inputMutex;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
+    ~Lobby();
+
+    void queueInput(const PlayerInput& input);
+    bool hasPendingInputs() const;
+    PlayerInput dequeueInput();
 };
+
+class RTypeServer; // Forward declaration
 
 class LobbyManager {
 public:
@@ -29,6 +51,14 @@ public:
      * Thread-safe for concurrent access from multiple threads.
      */
     LobbyManager();
+
+    /**
+     * Set the server reference for broadcasting messages.
+     *
+     * Args:
+     *     server (RTypeServer*): Pointer to the server instance
+     */
+    void setServer(RTypeServer* server);
 
     /**
      * Create a new lobby with the specified creator.
@@ -106,11 +136,34 @@ public:
      */
     std::vector<uint32_t> getActiveLobbies() const;
 
+    /**
+     * Get the GameInstance for a lobby.
+     *
+     * Args:
+     *     lobbyId (uint32_t): ID of the lobby
+     *
+     * Returns:
+     *     GameInstance*: Pointer to the game instance, or nullptr if not running
+     */
+    GameInstance* getGameInstance(uint32_t lobbyId);
+
+    /**
+     * Get the players in a lobby (thread-safe).
+     *
+     * Args:
+     *     lobbyId (uint32_t): ID of the lobby
+     *
+     * Returns:
+     *     std::vector<uint32_t>: List of player IDs in the lobby
+     */
+    std::vector<uint32_t> getLobbyPlayers(uint32_t lobbyId) const;
+
 private:
     std::unordered_map<uint32_t, std::unique_ptr<Lobby>> _lobbies;
     std::unordered_map<uint32_t, uint32_t> _playerToLobby; // playerId -> lobbyId
     mutable std::mutex _mutex;
     uint32_t _nextLobbyId;
+    RTypeServer* _server;
 
     /**
      * Generate a unique lobby ID.
@@ -119,4 +172,12 @@ private:
      *     uint32_t: New unique lobby ID
      */
     uint32_t generateLobbyId();
+
+    /**
+     * Main loop for a lobby's game thread.
+     *
+     * Args:
+     *     lobby (Lobby*): Pointer to the lobby to run
+     */
+    void runLobbyThread(Lobby* lobby);
 };

@@ -8,7 +8,7 @@
 #include "../weapon/CreateWeapon.hpp"
 
 namespace factories {
-void createPlayer(Registry& registry)
+Entity createPlayer(Registry& registry)
 {
     Entity player = registry.create_entity();
     registry.emplace<Position>(player, 50.0f, -500.0f);
@@ -19,6 +19,23 @@ void createPlayer(Registry& registry)
     registry.emplace<Jump>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
+<<<<<<< HEAD
+    return player;
+}
+
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox)
+{
+    Entity player = registry.create_entity();
+    registry.add<Position>(player, position);
+    registry.add<PreviousPosition>(player, PreviousPosition { position.x, position.y });
+    registry.add<Velocity>(player, Velocity { 0.0f, 0.0f });
+    registry.add<Health>(player, health);
+    registry.add<Hitbox>(player, hitbox);
+    registry.add<Jump>(player, Jump {});
+    registry.add<PlayerTag>(player, PlayerTag {});
+    return player;
+=======
     createWeapon(registry, Parent{player});
+>>>>>>> 22-basic-weapon
 }
 }

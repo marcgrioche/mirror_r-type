@@ -24,8 +24,15 @@ void renderSystem(Registry& registry)
 
     graphics.setDrawColor(255, 255, 255, 255);
     auto view = registry.view<Hitbox, Position>();
-    for (auto [hitbox, pos] : view) {
-        std::cout << "Rendering entity at position (" << pos.x << ", " << pos.y << ")\n";
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        Entity e = it.entity();
+        // Skip UI buttons to avoid white rectangles from appearing in gameplay
+        if (registry.has<Button>(e)) {
+            continue;
+        }
+
+        Hitbox& hitbox = registry.get<Hitbox>(e);
+        Position& pos = registry.get<Position>(e);
         SDL_Rect rect = {
             static_cast<int>(pos.x),
             static_cast<int>(pos.y),

@@ -24,7 +24,16 @@ class InputManager {
 public:
     static InputManager& getInstance();
 
+    // Deprecated for general use: prefer polling events in your main loop and
+    // calling handleSDLEvent() + beginFrame() each frame to allow the game to
+    // see non-keyboard events (mouse, text input, etc.).
     void updateInputs(SDL_Event& e);
+
+    // Mark the start of a new frame (captures previousActionStates snapshot).
+    void beginFrame();
+
+    // Update input state from a single SDL event (key up/down, quit).
+    void handleSDLEvent(const SDL_Event& e);
 
     void bindKey(SDL_Keycode key, GameAction action);
     void unbindKey(SDL_Keycode key);
@@ -39,6 +48,7 @@ public:
     bool isRight() const { return isActionPressed(GameAction::MOVE_RIGHT); }
     bool isShoot() const { return isActionPressed(GameAction::SHOOT); }
     bool isQuit() const { return isActionPressed(GameAction::QUIT); }
+    const std::unordered_map<GameAction, bool>& getActions() const;
 
 private:
     InputManager() { setDefaultKeyBindings(); }

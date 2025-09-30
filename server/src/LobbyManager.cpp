@@ -1,4 +1,6 @@
 #include "LobbyManager.hpp"
+#include "../../shared/include/Message.hpp"
+#include "RTypeServer.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -7,13 +9,54 @@ Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
     , creatorId(creator)
     , state(LobbyState::WAITING)
     , maxPlayers(4)
+    , gameInstance(nullptr)
+    , threadRunning(false)
 {
     players.push_back(creator);
 }
 
+Lobby::~Lobby()
+{
+    if (threadRunning) {
+        threadRunning = false;
+        if (gameThread.joinable()) {
+            gameThread.join();
+        }
+    }
+}
+
+void Lobby::queueInput(const PlayerInput& input)
+{
+    std::lock_guard<std::mutex> lock(inputMutex);
+    inputQueue.push(input);
+}
+
+bool Lobby::hasPendingInputs() const
+{
+    std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(inputMutex));
+    return !inputQueue.empty();
+}
+
+PlayerInput Lobby::dequeueInput()
+{
+    std::lock_guard<std::mutex> lock(inputMutex);
+    if (inputQueue.empty()) {
+        return { 0, 0, {} };
+    }
+    PlayerInput input = inputQueue.front();
+    inputQueue.pop();
+    return input;
+}
+
 LobbyManager::LobbyManager()
     : _nextLobbyId(1)
+    , _server(nullptr)
 {
+}
+
+void LobbyManager::setServer(RTypeServer* server)
+{
+    _server = server;
 }
 
 uint32_t LobbyManager::createLobby(uint32_t creatorId)
@@ -89,8 +132,18 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
         return false;
     }
 
+    lobby->gameInstance = std::make_unique<GameInstance>(lobbyId);
+    lobby->gameInstance->initialize();
+
+    for (uint32_t player : lobby->players) {
+        lobby->gameInstance->addPlayer(player);
+    }
+
+    lobby->threadRunning = true;
+    lobby->gameThread = std::thread(&LobbyManager::runLobbyThread, this, lobby);
+
     lobby->state = LobbyState::RUNNING;
-    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << std::endl;
+    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << " with " << lobby->players.size() << " players" << std::endl;
     return true;
 }
 
@@ -166,4 +219,66 @@ std::vector<uint32_t> LobbyManager::getActiveLobbies() const
 uint32_t LobbyManager::generateLobbyId()
 {
     return _nextLobbyId++;
+}
+
+GameInstance* LobbyManager::getGameInstance(uint32_t lobbyId)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    auto it = _lobbies.find(lobbyId);
+    if (it == _lobbies.end()) {
+        return nullptr;
+    }
+
+    Lobby* lobby = it->second.get();
+    if (lobby->state != LobbyState::RUNNING || !lobby->gameInstance) {
+        return nullptr;
+    }
+
+    return lobby->gameInstance.get();
+}
+
+std::vector<uint32_t> LobbyManager::getLobbyPlayers(uint32_t lobbyId) const
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    auto it = _lobbies.find(lobbyId);
+    if (it == _lobbies.end()) {
+        return {};
+    }
+
+    return it->second->players;
+}
+
+void LobbyManager::runLobbyThread(Lobby* lobby)
+{
+    std::cout << "Started game thread for lobby " << lobby->id << std::endl;
+
+    while (lobby->threadRunning) {
+        while (lobby->hasPendingInputs()) {
+            PlayerInput input = lobby->dequeueInput();
+            lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
+        }
+
+        lobby->gameInstance->update();
+
+        // Broadcast newly spawned entities
+        if (_server) {
+            auto newEntities = lobby->gameInstance->getAndClearNewEntities();
+            for (Entity entity : newEntities) {
+                Message spawnMsg = lobby->gameInstance->serializeEntitySpawn(entity);
+                if (!spawnMsg.getPayload().empty()) {
+                    _server->broadcastToLobby(lobby->id, spawnMsg);
+                }
+            }
+        }
+        if (_server) {
+            std::vector<uint8_t> gameStateData = lobby->gameInstance->serializeGameState();
+            Message gameStateMsg(MessageType::GAME_STATE, gameStateData);
+            _server->broadcastToLobby(lobby->id, gameStateMsg);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    }
+
+    std::cout << "Game thread ended for lobby " << lobby->id << std::endl;
 }
