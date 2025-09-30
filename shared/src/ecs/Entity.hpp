@@ -8,6 +8,10 @@
 #pragma once
 #include <cstdint>
 #include <iostream>
+#include <limits>
+
+constexpr Entity INVALID_ENTITY{std::numeric_limits<uint32_t>::max(), 
+                                std::numeric_limits<uint32_t>::max()};
 
 constexpr Entity INVALID_ENTITY{std::numeric_limits<uint32_t>::max(), 
                                 std::numeric_limits<uint32_t>::max()};
@@ -19,5 +23,8 @@ struct Entity {
     bool operator==(Entity const& o) const noexcept;
     bool operator!=(Entity const& o) const noexcept;
 };
+
+constexpr Entity INVALID_ENTITY{std::numeric_limits<uint32_t>::max(), 
+                                std::numeric_limits<uint32_t>::max()};
 
 std::ostream& operator<<(std::ostream& os, Entity const& e);

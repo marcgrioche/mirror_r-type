@@ -5,6 +5,7 @@
 ** Player
 */
 #include "CreatePlayer.hpp"
+#include "../weapon/CreateWeapon.hpp"
 
 namespace factories {
 Entity createPlayer(Registry& registry)
@@ -18,6 +19,7 @@ Entity createPlayer(Registry& registry)
     registry.emplace<Jump>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
+<<<<<<< HEAD
     return player;
 }
 
@@ -32,5 +34,8 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Jump>(player, Jump {});
     registry.add<PlayerTag>(player, PlayerTag {});
     return player;
+=======
+    createWeapon(registry, Parent{player});
+>>>>>>> 22-basic-weapon
 }
 }
