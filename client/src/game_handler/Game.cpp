@@ -88,7 +88,8 @@ void Game::run()
                 std::string ip;
                 int port;
                 decodeIp(m_menu.m_inputCode, ip, port);
-                printf("Decoded IP: %s, Port: %d\n", ip.c_str(), port);
+                ip = ip.empty() ? "127.0.0.1" : ip;
+                port = (port == 0) ? 4242 : port;
                 m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, 2020, m_events);
                 m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
                 m_clientNetwork->connectToServerRequest();
