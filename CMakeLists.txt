@@ -15,9 +15,9 @@ include_directories(src include ../shared/include ../shared/src ../shared/src/ec
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 # Set C++ standard globally
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# Avoid compiler-specific extensions (use portable -std=c++17)
+# Avoid compiler-specific extensions (use portable -std=c++20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Build types
