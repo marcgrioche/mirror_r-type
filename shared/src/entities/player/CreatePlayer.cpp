@@ -19,7 +19,7 @@ Entity createPlayer(Registry& registry)
     registry.emplace<Jump>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
-<<<<<<< HEAD
+    createWeapon(registry, Parent { player });
     return player;
 }
 
@@ -33,9 +33,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Hitbox>(player, hitbox);
     registry.add<Jump>(player, Jump {});
     registry.add<PlayerTag>(player, PlayerTag {});
+    createWeapon(registry, Parent { player });
     return player;
-=======
-    createWeapon(registry, Parent{player});
->>>>>>> 22-basic-weapon
 }
 }

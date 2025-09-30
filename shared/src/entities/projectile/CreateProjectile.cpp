@@ -26,14 +26,14 @@ void createProjectile(Registry& registry, Vector2 position, Vector2 velocity,
 }
 
 void createProjectile(Registry& registry, const Position& position, const Velocity& velocity,
-    const Damage& damage, const Hitbox& hitbox, const OwnerId& ownerId, const Lifetime& lifetime)
+    const Damage& damage, const Hitbox& hitbox, const Parent& parent, const Lifetime& lifetime)
 {
     Entity projectile = registry.create_entity();
     registry.add<Position>(projectile, position);
     registry.add<Velocity>(projectile, velocity);
     registry.add<Damage>(projectile, damage);
     registry.add<Hitbox>(projectile, hitbox);
-    registry.add<OwnerId>(projectile, ownerId);
+    registry.add<Parent>(projectile, parent);
     registry.add<Lifetime>(projectile, lifetime);
     registry.add<Projectile>(projectile, Projectile {});
 }

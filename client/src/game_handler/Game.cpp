@@ -15,14 +15,14 @@
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
+#include "entities/weapons/HandleWeaponInputs.hpp"
+#include "systems/ProjectileSystem.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/WeaponPositionSystem.hpp"
 #include <SDL.h>
 #include <iostream>
 #include <random>
 #include <thread>
-#include "systems/WeaponPositionSystem.hpp"
-#include "entities/weapons/HandleWeaponInputs.hpp"
-#include "systems/ProjectileSystem.hpp"
 
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
@@ -138,7 +138,6 @@ void Game::run()
 
 void Game::update(float deltaTime)
 {
-<<<<<<< HEAD
     _accumulatedTime += deltaTime;
 
     while (_accumulatedTime >= TICK_DURATION) {
@@ -153,15 +152,6 @@ void Game::update(float deltaTime)
 
         _accumulatedTime -= TICK_DURATION;
     }
-=======
-    handlePlayerInputs(_inputs, _registry);
-    handleWeaponInputs(_inputs, _registry);
-    gravitySystem(_registry, deltaTime);
-    movementSystem(_registry, deltaTime);
-    collisionSystem(_registry, deltaTime);
-    projectileSystem(_registry, deltaTime);
-    weaponPositionSystem(_registry);
->>>>>>> 22-basic-weapon
 }
 
 void Game::render()
@@ -265,7 +255,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
             Velocity { velX, velY },
             Damage { damageValue },
             Hitbox { width, height, offsetX, offsetY },
-            OwnerId { static_cast<int>(ownerId) },
+            Parent { Entity { ownerId, 0 } },
             Lifetime { lifetimeValue });
         break;
     }
