@@ -13,7 +13,6 @@ void Menu::activate(Page page)
     m_inputFocused = (page == Page::Connect || page == Page::Join);
     m_requestConnect = m_requestCreate = m_requestJoin = m_requestStart = false;
 
-    // reset creation flags
     m_joinButtonCreated = false;
     m_lobbyButtonsCreated = false;
     m_joinConfirmCreated = false;
@@ -63,7 +62,6 @@ void Menu::handleEvent(const SDL_Event& e)
         SDL_StopTextInput();
     }
 
-    // Saisie sur page Connect ou Join (champ et touche Entrée ont des effets différents)
     if (m_page == Page::Connect || m_page == Page::Join) {
         if (e.type == SDL_TEXTINPUT && m_inputFocused) {
             m_inputCode += e.text.text;
@@ -74,7 +72,6 @@ void Menu::handleEvent(const SDL_Event& e)
                     m_inputCode.pop_back();
             } else if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_KP_ENTER) {
                 if (m_page == Page::Connect) {
-                    // Valide la connexion “locale”
                     m_requestConnect = true;
                 }
             }
@@ -94,7 +91,6 @@ void Menu::handleEvent(const SDL_Event& e)
 
 void Menu::render(GraphicsManager& gfx, Registry& registry)
 {
-    // auto* renderer = gfx.getRenderer();
     gfx.clear(10, 10, 30, 255);
 
     if (m_page == Page::Connect)
@@ -113,14 +109,12 @@ void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
 {
     auto* renderer = gfx.getRenderer();
 
-    // Champ d’entrée
     gfx.setDrawColor(30, 30, 60, 255);
     SDL_RenderFillRect(renderer, &m_inputRect);
     gfx.setDrawColor(200, 200, 230, 255);
     SDL_RenderDrawRect(renderer, &m_inputRect);
     renderInputText(renderer);
 
-    // Caret
     if (m_inputFocused) {
         Uint32 ticks = SDL_GetTicks();
         if ((ticks / 500) % 2 == 0) {
@@ -138,7 +132,6 @@ void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
         }
     }
 
-    // Bouton ECS “Join Server”
     if (!m_joinButtonCreated) {
         m_joinServerButton = factories::createButton(
             registry,
@@ -157,8 +150,8 @@ void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
         if (b.is_hovered)
             btnFill = SDL_Color { 60, 180, 240, 230 };
         if (b.was_pressed) {
-            b.was_pressed = false; // consume
-            m_requestConnect = true; // hard-coded: passe à la page Lobby
+            b.was_pressed = false;
+            m_requestConnect = true;
         }
     }
 
@@ -174,7 +167,6 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
 {
     auto* renderer = gfx.getRenderer();
 
-    // Crée les 2 boutons ECS si nécessaire
     if (!m_lobbyButtonsCreated) {
         m_createLobbyButton = factories::createButton(
             registry,
@@ -193,7 +185,6 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
         m_lobbyButtonsCreated = true;
     }
 
-    // Create
     SDL_Color crFill { 80, 200, 120, 230 }, crBorder { 255, 255, 255, 255 };
     if (registry.has<Button>(m_createLobbyButton)) {
         auto& b = registry.get<Button>(m_createLobbyButton);
@@ -201,13 +192,11 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
             crFill = SDL_Color { 100, 220, 140, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
-            // Navigue vers la page Start (simulation d'attente joueurs)
             m_page = Page::Start;
-            // Nettoyage des entités lobby au profit de la page Start
             registry.kill_entity(m_createLobbyButton);
             registry.kill_entity(m_joinLobbyButton);
             m_lobbyButtonsCreated = false;
-            m_requestCreate = true; // Game consommera et créera la lobby
+            m_requestCreate = true;
         }
     }
     gfx.setDrawColor(crFill.r, crFill.g, crFill.b, crFill.a);
@@ -217,7 +206,6 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
     if (m_font)
         renderTextCentered(renderer, m_createBtnRect, "Create Lobby", SDL_Color { 255, 255, 255, 255 });
 
-    // Join -> navigue vers la page Join (même UI que Connect) avec input + bouton valider
     SDL_Color jnFill { 40, 160, 220, 230 }, jnBorder { 255, 255, 255, 255 };
     if (registry.has<Button>(m_joinLobbyButton)) {
         auto& b = registry.get<Button>(m_joinLobbyButton);
@@ -225,9 +213,7 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
             jnFill = SDL_Color { 60, 180, 240, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
-            // Aller à la page Join : champ + bouton de validation
             onJoint();
-            // Nettoyage des entités lobby avant d'afficher la page Join
             registry.kill_entity(m_createLobbyButton);
             registry.kill_entity(m_joinLobbyButton);
             m_lobbyButtonsCreated = false;
@@ -245,7 +231,6 @@ void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
 {
     auto* renderer = gfx.getRenderer();
 
-    // Crée le bouton Start si nécessaire
     if (!m_startButtonCreated) {
         m_startButton = factories::createButton(
             registry,
@@ -264,7 +249,7 @@ void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
             stFill = SDL_Color { 220, 180, 60, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
-            m_requestStart = true; // Game consommera et démarrera le gameplay
+            m_requestStart = true;
         }
     }
 
@@ -280,14 +265,12 @@ void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
 {
     auto* renderer = gfx.getRenderer();
 
-    // Champ d’entrée
     gfx.setDrawColor(30, 30, 60, 255);
     SDL_RenderFillRect(renderer, &m_inputRect);
     gfx.setDrawColor(200, 200, 230, 255);
     SDL_RenderDrawRect(renderer, &m_inputRect);
     renderInputText(renderer);
 
-    // Caret
     if (m_inputFocused) {
         Uint32 ticks = SDL_GetTicks();
         if ((ticks / 500) % 2 == 0) {

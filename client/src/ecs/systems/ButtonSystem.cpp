@@ -15,9 +15,8 @@
 
 void buttonSystem(Registry& registry)
 {
-    // Edge-triggered left-click handling, consumed once per press
-    static bool prevMousePressed = false;          // state at previous frame
-    static bool clickConsumedForThisPress = false; // only one button per press
+    static bool prevMousePressed = false;
+    static bool clickConsumedForThisPress = false;
 
     int mx = 0, my = 0;
     const Uint32 mouseState = SDL_GetMouseState(&mx, &my);
@@ -27,7 +26,6 @@ void buttonSystem(Registry& registry)
     const bool justReleased = !mousePressed && prevMousePressed;
 
     if (justReleased) {
-        // reset consumption for next press
         clickConsumedForThisPress = false;
     }
 
@@ -47,9 +45,8 @@ void buttonSystem(Registry& registry)
         const bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
         button.is_hovered = hovered && button.interactable;
 
-        // Fire only on the press edge and only once per press
         if (button.interactable && hovered && justPressed && !clickConsumedForThisPress) {
-            button.was_pressed = true; // UI code will consume and reset this
+            button.was_pressed = true;
             eventMgr.emitButtonClick(e, button.action_id);
             clickConsumedForThisPress = true;
         }

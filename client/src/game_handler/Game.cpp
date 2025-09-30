@@ -41,9 +41,6 @@ bool Game::initialize()
         return false;
     }
 
-    // Entities will be created dynamically via SPAWN_ENTITY messages from server
-    // No hardcoded entities needed - client receives all entities from server
-
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;
@@ -83,7 +80,6 @@ void Game::run()
         }
 
         if (_state == GameState::MENU) {
-            // Page 1: Connect -> passe à la page Lobby (hard-coded)
             if (m_menu.popConnectRequest()) {
                 std::string ip;
                 int port;
@@ -98,32 +94,28 @@ void Game::run()
             // Page 2: Lobby
             if (m_menu.popCreateLobbyRequest()) {
                 m_clientNetwork->createLobbyRequest();
-                // Aller à la page Start (attente) via menu
                 m_menu.onCreated();
                 printf("Lobby created, waiting for game start...\n");
             }
             if (m_menu.popJoinLobbyRequest()) {
-                // Join direct -> jeu
                 m_clientNetwork->joinLobbyRequest(std::stoi(m_menu.m_inputCode));
                 m_menu.deactivate(_registry);
                 startGameplay();
             }
 
-            // Page 3: Start -> bouton "Start" lance le jeu
+            // Page 3: Start -> button "Start"
             if (m_menu.popStartRequest()) {
                 m_clientNetwork->startGameRequest();
                 m_menu.deactivate(_registry);
                 startGameplay();
             }
 
-            // MAJ ECS boutons + rendu
-            buttonSystem(_registry); // [client/src/ecs/systems/ButtonSystem.hpp](client/src/ecs/systems/ButtonSystem.hpp)
+            buttonSystem(_registry);
             m_menu.render(_graphics, _registry);
             SDL_Delay(16);
             continue;
         }
 
-        // Etat PLAYING
         update(deltaTime);
         render();
         SDL_Delay(16);
@@ -210,7 +202,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
     float posY = msg.readFloat();
 
     switch (entityType) {
-    case 0: { // Player
+    case 0: {
         uint32_t healthValue = msg.readU32();
         float width = msg.readFloat();
         float height = msg.readFloat();
@@ -224,7 +216,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
 
         registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
 
-        // TODO : AUTO Sprite component for rendering
+        // TODO : AUTO Sprite component for rendering // DONE: on branch Ressource_manager
         Sprite sprite;
         sprite.texture_id = "player_sprite.png";
         sprite.frame_width = 32;
@@ -235,7 +227,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
         break;
     }
 
-    case 1: { // Projectile
+    case 1: {
         float velX = msg.readFloat();
         float velY = msg.readFloat();
         float damageValue = msg.readFloat();
@@ -256,7 +248,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
         break;
     }
 
-    case 2: { // Platform
+    case 2: {
         float width = msg.readFloat();
         float height = msg.readFloat();
         float offsetX = msg.readFloat();
