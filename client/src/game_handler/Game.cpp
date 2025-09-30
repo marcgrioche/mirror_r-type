@@ -20,6 +20,7 @@
 #include <thread>
 #include "systems/WeaponPositionSystem.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
+#include "systems/ProjectileSystem.hpp"
 
 Game::Game()
     : _graphics(GraphicsManager::getInstance())
@@ -96,6 +97,7 @@ void Game::update(float deltaTime)
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
     collisionSystem(_registry, deltaTime);
+    projectileSystem(_registry, deltaTime);
     weaponPositionSystem(_registry);
 }
 
