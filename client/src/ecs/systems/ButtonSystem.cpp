@@ -11,13 +11,25 @@
 #include "ButtonSystem.hpp"
 #include "../../managers/EventManager.hpp"
 #include "components/AllComponents.hpp"
+#include <SDL2/SDL.h>
 
 void buttonSystem(Registry& registry)
 {
-    // Récupère état souris (comme dans InputManager::updateInputs)
-    int mx, my;
-    Uint32 mouseState = SDL_GetMouseState(&mx, &my);
-    bool mousePressed = (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+    // Edge-triggered left-click handling, consumed once per press
+    static bool prevMousePressed = false;          // state at previous frame
+    static bool clickConsumedForThisPress = false; // only one button per press
+
+    int mx = 0, my = 0;
+    const Uint32 mouseState = SDL_GetMouseState(&mx, &my);
+    const bool mousePressed = (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+
+    const bool justPressed = mousePressed && !prevMousePressed;
+    const bool justReleased = !mousePressed && prevMousePressed;
+
+    if (justReleased) {
+        // reset consumption for next press
+        clickConsumedForThisPress = false;
+    }
 
     auto& eventMgr = EventManager::getInstance();
 
@@ -25,29 +37,23 @@ void buttonSystem(Registry& registry)
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity e = it.entity();
 
-        // require Position + Hitbox + Button
         if (!registry.has<Position>(e) || !registry.has<Hitbox>(e) || !registry.has<Button>(e))
             continue;
 
-        // get component references
         Button& button = registry.get<Button>(e);
         Position& pos = registry.get<Position>(e);
         Hitbox& hitbox = registry.get<Hitbox>(e);
 
-        // Test point-in-rect
-        bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
+        const bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
+        button.is_hovered = hovered && button.interactable;
 
-        // Détection clic
-        if (hovered && !button.was_pressed && mousePressed && button.interactable) {
-            button.was_pressed = true;
-        } else if (button.was_pressed && !mousePressed) {
-            // Relâchement = clic validé
-            if (hovered) {
-                eventMgr.emitButtonClick(e, button.action_id);
-            }
-            button.was_pressed = false;
+        // Fire only on the press edge and only once per press
+        if (button.interactable && hovered && justPressed && !clickConsumedForThisPress) {
+            button.was_pressed = true; // UI code will consume and reset this
+            eventMgr.emitButtonClick(e, button.action_id);
+            clickConsumedForThisPress = true;
         }
-
-        button.is_hovered = hovered;
     }
+
+    prevMousePressed = mousePressed;
 }
