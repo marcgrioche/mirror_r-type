@@ -6,8 +6,12 @@
 */
 
 #pragma once
+#include <chrono>
 
 struct Frequency {
-    float seconds = 1; //happends every n seconds
-    float lastTime = seconds; //store the last time the frequency have been reached
+    double frequency = 1.0; // happens every "frequency" seconds
+    std::chrono::high_resolution_clock::time_point lastTime = std::chrono::high_resolution_clock::time_point::min();
+    
+    Frequency() = default;
+    Frequency(double freq) : frequency(freq) {}
 };

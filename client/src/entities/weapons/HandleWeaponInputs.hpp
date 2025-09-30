@@ -9,4 +9,4 @@
 #include "Registry.hpp"
 #include "managers/InputManager.hpp"
 
-void handleWeaponInputs(InputManager& _inputs, Registry& registry, float deltaTime);
+void handleWeaponInputs(InputManager& _inputs, Registry& registry);

@@ -93,7 +93,7 @@ void Game::run()
 void Game::update(float deltaTime)
 {
     handlePlayerInputs(_inputs, _registry);
-    handleWeaponInputs(_inputs, _registry, deltaTime);
+    handleWeaponInputs(_inputs, _registry);
     gravitySystem(_registry, deltaTime);
     movementSystem(_registry, deltaTime);
     collisionSystem(_registry, deltaTime);
