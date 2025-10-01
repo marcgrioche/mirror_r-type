@@ -42,8 +42,6 @@ void Game::updateNetworkGameTick()
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_clientNetwork->incrementTick();
-
-    updateClientPrediction();
 }
 
 void Game::updateLocalGameTick()
@@ -63,9 +61,4 @@ void Game::render()
 void Game::startGameplay()
 {
     _state = GameState::PLAYING;
-
-    if (!m_isLocalMode && m_clientNetwork) {
-        m_inputHistory.clear();
-        std::cout << "Game started - waiting for player spawn to initialize prediction" << std::endl;
-    }
 }

@@ -58,38 +58,7 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         Hitbox { width, height, offsetX, offsetY });
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
-    handlePlayerPrediction(msg, registry, entity, serverPlayerId);
     addPlayerSprite(registry, entity, posX, posY);
-}
-
-void Game::handlePlayerPrediction(const Message& msg, Registry& registry,
-    Entity entity, uint32_t serverPlayerId)
-{
-    if (m_isLocalMode || !m_clientNetwork) {
-        return;
-    }
-
-    Message& msgRef = const_cast<Message&>(msg);
-    if (msgRef.player_id != serverPlayerId) {
-        return;
-    }
-
-    m_clientPlayerId = serverPlayerId;
-    registry.add<PredictedEntity>(entity, PredictedEntity { serverPlayerId });
-    initializeClientPrediction();
-}
-
-void Game::initializeClientPrediction()
-{
-    if (m_clientGameInstance) {
-        return;
-    }
-
-    m_clientGameInstance = std::make_unique<GameInstance>(0);
-    m_clientGameInstance->initialize();
-    m_clientGameInstance->addPlayer(m_clientPlayerId);
-    std::cout << "Client prediction initialized with Player ID " << m_clientPlayerId << std::endl;
-    std::cout << "Client identified as Player " << m_clientPlayerId << std::endl;
 }
 
 void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float posY)
@@ -162,11 +131,6 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     uint32_t tick = msg.readU32();
     uint8_t numPlayers = msg.readU8();
 
-    if (!m_isLocalMode && m_clientGameInstance) {
-        reconcileWithServerState(tick, msg);
-        return;
-    }
-
     updateNonPredictedEntities(msg, registry, numPlayers);
 }
 
@@ -209,9 +173,7 @@ Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
 void Game::updateEntityState(Registry& registry, Entity entity,
     float posX, float posY, uint32_t health)
 {
-    if (!registry.has<PredictedEntity>(entity)) {
-        updateEntityPosition(registry, entity, posX, posY);
-    }
+    updateEntityPosition(registry, entity, posX, posY);
     updateEntityHealth(registry, entity, health);
 }
 
