@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Sep 29 1:41:01 PM 2025 jojo
-** Last update Tue Sep 29 1:41:08 PM 2025 jojo
+** Last update Thu Oct 1 10:44:03 AM 2025 jojo
 */
 
 #include "CreateButton.hpp"
@@ -17,13 +17,8 @@ Entity createButton(Registry& registry, float x, float y, float width, float hei
 {
     Entity button = registry.create_entity();
 
-    // Position sur l'écran
     registry.emplace<Position>(button, x, y);
-
-    // Zone cliquable
     registry.emplace<Hitbox>(button, width, height, 0.0f, 0.0f);
-
-    // State et action du bouton
     registry.emplace<Button>(button, actionId, false, false, interactable);
 
     // Optionnel : sprite pour le rendu
