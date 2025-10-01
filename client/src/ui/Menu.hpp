@@ -1,8 +1,8 @@
 #pragma once
 #include "../entities/button/CreateButton.hpp"
-#include "Entity.hpp" // pour stocker l'entité bouton
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include "Entity.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <string>
 
@@ -24,7 +24,6 @@ public:
     void render(GraphicsManager& gfx, Registry& registry);
 
     std::string m_inputCode;
-    // Navigation “hard-coded”
     void onConnected() { m_page = Page::Lobby; }
     void onJoint()
     {
@@ -34,7 +33,6 @@ public:
     }
     void onCreated() { m_page = Page::Start; }
 
-    // Signaux UI (hard-coded)
     bool popConnectRequest()
     {
         bool v = m_requestConnect;
@@ -63,17 +61,14 @@ public:
     ~Menu() = default;
 
 private:
-    // Pages
     void renderConnectPage(GraphicsManager& gfx, Registry& registry);
     void renderLobbyPage(GraphicsManager& gfx, Registry& registry);
     void renderJoinPage(GraphicsManager& gfx, Registry& registry);
     void renderStartPage(GraphicsManager& gfx, Registry& registry);
 
-    // Etat global
     bool m_active = false;
     Page m_page = Page::Connect;
 
-    // Page Connect
     bool m_inputFocused = true;
     SDL_Rect m_inputRect { 800 / 2 - 200, 600 / 2 - 80, 400, 50 };
     SDL_Rect m_connectBtnRect { 800 / 2 - 100, 600 / 2 + 0, 200, 60 };
@@ -81,7 +76,6 @@ private:
     bool m_joinButtonCreated = false;
     bool m_requestConnect = false;
 
-    // Page Lobby
     SDL_Rect m_createBtnRect { 800 / 2 - 220, 600 / 2 - 30, 200, 60 };
     SDL_Rect m_joinBtnRect { 800 / 2 + 20, 600 / 2 - 30, 200, 60 };
     Entity m_createLobbyButton {};
@@ -91,16 +85,13 @@ private:
     bool m_requestJoin = false;
     bool m_requestStart = false;
 
-    // Page Join (input + confirm)
     Entity m_joinConfirmButton {};
     bool m_joinConfirmCreated = false;
 
-    // Page Start (single button)
     SDL_Rect m_startBtnRect { 800 / 2 - 100, 600 / 2 - 30, 200, 60 };
     Entity m_startButton {};
     bool m_startButtonCreated = false;
 
-    // Text rendering
     TTF_Font* m_font = nullptr;
     int m_fontSize = 22;
     SDL_Color m_textColor { 240, 240, 255, 255 };
