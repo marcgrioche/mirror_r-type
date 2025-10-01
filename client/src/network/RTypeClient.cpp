@@ -112,7 +112,7 @@ void RTypeClient::stop()
 
 void RTypeClient::sendMessage(const MessageType t_type)
 {
-    const Message msg(t_type, m_msgSequenceNumber, 0, 1);
+    const Message msg(t_type, m_msgSequenceNumber, m_playerId, 1);
     const std::vector<uint8_t> msgData = msg.serialize();
 
     queueMessage(msg, m_serverInfo);
@@ -120,7 +120,7 @@ void RTypeClient::sendMessage(const MessageType t_type)
 
 void RTypeClient::sendMessage(const MessageType t_type, uint32_t t_payload)
 {
-    Message msg(t_type, m_msgSequenceNumber, 0, 1);
+    Message msg(t_type, m_msgSequenceNumber, m_playerId, 1);
 
     msg.write(t_payload);
     queueMessage(msg, m_serverInfo);
@@ -128,7 +128,8 @@ void RTypeClient::sendMessage(const MessageType t_type, uint32_t t_payload)
 
 void RTypeClient::sendMessage(const Message& t_msg)
 {
-    queueMessage(t_msg, m_serverInfo);
+    Message msg(t_msg.getType(), t_msg.getPayload(), t_msg.sequence_number, m_playerId, t_msg.version);
+    queueMessage(msg, m_serverInfo);
 }
 
 void RTypeClient::connectToServerRequest()

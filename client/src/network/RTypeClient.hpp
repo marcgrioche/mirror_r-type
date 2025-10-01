@@ -56,9 +56,11 @@ private:
     PeerInfo m_serverInfo;
     bool m_debug;
     uint16_t m_msgSequenceNumber;
+    uint32_t m_playerId = 0;
     uint32_t m_lobbyId = 0;
     uint64_t m_ping;
     uint32_t m_currentTick = 0;
+    bool m_isConnected = false;
     NetworkEventQueue& m_eventsQueue;
     std::unordered_map<GameAction, bool> m_previousInputStates;
 

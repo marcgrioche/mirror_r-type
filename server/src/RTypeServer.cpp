@@ -33,6 +33,7 @@ void RTypeServer::handleSignal(int)
 
 RTypeServer::RTypeServer(uint16_t port)
     : _port(port)
+    , _nextPlayerId(1)
 {
     _socket = std::make_unique<UdpSocket>(_port);
     _lobbyManager.setServer(this);
