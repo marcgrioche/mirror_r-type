@@ -8,6 +8,7 @@
 #pragma once
 
 // Individual component includes
+#include "Button.hpp"
 #include "Damage.hpp"
 #include "Health.hpp"
 #include "Hitbox.hpp"
@@ -20,6 +21,7 @@
 #include "Position.hpp"
 #include "PreviousPosition.hpp"
 #include "Projectile.hpp"
+#include "ServerEntityId.hpp"
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"

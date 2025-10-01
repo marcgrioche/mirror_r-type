@@ -2,8 +2,10 @@
 
 using namespace Client;
 
-void RTypeClient::handleEntitySpawn(const Message& t_msg, PeerInfo& t_peerInfo)
+void RTypeClient::handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo)
 {
-    (void)t_msg;
     (void)t_peerInfo;
+
+    // Push the message to the event queue for Game to process
+    m_eventsQueue.push({ MessageType::SPAWN_ENTITY, t_msg });
 }

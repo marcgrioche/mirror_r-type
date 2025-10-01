@@ -35,4 +35,6 @@ void RTypeClient::handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo)
         m_lobbyId = lobbyId;
         std::cout << "Joined lobby " << lobbyId << std::endl;
     }
+
+    m_eventsQueue.push({ MessageType::LOBBY_INFO, t_msg });
 }

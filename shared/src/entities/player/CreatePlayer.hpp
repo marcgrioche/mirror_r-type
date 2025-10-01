@@ -10,5 +10,6 @@
 #include "components/AllComponents.hpp"
 
 namespace factories {
-void createPlayer(Registry& registry);
+Entity createPlayer(Registry& registry);
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
 }
