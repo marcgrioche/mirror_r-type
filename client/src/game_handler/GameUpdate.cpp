@@ -12,6 +12,7 @@
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
+#include "entities/enemies/enemyMovement.hpp"
 #include "systems/RenderSystem.hpp"
 #include <iostream>
 
@@ -48,6 +49,7 @@ void Game::updateNetworkGameTick()
 
 void Game::updateLocalGameTick()
 {
+    enemyMovement(_registry, TICK_DURATION);
     handlePlayerInputs(_inputs, _registry);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);

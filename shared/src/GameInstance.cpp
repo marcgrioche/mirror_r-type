@@ -53,6 +53,7 @@ void GameInstance::initializeLevel()
     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
     _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
 
     for (int i = 0; i < 8; i++) {
         _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));

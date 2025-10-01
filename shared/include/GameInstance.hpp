@@ -10,6 +10,7 @@
 #include "../../shared/src/ecs/systems/ProjectileSystem.hpp"
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
+#include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include <chrono>
 #include <cstdint>
 #include <functional>

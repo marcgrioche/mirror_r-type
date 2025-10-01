@@ -23,13 +23,13 @@ void movementSystem(Registry& registry, float deltaTime)
         pos.y += vel.dy * deltaTime;
 
         // garde le joueur dans l'écran, fait à l'arrache
-        if (pos.x < 0) {
-            pos.x = 0;
-            vel.dx = 0;
-        }
-        if (pos.x > 800 - 32) { // Assuming player width of 32
-            pos.x = 800 - 32;
-            vel.dx = 0;
-        }
+        // if (pos.x < 0) {
+        //     pos.x = 0;
+        //     vel.dx = 0;
+        // }
+        // if (pos.x > 800 - 32) { // Assuming player width of 32
+        //     pos.x = 800 - 32;
+        //     vel.dx = 0;
+        // }
     }
 }

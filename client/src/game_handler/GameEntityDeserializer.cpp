@@ -10,6 +10,7 @@
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
+#include "entities/enemies/CreateEnemy.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -141,7 +142,20 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
-    std::cout << "Enemy entity creation not implemented yet" << std::endl;
+    uint32_t healthValue = msg.readU32();
+    float width = msg.readFloat();
+    float height = msg.readFloat();
+    float offsetX = msg.readFloat();
+    float offsetY = msg.readFloat();
+
+    Entity enemy = factories::createEnemy(
+        registry,
+        Position { posX, posY },
+        Health { static_cast<int>(healthValue) },
+        Hitbox { width, height, offsetX, offsetY }
+    );
+
+    registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
 }
 
 void Game::logUnknownEntityType(uint8_t entityType)
