@@ -55,5 +55,7 @@ private:
     void handleLobbyCreation(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo);
     void handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleRollback(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleEntitySpawn(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }
