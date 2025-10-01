@@ -15,8 +15,11 @@
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
+#include "entities/weapons/HandleWeaponInputs.hpp"
+#include "systems/ProjectileSystem.hpp"
 #include "systems/RenderSystem.hpp"
-#include <SDL2/SDL.h>
+#include "systems/WeaponPositionSystem.hpp"
+#include <SDL.h>
 #include <iostream>
 #include <random>
 #include <thread>
@@ -252,7 +255,7 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
             Velocity { velX, velY },
             Damage { damageValue },
             Hitbox { width, height, offsetX, offsetY },
-            OwnerId { static_cast<int>(ownerId) },
+            Parent { Entity { ownerId, 0 } },
             Lifetime { lifetimeValue });
         break;
     }

@@ -1,8 +1,8 @@
 #pragma once
 #include "../entities/button/CreateButton.hpp"
 #include "Entity.hpp" // pour stocker l'entité bouton
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <string>
 

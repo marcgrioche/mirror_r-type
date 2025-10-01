@@ -14,6 +14,6 @@
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
 #include "ecs/Registry.hpp"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 void buttonSystem(Registry& registry);
