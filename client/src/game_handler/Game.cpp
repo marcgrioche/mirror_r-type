@@ -2,30 +2,22 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** Game class implementation
+** Game class implementation - Core initialization and main loop
 */
 
 #include "Game.hpp"
-#include "ecs/components/AllComponents.hpp"
-#include "ecs/systems/CollisionSystem.hpp"
-#include "ecs/systems/GravitySystem.hpp"
-#include "ecs/systems/MovementSystem.hpp"
-#include "entities/platform/CreatePlatform.hpp"
-#include "entities/player/CreatePlayer.hpp"
-#include "entities/player/HandlePlayerInputs.hpp"
-#include "systems/RenderSystem.hpp"
-#include <SDL2/SDL.h>
+#include "ButtonSystem.hpp"
+#include <SDL.h>
 #include <iostream>
-#include <random>
-#include <thread>
 
-Game::Game()
+Game::Game(bool isLocalMode)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
-    , m_clientNetwork(std::make_unique<Client::RTypeClient>("127.0.0.1", 4242, 2020, m_events))
+    , m_clientNetwork(nullptr)
+    , m_localGameInstance(nullptr)
     , _isRunning(false)
+    , m_isLocalMode(isLocalMode)
 {
-    m_clientNetwork->connectToServerRequest();
 }
 
 Game::~Game()
@@ -40,21 +32,38 @@ bool Game::initialize()
         return false;
     }
 
-    Entity playerEntity = factories::createPlayer(_registry);
-    (void)playerEntity;
-
-    factories::createOneWayPlatform(_registry, 100, 400);
-    factories::createPlatform(_registry, 300, 350);
-    factories::createPlatform(_registry, 500, 300);
-    factories::createOneWayPlatform(_registry, 200, 250);
-
-    for (int i = 0; i < 8; i++) {
-        factories::createPlatform(_registry, i * 100, 520);
-    }
-
     _timer.start();
+    _lastTickTime = std::chrono::steady_clock::now();
+    _accumulatedTime = 0.0f;
     _isRunning = true;
+
+    initializeGameMode();
     return true;
+}
+
+void Game::initializeGameMode()
+{
+    if (m_isLocalMode) {
+        initializeLocalMode();
+    } else {
+        initializeMenuMode();
+    }
+}
+
+void Game::initializeLocalMode()
+{
+    m_localGameInstance = std::make_unique<GameInstance>(0);
+    m_localGameInstance->initialize();
+    m_localGameInstance->addPlayer(1);
+
+    _state = GameState::PLAYING;
+    std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
+}
+
+void Game::initializeMenuMode()
+{
+    _state = GameState::MENU;
+    m_menu.activate(Menu::Page::Connect);
 }
 
 void Game::run()
@@ -63,68 +72,84 @@ void Game::run()
         std::cerr << "Game not initialized! Call initialize() first." << std::endl;
         return;
     }
-    auto netThread = std::thread([this]() { m_clientNetwork->start(); });
+
     SDL_Event event;
 
     while (_isRunning) {
-        processNetworkEvents();
-        float deltaTime = _timer.getDeltaTime();
+        processGameMode();
 
-        _inputs.updateInputs(event);
+        float deltaTime = _timer.getDeltaTime();
+        handleInputEvents(event);
+
         if (_inputs.isActionPressed(GameAction::QUIT)) {
             _isRunning = false;
-            m_clientNetwork->disconnectFromServerRequest();
             break;
         }
-        update(deltaTime);
-        render();
 
-        SDL_Delay(16); // ~60 FPS
+        if (_state == GameState::MENU) {
+            runMenuLoop();
+            continue;
+        }
+
+        runGameLoop(deltaTime);
     }
 
-    if (netThread.joinable()) {
-        netThread.join();
-    }
     std::cout << "Game loop ended." << std::endl;
 }
 
-void Game::update(float deltaTime)
+void Game::processGameMode()
 {
-    handlePlayerInputs(_inputs, _registry);
-    gravitySystem(_registry, deltaTime);
-    movementSystem(_registry, deltaTime);
-    collisionSystem(_registry, deltaTime);
+    if (m_isLocalMode) {
+        processLocalGameUpdates();
+    } else {
+        processNetworkEvents();
+    }
 }
 
-void Game::render()
+void Game::handleInputEvents(SDL_Event& event)
 {
-    renderSystem(_registry);
+    _inputs.beginFrame();
+    while (SDL_PollEvent(&event)) {
+        _inputs.handleSDLEvent(event);
+        if (_state == GameState::MENU) {
+            m_menu.handleEvent(event);
+        }
+    }
+}
+
+void Game::runMenuLoop()
+{
+    processMenuEvents();
+    buttonSystem(_registry);
+    m_menu.render(_graphics, _registry);
+    SDL_Delay(16);
+}
+
+void Game::runGameLoop(float deltaTime)
+{
+    update(deltaTime);
+    render();
+    SDL_Delay(16);
 }
 
 void Game::cleanup()
 {
     if (_isRunning) {
+        SDL_StopTextInput();
         _graphics.cleanup();
         _isRunning = false;
         std::cout << "Game cleanup completed." << std::endl;
     }
+
+    cleanupNetwork();
+}
+
+void Game::cleanupNetwork()
+{
     if (m_clientNetwork) {
         m_clientNetwork->stop();
     }
-}
-
-void Game::processNetworkEvents()
-{
-    const auto event = m_events.pop();
-    if (!event)
-        return;
-    const auto value = event.value();
-
-    switch (value.type) {
-    case MessageType::CONNECT_ACK:
-        std::cout << "Connection acknowledged by server" << std::endl;
-        break;
-    default:
-        break;
+    if (m_networkThread.joinable()) {
+        m_networkThread.join();
     }
 }

@@ -7,7 +7,7 @@
 
 #include "Message.hpp"
 
-using NetworkPayload = std::variant<bool, std::string>;
+using NetworkPayload = std::variant<bool, std::string, Message>;
 
 namespace Client {
 struct NetworkEvent {

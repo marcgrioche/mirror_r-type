@@ -106,7 +106,42 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 
 ### SPAWN_ENTITY
 - **Direction**: Server → Client
-- **Payload**: Entity spawn data (TBD - depends on ECS implementation)
+- **Payload**:
+  - uint32: Entity ID (unique identifier)
+  - uint8: Entity Type (0=Player, 1=Projectile, 2=Platform, 3=Enemy)
+  - Entity-specific component data (see below)
+
+**Entity Type Data Formats:**
+
+**All Entity Types:**
+- Position: `float x, float y` (network byte order)
+
+**Player (Type 0):**
+- Health: `int32 health`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
+- PlayerID: `uint32 player_id` (for client to identify which player is theirs)
+
+**Projectile (Type 1):**
+- Velocity: `float vx, float vy`
+- Damage: `float damage`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
+- OwnerId: `int32 owner_entity_id`
+- Lifetime: `float lifetime_seconds`
+
+**Enemy (Type 3):**
+- Health: `int32 health`
+- Hitbox: `float width, float height, float offset_x, float offset_y`
+
+### GAME_STATE
+- **Direction**: Server → Client
+- **Payload**:
+  - uint32: Current tick number
+  - uint8: Number of players in this update
+  - For each player:
+    - uint32: Entity ID
+    - float: Position X
+    - float: Position Y
+    - uint32: Health value
 
 ### ROLLBACK
 - **Direction**: Server → Client

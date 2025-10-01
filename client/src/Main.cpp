@@ -7,10 +7,21 @@
 
 #include "game_handler/Game.hpp"
 #include <iostream>
+#include <string>
 
-int main()
+int main(int argc, char* argv[])
 {
-    Game game;
+    bool isLocalMode = false;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--local") {
+            isLocalMode = true;
+            std::cout << "Starting in local mode" << std::endl;
+        }
+    }
+
+    Game game(isLocalMode);
 
     if (!game.initialize()) {
         std::cerr << "Failed to initialize game!" << std::endl;

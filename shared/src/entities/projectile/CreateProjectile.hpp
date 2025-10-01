@@ -9,10 +9,13 @@
 */
 
 #pragma once
+#include "Parent.hpp"
 #include "Registry.hpp"
 #include "components/AllComponents.hpp"
 
 namespace factories {
 void createProjectile(Registry& registry, Vector2 position, Vector2 velocity,
-    Entity owner, float lifetime = 3.0f, int damage = 1);
+    Parent parent, float lifetime = 3.0f, int damage = 1);
+void createProjectile(Registry& registry, const Position& position, const Velocity& velocity,
+    const Damage& damage, const Hitbox& hitbox, const Parent& parent, const Lifetime& lifetime);
 }

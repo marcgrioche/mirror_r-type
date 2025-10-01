@@ -76,7 +76,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
                 playerVel.dy = 0.0f;
                 playerJump.isJumping = false; // Player can jump again
                 playerJump.canJump = true; // Reset jump ability
-                std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
+                // std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
             }
         } else {
             playerPos.y = platformBottom - playerHitbox.offset_y;
@@ -105,6 +105,6 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
-        std::cout << "Player landed on one-way platform!" << std::endl;
+        // std::cout << "Player landed on one-way platform!" << std::endl;
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../shared/include/GameInputs.hpp"
+#include "../../shared/include/Message.hpp"
 #include "../../shared/src/ecs/Registry.hpp"
 #include "../../shared/src/ecs/components/AllComponents.hpp"
 #include "../../shared/src/ecs/systems/CollisionSystem.hpp"
@@ -11,6 +12,7 @@
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <unordered_map>
 #include <vector>
 
@@ -37,6 +39,34 @@ public:
     std::vector<uint8_t> serializeGameState() const;
     void deserializeGameState(const std::vector<uint8_t>& data);
 
+    /**
+     * Serialize entity spawn data for SPAWN_ENTITY message.
+     *
+     * Args:
+     *     entity (Entity): The entity to serialize
+     *
+     * Returns:
+     *     std::vector<uint8_t>: Serialized spawn data, or empty if entity type not supported
+     */
+    Message serializeEntitySpawn(Entity entity);
+
+    /**
+     * Get newly spawned entities from this tick and clear the list.
+     *
+     * Returns:
+     *     std::vector<Entity>: Entities created this tick
+     */
+    std::vector<Entity> getAndClearNewEntities();
+
+    /**
+     * Get registry for client prediction access.
+     *
+     * Returns:
+     *     Registry&: Reference to the game registry
+     */
+    Registry& getRegistry() { return _registry; }
+    const Registry& getRegistry() const { return _registry; }
+
 private:
     uint32_t _lobbyId;
     Registry _registry;
@@ -45,6 +75,7 @@ private:
     std::chrono::steady_clock::time_point _lastTickTime;
 
     std::unordered_map<uint32_t, Entity> _playerEntities;
+    std::vector<Entity> _newEntitiesThisTick;
 
     void updateTick();
     void initializeLevel();

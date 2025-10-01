@@ -11,4 +11,5 @@
 
 namespace factories {
 Entity createPlayer(Registry& registry);
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
 }

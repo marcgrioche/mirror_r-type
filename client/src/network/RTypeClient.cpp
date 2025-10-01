@@ -126,6 +126,11 @@ void RTypeClient::sendMessage(const MessageType t_type, uint32_t t_payload)
     queueMessage(msg, m_serverInfo);
 }
 
+void RTypeClient::sendMessage(const Message& t_msg)
+{
+    queueMessage(t_msg, m_serverInfo);
+}
+
 void RTypeClient::connectToServerRequest()
 {
     sendMessage(MessageType::CONNECT);
@@ -147,6 +152,11 @@ void RTypeClient::lobbyStartRequest()
     sendMessage(MessageType::LOBBY_STATE);
 }
 
+void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
+}
+
 void RTypeClient::registerHandlers()
 {
     _handlers[MessageType::CONNECT_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
@@ -157,5 +167,11 @@ void RTypeClient::registerHandlers()
     };
     _handlers[MessageType::PONG] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handlePongReceipt(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::SPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleSpawnEntity(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameState(t_msg, t_peerInfo);
     };
 }
