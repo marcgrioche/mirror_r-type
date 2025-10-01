@@ -5,15 +5,15 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:02:34 AM 2025 jojo
-** Last update Thu Oct 1 11:21:05 AM 2025 jojo
+** Last update Thu Oct 1 2:22:00 PM 2025 jojo
 */
 
 #pragma once
-#include "../../components/TextBox.hpp"
 #include "Registry.hpp"
 #include "components/AllComponents.hpp"
+#include "components/TextBox.hpp"
 
-namespace Factory {
+namespace factories {
 Entity TextBox(Registry& registry, const std::string& text,
     float x, float y, int fontSize = 16,
     SDL_Color color = { 255, 255, 255, 255 });
