@@ -32,9 +32,16 @@ void Game::handleMenuCreateLobbyRequest()
 
 void Game::handleMenuJoinLobbyRequest()
 {
-    m_clientNetwork->joinLobbyRequest(std::stoi(m_menu.m_inputCode));
-    m_menu.deactivate(_registry);
-    startGameplay();
+    if (!m_clientNetwork) {
+        std::cout << "Not connected to server. Use Connect first." << std::endl;
+        return;
+    }
+    if (m_menu.m_inputCode.empty()) {
+        std::cout << "Please enter a lobby ID" << std::endl;
+        return;
+    }
+    m_clientNetwork->joinLobbyRequest(static_cast<uint32_t>(std::stoul(m_menu.m_inputCode)));
+    // Attendre la réponse LOBBY_INFO pour changer d'état
 }
 
 void Game::handleMenuStartRequest()
