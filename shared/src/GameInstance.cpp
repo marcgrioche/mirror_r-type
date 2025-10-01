@@ -1,5 +1,5 @@
-#include "GameInstance.hpp"
-#include "../../shared/include/Message.hpp"
+#include "../include/GameInstance.hpp"
+#include "../include/Message.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)

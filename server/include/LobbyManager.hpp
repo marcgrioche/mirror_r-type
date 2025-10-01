@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameInstance.hpp"
+#include "../../shared/include/GameInstance.hpp"
 #include <atomic>
 #include <cstdint>
 #include <memory>

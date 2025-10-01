@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "../../../shared/include/GameInstance.hpp"
 #include "../../../shared/include/Message.hpp"
 #include "../network/RTypeClient.hpp"
 #include "../ui/Menu.hpp"
@@ -37,7 +38,7 @@ public:
     static constexpr uint32_t TICKS_PER_SECOND = 60;
     static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND;
 
-    Game();
+    Game(bool isLocalMode = false);
     ~Game();
 
     bool initialize();
@@ -48,6 +49,7 @@ private:
     void update(float deltaTime);
     void render();
     void processNetworkEvents();
+    void processLocalGameUpdates();
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
     void deserializeAndUpdateGameState(const Message& msg, Registry& registry);
     void startGameplay();
@@ -61,9 +63,11 @@ private:
     InputManager& _inputs;
     Client::NetworkEventQueue m_events;
     std::unique_ptr<Client::RTypeClient> m_clientNetwork;
+    std::unique_ptr<GameInstance> m_localGameInstance;
     std::thread m_networkThread;
 
     bool _isRunning;
+    bool m_isLocalMode;
     bool m_connected = false;
     bool m_lobbyCreated = false;
 

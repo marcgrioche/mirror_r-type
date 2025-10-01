@@ -24,11 +24,13 @@
 #include <random>
 #include <thread>
 
-Game::Game()
+Game::Game(bool isLocalMode)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
+    , m_localGameInstance(nullptr)
     , _isRunning(false)
+    , m_isLocalMode(isLocalMode)
 {
 }
 
@@ -44,15 +46,22 @@ bool Game::initialize()
         return false;
     }
 
-    // Entities will be created dynamically via SPAWN_ENTITY messages from server
-    // No hardcoded entities needed - client receives all entities from server
-
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;
     _isRunning = true;
-    _state = GameState::MENU;
-    m_menu.activate(Menu::Page::Connect);
+
+    if (m_isLocalMode) {
+        m_localGameInstance = std::make_unique<GameInstance>(0);
+        m_localGameInstance->initialize();
+        m_localGameInstance->addPlayer(1);
+
+        _state = GameState::PLAYING;
+        std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
+    } else {
+        _state = GameState::MENU;
+        m_menu.activate(Menu::Page::Connect);
+    }
 
     return true;
 }
@@ -69,7 +78,11 @@ void Game::run()
     SDL_Event event;
 
     while (_isRunning) {
-        processNetworkEvents();
+        if (m_isLocalMode) {
+            processLocalGameUpdates();
+        } else {
+            processNetworkEvents();
+        }
         float deltaTime = _timer.getDeltaTime();
 
         _inputs.beginFrame();
@@ -141,8 +154,10 @@ void Game::update(float deltaTime)
     _accumulatedTime += deltaTime;
 
     while (_accumulatedTime >= TICK_DURATION) {
-        m_clientNetwork->handleInputs(_inputs);
-        m_clientNetwork->incrementTick();
+        if (!m_isLocalMode) {
+            m_clientNetwork->handleInputs(_inputs);
+            m_clientNetwork->incrementTick();
+        }
         handlePlayerInputs(_inputs, _registry);
         gravitySystem(_registry, TICK_DURATION);
         movementSystem(_registry, TICK_DURATION);
@@ -324,6 +339,25 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
                 break;
             }
         }
+    }
+}
+
+void Game::processLocalGameUpdates()
+{
+    if (!m_localGameInstance) {
+        return;
+    }
+
+    m_localGameInstance->update();
+
+    auto newEntities = m_localGameInstance->getAndClearNewEntities();
+
+    for (const auto& entity : newEntities) {
+        Message msg = m_localGameInstance->serializeEntitySpawn(entity);
+        if (msg.getPayload().empty()) {
+            continue;
+        }
+        deserializeAndCreateEntity(msg, _registry);
     }
 }
 
