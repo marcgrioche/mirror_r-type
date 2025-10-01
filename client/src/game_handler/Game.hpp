@@ -77,6 +77,7 @@ private:
     void processNetworkEvents();
     void handleNetworkEvent(const Client::NetworkEvent& event);
     void handleConnectAck();
+    void handleLobbyInfo(const Client::NetworkEvent& event);
     void handleSpawnEntity(const Client::NetworkEvent& event);
     void handleGameState(const Client::NetworkEvent& event);
 

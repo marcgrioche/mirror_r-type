@@ -27,7 +27,9 @@ void RTypeClient::handleLobbyCreation(const Message& t_msg, PeerInfo& t_peerInfo
 void RTypeClient::handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo)
 {
     (void)t_peerInfo;
-    const uint32_t lobbyId = t_msg.readU32();
+    Message msg = t_msg; // Make a copy to adjust read position safely
+    msg.resetReadPosition();
+    const uint32_t lobbyId = msg.readU32();
 
     if (lobbyId == 0) {
         std::cout << "Lobby not found" << std::endl;
@@ -36,5 +38,5 @@ void RTypeClient::handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo)
         std::cout << "Joined lobby " << lobbyId << std::endl;
     }
 
-    m_eventsQueue.push({ MessageType::LOBBY_INFO, t_msg });
+    m_eventsQueue.push({ MessageType::LOBBY_INFO, msg });
 }
