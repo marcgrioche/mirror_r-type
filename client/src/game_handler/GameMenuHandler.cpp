@@ -36,11 +36,17 @@ void Game::handleMenuJoinLobbyRequest()
         std::cout << "Not connected to server. Use Connect first." << std::endl;
         return;
     }
-    if (m_menu.m_inputCode.empty()) {
-        std::cout << "Please enter a lobby ID" << std::endl;
+    try {
+        if (m_menu.m_inputCode.empty()) {
+            std::cout << "Please enter a lobby ID" << std::endl;
+            return;
+        }
+        uint32_t lobbyId = static_cast<uint32_t>(std::stoul(m_menu.m_inputCode));
+        m_clientNetwork->joinLobbyRequest(lobbyId);
+    } catch (const std::exception&) {
+        std::cout << "Invalid lobby ID: " << m_menu.m_inputCode << std::endl;
         return;
     }
-    m_clientNetwork->joinLobbyRequest(static_cast<uint32_t>(std::stoul(m_menu.m_inputCode)));
     // Attendre la réponse LOBBY_INFO pour changer d'état
 }
 

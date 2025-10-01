@@ -84,6 +84,7 @@ void RTypeClient::start()
     instance = this;
     std::signal(SIGINT, SIG_DFL);
 #endif
+    _running = true;
     while (_running) {
 #ifdef _WIN32
         if (stop_requested) {
