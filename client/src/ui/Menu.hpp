@@ -30,6 +30,7 @@ public:
         m_page = Page::Join;
         m_inputFocused = true;
         m_inputCode.clear();
+        m_joinConfirmCreated = false;
     }
     void onCreated() { m_page = Page::Start; }
 

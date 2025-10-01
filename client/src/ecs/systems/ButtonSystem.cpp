@@ -32,6 +32,7 @@ void buttonSystem(Registry& registry)
     auto& eventMgr = EventManager::getInstance();
 
     auto view = registry.view<Button, Position, Hitbox>();
+    
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity e = it.entity();
 
