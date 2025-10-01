@@ -254,15 +254,21 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 {
     std::cout << "Started game thread for lobby " << lobby->id << std::endl;
 
+    bool hadInputsThisTick = false;
+    uint32_t ticksSinceLastUpdate = 0;
+    const uint32_t maxTicksWithoutUpdate = 5;
+
     while (lobby->threadRunning) {
+        hadInputsThisTick = false;
+
         while (lobby->hasPendingInputs()) {
             PlayerInput input = lobby->dequeueInput();
             lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
+            hadInputsThisTick = true;
         }
 
         lobby->gameInstance->update();
 
-        // Broadcast newly spawned entities
         if (_server) {
             auto newEntities = lobby->gameInstance->getAndClearNewEntities();
             for (Entity entity : newEntities) {
@@ -271,13 +277,17 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
                     _server->broadcastToLobby(lobby->id, spawnMsg);
                 }
             }
+
+            ticksSinceLastUpdate++;
+            if (hadInputsThisTick || ticksSinceLastUpdate >= maxTicksWithoutUpdate) {
+                std::vector<uint8_t> gameStateData = lobby->gameInstance->serializeGameState();
+                Message gameStateMsg(MessageType::GAME_STATE, gameStateData);
+                _server->broadcastToLobby(lobby->id, gameStateMsg);
+                ticksSinceLastUpdate = 0;
+            }
         }
-        if (_server) {
-            std::vector<uint8_t> gameStateData = lobby->gameInstance->serializeGameState();
-            Message gameStateMsg(MessageType::GAME_STATE, gameStateData);
-            _server->broadcastToLobby(lobby->id, gameStateMsg);
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(8));
     }
 
     std::cout << "Game thread ended for lobby " << lobby->id << std::endl;

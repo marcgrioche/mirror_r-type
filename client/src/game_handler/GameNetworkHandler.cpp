@@ -25,6 +25,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::CONNECT_ACK:
         handleConnectAck();
         break;
+    case MessageType::LOBBY_INFO:
+        handleLobbyInfo(event);
+        break;
     case MessageType::SPAWN_ENTITY:
         handleSpawnEntity(event);
         break;
@@ -55,6 +58,27 @@ void Game::handleGameState(const Client::NetworkEvent& event)
         const Message& msg = std::get<Message>(event.payload);
         deserializeAndUpdateGameState(msg, _registry);
     }
+}
+
+void Game::handleLobbyInfo(const Client::NetworkEvent& event)
+{
+    if (!std::holds_alternative<Message>(event.payload)) {
+        return;
+    }
+    const Message& raw = std::get<Message>(event.payload);
+    Message msg = raw;
+    msg.resetReadPosition();
+    uint32_t lobbyId = msg.readU32();
+
+    if (lobbyId == 0) {
+        std::cout << "Lobby not found or join failed" << std::endl;
+        // Optionnel: revenir à Lobby page
+        m_menu.activate(Menu::Page::Lobby);
+        return;
+    }
+
+    std::cout << "Joined lobby " << lobbyId << " (server confirmed)" << std::endl;
+    m_menu.onCreated();
 }
 
 void Game::processLocalGameUpdates()

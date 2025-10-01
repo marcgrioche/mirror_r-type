@@ -62,6 +62,7 @@ private:
     uint16_t _port;
     std::unordered_map<uint32_t, PeerInfo> _clients;
     LobbyManager _lobbyManager;
+    uint32_t _nextPlayerId;
 
     static void handleSignal(int);
 

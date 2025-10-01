@@ -5,6 +5,10 @@ using namespace Client;
 
 void RTypeClient::handleInputs(const InputManager& t_inputs)
 {
+    if (!m_isConnected) {
+        return;
+    }
+
     const auto& currentActions = t_inputs.getActions();
     std::vector<std::pair<GameInput, bool>> changedInputs;
 
@@ -65,7 +69,7 @@ void RTypeClient::handleAllInputs(const InputManager& t_inputs)
 
 void RTypeClient::sendCurrentInputState(const std::vector<std::pair<GameInput, bool>>& inputs)
 {
-    if (inputs.empty()) {
+    if (inputs.empty() || !m_isConnected) {
         return;
     }
 

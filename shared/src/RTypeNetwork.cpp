@@ -36,7 +36,7 @@ void RTypeNetwork::handleReceive(const Message& msg, const std::string& sender_i
 
 void RTypeNetwork::processIncomingMessages()
 {
-    if (_socket && _socket->pollForData(100)) { // TODO: smart timeout
+    if (_socket && _socket->pollForData(0)) { // TODO: smart timeout
         std::vector<uint8_t> data;
         std::string sender_ip;
         uint16_t sender_port;

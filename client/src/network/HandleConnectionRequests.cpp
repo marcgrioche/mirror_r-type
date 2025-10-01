@@ -7,7 +7,10 @@ using namespace Client;
 
 void RTypeClient::handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo)
 {
-    (void)t_msg;
+    m_playerId = t_msg.player_id;
+    m_isConnected = true;
+    std::cout << "[CLIENT] Connected to server - assigned player ID: " << m_playerId << std::endl;
+
     m_eventsQueue.push({ MessageType::CONNECT_ACK, true });
     if (m_serverInfo.ip_address != t_peerInfo.ip_address || m_serverInfo.port != t_peerInfo.port) {
         m_serverInfo = t_peerInfo;
