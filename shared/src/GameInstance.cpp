@@ -132,6 +132,20 @@ void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             break;
         }
     }
+
+    // DEBUG: Only print when there are actual inputs (not empty input calls)
+    bool hasInputs = false;
+    for (const auto& [input, isPressed] : inputs) {
+        if (isPressed) {
+            hasInputs = true;
+            break;
+        }
+    }
+
+    if (hasInputs && _registry.has<Position>(playerEntity)) {
+        const auto& pos = _registry.get<Position>(playerEntity);
+        printf("[SERVER] Player %u at (%.2f, %.2f) tick: %u\n", playerId, pos.x, pos.y, tick);
+    }
 }
 
 void GameInstance::processInputs()
@@ -250,6 +264,13 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.height);
             msg.write(hitbox.offset_x);
             msg.write(hitbox.offset_y);
+        }
+
+        if (_registry.has<OwnerId>(entity)) {
+            auto& owner = _registry.get<OwnerId>(entity);
+            msg.write(static_cast<uint32_t>(owner.id));
+        } else {
+            msg.write(static_cast<uint32_t>(0)); // Default player ID
         }
 
     } else if (entityType == 1) { // Projectile

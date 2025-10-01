@@ -45,6 +45,7 @@ public:
     void pingRequest();
     void handleInputs(const InputManager& t_inputs);
     void handleAllInputs(const InputManager& t_inputs);
+    void sendCurrentInputState(const std::vector<std::pair<GameInput, bool>>& inputs);
 
     uint32_t getCurrentTick() const { return m_currentTick; }
     void incrementTick() { m_currentTick++; }

@@ -119,6 +119,7 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 **Player (Type 0):**
 - Health: `int32 health`
 - Hitbox: `float width, float height, float offset_x, float offset_y`
+- PlayerID: `uint32 player_id` (for client to identify which player is theirs)
 
 **Projectile (Type 1):**
 - Velocity: `float vx, float vy`

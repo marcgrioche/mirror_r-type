@@ -58,6 +58,15 @@ public:
      */
     std::vector<Entity> getAndClearNewEntities();
 
+    /**
+     * Get registry for client prediction access.
+     *
+     * Returns:
+     *     Registry&: Reference to the game registry
+     */
+    Registry& getRegistry() { return _registry; }
+    const Registry& getRegistry() const { return _registry; }
+
 private:
     uint32_t _lobbyId;
     Registry _registry;

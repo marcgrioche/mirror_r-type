@@ -19,6 +19,7 @@
 #include "Platform.hpp"
 #include "Player.hpp"
 #include "Position.hpp"
+#include "PredictedEntity.hpp"
 #include "PreviousPosition.hpp"
 #include "Projectile.hpp"
 #include "ServerEntityId.hpp"

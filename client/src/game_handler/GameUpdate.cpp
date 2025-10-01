@@ -1,0 +1,71 @@
+/*
+** EPITECH PROJECT, 2025
+** mirror_r-type
+** File description:
+** Game Update - Manages game loop updates and rendering
+*/
+
+#include "ButtonSystem.hpp"
+#include "Game.hpp"
+#include "ecs/systems/CollisionSystem.hpp"
+#include "ecs/systems/GravitySystem.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/ProjectileSystem.hpp"
+#include "entities/player/HandlePlayerInputs.hpp"
+#include "systems/RenderSystem.hpp"
+#include <iostream>
+
+void Game::update(float deltaTime)
+{
+    _accumulatedTime += deltaTime;
+
+    while (_accumulatedTime >= TICK_DURATION) {
+        updateGameTick();
+        _accumulatedTime -= TICK_DURATION;
+    }
+}
+
+void Game::updateGameTick()
+{
+    if (!m_isLocalMode) {
+        updateNetworkGameTick();
+    } else {
+        updateLocalGameTick();
+    }
+
+    buttonSystem(_registry);
+}
+
+void Game::updateNetworkGameTick()
+{
+    auto currentInputs = getCurrentInputs();
+
+    m_clientNetwork->sendCurrentInputState(currentInputs);
+    m_clientNetwork->incrementTick();
+
+    updateClientPrediction();
+}
+
+void Game::updateLocalGameTick()
+{
+    handlePlayerInputs(_inputs, _registry);
+    gravitySystem(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
+    projectileSystem(_registry, TICK_DURATION);
+    collisionSystem(_registry, TICK_DURATION);
+}
+
+void Game::render()
+{
+    renderSystem(_registry);
+}
+
+void Game::startGameplay()
+{
+    _state = GameState::PLAYING;
+
+    if (!m_isLocalMode && m_clientNetwork) {
+        m_inputHistory.clear();
+        std::cout << "Game started - waiting for player spawn to initialize prediction" << std::endl;
+    }
+}
