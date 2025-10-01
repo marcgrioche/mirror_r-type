@@ -11,6 +11,7 @@
 #include "ecs/systems/GravitySystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
+#include "ecs/systems/HealthSystem.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/enemies/enemyMovement.hpp"
 #include "systems/RenderSystem.hpp"
@@ -55,6 +56,7 @@ void Game::updateLocalGameTick()
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
     collisionSystem(_registry, TICK_DURATION);
+    healthSystem(_registry);
 }
 
 void Game::render()
