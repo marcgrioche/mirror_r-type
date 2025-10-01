@@ -10,10 +10,15 @@
  */
 void RTypeServer::handleConnect(const Message& msg, PeerInfo& peerInfo)
 {
-    std::cout << "Client " << msg.player_id << " connected from " << peerInfo.ip_address << ":" << peerInfo.port << std::endl;
-    if (_clients.find(msg.player_id) == _clients.end()) {
-        _clients[msg.player_id] = peerInfo;
+    uint32_t assignedPlayerId = _nextPlayerId++;
+
+    std::cout << "Client connected from " << peerInfo.ip_address << ":" << peerInfo.port
+              << " - assigned player ID: " << assignedPlayerId << std::endl;
+
+    if (_clients.find(assignedPlayerId) == _clients.end()) {
+        _clients[assignedPlayerId] = peerInfo;
     }
-    Message connectAckMsg(MessageType::CONNECT_ACK, msg.sequence_number, msg.player_id);
-    sendToClient(msg.player_id, connectAckMsg);
+
+    Message connectAckMsg(MessageType::CONNECT_ACK, msg.sequence_number, assignedPlayerId);
+    sendToClient(assignedPlayerId, connectAckMsg);
 }
