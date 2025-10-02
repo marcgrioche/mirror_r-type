@@ -148,14 +148,8 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
         }
     }
 
-    if (hasRealInputs) {
+    if (hasRealInputs)
         _stateChanged = true;
-
-        if (_registry.has<Position>(playerEntity)) {
-            const auto& pos = _registry.get<Position>(playerEntity);
-            printf("[SERVER] Player %u at (%.2f, %.2f) tick: %u\n", playerId, pos.x, pos.y, tick);
-        }
-    }
 
     return hasRealInputs;
 }
