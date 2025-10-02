@@ -7,10 +7,10 @@
 
 #include "Game.hpp"
 #include "ecs/components/AllComponents.hpp"
+#include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
-#include "entities/enemies/CreateEnemy.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -39,8 +39,6 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
         logUnknownEntityType(entityType);
         break;
     }
-
-    logEntityCreation(entityId, entityType, posX, posY);
 }
 
 void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
@@ -121,8 +119,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
-        Hitbox { width, height, offsetX, offsetY }
-    );
+        Hitbox { width, height, offsetX, offsetY });
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
 }

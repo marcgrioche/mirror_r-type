@@ -254,17 +254,17 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 {
     std::cout << "Started game thread for lobby " << lobby->id << std::endl;
 
-    bool hadInputsThisTick = false;
-    uint32_t ticksSinceLastUpdate = 0;
-    const uint32_t maxTicksWithoutUpdate = 5;
+    bool hadRealInputsThisTick = false;
 
     while (lobby->threadRunning) {
-        hadInputsThisTick = false;
+        hadRealInputsThisTick = false;
 
         while (lobby->hasPendingInputs()) {
             PlayerInput input = lobby->dequeueInput();
-            lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
-            hadInputsThisTick = true;
+            bool hadRealInput = lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
+            if (hadRealInput) {
+                hadRealInputsThisTick = true;
+            }
         }
 
         lobby->gameInstance->update();
@@ -278,12 +278,10 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
                 }
             }
 
-            ticksSinceLastUpdate++;
-            if (hadInputsThisTick || ticksSinceLastUpdate >= maxTicksWithoutUpdate) {
+            if (hadRealInputsThisTick || lobby->gameInstance->hasStateChanged()) {
                 std::vector<uint8_t> gameStateData = lobby->gameInstance->serializeGameState();
                 Message gameStateMsg(MessageType::GAME_STATE, gameStateData);
                 _server->broadcastToLobby(lobby->id, gameStateMsg);
-                ticksSinceLastUpdate = 0;
             }
         }
 

@@ -8,9 +8,9 @@
 #include "../../shared/src/ecs/systems/GravitySystem.hpp"
 #include "../../shared/src/ecs/systems/MovementSystem.hpp"
 #include "../../shared/src/ecs/systems/ProjectileSystem.hpp"
+#include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
-#include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -35,7 +35,7 @@ public:
 
     void addPlayer(uint32_t playerId);
     void removePlayer(uint32_t playerId);
-    void processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs);
+    bool processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs);
 
     std::vector<uint8_t> serializeGameState() const;
     void deserializeGameState(const std::vector<uint8_t>& data);
@@ -60,6 +60,14 @@ public:
     std::vector<Entity> getAndClearNewEntities();
 
     /**
+     * Check if game state changed this tick and reset the flag.
+     *
+     * Returns:
+     *     bool: True if state changed since last check
+     */
+    bool hasStateChanged();
+
+    /**
      * Get registry for client prediction access.
      *
      * Returns:
@@ -74,6 +82,7 @@ private:
     bool _isRunning;
     uint32_t _currentTick;
     std::chrono::steady_clock::time_point _lastTickTime;
+    bool _stateChanged;
 
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;

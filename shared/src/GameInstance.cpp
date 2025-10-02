@@ -6,6 +6,7 @@ GameInstance::GameInstance(uint32_t lobbyId)
     : _lobbyId(lobbyId)
     , _isRunning(false)
     , _currentTick(0)
+    , _stateChanged(false)
 {
 }
 
@@ -44,6 +45,16 @@ void GameInstance::updateTick()
     simulatePhysics();
     checkCollisions();
     cleanupEntities();
+
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Velocity>(entity)) {
+            const auto& vel = _registry.get<Velocity>(entity);
+            if (vel.dx != 0.0f || vel.dy != 0.0f) {
+                _stateChanged = true;
+                break;
+            }
+        }
+    }
 }
 
 void GameInstance::initializeLevel()
@@ -66,6 +77,7 @@ void GameInstance::addPlayer(uint32_t playerId)
     Entity playerEntity = factories::createPlayer(_registry);
     _playerEntities[playerId] = playerEntity;
     _newEntitiesThisTick.push_back(playerEntity);
+    _stateChanged = true;
 
     if (_registry.has<OwnerId>(playerEntity)) {
         _registry.get<OwnerId>(playerEntity).id = playerId;
@@ -82,17 +94,17 @@ void GameInstance::removePlayer(uint32_t playerId)
     }
 }
 
-void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
+bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
     // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
-        return;
+        return false;
 
     Entity playerEntity = it->second;
 
     if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
-        return;
+        return false;
     }
 
     auto& velocity = _registry.get<Velocity>(playerEntity);
@@ -101,11 +113,13 @@ void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
     velocity.dx = 0.0f;
 
     const float speed = 250.0f;
+    bool hasRealInputs = false;
 
     for (const auto& [input, isPressed] : inputs) {
         if (!isPressed)
             continue;
 
+        hasRealInputs = true;
         switch (input) {
         case GameInput::UP:
             if (!jump.isJumping && jump.canJump) {
@@ -134,19 +148,16 @@ void GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
         }
     }
 
-    // DEBUG: Only print when there are actual inputs (not empty input calls)
-    bool hasInputs = false;
-    for (const auto& [input, isPressed] : inputs) {
-        if (isPressed) {
-            hasInputs = true;
-            break;
+    if (hasRealInputs) {
+        _stateChanged = true;
+
+        if (_registry.has<Position>(playerEntity)) {
+            const auto& pos = _registry.get<Position>(playerEntity);
+            printf("[SERVER] Player %u at (%.2f, %.2f) tick: %u\n", playerId, pos.x, pos.y, tick);
         }
     }
 
-    if (hasInputs && _registry.has<Position>(playerEntity)) {
-        const auto& pos = _registry.get<Position>(playerEntity);
-        printf("[SERVER] Player %u at (%.2f, %.2f) tick: %u\n", playerId, pos.x, pos.y, tick);
-    }
+    return hasRealInputs;
 }
 
 void GameInstance::processInputs()
@@ -336,4 +347,11 @@ std::vector<Entity> GameInstance::getAndClearNewEntities()
     std::vector<Entity> entities = std::move(_newEntitiesThisTick);
     _newEntitiesThisTick.clear();
     return entities;
+}
+
+bool GameInstance::hasStateChanged()
+{
+    bool changed = _stateChanged;
+    _stateChanged = false;
+    return changed;
 }
