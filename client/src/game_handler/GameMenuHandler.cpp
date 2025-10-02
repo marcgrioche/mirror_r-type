@@ -17,7 +17,7 @@ void Game::handleMenuConnectRequest()
     ip = ip.empty() ? "127.0.0.1" : ip;
     port = (port == 0) ? 4242 : port;
 
-    m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, 2020, m_events);
+    m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, m_clientPort, m_events);
     m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
     m_clientNetwork->connectToServerRequest();
     m_menu.onConnected();

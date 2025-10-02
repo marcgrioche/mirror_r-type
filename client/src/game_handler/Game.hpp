@@ -38,7 +38,7 @@ public:
     static constexpr uint32_t TICKS_PER_SECOND = 60;
     static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND;
 
-    Game(bool isLocalMode = false);
+    Game(bool isLocalMode = false, uint16_t clientPort = 2020);
     ~Game();
 
     bool initialize();
@@ -128,6 +128,7 @@ private:
     bool m_isLocalMode;
     bool m_connected = false;
     bool m_lobbyCreated = false;
+    uint16_t m_clientPort;
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
