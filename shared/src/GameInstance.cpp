@@ -42,8 +42,8 @@ void GameInstance::updateTick()
     _currentTick++;
 
     processInputs();
-    simulatePhysics();
     checkCollisions();
+    simulatePhysics();
     cleanupEntities();
 
     for (const auto& [playerId, entity] : _playerEntities) {
