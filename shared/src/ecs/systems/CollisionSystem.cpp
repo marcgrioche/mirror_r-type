@@ -27,7 +27,7 @@ void collisionSystem(Registry& registry, float deltaTime)
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos);
                 // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx * 2;
+                playerVel.dx = platformVel.dx;
             }
         }
 
@@ -36,7 +36,7 @@ void collisionSystem(Registry& registry, float deltaTime)
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos);
                 // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx * 2;
+                playerVel.dx = platformVel.dx;
             }
         }
     }

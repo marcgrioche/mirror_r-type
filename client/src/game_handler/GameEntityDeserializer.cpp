@@ -101,7 +101,7 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     float offsetX = msg.readFloat();
     float offsetY = msg.readFloat();
 
-    factories::createPlatform(registry,
+    factories::createOneWayPlatform(registry,
         posX,
         posY);
 }
