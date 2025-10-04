@@ -285,7 +285,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 30 ticks per second
     }
 
     std::cout << "Game thread ended for lobby " << lobby->id << std::endl;

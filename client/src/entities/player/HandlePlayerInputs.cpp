@@ -14,7 +14,6 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
     auto view = registry.view<PlayerTag, Velocity, Jump>();
 
     for (auto [tag, velocity, jump] : view) {
-        velocity.dx = 0.0f;
         
         const float speed = 250.0f;
 
