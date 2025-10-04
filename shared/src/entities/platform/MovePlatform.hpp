@@ -9,6 +9,5 @@
 #include "components/AllComponents.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
-#include "managers/InputManager.hpp"
 
-void handlePlayerInputs(InputManager& _inputs, Registry& registry);
+void movePlatform(Registry& registry);

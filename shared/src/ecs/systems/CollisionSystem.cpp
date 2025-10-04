@@ -15,24 +15,26 @@ void collisionSystem(Registry& registry, float deltaTime)
 {
     auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
 
-    auto platformView = registry.view<NoPassPlatform, Position, Hitbox>();
-    auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox>();
+    auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
+    auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
     for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView) {
 
         Position originalPos = { prevPos.x, prevPos.y };
 
-        for (auto&& [p, platformPos, platformHitbox] : platformView) {
+        for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos);
+                playerVel.dx = platformVel.dx;
             }
         }
 
-        for (auto&& [p, platformPos, platformHitbox] : oneWayPlatformView) {
+        for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos);
+                playerVel.dx = platformVel.dx;
             }
         }
     }
@@ -105,6 +107,6 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
-        // std::cout << "Player landed on one-way platform!" << std::endl;
+        std::cout << "Player landed on one-way platform!" << std::endl;
     }
 }
