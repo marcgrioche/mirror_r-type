@@ -1,5 +1,6 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
+#include "ecs/systems/MovementSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
 #include <iostream>
 
@@ -42,9 +43,20 @@ void GameInstance::updateTick()
 {
     _currentTick++;
 
+    auto prevPosView = _registry.view<Position, PreviousPosition>();
+    for (auto&& [pos, prevPos] : prevPosView) {
+        prevPos.x = pos.x;
+        prevPos.y = pos.y;
+    }
+
     processInputs();
+    enemyMovement(_registry, TICK_DURATION);
+    gravitySystem(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
+    projectileSystem(_registry, TICK_DURATION);
+
     checkCollisions();
-    simulatePhysics();
+
     cleanupEntities();
 
     for (const auto& [playerId, entity] : _playerEntities) {
