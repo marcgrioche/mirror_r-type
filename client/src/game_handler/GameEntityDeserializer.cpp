@@ -102,8 +102,8 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     float offsetY = msg.readFloat();
 
     factories::createPlatform(registry,
-        Position { posX, posY },
-        Hitbox { width, height, offsetX, offsetY });
+        posX,
+        posY);
 }
 
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,

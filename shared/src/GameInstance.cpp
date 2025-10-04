@@ -43,8 +43,8 @@ void GameInstance::updateTick()
     _currentTick++;
 
     processInputs();
-    simulatePhysics();
     checkCollisions();
+    simulatePhysics();
     cleanupEntities();
 
     for (const auto& [playerId, entity] : _playerEntities) {
@@ -61,15 +61,17 @@ void GameInstance::updateTick()
 void GameInstance::initializeLevel()
 {
     // TODO: Game levels, (create platforms (same as client for now))
-    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
-    _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
-    _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
-    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
+    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
+    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
+    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
+    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
+    auto platformList = factories::generateRandomPlatforms(_registry, 8);
+    _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
 
-    for (int i = 0; i < 8; i++) {
-        _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
-    }
+    // for (int i = 0; i < 8; i++) {
+    //     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
+    // }
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
