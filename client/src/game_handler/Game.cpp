@@ -67,6 +67,8 @@ void Game::initializeMenuMode()
     m_menu.activate(Menu::Page::Connect);
 }
 
+// TODO: send a disconnect message to the server when closing the window when
+// the player is connected
 void Game::run()
 {
     if (!_isRunning) {
