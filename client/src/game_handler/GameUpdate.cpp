@@ -9,13 +9,15 @@
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
+#include "ecs/systems/HealthSystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
-#include "ecs/systems/HealthSystem.hpp"
-#include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/enemies/enemyMovement.hpp"
+#include "entities/player/HandlePlayerInputs.hpp"
 #include "systems/RenderSystem.hpp"
 #include <iostream>
+
+#include "PlayerActions.hpp"
 
 void Game::update(float deltaTime)
 {
@@ -42,6 +44,12 @@ void Game::updateNetworkGameTick()
 {
     auto currentInputs = getCurrentInputs();
 
+    // TODO: update the velocity with the client entity
+    // PlayerActions::updateVelocity(currentInputs, _registry, playerEntity);
+    gravitySystem(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
+    projectileSystem(_registry, TICK_DURATION);
+    collisionSystem(_registry, TICK_DURATION);
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_clientNetwork->incrementTick();
 }

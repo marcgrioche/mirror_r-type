@@ -26,6 +26,8 @@
 
 #include <string>
 
+#include "prediction/InputHistory.hpp"
+
 class Game {
     enum class GameState {
         MENU,
@@ -102,12 +104,18 @@ private:
     void logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, float posY);
 
     // Game state updates
-    void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers);
-    void updateSingleEntity(const Message& msg, Registry& registry);
+    void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers,
+        uint32_t t_tick);
+    void updateSingleEntity(const Message& msg, Registry& registry, uint32_t t_tick);
     Entity findEntityByServerId(Registry& registry, uint32_t serverId);
-    void updateEntityState(Registry& registry, Entity entity, float posX, float posY, uint32_t health);
+    void updateEntityState(Registry& registry, Entity entity, uint32_t health);
     void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY);
+    void updateEntitySpritePosition(Registry& t_registry, Entity& t_entity);
     void updateEntityHealth(Registry& registry, Entity entity, uint32_t health);
+
+    // Client reconciliation after prediction functions
+    void interpolateEntityPosition(Registry& registry, Entity& entity, float posX, float posY, uint32_t t_serverTick);
+    void simulateLocalPlayerInput(Entity& t_player, const std::vector<std::pair<GameInput, bool>>& t_inputs, Registry& t_registry);
 
     // Input handling
     std::vector<std::pair<GameInput, bool>> getCurrentInputs();
@@ -123,6 +131,7 @@ private:
     std::unique_ptr<Client::RTypeClient> m_clientNetwork;
     std::unique_ptr<GameInstance> m_localGameInstance;
     std::thread m_networkThread;
+    InputHistory m_inputHistory;
 
     bool _isRunning;
     bool m_isLocalMode;

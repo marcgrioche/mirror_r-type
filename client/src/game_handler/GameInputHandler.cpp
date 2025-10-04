@@ -18,5 +18,7 @@ std::vector<std::pair<GameInput, bool>> Game::getCurrentInputs()
     inputs.emplace_back(GameInput::ATTACK, _inputs.isActionPressed(GameAction::SHOOT));
     inputs.emplace_back(GameInput::DASH, false);
 
+    m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), inputs);
+
     return inputs;
 }

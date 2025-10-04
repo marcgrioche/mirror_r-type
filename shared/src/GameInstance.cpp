@@ -2,6 +2,8 @@
 #include "../include/Message.hpp"
 #include <iostream>
 
+#include "PlayerActions.hpp"
+
 GameInstance::GameInstance(uint32_t lobbyId)
     : _lobbyId(lobbyId)
     , _isRunning(false)
@@ -105,50 +107,51 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     Entity playerEntity = it->second;
 
-    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
-        return false;
-    }
-
-    auto& velocity = _registry.get<Velocity>(playerEntity);
-    auto& jump = _registry.get<Jump>(playerEntity);
-
-    velocity.dx = 0.0f;
-
-    const float speed = 250.0f;
-    bool hasRealInputs = false;
-
-    for (const auto& [input, isPressed] : inputs) {
-        if (!isPressed)
-            continue;
-
-        hasRealInputs = true;
-        switch (input) {
-        case GameInput::UP:
-            if (!jump.isJumping && jump.canJump) {
-                velocity.dy = -V0;
-                jump.isJumping = true;
-                jump.canJump = false;
-            }
-            break;
-        case GameInput::DOWN:
-            if (jump.isJumping && velocity.dy > 0) {
-                velocity.dy += 300.0f; // Fast-fall
-            }
-            break;
-        case GameInput::LEFT:
-            velocity.dx = -speed;
-            break;
-        case GameInput::RIGHT:
-            velocity.dx = speed;
-            break;
-        case GameInput::ATTACK:
-            // TODO: Handle shooting/projectile creation
-            break;
-        case GameInput::DASH:
-            // TODO: Handle dash ability
-            break;
-        }
-    }
+    const bool hasRealInputs = PlayerActions::updateVelocity(inputs, _registry, playerEntity);
+    // if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
+    //     return false;
+    // }
+    //
+    // auto& velocity = _registry.get<Velocity>(playerEntity);
+    // auto& jump = _registry.get<Jump>(playerEntity);
+    //
+    // velocity.dx = 0.0f;
+    //
+    // const float speed = 250.0f;
+    // bool hasRealInputs = false;
+    //
+    // for (const auto& [input, isPressed] : inputs) {
+    //     if (!isPressed)
+    //         continue;
+    //
+    //     hasRealInputs = true;
+    //     switch (input) {
+    //     case GameInput::UP:
+    //         if (!jump.isJumping && jump.canJump) {
+    //             velocity.dy = -V0;
+    //             jump.isJumping = true;
+    //             jump.canJump = false;
+    //         }
+    //         break;
+    //     case GameInput::DOWN:
+    //         if (jump.isJumping && velocity.dy > 0) {
+    //             velocity.dy += 300.0f; // Fast-fall
+    //         }
+    //         break;
+    //     case GameInput::LEFT:
+    //         velocity.dx = -speed;
+    //         break;
+    //     case GameInput::RIGHT:
+    //         velocity.dx = speed;
+    //         break;
+    //     case GameInput::ATTACK:
+    //         // TODO: Handle shooting/projectile creation
+    //         break;
+    //     case GameInput::DASH:
+    //         // TODO: Handle dash ability
+    //         break;
+    //     }
+    // }
 
     if (hasRealInputs)
         _stateChanged = true;
@@ -165,7 +168,7 @@ void GameInstance::processInputs()
 void GameInstance::simulatePhysics()
 {
     // Run shared physics systems
-    
+
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);

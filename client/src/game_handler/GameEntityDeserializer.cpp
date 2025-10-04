@@ -142,18 +142,18 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     uint32_t tick = msg.readU32();
     uint8_t numPlayers = msg.readU8();
 
-    updateNonPredictedEntities(msg, registry, numPlayers);
+    updateNonPredictedEntities(msg, registry, numPlayers, tick);
 }
 
 void Game::updateNonPredictedEntities(const Message& msg, Registry& registry,
-    uint8_t numPlayers)
+    uint8_t numPlayers, uint32_t t_tick)
 {
     for (uint8_t i = 0; i < numPlayers; ++i) {
-        updateSingleEntity(msg, registry);
+        updateSingleEntity(msg, registry, t_tick);
     }
 }
 
-void Game::updateSingleEntity(const Message& msg, Registry& registry)
+void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t t_tick)
 {
     uint32_t entityId = msg.readU32();
     float posX = msg.readFloat();
@@ -165,7 +165,8 @@ void Game::updateSingleEntity(const Message& msg, Registry& registry)
         return;
     }
 
-    updateEntityState(registry, entity, posX, posY, health);
+    interpolateEntityPosition(registry, entity, posX, posY, t_tick);
+    updateEntityState(registry, entity, health);
 }
 
 Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
@@ -181,10 +182,9 @@ Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
     return Entity { 0, 0 };
 }
 
-void Game::updateEntityState(Registry& registry, Entity entity,
-    float posX, float posY, uint32_t health)
+void Game::updateEntityState(Registry& registry, Entity entity, uint32_t health)
 {
-    updateEntityPosition(registry, entity, posX, posY);
+    // updateEntityPosition(registry, entity, posX, posY);
     updateEntityHealth(registry, entity, health);
 }
 
@@ -200,6 +200,18 @@ void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, f
         auto& sprite = registry.get<Sprite>(entity);
         sprite.dstRect.x = static_cast<int>(posX);
         sprite.dstRect.y = static_cast<int>(posY);
+    }
+}
+
+void Game::updateEntitySpritePosition(Registry& t_registry, Entity& t_entity)
+{
+
+    auto& [x, y] = t_registry.get<Position>(t_entity);
+
+    if (t_registry.has<Sprite>(t_entity)) {
+        auto& sprite = t_registry.get<Sprite>(t_entity);
+        sprite.dstRect.x = static_cast<int>(x);
+        sprite.dstRect.y = static_cast<int>(y);
     }
 }
 
