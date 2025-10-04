@@ -109,6 +109,8 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
+    float velX = msg.readFloat();
+    float velY = msg.readFloat();
     uint32_t healthValue = msg.readU32();
     float width = msg.readFloat();
     float height = msg.readFloat();
@@ -120,6 +122,12 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
         Hitbox { width, height, offsetX, offsetY });
+
+    if (registry.has<Velocity>(enemy)) {
+        auto& velocity = registry.get<Velocity>(enemy);
+        velocity.dx = velX;
+        velocity.dy = velY;
+    }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
 }

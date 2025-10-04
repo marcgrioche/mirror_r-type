@@ -1,5 +1,6 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
+#include "entities/enemies/EnemyMovement.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -163,6 +164,7 @@ void GameInstance::processInputs()
 void GameInstance::simulatePhysics()
 {
     // Run shared physics systems
+    enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
@@ -319,6 +321,12 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         }
 
     } else if (entityType == 3) { // Enemy
+        if (_registry.has<Velocity>(entity)) {
+            auto& vel = _registry.get<Velocity>(entity);
+            msg.write(vel.dx);
+            msg.write(vel.dy);
+        }
+
         if (_registry.has<Health>(entity)) {
             auto& health = _registry.get<Health>(entity);
             msg.write(static_cast<uint32_t>(health.hp));

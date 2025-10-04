@@ -2,12 +2,11 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** enemyMovement
+** Enemy Movement System Header
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
-#include "Entity.hpp"
-#include "Registry.hpp"
+
+#include "../../ecs/Registry.hpp"
 
 void enemyMovement(Registry& registry, float deltaTime);
