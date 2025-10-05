@@ -1,4 +1,4 @@
-# Comparative Study — Multiplayer Game
+# Comparative Study — Multiplayer Game (RTYPE)
 
 ## 1. Executive Summary
 
