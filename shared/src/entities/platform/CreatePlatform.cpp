@@ -1,12 +1,12 @@
 #include "CreatePlatform.hpp"
 #include "Hitbox.hpp"
-#include "Velocity.hpp"
 #include "Platform.hpp"
 #include "Position.hpp"
 #include "Tags.hpp"
 #include "Dead.hpp"
-#include <random>
+#include "Velocity.hpp"
 #include <array>
+#include <random>
 
 Entity factories::createOneWayPlatform(Registry& registry, float posx, float posy)
 {
@@ -170,5 +170,3 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
     }
     return platformsEntities;
 }
-
-// (Ancienne implémentation commentée supprimée pour clarté)

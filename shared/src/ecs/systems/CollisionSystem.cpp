@@ -25,18 +25,17 @@ void collisionSystem(Registry& registry, float deltaTime)
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos);
+                    platformPos, platformHitbox, originalPos, platformVel);
                 // Apply platform movement to player position directly
                 playerVel.dx = platformVel.dx;
+                
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos);
-                // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx;
+                    platformPos, platformHitbox, originalPos, platformVel);
             }
         }
     }
@@ -44,7 +43,7 @@ void collisionSystem(Registry& registry, float deltaTime)
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos)
+    const Position& originalPos, const Velocity& platformVel)
 {
     float playerLeft = playerPos.x + playerHitbox.offset_x;
     float playerRight = playerLeft + playerHitbox.width;
@@ -71,7 +70,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
         } else {
             playerPos.x = platformRight - playerHitbox.offset_x;
         }
-        playerVel.dx = 0.0f;
+        playerVel.dx = platformVel.dx;
         std::cout << "Horizontal collision resolved!" << std::endl;
     } else {
         if (overlapTop < overlapBottom) {
@@ -94,7 +93,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos)
+    const Position& originalPos, const Velocity& platformVel)
 {
     if (playerVel.dy <= 0) {
         return; // Player is not falling, ignore collision
