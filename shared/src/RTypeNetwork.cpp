@@ -36,7 +36,10 @@ void RTypeNetwork::handleReceive(const Message& msg, const std::string& sender_i
 
 void RTypeNetwork::processIncomingMessages()
 {
-    if (_socket && _socket->pollForData(0)) { // TODO: smart timeout
+    int messagesProcessed = 0;
+    const int MAX_MESSAGES_PER_CALL = 50;
+
+    while (_socket && _socket->pollForData(0) && messagesProcessed < MAX_MESSAGES_PER_CALL) {
         std::vector<uint8_t> data;
         std::string sender_ip;
         uint16_t sender_port;
@@ -46,9 +49,12 @@ void RTypeNetwork::processIncomingMessages()
             try {
                 Message msg = Message::deserialize(data);
                 handleReceive(msg, sender_ip, sender_port);
+                messagesProcessed++;
             } catch (const std::exception& e) {
                 std::cerr << "Error deserializing message: " << e.what() << std::endl;
             }
+        } else {
+            break;
         }
     }
 }

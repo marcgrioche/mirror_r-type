@@ -10,13 +10,14 @@
 #include <SDL.h>
 #include <iostream>
 
-Game::Game(bool isLocalMode)
+Game::Game(bool isLocalMode, uint16_t clientPort)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
     , m_localGameInstance(nullptr)
     , _isRunning(false)
     , m_isLocalMode(isLocalMode)
+    , m_clientPort(clientPort)
 {
 }
 
