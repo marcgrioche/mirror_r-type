@@ -54,13 +54,22 @@ void GameInstance::updateTick()
     processInputs();
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
+    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     boundarySystem(_registry);
     projectileSystem(_registry, TICK_DURATION);
 
     checkCollisions();
 
     cleanupEntities();
+
+    if (_platformsToAdd > 0) {
+        std::cout << "platforms to add = " << _platformsToAdd << std::endl;
+        for (; _platformsToAdd > 0; _platformsToAdd--) {
+            auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
+            _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
+            std::cout << _platformsToAdd << std::endl;
+        }
+    }
 
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
@@ -76,17 +85,9 @@ void GameInstance::updateTick()
 void GameInstance::initializeLevel()
 {
     // TODO: Game levels, (create platforms (same as client for now))
-    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
-    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
-    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
-    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
-
-    // for (int i = 0; i < 8; i++) {
-    //     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
-    // }
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
@@ -186,7 +187,7 @@ void GameInstance::simulatePhysics()
     // Run shared physics systems
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
+    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
 }
 
@@ -211,6 +212,17 @@ void GameInstance::cleanupEntities()
         } else {
             ++it;
         }
+    }
+    auto view2 = _registry.view<Dead>();
+    std::vector<Entity> toKill;
+    for (auto it = view2.begin(); it != view2.end(); ++it) {
+        auto [dead] = *it;
+        if (dead.dead) {
+            toKill.push_back(it.entity());
+        }
+    }
+    for (auto entity : toKill) {
+        _registry.kill_entity(entity);
     }
 }
 

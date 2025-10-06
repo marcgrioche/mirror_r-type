@@ -27,6 +27,8 @@ void collisionSystem(Registry& registry, float deltaTime)
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos, platformVel);
+                // Apply platform movement to player position directly
+                playerVel.dx = platformVel.dx;
             }
         }
 
