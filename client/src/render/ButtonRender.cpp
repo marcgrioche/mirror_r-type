@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 5:20:40 PM 2025 jojo
-** Last update Thu Oct 1 5:35:55 PM 2025 jojo
+** Last update Tue Oct 6 10:12:58 AM 2025 jojo
 */
 
 #include "ButtonRender.hpp"
@@ -14,8 +14,8 @@ void drawButton(GraphicsManager& gfx, Registry& registry, Entity entity)
 {
     SDL_Renderer* renderer = gfx.getRenderer();
 
-    if (!registry.has<Button>(entity))
-        continue;
+    if (!registry.has<ButtonTag>(entity))
+        return;
 
     const Button& button = registry.get<Button>(entity);
     const Position& pos = registry.get<Position>(entity);
