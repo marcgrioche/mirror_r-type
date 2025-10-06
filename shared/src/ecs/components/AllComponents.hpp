@@ -26,6 +26,7 @@
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"
+#include "Dead.hpp"
 #include "componentutils/HitboxUtils.hpp"
 
 // Tags

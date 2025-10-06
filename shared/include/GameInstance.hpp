@@ -87,6 +87,8 @@ private:
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;
 
+    int _platformsToAdd = 0;
+
     void updateTick();
     void initializeLevel();
     void processInputs();
