@@ -48,7 +48,20 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distX(0.0f, SCREEN_W - PLATFORM_W);
-    std::uniform_real_distribution<float> distY(MIN_Y, MAX_Y);
+
+    // --- Discrétisation en 4 "layers" verticaux ---
+    // On veut 4 niveaux accessibles : l'écart doit être <= MAX_DIFF_Y.
+    // L'écart naturel (MAX_Y - MIN_Y) / 3 = 120 (> 110) donc on "compresse" les layers
+    // pour garder une marge haute/basse tout en restant atteignable.
+    constexpr int LAYER_COUNT = 4;
+    const float availableSpan = (MAX_Y - MIN_Y);
+    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
+    const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
+    const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f; // centre les layers dans la fenêtre jouable
+    std::array<float, LAYER_COUNT> layers{};
+    for (int i = 0; i < LAYER_COUNT; ++i)
+        layers[i] = verticalOffset + targetSpacing * i; // valeurs exactes sans jitter
+    std::uniform_int_distribution<int> pickLayer(0, LAYER_COUNT - 1);
 
     struct Plat { float x, y; };
     std::vector<Plat> placed; placed.reserve(quantity);
@@ -61,10 +74,11 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
         bool accepted = false;
         for (int attempt = 0; attempt < 80 && !accepted; ++attempt) {
             x = distX(gen);
-            y = distY(gen);
+            y = layers[pickLayer(gen)];
 
-            bool isTopBand    = y < (MIN_Y + (MAX_Y - MIN_Y) * 0.18f);
-            bool isBottomBand = y > (MIN_Y + (MAX_Y - MIN_Y) * 0.82f);
+            // On considère la première et dernière couche comme bandes extrêmes
+            bool isTopBand    = (y == layers.front());
+            bool isBottomBand = (y == layers.back());
             if ((isTopBand && topCount >= edgeQuota) || (isBottomBand && bottomCount >= edgeQuota))
                 continue; // trop d'accumulation extrême
 
@@ -116,7 +130,17 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distX(SCREEN_W, SCREEN_W + SPAWN_OFFSET);
-    std::uniform_real_distribution<float> distY(MIN_Y, MAX_Y);
+
+    // Même logique de layers que dans generateRandomPlatforms
+    constexpr int LAYER_COUNT = 4;
+    const float availableSpan = (MAX_Y - MIN_Y);
+    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f);
+    const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
+    const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f;
+    std::array<float, LAYER_COUNT> layers{};
+    for (int i = 0; i < LAYER_COUNT; ++i)
+        layers[i] = verticalOffset + targetSpacing * i;
+    std::uniform_int_distribution<int> pickLayer(0, LAYER_COUNT - 1);
 
     struct Plat { float x, y; };
     std::vector<Plat> placed; // On récupère les plateformes déjà existantes pour cohérence
@@ -135,10 +159,10 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
         bool accepted = false;
         for (int attempt = 0; attempt < 80 && !accepted; ++attempt) {
             x = distX(gen);
-            y = distY(gen);
+            y = layers[pickLayer(gen)];
 
-            bool isTopBand    = y < (MIN_Y + (MAX_Y - MIN_Y) * 0.18f);
-            bool isBottomBand = y > (MIN_Y + (MAX_Y - MIN_Y) * 0.82f);
+            bool isTopBand    = (y == layers.front());
+            bool isBottomBand = (y == layers.back());
             if ((isTopBand && topCount >= edgeQuota) || (isBottomBand && bottomCount >= edgeQuota))
                 continue;
 
