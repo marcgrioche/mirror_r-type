@@ -5,6 +5,7 @@
 ** Game Update - Manages game loop updates and rendering
 */
 
+#include "../../../shared/src/ecs/systems/BoundarySystem.hpp"
 #include "../../../shared/src/entities/enemies/EnemyMovement.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"

@@ -6,15 +6,17 @@
 */
 
 #include "GravitySystem.hpp"
-#include "components/Jump.hpp"
-#include "components/Tags.hpp"
-#include "components/Velocity.hpp"
+#include "components/AllComponents.hpp"
 
 void gravitySystem(Registry& registry, float deltaTime)
 {
-    auto view = registry.view<PlayerTag, Velocity, Jump>();
+    auto view = registry.view<PlayerTag, Velocity, Jump, Health>();
 
-    for (auto&& [player, vel, jump] : view) {
+    for (auto&& [player, vel, jump, health] : view) {
+        if (health.hp <= 0) {
+            continue;
+        }
+
         if (vel.dy < 0.f) {
             vel.dy += GRAVITY_UP * deltaTime;
         } else {

@@ -55,6 +55,7 @@ void GameInstance::updateTick()
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
+    boundarySystem(_registry);
     projectileSystem(_registry, TICK_DURATION);
 
     checkCollisions();
@@ -116,6 +117,10 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
         return false;
 
     Entity playerEntity = it->second;
+
+    if (!_registry.has<Health>(playerEntity) || _registry.get<Health>(playerEntity).hp <= 0) {
+        return false;
+    }
 
     if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
         return false;
@@ -215,9 +220,19 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
     msg.write(static_cast<uint32_t>(_currentTick));
 
-    msg.write(static_cast<uint8_t>(_playerEntities.size()));
+    uint8_t alivePlayerCount = 0;
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
+            alivePlayerCount++;
+        }
+    }
+    msg.write(alivePlayerCount);
 
     for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp <= 0) {
+            continue;
+        }
+
         msg.write(static_cast<uint32_t>(entity.id));
 
         if (_registry.has<Position>(entity)) {
