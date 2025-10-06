@@ -48,7 +48,6 @@ bool handlePlayerAttack(
         registry.emplace<Parent>(projectileEntity, Parent{weaponIt.entity()});
         registry.emplace<Lifetime>(projectileEntity, 3.0f);
         registry.emplace<ProjectileTag>(projectileEntity);
-        registry.emplace<OwnerId>(projectileEntity, static_cast<int>(playerId));
         
         // Add to new entities for synchronization
         newEntitiesThisTick.push_back(projectileEntity);

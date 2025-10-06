@@ -24,10 +24,18 @@ void handleWeaponInputs(InputManager& _inputs, Registry& registry)
         auto [w, magazine, damage, frequency, parent] = *it;
         if (_inputs.isShoot()) {
             if (FrequencyUtils::triggerAndReset(frequency)) {
-                auto entity = it.entity();
+                auto weaponEntity = it.entity();
                 if (registry.has<Position>(parent.parent)) {
                     const Position& parentPosition = registry.get<Position>(parent.parent);
-                    factories::createProjectile(registry, Vector2{parentPosition.x, parentPosition.y}, Vector2{500, 0}, Parent{entity});
+                    factories::createProjectile(
+                        registry,
+                        Position{parentPosition.x, parentPosition.y},
+                        Velocity{500.0f, 0.0f},
+                        Damage{damage.value},
+                        Hitbox{50.0f, 50.0f, 0.0f, 0.0f},
+                        Parent{weaponEntity},
+                        Lifetime{3.0f}
+                    );
                 } else {
                     std::cout << "Parent has no Position component" << std::endl;
                 }

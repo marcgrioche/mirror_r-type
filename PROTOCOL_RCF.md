@@ -125,7 +125,7 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - Velocity: `float vx, float vy`
 - Damage: `float damage`
 - Hitbox: `float width, float height, float offset_x, float offset_y`
-- OwnerId: `int32 owner_entity_id`
+- Parent Entity: `uint32 parent_entity_id, uint32 parent_entity_version` (weapon entity that spawned this projectile)
 - Lifetime: `float lifetime_seconds`
 
 **Enemy (Type 3):**

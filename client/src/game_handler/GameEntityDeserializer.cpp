@@ -81,16 +81,19 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
     float height = msg.readFloat();
     float offsetX = msg.readFloat();
     float offsetY = msg.readFloat();
-    uint32_t ownerId = msg.readU32();
+    uint32_t parentId = msg.readU32();
+    uint32_t parentVersion = msg.readU32();
     float lifetimeValue = msg.readFloat();
 
-    factories::createProjectile(registry,
-        Position { posX, posY },
-        Velocity { velX, velY },
-        Damage { damageValue },
-        Hitbox { width, height, offsetX, offsetY },
-        Parent { Entity { ownerId, 0 } },
-        Lifetime { lifetimeValue });
+    factories::createProjectile(
+        registry,
+        Position{posX, posY},
+        Velocity{velX, velY},
+        Damage{damageValue},
+        Hitbox{width, height, offsetX, offsetY},
+        Parent{Entity{parentId, parentVersion}},
+        Lifetime{lifetimeValue}
+    );
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,

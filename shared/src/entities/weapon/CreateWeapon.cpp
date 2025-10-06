@@ -10,7 +10,6 @@
 #include "Magazine.hpp"
 #include "Frequency.hpp"
 #include "Tags.hpp"
-#include "OwnerId.hpp"
 
 Entity factories::createWeapon(Registry &registry)
 {
