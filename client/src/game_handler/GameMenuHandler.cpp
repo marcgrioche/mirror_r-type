@@ -17,7 +17,7 @@ void Game::handleMenuConnectRequest()
     ip = ip.empty() ? "127.0.0.1" : ip;
     port = (port == 0) ? 4242 : port;
 
-    m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, 2020, m_events);
+    m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, m_clientPort, m_events);
     m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
     m_clientNetwork->connectToServerRequest();
     m_menu.onConnected();
@@ -33,14 +33,20 @@ void Game::handleMenuCreateLobbyRequest()
 void Game::handleMenuJoinLobbyRequest()
 {
     if (!m_clientNetwork) {
-        std::cout << "Not connected to server. Use Connect first." << std::endl;
+        std::cout << "ERROR: Not connected to server. Use Connect first." << std::endl;
         return;
     }
-    if (m_menu.m_inputCode.empty()) {
-        std::cout << "Please enter a lobby ID" << std::endl;
+    try {
+        if (m_menu.m_inputCode.empty()) {
+            std::cout << "ERROR: Please enter a lobby ID" << std::endl;
+            return;
+        }
+        uint32_t lobbyId = static_cast<uint32_t>(std::stoul(m_menu.m_inputCode));
+        m_clientNetwork->joinLobbyRequest(lobbyId);
+    } catch (const std::exception& e) {
+        std::cout << "ERROR: Invalid lobby ID: " << m_menu.m_inputCode << " - " << e.what() << std::endl;
         return;
     }
-    m_clientNetwork->joinLobbyRequest(static_cast<uint32_t>(std::stoul(m_menu.m_inputCode)));
     // Attendre la réponse LOBBY_INFO pour changer d'état
 }
 
