@@ -54,7 +54,7 @@ void GameInstance::updateTick()
     processInputs();
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
+    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
 
     checkCollisions();
@@ -62,6 +62,7 @@ void GameInstance::updateTick()
     cleanupEntities();
 
     if (_platformsToAdd > 0) {
+        std::cout << "platforms to add = " << _platformsToAdd << std::endl;
         for (;_platformsToAdd > 0; _platformsToAdd--) {
            auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
             _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());

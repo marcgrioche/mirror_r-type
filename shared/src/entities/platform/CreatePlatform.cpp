@@ -115,7 +115,7 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distX(SCREEN_W + SPAWN_OFFSET, SCREEN_W + SPAWN_OFFSET);
+    std::uniform_real_distribution<float> distX(SCREEN_W, SCREEN_W + SPAWN_OFFSET);
     std::uniform_real_distribution<float> distY(MIN_Y, MAX_Y);
 
     struct Plat { float x, y; };
