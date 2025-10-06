@@ -1,9 +1,9 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
+#include "Parent.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
-#include "Parent.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -109,6 +109,7 @@ void GameInstance::removePlayer(uint32_t playerId)
 
 bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
+    (void)tick;
     // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
@@ -252,6 +253,7 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 {
+    (void)data;
     // TODO: Implement state deserialization for rollback
 }
 
@@ -299,7 +301,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_y);
         }
 
-        msg.write(static_cast<uint32_t>(entity.id)); //compability with server ?
+        msg.write(static_cast<uint32_t>(entity.id)); // compability with server ?
 
     } else if (entityType == 1) { // Projectile
         if (_registry.has<Velocity>(entity)) {

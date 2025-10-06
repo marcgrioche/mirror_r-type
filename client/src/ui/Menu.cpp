@@ -361,13 +361,15 @@ void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
             static_cast<float>(m_connectBtnRect.h),
             "join_lobby_confirm");
         m_joinConfirmCreated = true;
-        
+
         // Verify the components were added
         if (registry.has<Position>(m_joinConfirmButton)) {
             auto& pos = registry.get<Position>(m_joinConfirmButton);
+            (void)pos;
         }
         if (registry.has<Hitbox>(m_joinConfirmButton)) {
             auto& hitbox = registry.get<Hitbox>(m_joinConfirmButton);
+            (void)hitbox;
         }
         if (registry.has<Button>(m_joinConfirmButton)) {
         }
