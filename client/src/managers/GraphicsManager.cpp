@@ -6,6 +6,7 @@
 */
 
 #include "GraphicsManager.hpp"
+#include <SDL_ttf.h>
 #include <iostream>
 
 GraphicsManager& GraphicsManager::getInstance()
@@ -23,6 +24,12 @@ bool GraphicsManager::initialize(const char* title, int width, int height)
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL could not initialize. SDL_Error: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    if (TTF_Init() == -1) {
+        std::cerr << "TTF_Init Error: " << TTF_GetError() << std::endl;
+        SDL_Quit();
         return false;
     }
 
@@ -62,6 +69,7 @@ void GraphicsManager::cleanup()
             m_window = nullptr;
         }
         SDL_Quit();
+        TTF_Quit();
         m_initialized = false;
         std::cout << "GraphicsManager cleaned up." << std::endl;
     }
