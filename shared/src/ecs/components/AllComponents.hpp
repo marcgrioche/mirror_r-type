@@ -9,6 +9,8 @@
 
 // Individual component includes
 #include "Button.hpp"
+#include "ButtonInfo.hpp"
+#include "Color.hpp"
 #include "Damage.hpp"
 #include "Health.hpp"
 #include "Hitbox.hpp"
@@ -23,6 +25,7 @@
 #include "PreviousPosition.hpp"
 #include "Projectile.hpp"
 #include "ServerEntityId.hpp"
+#include "TextBox.hpp"
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"
