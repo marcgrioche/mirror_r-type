@@ -50,6 +50,7 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
     float offsetX = msg.readFloat();
     float offsetY = msg.readFloat();
     uint32_t serverPlayerId = msg.readU32();
+    (void)serverPlayerId;
 
     Entity entity = factories::createPlayer(registry,
         Position { posX, posY },
@@ -74,6 +75,7 @@ void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
+    (void)entityId;
     float velX = msg.readFloat();
     float velY = msg.readFloat();
     float damageValue = msg.readFloat();
@@ -87,22 +89,26 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
 
     factories::createProjectile(
         registry,
-        Position{posX, posY},
-        Velocity{velX, velY},
-        Damage{damageValue},
-        Hitbox{width, height, offsetX, offsetY},
-        Parent{Entity{parentId, parentVersion}},
-        Lifetime{lifetimeValue}
-    );
+        Position { posX, posY },
+        Velocity { velX, velY },
+        Damage { damageValue },
+        Hitbox { width, height, offsetX, offsetY },
+        Parent { Entity { parentId, parentVersion } },
+        Lifetime { lifetimeValue });
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
+    (void)entityId;
     float width = msg.readFloat();
+    (void)width;
     float height = msg.readFloat();
+    (void)height;
     float offsetX = msg.readFloat();
+    (void)offsetX;
     float offsetY = msg.readFloat();
+    (void)offsetY;
 
     factories::createOneWayPlatform(registry,
         posX,
@@ -151,6 +157,7 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     const_cast<Message&>(msg).resetReadPosition();
 
     uint32_t tick = msg.readU32();
+    (void)tick;
     uint8_t numPlayers = msg.readU8();
 
     updateNonPredictedEntities(msg, registry, numPlayers);

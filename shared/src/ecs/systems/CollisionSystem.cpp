@@ -13,6 +13,7 @@
 
 void collisionSystem(Registry& registry, float deltaTime)
 {
+    (void)deltaTime;
     auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
 
     auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
@@ -42,6 +43,8 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel)
 {
+    (void)originalPos;
+    (void)platformVel;
     float playerLeft = playerPos.x + playerHitbox.offset_x;
     float playerRight = playerLeft + playerHitbox.width;
     float playerTop = playerPos.y + playerHitbox.offset_y;
@@ -92,6 +95,7 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel)
 {
+    (void)platformVel;
     if (playerVel.dy <= 0) {
         return; // Player is not falling, ignore collision
     }
