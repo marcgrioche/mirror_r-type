@@ -1,6 +1,7 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
 #include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
 #include <iostream>
 
@@ -155,7 +156,9 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             velocity.dx = speed;
             break;
         case GameInput::ATTACK:
-            // TODO: Handle shooting/projectile creation
+            if (WeaponSystem::handlePlayerAttack(_registry, playerEntity, playerId, _newEntitiesThisTick)) {
+                _stateChanged = true;
+            }
             break;
         case GameInput::DASH:
             // TODO: Handle dash ability
