@@ -55,6 +55,7 @@ private:
     void runMenuLoop();
     void runGameLoop(float deltaTime);
     void cleanupNetwork();
+    void sendDisconnectMessage();
 
     // Core update and render
     void update(float deltaTime);

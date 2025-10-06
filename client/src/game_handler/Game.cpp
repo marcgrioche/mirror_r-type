@@ -148,9 +148,24 @@ void Game::cleanup()
 void Game::cleanupNetwork()
 {
     if (m_clientNetwork) {
+        sendDisconnectMessage();
         m_clientNetwork->stop();
     }
     if (m_networkThread.joinable()) {
         m_networkThread.join();
+    }
+}
+
+void Game::sendDisconnectMessage()
+{
+    if (!m_clientNetwork)
+        return;
+
+    try {
+        Message disconnectMsg(MessageType::DISCONNECT, 0, m_clientNetwork->getPlayerId(), 1);
+        m_clientNetwork->sendMessageImmediately(disconnectMsg);
+        std::cout << "Disconnect message sent to server" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send disconnect message: " << e.what() << std::endl;
     }
 }

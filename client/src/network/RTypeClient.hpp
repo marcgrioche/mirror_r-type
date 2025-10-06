@@ -36,6 +36,7 @@ public:
     void sendMessage(MessageType t_type);
     void sendMessage(MessageType t_type, uint32_t t_payload);
     void sendMessage(const Message& t_msg);
+    void sendMessageImmediately(const Message& t_msg);
     void connectToServerRequest();
     void disconnectFromServerRequest();
     void createLobbyRequest();
@@ -49,6 +50,7 @@ public:
 
     uint32_t getCurrentTick() const { return m_currentTick; }
     void incrementTick() { m_currentTick++; }
+    uint32_t getPlayerId() const { return m_playerId; }
 
 private:
     void registerHandlers() override;

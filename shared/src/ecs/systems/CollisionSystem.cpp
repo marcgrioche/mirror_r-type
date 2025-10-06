@@ -109,6 +109,5 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
-        std::cout << "Player landed on one-way platform!" << std::endl;
     }
 }

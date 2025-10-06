@@ -133,6 +133,16 @@ void RTypeClient::sendMessage(const Message& t_msg)
     queueMessage(msg, m_serverInfo);
 }
 
+void RTypeClient::sendMessageImmediately(const Message& t_msg)
+{
+    Message msg(t_msg.getType(), t_msg.getPayload(), t_msg.sequence_number, m_playerId, t_msg.version);
+    std::vector<uint8_t> data = msg.serialize();
+
+    if (_socket) {
+        _socket->send(data, m_serverInfo.ip_address, m_serverInfo.port);
+    }
+}
+
 void RTypeClient::connectToServerRequest()
 {
     sendMessage(MessageType::CONNECT);
