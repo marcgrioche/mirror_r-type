@@ -5,10 +5,10 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 1:24:26 PM 2025 jojo
-** Last update Thu Oct 1 2:42:18 PM 2025 jojo
+** Last update Tue Oct 6 10:48:43 AM 2025 jojo
 */
 
-#include "TextRenderSystem.hpp"
+#include "TextBoxRenderSystem.hpp"
 #include <SDL2/SDL_ttf.h>
 
 void textRenderSystem(Registry& registry, GraphicsManager& graphics)
@@ -25,7 +25,9 @@ void textRenderSystem(Registry& registry, GraphicsManager& graphics)
             continue;
         }
 
-        SDL_Surface* textSurface = TTF_RenderText_Solid(font, textBox.text.c_str(), textBox.color);
+        SDL_Color color = { textBox.color.a, textBox.color.r, textBox.color.g, textBox.color.b };
+
+        SDL_Surface* textSurface = TTF_RenderText_Solid(font, textBox.text.c_str(), color);
         if (!textSurface) {
             TTF_CloseFont(font);
             continue;
