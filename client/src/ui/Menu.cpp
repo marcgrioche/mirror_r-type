@@ -460,14 +460,14 @@ void Menu::renderWinPage(GraphicsManager& gfx, Registry& registry)
 {
     (void)gfx;
     (void)registry;
-    cout << "You Win!" << endl;
+    std::cout << "You Win!" << std::endl;
 }
 
 void Menu::renderLosePage(GraphicsManager& gfx, Registry& registry)
 {
     (void)gfx;
     (void)registry;
-    cout << "You Lose!" << endl;
+    std::cout << "You Lose!" << std::endl;
 }
 
 void Menu::renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color)
