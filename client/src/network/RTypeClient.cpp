@@ -169,6 +169,16 @@ void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
 }
 
+void RTypeClient::handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_WIN, t_msg });
+}
+
+void RTypeClient::handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_LOSE, t_msg });
+}
+
 void RTypeClient::registerHandlers()
 {
     _handlers[MessageType::CONNECT_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
@@ -183,7 +193,16 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::SPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleSpawnEntity(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::DESPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleDespawnEntity(t_msg, t_peerInfo);
+    };
     _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleGameState(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_END_WIN] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameEndWin(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_END_LOSE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameEndLose(t_msg, t_peerInfo);
     };
 }

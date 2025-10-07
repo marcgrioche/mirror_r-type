@@ -192,6 +192,10 @@ bool LobbyManager::removePlayer(uint32_t playerId)
         }
 
         if (lobby->players.empty()) {
+            lobby->threadRunning = false;
+            if (lobby->gameThread.joinable()) {
+                lobby->gameThread.join();
+            }
             _lobbies.erase(lobbyIt);
             std::cout << "Removed empty lobby " << lobbyId << std::endl;
         } else if (lobby->creatorId == playerId) {
@@ -252,6 +256,7 @@ std::vector<uint32_t> LobbyManager::getLobbyPlayers(uint32_t lobbyId) const
 
 void LobbyManager::runLobbyThread(Lobby* lobby)
 {
+    // TODO: Refactor
     std::cout << "Started game thread for lobby " << lobby->id << std::endl;
 
     bool hadRealInputsThisTick = false;
@@ -269,6 +274,24 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
         lobby->gameInstance->update();
 
+        if (lobby->gameInstance->hasWon()) {
+            std::cout << "Game won in lobby " << lobby->id << std::endl;
+            Message endMsg(MessageType::GAME_END_WIN);
+            _server->broadcastToLobby(lobby->id, endMsg);
+            lobby->state = LobbyState::WAITING;
+            lobby->gameInstance.reset();
+            lobby->threadRunning = false;
+            break;
+        } else if (lobby->gameInstance->hasLost()) {
+            std::cout << "Game lost in lobby " << lobby->id << std::endl;
+            Message endMsg(MessageType::GAME_END_LOSE);
+            _server->broadcastToLobby(lobby->id, endMsg);
+            lobby->state = LobbyState::WAITING;
+            lobby->gameInstance.reset();
+            lobby->threadRunning = false;
+            break;
+        }
+
         if (_server) {
             auto newEntities = lobby->gameInstance->getAndClearNewEntities();
             for (Entity entity : newEntities) {
@@ -276,6 +299,13 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
                 if (!spawnMsg.getPayload().empty()) {
                     _server->broadcastToLobby(lobby->id, spawnMsg);
                 }
+            }
+
+            auto killedEntities = lobby->gameInstance->getAndClearKilledEntities();
+            for (uint32_t entityId : killedEntities) {
+                Message despawnMsg(MessageType::DESPAWN_ENTITY);
+                despawnMsg.write(entityId);
+                _server->broadcastToLobby(lobby->id, despawnMsg);
             }
 
             if (hadRealInputsThisTick || lobby->gameInstance->hasStateChanged()) {

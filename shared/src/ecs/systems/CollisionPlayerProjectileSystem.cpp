@@ -13,8 +13,8 @@
 
 void collisionPlayerProjectileSystem(Registry& registry, float)
 {
-    auto projView = registry.view<Projectile>();
-    auto playerView = registry.view<Player>();
+    auto projView = registry.view<ProjectileTag>();
+    auto playerView = registry.view<PlayerTag>();
 
     for (auto it = projView.begin(); it != projView.end(); ++it) {
         Entity projE = it.entity();
@@ -40,13 +40,15 @@ void collisionPlayerProjectileSystem(Registry& registry, float)
             }
 
             if (entities_collide(registry, projE, plE)) {
-                // apply damage if player has Health and projectile has Damage
                 if (registry.has<Health>(plE) && registry.has<Damage>(projE)) {
                     Health& h = registry.get<Health>(plE);
-                    Lifetime& time = registry.get<Lifetime>(projE);
-                    time.value = 0.0f;
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
+                    if (registry.has<Lifetime>(projE)) {
+                        Lifetime& time = registry.get<Lifetime>(projE);
+                        time.value = 0.0f;
+                    }
+                    std::cout << "[Collision] Player " << plE.id << " hit by projectile " << projE.id << " dmg=" << dmg << " hp=" << h.hp << "\n";
                 }
             }
         }

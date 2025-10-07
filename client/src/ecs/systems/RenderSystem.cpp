@@ -28,7 +28,7 @@ void renderSystem(Registry& registry)
         // Skip UI buttons to avoid white rectangles from appearing in gameplay
         if (registry.has<Button>(e)) {
             continue;
-        // choose a different color for each entity to distinguish them
+            // choose a different color for each entity to distinguish them
         } else if (registry.has<PlayerTag>(e)) {
             graphics.setDrawColor(255, 0, 255, 255);
         } else if (registry.has<PlatformTag>(e)) {
@@ -37,6 +37,8 @@ void renderSystem(Registry& registry)
             graphics.setDrawColor(255, 255, 0, 255);
         } else if (registry.has<EnemyTag>(e)) {
             graphics.setDrawColor(0, 255, 255, 255);
+        } else if (registry.has<PowerUpTag>(e)) {
+            graphics.setDrawColor(0, 255, 0, 255);
         }
 
         Hitbox& hitbox = registry.get<Hitbox>(e);

@@ -1,16 +1,26 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
 #include "Parent.hpp"
+#include "ecs/systems/ColisionPlayerPowerUpSystem.hpp"
+#include "ecs/systems/DashSystem.hpp"
+#include "ecs/systems/FrequencyUtils.hpp"
 #include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/PowerUpEffectSystem.hpp"
+#include "ecs/systems/PowerUpSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
+#include "entities/powerUp/CreatePowerUp.hpp"
+#include <cstdlib>
 #include <iostream>
+#include <unordered_set>
 
 GameInstance::GameInstance(uint32_t lobbyId)
     : _lobbyId(lobbyId)
     , _isRunning(false)
     , _currentTick(0)
     , _stateChanged(false)
+    , _gameWon(false)
+    , _gameLost(false)
 {
 }
 
@@ -19,6 +29,7 @@ void GameInstance::initialize()
     std::cout << "Initializing game instance for lobby " << _lobbyId << std::endl;
     initializeLevel();
     _lastTickTime = std::chrono::steady_clock::now();
+    _lastPowerUpSpawnTime = std::chrono::steady_clock::now() - std::chrono::seconds(static_cast<long long>(POWER_UP_SPAWN_INTERVAL));
     _isRunning = true;
     std::cout << "Game instance initialized successfully" << std::endl;
 }
@@ -41,6 +52,22 @@ void GameInstance::update()
     _lastTickTime = currentTime - deltaTime;
 }
 
+bool GameInstance::checkLoseCondition() const
+{
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool GameInstance::checkWinCondition() const
+{
+    // TODO: Implement win condition
+    return false;
+}
+
 void GameInstance::updateTick()
 {
     _currentTick++;
@@ -51,31 +78,49 @@ void GameInstance::updateTick()
         prevPos.y = pos.y;
     }
 
-    auto deadEntities = _registry.view<Health, Dead>();
-    for (auto&& [hp, dead] : deadEntities) {
-        if (hp.hp <= 0)
-            dead.dead = true;
-    }
+    // auto deadEntities = _registry.view<Health, Dead>();
+    // for (auto&& [hp, dead] : deadEntities) {
+    //     if (hp.hp <= 0) {
+    //         dead.dead = true;
+    //     }
+    // }
 
     processInputs();
+    dashSystem(_registry, TICK_DURATION);
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    
+
     _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     boundarySystem(_registry);
-    projectileSystem(_registry, TICK_DURATION);
-    
+
     checkCollisions();
+    powerUpEffectSystem(_registry, TICK_DURATION);
 
     cleanupEntities();
+    powerUpSystem(_registry, TICK_DURATION);
+
+    if (checkLoseCondition()) {
+        _gameLost = true;
+        _isRunning = false;
+    } else if (checkWinCondition()) {
+        _gameWon = true;
+        _isRunning = false;
+    }
 
     if (_platformsToAdd > 0) {
-        std::cout << "platforms to add = " << _platformsToAdd << std::endl;
         for (; _platformsToAdd > 0; _platformsToAdd--) {
             auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
             _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
             std::cout << _platformsToAdd << std::endl;
         }
+    }
+
+    auto currentTime = std::chrono::steady_clock::now();
+    auto timeSinceLastSpawn = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - _lastPowerUpSpawnTime);
+
+    if (timeSinceLastSpawn.count() >= POWER_UP_SPAWN_INTERVAL && !_playerEntities.empty()) {
+        spawnRandomPowerUps(static_cast<int>(_playerEntities.size()));
+        _lastPowerUpSpawnTime = currentTime;
     }
 
     for (const auto& [playerId, entity] : _playerEntities) {
@@ -91,7 +136,6 @@ void GameInstance::updateTick()
 
 void GameInstance::initializeLevel()
 {
-    // TODO: Game levels, (create platforms (same as client for now))
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
@@ -118,7 +162,6 @@ void GameInstance::removePlayer(uint32_t playerId)
 
 bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
-    (void)tick;
     // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
@@ -126,18 +169,17 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     Entity playerEntity = it->second;
 
-    if (!_registry.has<Health>(playerEntity) || _registry.get<Health>(playerEntity).hp <= 0) {
-        return false;
-    }
-
-    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
+    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity) || !_registry.has<Dash>(playerEntity)) {
         return false;
     }
 
     auto& velocity = _registry.get<Velocity>(playerEntity);
     auto& jump = _registry.get<Jump>(playerEntity);
+    auto& dash = _registry.get<Dash>(playerEntity);
 
-    velocity.dx = 0.0f;
+    if (!dash.isDashing) {
+        velocity.dx = 0.0f;
+    }
 
     const float speed = 250.0f;
     bool hasRealInputs = false;
@@ -161,10 +203,16 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             }
             break;
         case GameInput::LEFT:
-            velocity.dx = -speed;
+            if (!dash.isDashing) {
+                velocity.dx = -speed;
+                dash.direction = -1;
+            }
             break;
         case GameInput::RIGHT:
-            velocity.dx = speed;
+            if (!dash.isDashing) {
+                velocity.dx = speed;
+                dash.direction = 1;
+            }
             break;
         case GameInput::ATTACK:
             if (WeaponSystem::handlePlayerAttack(_registry, playerEntity, playerId, _newEntitiesThisTick)) {
@@ -172,7 +220,16 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             }
             break;
         case GameInput::DASH:
-            // TODO: Handle dash ability
+            if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
+                dash.isDashing = true;
+                dash.remaining = dash.duration;
+                if (velocity.dx < 0) {
+                    dash.direction = -1;
+                } else if (velocity.dx > 0) {
+                    dash.direction = 1;
+                }
+                _stateChanged = true;
+            }
             break;
         }
     }
@@ -194,7 +251,7 @@ void GameInstance::simulatePhysics()
     // Run shared physics systems
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
 }
 
@@ -203,6 +260,7 @@ void GameInstance::checkCollisions()
     collisionSystem(_registry, TICK_DURATION);
     collisionPlayerProjectileSystem(_registry, TICK_DURATION);
     collisionEnemyProjectileSystem(_registry, TICK_DURATION);
+    collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
     // TODO: collisionPlayerProjectileSystem(_registry, TICK_DURATION);
     // Currently disabled due to include path issues from server directory
 }
@@ -228,7 +286,7 @@ void GameInstance::cleanupEntities()
         auto viewDead = _registry.view<Dead>();
         for (auto it = viewDead.begin(); it != viewDead.end(); ++it) {
             auto [dead] = *it;
-            if (dead.dead) {
+            if (dead.dead == true) {
                 killedThisTick.push_back(it.entity());
             }
         }
@@ -237,9 +295,15 @@ void GameInstance::cleanupEntities()
     if (killedThisTick.empty())
         return; // nothing to do
 
-    // 3) Physically remove from registry
-    for (auto e : killedThisTick) {
-        _registry.kill_entity(e);
+    // 3) Record killed entity IDs (deduplicated) then physically remove from registry
+    {
+        std::unordered_set<uint32_t> already; // dedupe by raw id for network despawn
+        for (auto e : killedThisTick) {
+            if (already.insert(e.id).second) {
+                _killedEntitiesThisTick.push_back(e.id);
+            }
+            _registry.kill_entity(e);
+        }
     }
 
     // 4) Purge references in _playerEntities (so they "disappear completely")
@@ -285,19 +349,9 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
     msg.write(static_cast<uint32_t>(_currentTick));
 
-    uint8_t alivePlayerCount = 0;
-    for (const auto& [playerId, entity] : _playerEntities) {
-        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
-            alivePlayerCount++;
-        }
-    }
-    msg.write(alivePlayerCount);
+    msg.write(static_cast<uint8_t>(_playerEntities.size()));
 
     for (const auto& [playerId, entity] : _playerEntities) {
-        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp <= 0) {
-            continue;
-        }
-
         msg.write(static_cast<uint32_t>(entity.id));
 
         if (_registry.has<Position>(entity)) {
@@ -322,7 +376,6 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 {
-    (void)data;
     // TODO: Implement state deserialization for rollback
 }
 
@@ -338,6 +391,8 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         entityType = 2; // Platform
     } else if (_registry.has<EnemyTag>(entity)) {
         entityType = 3; // Enemy
+    } else if (_registry.has<PowerUpTag>(entity)) {
+        entityType = 4; // Power-up
     }
 
     if (entityType == 255) {
@@ -435,6 +490,25 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_x);
             msg.write(hitbox.offset_y);
         }
+    } else if (entityType == 4) { // Power-up
+        if (_registry.has<PowerUp>(entity)) {
+            auto& powerUp = _registry.get<PowerUp>(entity);
+            msg.write(static_cast<uint8_t>(powerUp.type));
+            msg.write(powerUp.effect_duration);
+        }
+
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+
+        if (_registry.has<Lifetime>(entity)) {
+            auto& lifetime = _registry.get<Lifetime>(entity);
+            msg.write(lifetime.value);
+        }
     }
 
     return msg;
@@ -447,9 +521,39 @@ std::vector<Entity> GameInstance::getAndClearNewEntities()
     return entities;
 }
 
+std::vector<uint32_t> GameInstance::getAndClearKilledEntities()
+{
+    std::vector<uint32_t> entities = std::move(_killedEntitiesThisTick);
+    _killedEntitiesThisTick.clear();
+    return entities;
+}
+
 bool GameInstance::hasStateChanged()
 {
     bool changed = _stateChanged;
     _stateChanged = false;
     return changed;
+}
+
+void GameInstance::spawnRandomPowerUps(int count)
+{
+    for (int i = 0; i < count; ++i) {
+        // Random position on screen (adjust based on your screen dimensions)
+        float x = static_cast<float>(rand() % 800 + 100); // Random X between 100-900
+        float y = static_cast<float>(rand() % 300 + 200); // Random Y between 200-500
+
+        // Random power-up type
+        PowerUpType type = (rand() % 2 == 0) ? PowerUpType::HEAL : PowerUpType::DAMAGE_BOOST;
+
+        // Effect duration: 10 seconds for damage boost, instant for heal
+        float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
+
+        Position pos = { x, y };
+        Velocity vel = { 0.0f, 0.0f }; // Stationary power-ups
+        Hitbox hitbox = { 20.0f, 20.0f, 0.0f, 0.0f }; // 20x20 hitbox
+        Lifetime lifetime = { 30.0f }; // 30 seconds lifetime
+
+        Entity powerUp = factories::createPowerUp(_registry, pos, vel, hitbox, lifetime, type, effectDuration);
+        _newEntitiesThisTick.push_back(powerUp);
+    }
 }

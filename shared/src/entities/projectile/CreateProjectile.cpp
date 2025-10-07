@@ -26,10 +26,6 @@ Entity createProjectile(Registry& registry,
     registry.emplace<Hitbox>(projectile, hitbox);
     registry.emplace<Parent>(projectile, parent);
     registry.emplace<Lifetime>(projectile, lifetime);
-    // Ensure both the data component and the tag are present so that
-    // systems using view<Projectile> can process this entity while the
-    // network serialization still relies on ProjectileTag.
-    registry.emplace<Projectile>(projectile);
     registry.emplace<ProjectileTag>(projectile);
     return projectile;
 }

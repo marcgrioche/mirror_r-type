@@ -13,7 +13,8 @@
 
 void collisionEnemyProjectileSystem(Registry& registry, float)
 {
-    auto projView = registry.view<Projectile>();
+    // Pattern calqué sur collision power-up: on utilise les Tags pour filtrer
+    auto projView = registry.view<ProjectileTag>();
     auto enemyView = registry.view<EnemyTag>();
     
     for (auto it = projView.begin(); it != projView.end(); ++it) {
@@ -21,7 +22,7 @@ void collisionEnemyProjectileSystem(Registry& registry, float)
         
         // require Position + Hitbox on both sides
         if (!registry.has<Position>(projE) || !registry.has<Hitbox>(projE))
-        continue;
+            continue;
         
         // check against all enemies
         for (auto eIT = enemyView.begin(); eIT != enemyView.end(); ++eIT) {
@@ -40,14 +41,19 @@ void collisionEnemyProjectileSystem(Registry& registry, float)
             }
             
             if (entities_collide(registry, projE, EnE)) {
-                // apply damage if enemy has Health and projectile has Damage
                 if (registry.has<Health>(EnE) && registry.has<Damage>(projE)) {
-                    std::cout << "Enemy collided Projectile\n";
                     Health& h = registry.get<Health>(EnE);
-                    Lifetime& time = registry.get<Lifetime>(projE);
-                    time.value = 0.0f;
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
+                    std::cout << "[Collision] Enemy " << EnE.id << " hit by projectile " << projE.id << " dmg=" << dmg << " hp=" << h.hp << "\n";
+                    if (h.hp <= 0) {
+                        Dead& dead = registry.get<Dead>(EnE);
+                        dead.dead = true;
+                    }
+                    if (registry.has<Lifetime>(projE)) {
+                        Lifetime& time = registry.get<Lifetime>(projE);
+                        time.value = 0.0f; // détruire le projectile
+                    }
                 }
             }
         }

@@ -33,6 +33,9 @@ public:
     bool isRunning() const { return _isRunning; }
     void stop() { _isRunning = false; }
 
+    bool hasWon() const { return _gameWon; }
+    bool hasLost() const { return _gameLost; }
+
     uint32_t getLobbyId() const { return _lobbyId; }
     uint32_t getCurrentTick() const { return _currentTick; }
 
@@ -63,6 +66,14 @@ public:
     std::vector<Entity> getAndClearNewEntities();
 
     /**
+     * Get entities killed this tick and clear the list.
+     *
+     * Returns:
+     *     std::vector<uint32_t>: Entity IDs killed this tick
+     */
+    std::vector<uint32_t> getAndClearKilledEntities();
+
+    /**
      * Check if game state changed this tick and reset the flag.
      *
      * Returns:
@@ -89,8 +100,15 @@ private:
 
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;
+    std::vector<uint32_t> _killedEntitiesThisTick;
+
+    bool _gameWon;
+    bool _gameLost;
 
     int _platformsToAdd = 0;
+
+    std::chrono::steady_clock::time_point _lastPowerUpSpawnTime;
+    static constexpr float POWER_UP_SPAWN_INTERVAL = 30.0f;
 
     void updateTick();
     void initializeLevel();
@@ -98,4 +116,8 @@ private:
     void simulatePhysics();
     void checkCollisions();
     void cleanupEntities();
+    void spawnRandomPowerUps(int count);
+
+    bool checkLoseCondition() const;
+    bool checkWinCondition() const;
 };
