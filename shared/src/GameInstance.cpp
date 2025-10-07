@@ -28,6 +28,7 @@ void GameInstance::initialize()
     std::cout << "Initializing game instance for lobby " << _lobbyId << std::endl;
     initializeLevel();
     _lastTickTime = std::chrono::steady_clock::now();
+    _lastPowerUpSpawnTime = std::chrono::steady_clock::now() - std::chrono::seconds(static_cast<long long>(POWER_UP_SPAWN_INTERVAL));
     _isRunning = true;
     std::cout << "Game instance initialized successfully" << std::endl;
 }
@@ -108,6 +109,14 @@ void GameInstance::updateTick()
         }
     }
 
+    auto currentTime = std::chrono::steady_clock::now();
+    auto timeSinceLastSpawn = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - _lastPowerUpSpawnTime);
+
+    if (timeSinceLastSpawn.count() >= POWER_UP_SPAWN_INTERVAL && !_playerEntities.empty()) {
+        spawnRandomPowerUps(static_cast<int>(_playerEntities.size()));
+        _lastPowerUpSpawnTime = currentTime;
+    }
+
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
             const auto& vel = _registry.get<Velocity>(entity);
@@ -121,20 +130,9 @@ void GameInstance::updateTick()
 
 void GameInstance::initializeLevel()
 {
-    // TODO: Game levels, (create platforms (same as client for now))
-    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
-    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
-    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
-    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
-
-    spawnRandomPowerUps(3);
-
-    // for (int i = 0; i < 8; i++) {
-    //     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
-    // }
 }
 
 void GameInstance::addPlayer(uint32_t playerId)

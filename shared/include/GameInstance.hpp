@@ -105,6 +105,9 @@ private:
 
     int _platformsToAdd = 0;
 
+    std::chrono::steady_clock::time_point _lastPowerUpSpawnTime;
+    static constexpr float POWER_UP_SPAWN_INTERVAL = 30.0f;
+
     void updateTick();
     void initializeLevel();
     void processInputs();
