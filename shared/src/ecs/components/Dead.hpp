@@ -2,11 +2,11 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** OwnerId Component
+** Damage Component
 */
 
 #pragma once
 
-struct OwnerId {
-    int id;
+struct Dead {
+    bool dead = false;
 };

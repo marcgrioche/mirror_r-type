@@ -6,11 +6,11 @@
 */
 
 #include "InputManager.hpp"
+#include "ConfigManager.hpp"
 
 InputManager& InputManager::getInstance()
 {
     static InputManager instance;
-    instance.setDefaultKeyBindings();
     return instance;
 }
 
@@ -47,6 +47,13 @@ void InputManager::handleSDLEvent(const SDL_Event& e)
 void InputManager::bindKey(SDL_Keycode key, GameAction action)
 {
     keyToAction[key] = action;
+}
+
+void InputManager::bindKeysForAction(GameAction action, const std::vector<SDL_Keycode>& keys)
+{
+    for (SDL_Keycode key : keys) {
+        bindKey(key, action);
+    }
 }
 
 void InputManager::unbindKey(SDL_Keycode key)
@@ -86,12 +93,14 @@ void InputManager::setDefaultKeyBindings()
 {
     keyToAction.clear();
 
-    bindKey(SDLK_z, GameAction::MOVE_UP);
-    bindKey(SDLK_s, GameAction::MOVE_DOWN);
-    bindKey(SDLK_q, GameAction::MOVE_LEFT);
-    bindKey(SDLK_d, GameAction::MOVE_RIGHT);
-    bindKey(SDLK_SPACE, GameAction::SHOOT);
-    bindKey(SDLK_ESCAPE, GameAction::QUIT);
+    ConfigManager& config = ConfigManager::getInstance();
+
+    bindKeysForAction(GameAction::MOVE_UP, config.getKeysForAction(GameAction::MOVE_UP));
+    bindKeysForAction(GameAction::MOVE_DOWN, config.getKeysForAction(GameAction::MOVE_DOWN));
+    bindKeysForAction(GameAction::MOVE_LEFT, config.getKeysForAction(GameAction::MOVE_LEFT));
+    bindKeysForAction(GameAction::MOVE_RIGHT, config.getKeysForAction(GameAction::MOVE_RIGHT));
+    bindKeysForAction(GameAction::SHOOT, config.getKeysForAction(GameAction::SHOOT));
+    bindKeysForAction(GameAction::QUIT, config.getKeysForAction(GameAction::QUIT));
 
     bindKey(SDLK_UP, GameAction::MOVE_UP);
     bindKey(SDLK_DOWN, GameAction::MOVE_DOWN);
@@ -102,6 +111,27 @@ void InputManager::setDefaultKeyBindings()
 void InputManager::updateActionState(GameAction action, bool isPressed)
 {
     actionStates[action] = isPressed;
+}
+
+void InputManager::reloadKeyBindings()
+{
+    setDefaultKeyBindings();
+}
+
+bool InputManager::saveKeyBindings()
+{
+    ConfigManager& config = ConfigManager::getInstance();
+
+    std::unordered_map<GameAction, std::vector<SDL_Keycode>> actionToKeys;
+    for (const auto& binding : keyToAction) {
+        actionToKeys[binding.second].push_back(binding.first);
+    }
+
+    for (const auto& actionKeys : actionToKeys) {
+        config.setKeysForAction(actionKeys.first, actionKeys.second);
+    }
+
+    return config.saveKeyBindings();
 }
 
 const std::unordered_map<GameAction, bool>& InputManager::getActions() const

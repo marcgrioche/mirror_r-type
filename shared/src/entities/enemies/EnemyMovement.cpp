@@ -2,13 +2,12 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** GravitySystem
+** Enemy Movement System Implementation
 */
 
-#include "GravitySystem.hpp"
-#include "components/Jump.hpp"
-#include "components/Tags.hpp"
-#include "components/Velocity.hpp"
+#include "EnemyMovement.hpp"
+#include "../components/Tags.hpp"
+#include "../components/Velocity.hpp"
 
 void enemyMovement(Registry& registry, float deltaTime)
 {

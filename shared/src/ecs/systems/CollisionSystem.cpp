@@ -13,6 +13,7 @@
 
 void collisionSystem(Registry& registry, float deltaTime)
 {
+    (void)deltaTime;
     auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
 
     auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
@@ -25,18 +26,14 @@ void collisionSystem(Registry& registry, float deltaTime)
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos);
-                // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx * 2;
+                    platformPos, platformHitbox, originalPos, platformVel);
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos);
-                // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx * 2;
+                    platformPos, platformHitbox, originalPos, platformVel);
             }
         }
     }
@@ -44,8 +41,9 @@ void collisionSystem(Registry& registry, float deltaTime)
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos)
+    const Position& originalPos, const Velocity& platformVel)
 {
+    (void)originalPos;
     float playerLeft = playerPos.x + playerHitbox.offset_x;
     float playerRight = playerLeft + playerHitbox.width;
     float playerTop = playerPos.y + playerHitbox.offset_y;
@@ -71,7 +69,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
         } else {
             playerPos.x = platformRight - playerHitbox.offset_x;
         }
-        playerVel.dx = 0.0f;
+        playerVel.dx = platformVel.dx;
         std::cout << "Horizontal collision resolved!" << std::endl;
     } else {
         if (overlapTop < overlapBottom) {
@@ -80,7 +78,8 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
                 playerVel.dy = 0.0f;
                 playerJump.isJumping = false; // Player can jump again
                 playerJump.canJump = true; // Reset jump ability
-                // std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
+                float inputVel = playerVel.dx;
+                playerVel.dx = 2 * platformVel.dx + inputVel;
             }
         } else {
             playerPos.y = platformBottom - playerHitbox.offset_y;
@@ -94,7 +93,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos)
+    const Position& originalPos, const Velocity& platformVel)
 {
     if (playerVel.dy <= 0) {
         return; // Player is not falling, ignore collision
@@ -109,6 +108,7 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
-        std::cout << "Player landed on one-way platform!" << std::endl;
+        float inputVel = playerVel.dx;
+        playerVel.dx = 2 * platformVel.dx + inputVel;
     }
 }

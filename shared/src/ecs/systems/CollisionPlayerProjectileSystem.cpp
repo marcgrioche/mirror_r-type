@@ -9,6 +9,7 @@
 */
 
 #include "CollisionPlayerProjectileSystem.hpp"
+#include "Parent.hpp"
 
 void collisionPlayerProjectileSystem(Registry& registry, float)
 {
@@ -28,9 +29,15 @@ void collisionPlayerProjectileSystem(Registry& registry, float)
             if (!registry.has<Position>(plE) || !registry.has<Hitbox>(plE))
                 continue;
 
-            // avoid friendly fire if OwnerId present
-            if (registry.has<OwnerId>(projE) && registry.get<OwnerId>(projE).id == static_cast<int>(plE.id))
-                continue;
+            // avoid friendly fire by checking Parent
+            if (registry.has<Parent>(projE)) {
+                Entity weaponEntity = registry.get<Parent>(projE).parent;
+                if (registry.has<Parent>(weaponEntity)) {
+                    Entity ownerEntity = registry.get<Parent>(weaponEntity).parent;
+                    if (ownerEntity.id == plE.id)
+                        continue;
+                }
+            }
 
             if (entities_collide(registry, projE, plE)) {
                 // apply damage if player has Health and projectile has Damage

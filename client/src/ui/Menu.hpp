@@ -1,8 +1,8 @@
 #pragma once
 #include "../entities/button/CreateButton.hpp"
 #include "Entity.hpp"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <string>
 
@@ -14,7 +14,9 @@ public:
     enum class Page { Connect,
         Lobby,
         Join,
-        Start };
+        Start,
+        Win,
+        Lose };
 
     void activate(Page page = Page::Connect);
     void deactivate();
@@ -66,6 +68,8 @@ private:
     void renderLobbyPage(GraphicsManager& gfx, Registry& registry);
     void renderJoinPage(GraphicsManager& gfx, Registry& registry);
     void renderStartPage(GraphicsManager& gfx, Registry& registry);
+    void renderWinPage(GraphicsManager& gfx, Registry& registry);
+    void renderLosePage(GraphicsManager& gfx, Registry& registry);
 
     bool m_active = false;
     Page m_page = Page::Connect;

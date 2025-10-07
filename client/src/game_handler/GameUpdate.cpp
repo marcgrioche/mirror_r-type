@@ -5,15 +5,17 @@
 ** Game Update - Manages game loop updates and rendering
 */
 
+#include "../../../shared/src/ecs/systems/BoundarySystem.hpp"
+#include "../../../shared/src/entities/enemies/EnemyMovement.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
+#include "ecs/systems/HealthSystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
-#include "ecs/systems/HealthSystem.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
-#include "entities/enemies/enemyMovement.hpp"
+#include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
 #include <iostream>
 
@@ -40,6 +42,8 @@ void Game::updateGameTick()
 
 void Game::updateNetworkGameTick()
 {
+    enemyMovement(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
@@ -50,6 +54,7 @@ void Game::updateLocalGameTick()
 {
     enemyMovement(_registry, TICK_DURATION);
     handlePlayerInputs(_inputs, _registry);
+    handleWeaponInputs(_inputs, _registry);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);

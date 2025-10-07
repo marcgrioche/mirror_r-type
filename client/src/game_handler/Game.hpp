@@ -55,6 +55,7 @@ private:
     void runMenuLoop();
     void runGameLoop(float deltaTime);
     void cleanupNetwork();
+    void sendDisconnectMessage();
 
     // Core update and render
     void update(float deltaTime);
@@ -80,6 +81,8 @@ private:
     void handleLobbyInfo(const Client::NetworkEvent& event);
     void handleSpawnEntity(const Client::NetworkEvent& event);
     void handleGameState(const Client::NetworkEvent& event);
+    void handleGameEndWin();
+    void handleGameEndLose();
 
     // Local game updates
     void processLocalGameUpdates();

@@ -1,5 +1,11 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
+#include "Parent.hpp"
+#include "ecs/systems/DashSystem.hpp"
+#include "ecs/systems/FrequencyUtils.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/WeaponSystem.hpp"
+#include "entities/enemies/EnemyMovement.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -7,6 +13,8 @@ GameInstance::GameInstance(uint32_t lobbyId)
     , _isRunning(false)
     , _currentTick(0)
     , _stateChanged(false)
+    , _gameWon(false)
+    , _gameLost(false)
 {
 }
 
@@ -37,14 +45,60 @@ void GameInstance::update()
     _lastTickTime = currentTime - deltaTime;
 }
 
+bool GameInstance::checkLoseCondition() const
+{
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool GameInstance::checkWinCondition() const
+{
+    // TODO: Implement win condition
+    return false;
+}
+
 void GameInstance::updateTick()
 {
     _currentTick++;
 
+    auto prevPosView = _registry.view<Position, PreviousPosition>();
+    for (auto&& [pos, prevPos] : prevPosView) {
+        prevPos.x = pos.x;
+        prevPos.y = pos.y;
+    }
+
     processInputs();
+    dashSystem(_registry, TICK_DURATION);
+    enemyMovement(_registry, TICK_DURATION);
+    gravitySystem(_registry, TICK_DURATION);
+
+    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
+    boundarySystem(_registry);
+    projectileSystem(_registry, TICK_DURATION);
+
     checkCollisions();
-    simulatePhysics();
+
     cleanupEntities();
+
+    if (checkLoseCondition()) {
+        _gameLost = true;
+        _isRunning = false;
+    } else if (checkWinCondition()) {
+        _gameWon = true;
+        _isRunning = false;
+    }
+
+    if (_platformsToAdd > 0) {
+        for (; _platformsToAdd > 0; _platformsToAdd--) {
+            auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
+            _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
+            std::cout << _platformsToAdd << std::endl;
+        }
+    }
 
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
@@ -80,10 +134,6 @@ void GameInstance::addPlayer(uint32_t playerId)
     _playerEntities[playerId] = playerEntity;
     _newEntitiesThisTick.push_back(playerEntity);
     _stateChanged = true;
-
-    if (_registry.has<OwnerId>(playerEntity)) {
-        _registry.get<OwnerId>(playerEntity).id = playerId;
-    }
 }
 
 void GameInstance::removePlayer(uint32_t playerId)
@@ -105,14 +155,17 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     Entity playerEntity = it->second;
 
-    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
+    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity) || !_registry.has<Dash>(playerEntity)) {
         return false;
     }
 
     auto& velocity = _registry.get<Velocity>(playerEntity);
     auto& jump = _registry.get<Jump>(playerEntity);
+    auto& dash = _registry.get<Dash>(playerEntity);
 
-    velocity.dx = 0.0f;
+    if (!dash.isDashing) {
+        velocity.dx = 0.0f;
+    }
 
     const float speed = 250.0f;
     bool hasRealInputs = false;
@@ -136,16 +189,33 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             }
             break;
         case GameInput::LEFT:
-            velocity.dx = -speed;
+            if (!dash.isDashing) {
+                velocity.dx = -speed;
+                dash.direction = -1;
+            }
             break;
         case GameInput::RIGHT:
-            velocity.dx = speed;
+            if (!dash.isDashing) {
+                velocity.dx = speed;
+                dash.direction = 1;
+            }
             break;
         case GameInput::ATTACK:
-            // TODO: Handle shooting/projectile creation
+            if (WeaponSystem::handlePlayerAttack(_registry, playerEntity, playerId, _newEntitiesThisTick)) {
+                _stateChanged = true;
+            }
             break;
         case GameInput::DASH:
-            // TODO: Handle dash ability
+            if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
+                dash.isDashing = true;
+                dash.remaining = dash.duration;
+                if (velocity.dx < 0) {
+                    dash.direction = -1;
+                } else if (velocity.dx > 0) {
+                    dash.direction = 1;
+                }
+                _stateChanged = true;
+            }
             break;
         }
     }
@@ -165,7 +235,7 @@ void GameInstance::processInputs()
 void GameInstance::simulatePhysics()
 {
     // Run shared physics systems
-    
+    enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
@@ -275,12 +345,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_y);
         }
 
-        if (_registry.has<OwnerId>(entity)) {
-            auto& owner = _registry.get<OwnerId>(entity);
-            msg.write(static_cast<uint32_t>(owner.id));
-        } else {
-            msg.write(static_cast<uint32_t>(0)); // Default player ID
-        }
+        msg.write(static_cast<uint32_t>(entity.id)); // compability with server ?
 
     } else if (entityType == 1) { // Projectile
         if (_registry.has<Velocity>(entity)) {
@@ -302,9 +367,14 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_y);
         }
 
-        if (_registry.has<OwnerId>(entity)) {
-            auto& owner = _registry.get<OwnerId>(entity);
-            msg.write(static_cast<uint32_t>(owner.id));
+        // Send parent entity ID and version
+        if (_registry.has<Parent>(entity)) {
+            auto& parent = _registry.get<Parent>(entity);
+            msg.write(static_cast<uint32_t>(parent.parent.id));
+            msg.write(static_cast<uint32_t>(parent.parent.version));
+        } else {
+            msg.write(static_cast<uint32_t>(0));
+            msg.write(static_cast<uint32_t>(0));
         }
 
         if (_registry.has<Lifetime>(entity)) {
@@ -322,6 +392,12 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         }
 
     } else if (entityType == 3) { // Enemy
+        if (_registry.has<Velocity>(entity)) {
+            auto& vel = _registry.get<Velocity>(entity);
+            msg.write(vel.dx);
+            msg.write(vel.dy);
+        }
+
         if (_registry.has<Health>(entity)) {
             auto& health = _registry.get<Health>(entity);
             msg.write(static_cast<uint32_t>(health.hp));

@@ -4,6 +4,7 @@
 #include "../../shared/include/Message.hpp"
 #include "../../shared/src/ecs/Registry.hpp"
 #include "../../shared/src/ecs/components/AllComponents.hpp"
+#include "../../shared/src/ecs/systems/BoundarySystem.hpp"
 #include "../../shared/src/ecs/systems/CollisionSystem.hpp"
 #include "../../shared/src/ecs/systems/GravitySystem.hpp"
 #include "../../shared/src/ecs/systems/MovementSystem.hpp"
@@ -29,6 +30,9 @@ public:
     void update();
     bool isRunning() const { return _isRunning; }
     void stop() { _isRunning = false; }
+
+    bool hasWon() const { return _gameWon; }
+    bool hasLost() const { return _gameLost; }
 
     uint32_t getLobbyId() const { return _lobbyId; }
     uint32_t getCurrentTick() const { return _currentTick; }
@@ -87,10 +91,18 @@ private:
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;
 
+    bool _gameWon;
+    bool _gameLost;
+
+    int _platformsToAdd = 0;
+
     void updateTick();
     void initializeLevel();
     void processInputs();
     void simulatePhysics();
     void checkCollisions();
     void cleanupEntities();
+
+    bool checkLoseCondition() const;
+    bool checkWinCondition() const;
 };

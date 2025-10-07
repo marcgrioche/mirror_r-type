@@ -101,6 +101,10 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
         renderJoinPage(gfx, registry);
     else if (m_page == Page::Start)
         renderStartPage(gfx, registry);
+    else if (m_page == Page::Win)
+        renderWinPage(gfx, registry);
+    else if (m_page == Page::Lose)
+        renderLosePage(gfx, registry);
 
     gfx.present();
 }
@@ -361,13 +365,15 @@ void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
             static_cast<float>(m_connectBtnRect.h),
             "join_lobby_confirm");
         m_joinConfirmCreated = true;
-        
+
         // Verify the components were added
         if (registry.has<Position>(m_joinConfirmButton)) {
             auto& pos = registry.get<Position>(m_joinConfirmButton);
+            (void)pos;
         }
         if (registry.has<Hitbox>(m_joinConfirmButton)) {
             auto& hitbox = registry.get<Hitbox>(m_joinConfirmButton);
+            (void)hitbox;
         }
         if (registry.has<Button>(m_joinConfirmButton)) {
         }
@@ -448,6 +454,20 @@ void Menu::renderInputText(SDL_Renderer* renderer)
 
     SDL_DestroyTexture(tex);
     SDL_FreeSurface(surf);
+}
+
+void Menu::renderWinPage(GraphicsManager& gfx, Registry& registry)
+{
+    (void)gfx;
+    (void)registry;
+    std::cout << "You Win!" << std::endl;
+}
+
+void Menu::renderLosePage(GraphicsManager& gfx, Registry& registry)
+{
+    (void)gfx;
+    (void)registry;
+    std::cout << "You Lose!" << std::endl;
 }
 
 void Menu::renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color)

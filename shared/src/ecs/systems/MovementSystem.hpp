@@ -9,4 +9,4 @@
 #include "Registry.hpp"
 
 // Movement system - updates entity positions based on velocity
-void movementSystem(Registry& registry, float deltaTime);
+int movementSystem(Registry& registry, float deltaTime);

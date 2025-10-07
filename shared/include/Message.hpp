@@ -40,7 +40,9 @@ enum class MessageType : uint8_t {
     PONG = 103,
     LOBBY_INFO = 104,
     SPAWN_ENTITY = 105,
-    ROLLBACK = 106
+    ROLLBACK = 106,
+    GAME_END_WIN = 107,
+    GAME_END_LOSE = 108
 };
 
 class Message {

@@ -133,6 +133,16 @@ void RTypeClient::sendMessage(const Message& t_msg)
     queueMessage(msg, m_serverInfo);
 }
 
+void RTypeClient::sendMessageImmediately(const Message& t_msg)
+{
+    Message msg(t_msg.getType(), t_msg.getPayload(), t_msg.sequence_number, m_playerId, t_msg.version);
+    std::vector<uint8_t> data = msg.serialize();
+
+    if (_socket) {
+        _socket->send(data, m_serverInfo.ip_address, m_serverInfo.port);
+    }
+}
+
 void RTypeClient::connectToServerRequest()
 {
     sendMessage(MessageType::CONNECT);
@@ -159,6 +169,16 @@ void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
 }
 
+void RTypeClient::handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_WIN, t_msg });
+}
+
+void RTypeClient::handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_LOSE, t_msg });
+}
+
 void RTypeClient::registerHandlers()
 {
     _handlers[MessageType::CONNECT_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
@@ -175,5 +195,11 @@ void RTypeClient::registerHandlers()
     };
     _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleGameState(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_END_WIN] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameEndWin(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_END_LOSE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameEndLose(t_msg, t_peerInfo);
     };
 }

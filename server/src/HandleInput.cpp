@@ -20,7 +20,6 @@ void RTypeServer::handleInput(const Message& msg, PeerInfo& peerInfo)
 
     const Lobby* lobby = _lobbyManager.getLobby(playerLobby);
     if (!lobby || lobby->state != LobbyState::RUNNING) {
-        std::cout << "Player " << msg.player_id << " sent input but lobby " << playerLobby << " is not running" << std::endl;
         return;
     }
 

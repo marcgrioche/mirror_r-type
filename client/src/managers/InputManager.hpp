@@ -9,6 +9,7 @@
 
 #include <SDL.h>
 #include <unordered_map>
+#include <vector>
 
 enum class GameAction {
     MOVE_UP,
@@ -16,6 +17,7 @@ enum class GameAction {
     MOVE_LEFT,
     MOVE_RIGHT,
     SHOOT,
+    DASH,
     QUIT,
     ACTION_COUNT
 };
@@ -36,17 +38,23 @@ public:
     void handleSDLEvent(const SDL_Event& e);
 
     void bindKey(SDL_Keycode key, GameAction action);
+
+    void bindKeysForAction(GameAction action, const std::vector<SDL_Keycode>& keys);
+
     void unbindKey(SDL_Keycode key);
     bool isActionPressed(GameAction action) const;
     bool isActionJustPressed(GameAction action) const;
     bool isActionJustReleased(GameAction action) const;
     void setDefaultKeyBindings();
+    void reloadKeyBindings();
+    bool saveKeyBindings();
 
     bool isUp() const { return isActionPressed(GameAction::MOVE_UP); }
     bool isDown() const { return isActionPressed(GameAction::MOVE_DOWN); }
     bool isLeft() const { return isActionPressed(GameAction::MOVE_LEFT); }
     bool isRight() const { return isActionPressed(GameAction::MOVE_RIGHT); }
     bool isShoot() const { return isActionPressed(GameAction::SHOOT); }
+    bool isDash() const { return isActionPressed(GameAction::DASH); }
     bool isQuit() const { return isActionPressed(GameAction::QUIT); }
     const std::unordered_map<GameAction, bool>& getActions() const;
 
