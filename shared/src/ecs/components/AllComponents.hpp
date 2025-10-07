@@ -10,6 +10,8 @@
 // Individual component includes
 #include "Button.hpp"
 #include "Damage.hpp"
+#include "Dash.hpp"
+#include "Dead.hpp"
 #include "Health.hpp"
 #include "Hitbox.hpp"
 #include "InputControlled.hpp"
@@ -25,7 +27,6 @@
 #include "Vector2.hpp"
 #include "Velocity.hpp"
 #include "Weight.hpp"
-#include "Dead.hpp"
 #include "componentutils/HitboxUtils.hpp"
 
 // Tags

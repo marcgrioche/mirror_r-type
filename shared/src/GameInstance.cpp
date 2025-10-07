@@ -1,9 +1,11 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
-#include "Parent.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
+#include "ecs/systems/DashSystem.hpp"
+#include "ecs/systems/FrequencyUtils.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
+#include "Parent.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -52,25 +54,15 @@ void GameInstance::updateTick()
     }
 
     processInputs();
+    dashSystem(_registry, TICK_DURATION);
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    
-    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
-    boundarySystem(_registry);
+    movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
-    
+
     checkCollisions();
 
     cleanupEntities();
-
-    if (_platformsToAdd > 0) {
-        std::cout << "platforms to add = " << _platformsToAdd << std::endl;
-        for (; _platformsToAdd > 0; _platformsToAdd--) {
-            auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
-            _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
-            std::cout << _platformsToAdd << std::endl;
-        }
-    }
 
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
@@ -86,9 +78,17 @@ void GameInstance::updateTick()
 void GameInstance::initializeLevel()
 {
     // TODO: Game levels, (create platforms (same as client for now))
+    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 100, 400));
+    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 300, 350));
+    // _newEntitiesThisTick.push_back(factories::createPlatform(_registry, 500, 300));
+    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 200, 250));
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
+
+    // for (int i = 0; i < 8; i++) {
+    //     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
+    // }
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
@@ -112,7 +112,6 @@ void GameInstance::removePlayer(uint32_t playerId)
 
 bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
-    (void)tick;
     // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
@@ -120,18 +119,17 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     Entity playerEntity = it->second;
 
-    if (!_registry.has<Health>(playerEntity) || _registry.get<Health>(playerEntity).hp <= 0) {
-        return false;
-    }
-
-    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
+    if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity) || !_registry.has<Dash>(playerEntity)) {
         return false;
     }
 
     auto& velocity = _registry.get<Velocity>(playerEntity);
     auto& jump = _registry.get<Jump>(playerEntity);
+    auto& dash = _registry.get<Dash>(playerEntity);
 
-    velocity.dx = 0.0f;
+    if (!dash.isDashing) {
+        velocity.dx = 0.0f;
+    }
 
     const float speed = 250.0f;
     bool hasRealInputs = false;
@@ -155,10 +153,16 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             }
             break;
         case GameInput::LEFT:
-            velocity.dx = -speed;
+            if (!dash.isDashing) {
+                velocity.dx = -speed;
+                dash.direction = -1;
+            }
             break;
         case GameInput::RIGHT:
-            velocity.dx = speed;
+            if (!dash.isDashing) {
+                velocity.dx = speed;
+                dash.direction = 1;
+            }
             break;
         case GameInput::ATTACK:
             if (WeaponSystem::handlePlayerAttack(_registry, playerEntity, playerId, _newEntitiesThisTick)) {
@@ -166,7 +170,16 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             }
             break;
         case GameInput::DASH:
-            // TODO: Handle dash ability
+            if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
+                dash.isDashing = true;
+                dash.remaining = dash.duration;
+                if (velocity.dx < 0) {
+                    dash.direction = -1;
+                } else if (velocity.dx > 0) {
+                    dash.direction = 1;
+                }
+                _stateChanged = true;
+            }
             break;
         }
     }
@@ -188,7 +201,7 @@ void GameInstance::simulatePhysics()
     // Run shared physics systems
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
+    movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
 }
 
@@ -214,17 +227,6 @@ void GameInstance::cleanupEntities()
             ++it;
         }
     }
-    auto view2 = _registry.view<Dead>();
-    std::vector<Entity> toKill;
-    for (auto it = view2.begin(); it != view2.end(); ++it) {
-        auto [dead] = *it;
-        if (dead.dead) {
-            toKill.push_back(it.entity());
-        }
-    }
-    for (auto entity : toKill) {
-        _registry.kill_entity(entity);
-    }
 }
 
 std::vector<uint8_t> GameInstance::serializeGameState() const
@@ -233,19 +235,9 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
     msg.write(static_cast<uint32_t>(_currentTick));
 
-    uint8_t alivePlayerCount = 0;
-    for (const auto& [playerId, entity] : _playerEntities) {
-        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
-            alivePlayerCount++;
-        }
-    }
-    msg.write(alivePlayerCount);
+    msg.write(static_cast<uint8_t>(_playerEntities.size()));
 
     for (const auto& [playerId, entity] : _playerEntities) {
-        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp <= 0) {
-            continue;
-        }
-
         msg.write(static_cast<uint32_t>(entity.id));
 
         if (_registry.has<Position>(entity)) {
@@ -270,7 +262,6 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 {
-    (void)data;
     // TODO: Implement state deserialization for rollback
 }
 
@@ -318,7 +309,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_y);
         }
 
-        msg.write(static_cast<uint32_t>(entity.id)); // compability with server ?
+        msg.write(static_cast<uint32_t>(entity.id)); //compability with server ?
 
     } else if (entityType == 1) { // Projectile
         if (_registry.has<Velocity>(entity)) {

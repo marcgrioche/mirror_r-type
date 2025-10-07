@@ -16,7 +16,7 @@ std::vector<std::pair<GameInput, bool>> Game::getCurrentInputs()
     inputs.emplace_back(GameInput::LEFT, _inputs.isActionPressed(GameAction::MOVE_LEFT));
     inputs.emplace_back(GameInput::RIGHT, _inputs.isActionPressed(GameAction::MOVE_RIGHT));
     inputs.emplace_back(GameInput::ATTACK, _inputs.isActionPressed(GameAction::SHOOT));
-    inputs.emplace_back(GameInput::DASH, false);
+    inputs.emplace_back(GameInput::DASH, _inputs.isActionPressed(GameAction::DASH));
 
     return inputs;
 }
