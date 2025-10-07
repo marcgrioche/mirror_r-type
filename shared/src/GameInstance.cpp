@@ -54,10 +54,11 @@ void GameInstance::updateTick()
     processInputs();
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
+    
     _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     boundarySystem(_registry);
     projectileSystem(_registry, TICK_DURATION);
-
+    
     checkCollisions();
 
     cleanupEntities();

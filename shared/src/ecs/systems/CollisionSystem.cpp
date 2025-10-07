@@ -36,6 +36,7 @@ void collisionSystem(Registry& registry, float deltaTime)
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos, platformVel);
+                playerVel.dx = platformVel.dx;
             }
         }
     }
