@@ -27,8 +27,6 @@ void collisionSystem(Registry& registry, float deltaTime)
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos, platformVel);
-                // Apply platform movement to player position directly
-                playerVel.dx = platformVel.dx;
             }
         }
 
@@ -36,7 +34,6 @@ void collisionSystem(Registry& registry, float deltaTime)
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
                     platformPos, platformHitbox, originalPos, platformVel);
-                playerVel.dx = platformVel.dx;
             }
         }
     }
@@ -47,7 +44,6 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
     const Position& originalPos, const Velocity& platformVel)
 {
     (void)originalPos;
-    (void)platformVel;
     float playerLeft = playerPos.x + playerHitbox.offset_x;
     float playerRight = playerLeft + playerHitbox.width;
     float playerTop = playerPos.y + playerHitbox.offset_y;
@@ -82,7 +78,8 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
                 playerVel.dy = 0.0f;
                 playerJump.isJumping = false; // Player can jump again
                 playerJump.canJump = true; // Reset jump ability
-                // std::cout << "Player landed on platform at Y: " << playerPos.y << std::endl;
+                float inputVel = playerVel.dx;
+                playerVel.dx = 2 * platformVel.dx + inputVel;
             }
         } else {
             playerPos.y = platformBottom - playerHitbox.offset_y;
@@ -98,7 +95,6 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel)
 {
-    (void)platformVel;
     if (playerVel.dy <= 0) {
         return; // Player is not falling, ignore collision
     }
@@ -112,5 +108,7 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
+        float inputVel = playerVel.dx;
+        playerVel.dx = 2 * platformVel.dx + inputVel;
     }
 }
