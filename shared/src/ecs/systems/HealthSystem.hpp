@@ -8,4 +8,4 @@
 #pragma once
 #include "Registry.hpp"
 
-void healthSystem(Registry& registry);
+void healthSystem(std::shared_ptr<Registry> registry);

@@ -4,7 +4,7 @@
 #include "Registry.hpp"
 
 namespace factories {
-Entity createOneWayPlatform(Registry& registry, float posx, float posy);
-Entity createPlatform(Registry& registry, float posx, float posy);
-std::vector<Entity> generateRandomPlatforms(Registry& registry, int quantity);
+Entity createOneWayPlatform(std::shared_ptr<Registry> registry, float posx, float posy);
+Entity createPlatform(std::shared_ptr<Registry> registry, float posx, float posy);
+std::vector<Entity> generateRandomPlatforms(std::shared_ptr<Registry> registry, int quantity);
 }

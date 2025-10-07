@@ -28,24 +28,24 @@ void Menu::deactivate()
     SDL_StopTextInput();
 }
 
-void Menu::deactivate(Registry& registry)
+void Menu::deactivate(std::shared_ptr<Registry> registry)
 {
     deactivate();
     if (m_joinButtonCreated) {
-        registry.kill_entity(m_joinServerButton);
+        registry->kill_entity(m_joinServerButton);
         m_joinButtonCreated = false;
     }
     if (m_lobbyButtonsCreated) {
-        registry.kill_entity(m_createLobbyButton);
-        registry.kill_entity(m_joinLobbyButton);
+        registry->kill_entity(m_createLobbyButton);
+        registry->kill_entity(m_joinLobbyButton);
         m_lobbyButtonsCreated = false;
     }
     if (m_joinConfirmCreated) {
-        registry.kill_entity(m_joinConfirmButton);
+        registry->kill_entity(m_joinConfirmButton);
         m_joinConfirmCreated = false;
     }
     if (m_startButtonCreated) {
-        registry.kill_entity(m_startButton);
+        registry->kill_entity(m_startButton);
         m_startButtonCreated = false;
     }
 }
@@ -89,7 +89,7 @@ void Menu::handleEvent(const SDL_Event& e)
     }
 }
 
-void Menu::render(GraphicsManager& gfx, Registry& registry)
+void Menu::render(GraphicsManager& gfx, std::shared_ptr<Registry> registry)
 {
     gfx.clear(10, 10, 30, 255);
 
@@ -105,22 +105,22 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
     gfx.present();
 }
 
-void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
+void Menu::renderConnectPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry)
 {
     auto* renderer = gfx.getRenderer();
 
     // Clean up buttons from other pages
     if (m_lobbyButtonsCreated) {
-        registry.kill_entity(m_createLobbyButton);
-        registry.kill_entity(m_joinLobbyButton);
+        registry->kill_entity(m_createLobbyButton);
+        registry->kill_entity(m_joinLobbyButton);
         m_lobbyButtonsCreated = false;
     }
     if (m_joinConfirmCreated) {
-        registry.kill_entity(m_joinConfirmButton);
+        registry->kill_entity(m_joinConfirmButton);
         m_joinConfirmCreated = false;
     }
     if (m_startButtonCreated) {
-        registry.kill_entity(m_startButton);
+        registry->kill_entity(m_startButton);
         m_startButtonCreated = false;
     }
 
@@ -160,8 +160,8 @@ void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
 
     SDL_Color btnFill { 40, 160, 220, 230 };
     SDL_Color btnBorder { 255, 255, 255, 255 };
-    if (registry.has<Button>(m_joinServerButton)) {
-        auto& b = registry.get<Button>(m_joinServerButton);
+    if (registry->has<Button>(m_joinServerButton)) {
+        auto& b = registry->get<Button>(m_joinServerButton);
         if (b.is_hovered)
             btnFill = SDL_Color { 60, 180, 240, 230 };
         if (b.was_pressed) {
@@ -178,21 +178,21 @@ void Menu::renderConnectPage(GraphicsManager& gfx, Registry& registry)
         renderTextCentered(renderer, m_connectBtnRect, "Join Server", SDL_Color { 255, 255, 255, 255 });
 }
 
-void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
+void Menu::renderLobbyPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry)
 {
     auto* renderer = gfx.getRenderer();
 
     // Clean up buttons from other pages
     if (m_joinButtonCreated) {
-        registry.kill_entity(m_joinServerButton);
+        registry->kill_entity(m_joinServerButton);
         m_joinButtonCreated = false;
     }
     if (m_joinConfirmCreated) {
-        registry.kill_entity(m_joinConfirmButton);
+        registry->kill_entity(m_joinConfirmButton);
         m_joinConfirmCreated = false;
     }
     if (m_startButtonCreated) {
-        registry.kill_entity(m_startButton);
+        registry->kill_entity(m_startButton);
         m_startButtonCreated = false;
     }
 
@@ -215,15 +215,15 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
     }
 
     SDL_Color crFill { 80, 200, 120, 230 }, crBorder { 255, 255, 255, 255 };
-    if (registry.has<Button>(m_createLobbyButton)) {
-        auto& b = registry.get<Button>(m_createLobbyButton);
+    if (registry->has<Button>(m_createLobbyButton)) {
+        auto& b = registry->get<Button>(m_createLobbyButton);
         if (b.is_hovered)
             crFill = SDL_Color { 100, 220, 140, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
             m_page = Page::Start;
-            registry.kill_entity(m_createLobbyButton);
-            registry.kill_entity(m_joinLobbyButton);
+            registry->kill_entity(m_createLobbyButton);
+            registry->kill_entity(m_joinLobbyButton);
             m_lobbyButtonsCreated = false;
             m_requestCreate = true;
         }
@@ -236,20 +236,20 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
         renderTextCentered(renderer, m_createBtnRect, "Create Lobby", SDL_Color { 255, 255, 255, 255 });
 
     SDL_Color jnFill { 40, 160, 220, 230 }, jnBorder { 255, 255, 255, 255 };
-    if (registry.has<Button>(m_joinLobbyButton)) {
-        auto& b = registry.get<Button>(m_joinLobbyButton);
+    if (registry->has<Button>(m_joinLobbyButton)) {
+        auto& b = registry->get<Button>(m_joinLobbyButton);
         if (b.is_hovered)
             jnFill = SDL_Color { 60, 180, 240, 230 };
         if (b.was_pressed) {
             b.was_pressed = false;
             // Clean up previous join page button if it exists
             if (m_joinConfirmCreated) {
-                registry.kill_entity(m_joinConfirmButton);
+                registry->kill_entity(m_joinConfirmButton);
                 m_joinConfirmCreated = false;
             }
             onJoint();
-            registry.kill_entity(m_createLobbyButton);
-            registry.kill_entity(m_joinLobbyButton);
+            registry->kill_entity(m_createLobbyButton);
+            registry->kill_entity(m_joinLobbyButton);
             m_lobbyButtonsCreated = false;
         }
     }
@@ -261,22 +261,22 @@ void Menu::renderLobbyPage(GraphicsManager& gfx, Registry& registry)
         renderTextCentered(renderer, m_joinBtnRect, "Join Lobby", SDL_Color { 255, 255, 255, 255 });
 }
 
-void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
+void Menu::renderStartPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry)
 {
     auto* renderer = gfx.getRenderer();
 
     // Clean up buttons from other pages
     if (m_joinButtonCreated) {
-        registry.kill_entity(m_joinServerButton);
+        registry->kill_entity(m_joinServerButton);
         m_joinButtonCreated = false;
     }
     if (m_lobbyButtonsCreated) {
-        registry.kill_entity(m_createLobbyButton);
-        registry.kill_entity(m_joinLobbyButton);
+        registry->kill_entity(m_createLobbyButton);
+        registry->kill_entity(m_joinLobbyButton);
         m_lobbyButtonsCreated = false;
     }
     if (m_joinConfirmCreated) {
-        registry.kill_entity(m_joinConfirmButton);
+        registry->kill_entity(m_joinConfirmButton);
         m_joinConfirmCreated = false;
     }
 
@@ -292,8 +292,8 @@ void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
     }
 
     SDL_Color stFill { 200, 160, 40, 230 }, stBorder { 255, 255, 255, 255 };
-    if (registry.has<Button>(m_startButton)) {
-        auto& b = registry.get<Button>(m_startButton);
+    if (registry->has<Button>(m_startButton)) {
+        auto& b = registry->get<Button>(m_startButton);
         if (b.is_hovered)
             stFill = SDL_Color { 220, 180, 60, 230 };
         if (b.was_pressed) {
@@ -310,22 +310,22 @@ void Menu::renderStartPage(GraphicsManager& gfx, Registry& registry)
         renderTextCentered(renderer, m_startBtnRect, "Start", SDL_Color { 255, 255, 255, 255 });
 }
 
-void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
+void Menu::renderJoinPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry)
 {
     auto* renderer = gfx.getRenderer();
 
     // Clean up buttons from other pages
     if (m_joinButtonCreated) {
-        registry.kill_entity(m_joinServerButton);
+        registry->kill_entity(m_joinServerButton);
         m_joinButtonCreated = false;
     }
     if (m_lobbyButtonsCreated) {
-        registry.kill_entity(m_createLobbyButton);
-        registry.kill_entity(m_joinLobbyButton);
+        registry->kill_entity(m_createLobbyButton);
+        registry->kill_entity(m_joinLobbyButton);
         m_lobbyButtonsCreated = false;
     }
     if (m_startButtonCreated) {
-        registry.kill_entity(m_startButton);
+        registry->kill_entity(m_startButton);
         m_startButtonCreated = false;
     }
 
@@ -361,22 +361,22 @@ void Menu::renderJoinPage(GraphicsManager& gfx, Registry& registry)
             static_cast<float>(m_connectBtnRect.h),
             "join_lobby_confirm");
         m_joinConfirmCreated = true;
-        
+
         // Verify the components were added
-        if (registry.has<Position>(m_joinConfirmButton)) {
-            auto& pos = registry.get<Position>(m_joinConfirmButton);
+        if (registry->has<Position>(m_joinConfirmButton)) {
+            auto& pos = registry->get<Position>(m_joinConfirmButton);
         }
-        if (registry.has<Hitbox>(m_joinConfirmButton)) {
-            auto& hitbox = registry.get<Hitbox>(m_joinConfirmButton);
+        if (registry->has<Hitbox>(m_joinConfirmButton)) {
+            auto& hitbox = registry->get<Hitbox>(m_joinConfirmButton);
         }
-        if (registry.has<Button>(m_joinConfirmButton)) {
+        if (registry->has<Button>(m_joinConfirmButton)) {
         }
     }
 
     SDL_Color btnFill { 40, 160, 220, 230 };
     SDL_Color btnBorder { 255, 255, 255, 255 };
-    if (registry.has<Button>(m_joinConfirmButton)) {
-        auto& b = registry.get<Button>(m_joinConfirmButton);
+    if (registry->has<Button>(m_joinConfirmButton)) {
+        auto& b = registry->get<Button>(m_joinConfirmButton);
         if (b.is_hovered) {
             btnFill = SDL_Color { 60, 180, 240, 230 };
         }

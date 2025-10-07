@@ -13,7 +13,7 @@
 #include "entities/projectile/CreateProjectile.hpp"
 #include <iostream>
 
-void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
+void Game::deserializeAndCreateEntity(const Message& msg, std::shared_ptr<Registry> registry)
 {
     const_cast<Message&>(msg).resetReadPosition();
 
@@ -41,26 +41,28 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
     }
 }
 
-void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
+void Game::createPlayerFromMessage(const Message& msg, std::shared_ptr<Registry> registry,
     uint32_t entityId, float posX, float posY)
 {
-    uint32_t healthValue = msg.readU32();
-    float width = msg.readFloat();
-    float height = msg.readFloat();
-    float offsetX = msg.readFloat();
-    float offsetY = msg.readFloat();
-    uint32_t serverPlayerId = msg.readU32();
+    const uint32_t healthValue = msg.readU32();
+    const float width = msg.readFloat();
+    const float height = msg.readFloat();
+    const float offsetX = msg.readFloat();
+    const float offsetY = msg.readFloat();
+    const uint32_t serverPlayerId = msg.readU32();
+    std::cout << "Player ID from server: " << serverPlayerId << std::endl;
 
     Entity entity = factories::createPlayer(registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
         Hitbox { width, height, offsetX, offsetY });
 
-    registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
+    registry->add<ServerEntityId>(entity, ServerEntityId { entityId });
+    m_localGameInstance->savePlayerEntity(serverPlayerId, entity);
     addPlayerSprite(registry, entity, posX, posY);
 }
 
-void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float posY)
+void Game::addPlayerSprite(std::shared_ptr<Registry> registry, Entity entity, float posX, float posY)
 {
     Sprite sprite;
     sprite.texture_id = "player_sprite.png";
@@ -68,10 +70,10 @@ void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float 
     sprite.frame_height = 32;
     sprite.srcRect = { 0, 0, 32, 32 };
     sprite.dstRect = { static_cast<int>(posX), static_cast<int>(posY), 32, 32 };
-    registry.add<Sprite>(entity, sprite);
+    registry->add<Sprite>(entity, sprite);
 }
 
-void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
+void Game::createProjectileFromMessage(const Message& msg, std::shared_ptr<Registry> registry,
     uint32_t entityId, float posX, float posY)
 {
     float velX = msg.readFloat();
@@ -93,7 +95,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 }
 
-void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
+void Game::createPlatformFromMessage(const Message& msg, std::shared_ptr<Registry> registry,
     uint32_t entityId, float posX, float posY)
 {
     float width = msg.readFloat();
@@ -106,7 +108,7 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
         posY);
 }
 
-void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
+void Game::createEnemyFromMessage(const Message& msg, std::shared_ptr<Registry> registry,
     uint32_t entityId, float posX, float posY)
 {
     uint32_t healthValue = msg.readU32();
@@ -121,7 +123,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         Health { static_cast<int>(healthValue) },
         Hitbox { width, height, offsetX, offsetY });
 
-    registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
+    registry->add<ServerEntityId>(enemy, ServerEntityId { entityId });
 }
 
 void Game::logUnknownEntityType(uint8_t entityType)
@@ -135,7 +137,7 @@ void Game::logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, 
               << " at position (" << posX << ", " << posY << ")" << std::endl;
 }
 
-void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
+void Game::deserializeAndUpdateGameState(const Message& msg, std::shared_ptr<Registry> registry)
 {
     const_cast<Message&>(msg).resetReadPosition();
 
@@ -145,7 +147,7 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     updateNonPredictedEntities(msg, registry, numPlayers, tick);
 }
 
-void Game::updateNonPredictedEntities(const Message& msg, Registry& registry,
+void Game::updateNonPredictedEntities(const Message& msg, std::shared_ptr<Registry> registry,
     uint8_t numPlayers, uint32_t t_tick)
 {
     for (uint8_t i = 0; i < numPlayers; ++i) {
@@ -153,7 +155,7 @@ void Game::updateNonPredictedEntities(const Message& msg, Registry& registry,
     }
 }
 
-void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t t_tick)
+void Game::updateSingleEntity(const Message& msg, std::shared_ptr<Registry> registry, uint32_t t_tick)
 {
     uint32_t entityId = msg.readU32();
     float posX = msg.readFloat();
@@ -164,17 +166,19 @@ void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t t
     if (entity.id == 0) {
         return;
     }
-
-    interpolateEntityPosition(registry, entity, posX, posY, t_tick);
+    auto playerEntity = m_localGameInstance->getPlayerEntity(m_clientNetwork->getPlayerId());
+    if (playerEntity.has_value() && playerEntity.value() == entity) {
+        interpolateEntityPosition(registry, entity, posX, posY, t_tick);
+    }
     updateEntityState(registry, entity, health);
 }
 
-Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
+Entity Game::findEntityByServerId(std::shared_ptr<Registry> registry, uint32_t serverId)
 {
-    auto view = registry.view<ServerEntityId>();
+    auto view = registry->view<ServerEntityId>();
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity entity = it.entity();
-        const auto& serverEntityId = registry.get<ServerEntityId>(entity);
+        const auto& serverEntityId = registry->get<ServerEntityId>(entity);
         if (serverEntityId.id == serverId) {
             return entity;
         }
@@ -182,43 +186,43 @@ Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
     return Entity { 0, 0 };
 }
 
-void Game::updateEntityState(Registry& registry, Entity entity, uint32_t health)
+void Game::updateEntityState(std::shared_ptr<Registry> registry, Entity entity, uint32_t health)
 {
     // updateEntityPosition(registry, entity, posX, posY);
     updateEntityHealth(registry, entity, health);
 }
 
-void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, float posY)
+void Game::updateEntityPosition(std::shared_ptr<Registry> registry, Entity entity, float posX, float posY)
 {
-    if (registry.has<Position>(entity)) {
-        auto& position = registry.get<Position>(entity);
+    if (registry->has<Position>(entity)) {
+        auto& position = registry->get<Position>(entity);
         position.x = posX;
         position.y = posY;
     }
 
-    if (registry.has<Sprite>(entity)) {
-        auto& sprite = registry.get<Sprite>(entity);
+    if (registry->has<Sprite>(entity)) {
+        auto& sprite = registry->get<Sprite>(entity);
         sprite.dstRect.x = static_cast<int>(posX);
         sprite.dstRect.y = static_cast<int>(posY);
     }
 }
 
-void Game::updateEntitySpritePosition(Registry& t_registry, Entity& t_entity)
+void Game::updateEntitySpritePosition(std::shared_ptr<Registry> t_registry, Entity& t_entity)
 {
 
-    auto& [x, y] = t_registry.get<Position>(t_entity);
+    auto& [x, y] = t_registry->get<Position>(t_entity);
 
-    if (t_registry.has<Sprite>(t_entity)) {
-        auto& sprite = t_registry.get<Sprite>(t_entity);
+    if (t_registry->has<Sprite>(t_entity)) {
+        auto& sprite = t_registry->get<Sprite>(t_entity);
         sprite.dstRect.x = static_cast<int>(x);
         sprite.dstRect.y = static_cast<int>(y);
     }
 }
 
-void Game::updateEntityHealth(Registry& registry, Entity entity, uint32_t health)
+void Game::updateEntityHealth(std::shared_ptr<Registry> registry, Entity entity, uint32_t health)
 {
-    if (registry.has<Health>(entity)) {
-        auto& healthComp = registry.get<Health>(entity);
+    if (registry->has<Health>(entity)) {
+        auto& healthComp = registry->get<Health>(entity);
         healthComp.hp = static_cast<int>(health);
     }
 }

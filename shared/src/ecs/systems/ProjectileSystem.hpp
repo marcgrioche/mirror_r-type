@@ -16,4 +16,4 @@
 #include <vector>
 
 // Projectile system - updates entity projectile
-void projectileSystem(Registry& registry, float deltaTime);
+void projectileSystem(std::shared_ptr<Registry> registry, float deltaTime);

@@ -16,4 +16,4 @@
 #include "ecs/Registry.hpp"
 #include <SDL.h>
 
-void buttonSystem(Registry& registry);
+void buttonSystem(std::shared_ptr<Registry> registry);

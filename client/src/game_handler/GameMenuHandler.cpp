@@ -53,7 +53,7 @@ void Game::handleMenuJoinLobbyRequest()
 void Game::handleMenuStartRequest()
 {
     m_clientNetwork->startGameRequest();
-    m_menu.deactivate(_registry);
+    m_menu.deactivate(m_localGameInstance->getRegistry());
     startGameplay();
 }
 

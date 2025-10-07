@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Registry.hpp"
+#include <optional>
 
 // Movement system - updates entity positions based on velocity
-void movementSystem(Registry& registry, float deltaTime);
+void movementSystem(std::shared_ptr<Registry> registry, float deltaTime, std::optional<Entity> t_onlyEntity = std::nullopt);

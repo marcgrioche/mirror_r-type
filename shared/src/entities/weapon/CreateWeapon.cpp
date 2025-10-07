@@ -7,24 +7,24 @@
 
 #include "CreateWeapon.hpp"
 #include "Damage.hpp"
-#include "Magazine.hpp"
 #include "Frequency.hpp"
-#include "Tags.hpp"
+#include "Magazine.hpp"
 #include "OwnerId.hpp"
+#include "Tags.hpp"
 
-Entity factories::createWeapon(Registry &registry)
+Entity factories::createWeapon(std::shared_ptr<Registry> registry)
 {
-    Entity weapon = registry.create_entity();
-    registry.emplace<WeaponTag>(weapon);
-    registry.emplace<Magazine>(weapon, Magazine{30, 30});
-    registry.emplace<Damage>(weapon, Damage{10});
-    registry.emplace<Frequency>(weapon, Frequency{1});
+    Entity weapon = registry->create_entity();
+    registry->emplace<WeaponTag>(weapon);
+    registry->emplace<Magazine>(weapon, Magazine { 30, 30 });
+    registry->emplace<Damage>(weapon, Damage { 10 });
+    registry->emplace<Frequency>(weapon, Frequency { 1 });
     return weapon;
 }
 
-Entity factories::createWeapon(Registry &registry, Parent parent)
+Entity factories::createWeapon(std::shared_ptr<Registry> registry, Parent parent)
 {
     Entity weapon = createWeapon(registry);
-    registry.emplace<Parent>(weapon, parent);
+    registry->emplace<Parent>(weapon, parent);
     return weapon;
 }

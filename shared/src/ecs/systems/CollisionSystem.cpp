@@ -11,12 +11,12 @@
 #include <algorithm>
 #include <iostream>
 
-void collisionSystem(Registry& registry, float deltaTime)
+void collisionSystem(std::shared_ptr<Registry> registry, float deltaTime)
 {
-    auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
+    auto playerView = registry->view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
 
-    auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
-    auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
+    auto platformView = registry->view<NoPassPlatform, Position, Hitbox, Velocity>();
+    auto oneWayPlatformView = registry->view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
     for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView) {
 

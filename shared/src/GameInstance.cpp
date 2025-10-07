@@ -10,6 +10,16 @@ GameInstance::GameInstance(uint32_t lobbyId)
     , _currentTick(0)
     , _stateChanged(false)
 {
+    _registry = std::make_shared<Registry>();
+}
+
+GameInstance::GameInstance(uint32_t lobbyId, std::shared_ptr<Registry> registry)
+    : _lobbyId(lobbyId)
+    , _registry(registry)
+    , _isRunning(false)
+    , _currentTick(0)
+    , _stateChanged(false)
+{
 }
 
 void GameInstance::initialize()
@@ -39,18 +49,27 @@ void GameInstance::update()
     _lastTickTime = currentTime - deltaTime;
 }
 
-void GameInstance::updateTick()
+void GameInstance::updateGameState(std::optional<uint32_t> t_playerId)
 {
     _currentTick++;
 
-    processInputs();
-    simulatePhysics();
+    if (!t_playerId.has_value()) {
+        processInputs();
+    }
+    simulatePhysics(t_playerId);
     checkCollisions();
-    cleanupEntities();
+    if (!t_playerId.has_value()) {
+        cleanupEntities();
+    }
+}
+
+void GameInstance::updateTick()
+{
+    updateGameState();
 
     for (const auto& [playerId, entity] : _playerEntities) {
-        if (_registry.has<Velocity>(entity)) {
-            const auto& vel = _registry.get<Velocity>(entity);
+        if (_registry->has<Velocity>(entity)) {
+            const auto& vel = _registry->get<Velocity>(entity);
             if (vel.dx != 0.0f || vel.dy != 0.0f) {
                 _stateChanged = true;
                 break;
@@ -83,8 +102,8 @@ void GameInstance::addPlayer(uint32_t playerId)
     _newEntitiesThisTick.push_back(playerEntity);
     _stateChanged = true;
 
-    if (_registry.has<OwnerId>(playerEntity)) {
-        _registry.get<OwnerId>(playerEntity).id = playerId;
+    if (_registry->has<OwnerId>(playerEntity)) {
+        _registry->get<OwnerId>(playerEntity).id = playerId;
     }
 }
 
@@ -92,7 +111,7 @@ void GameInstance::removePlayer(uint32_t playerId)
 {
     auto it = _playerEntities.find(playerId);
     if (it != _playerEntities.end()) {
-        _registry.kill_entity(it->second);
+        _registry->kill_entity(it->second);
         _playerEntities.erase(it);
         std::cout << "Removed player " << playerId << " from game instance" << std::endl;
     }
@@ -108,50 +127,6 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
     Entity playerEntity = it->second;
 
     const bool hasRealInputs = PlayerActions::updateVelocity(inputs, _registry, playerEntity);
-    // if (!_registry.has<Velocity>(playerEntity) || !_registry.has<Jump>(playerEntity)) {
-    //     return false;
-    // }
-    //
-    // auto& velocity = _registry.get<Velocity>(playerEntity);
-    // auto& jump = _registry.get<Jump>(playerEntity);
-    //
-    // velocity.dx = 0.0f;
-    //
-    // const float speed = 250.0f;
-    // bool hasRealInputs = false;
-    //
-    // for (const auto& [input, isPressed] : inputs) {
-    //     if (!isPressed)
-    //         continue;
-    //
-    //     hasRealInputs = true;
-    //     switch (input) {
-    //     case GameInput::UP:
-    //         if (!jump.isJumping && jump.canJump) {
-    //             velocity.dy = -V0;
-    //             jump.isJumping = true;
-    //             jump.canJump = false;
-    //         }
-    //         break;
-    //     case GameInput::DOWN:
-    //         if (jump.isJumping && velocity.dy > 0) {
-    //             velocity.dy += 300.0f; // Fast-fall
-    //         }
-    //         break;
-    //     case GameInput::LEFT:
-    //         velocity.dx = -speed;
-    //         break;
-    //     case GameInput::RIGHT:
-    //         velocity.dx = speed;
-    //         break;
-    //     case GameInput::ATTACK:
-    //         // TODO: Handle shooting/projectile creation
-    //         break;
-    //     case GameInput::DASH:
-    //         // TODO: Handle dash ability
-    //         break;
-    //     }
-    // }
 
     if (hasRealInputs)
         _stateChanged = true;
@@ -165,13 +140,21 @@ void GameInstance::processInputs()
     // This will be called from updateTick()
 }
 
-void GameInstance::simulatePhysics()
+void GameInstance::simulatePhysics(std::optional<uint32_t> t_playerId)
 {
     // Run shared physics systems
-
-    gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
-    projectileSystem(_registry, TICK_DURATION);
+    if (t_playerId.has_value()) {
+        auto it = _playerEntities.find(t_playerId.value());
+        if (it == _playerEntities.end())
+            return;
+        Entity playerEntity = it->second;
+        gravitySystem(_registry, TICK_DURATION, playerEntity);
+        movementSystem(_registry, TICK_DURATION, playerEntity);
+    } else {
+        gravitySystem(_registry, TICK_DURATION);
+        movementSystem(_registry, TICK_DURATION);
+        projectileSystem(_registry, TICK_DURATION);
+    }
 }
 
 void GameInstance::checkCollisions()
@@ -183,14 +166,14 @@ void GameInstance::checkCollisions()
 
 void GameInstance::cleanupEntities()
 {
-    auto view = _registry.view<Lifetime>();
+    auto view = _registry->view<Lifetime>();
     for (auto it = view.begin(); it != view.end();) {
         auto [lifetime] = *it;
         Entity entity = it.entity();
         lifetime.value -= TICK_DURATION;
         if (lifetime.value <= 0.0f) {
             it = view.end();
-            _registry.kill_entity(entity);
+            _registry->kill_entity(entity);
             break;
         } else {
             ++it;
@@ -209,8 +192,8 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
     for (const auto& [playerId, entity] : _playerEntities) {
         msg.write(static_cast<uint32_t>(entity.id));
 
-        if (_registry.has<Position>(entity)) {
-            const auto& pos = _registry.get<Position>(entity);
+        if (_registry->has<Position>(entity)) {
+            const auto& pos = _registry->get<Position>(entity);
             msg.write(pos.x);
             msg.write(pos.y);
         } else {
@@ -218,8 +201,8 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
             msg.write(0.0f);
         }
 
-        if (_registry.has<Health>(entity)) {
-            const auto& health = _registry.get<Health>(entity);
+        if (_registry->has<Health>(entity)) {
+            const auto& health = _registry->get<Health>(entity);
             msg.write(static_cast<uint32_t>(health.hp));
         } else {
             msg.write(static_cast<uint32_t>(100));
@@ -238,13 +221,13 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
 {
     uint8_t entityType = 255;
 
-    if (_registry.has<PlayerTag>(entity)) {
+    if (_registry->has<PlayerTag>(entity)) {
         entityType = 0; // Player
-    } else if (_registry.has<ProjectileTag>(entity)) {
+    } else if (_registry->has<ProjectileTag>(entity)) {
         entityType = 1; // Projectile
-    } else if (_registry.has<PlatformTag>(entity)) {
+    } else if (_registry->has<PlatformTag>(entity)) {
         entityType = 2; // Platform
-    } else if (_registry.has<EnemyTag>(entity)) {
+    } else if (_registry->has<EnemyTag>(entity)) {
         entityType = 3; // Enemy
     }
 
@@ -256,8 +239,8 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
     msg.write(static_cast<uint32_t>(entity.id));
     msg.write(entityType);
 
-    if (_registry.has<Position>(entity)) {
-        auto& pos = _registry.get<Position>(entity);
+    if (_registry->has<Position>(entity)) {
+        auto& pos = _registry->get<Position>(entity);
         msg.write(pos.x);
         msg.write(pos.y);
     } else {
@@ -265,59 +248,60 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
     }
 
     if (entityType == 0) { // Player
-        if (_registry.has<Health>(entity)) {
-            auto& health = _registry.get<Health>(entity);
+        if (_registry->has<Health>(entity)) {
+            auto& health = _registry->get<Health>(entity);
             msg.write(static_cast<uint32_t>(health.hp));
         }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
+        if (_registry->has<Hitbox>(entity)) {
+            auto& hitbox = _registry->get<Hitbox>(entity);
             msg.write(hitbox.width);
             msg.write(hitbox.height);
             msg.write(hitbox.offset_x);
             msg.write(hitbox.offset_y);
         }
 
-        if (_registry.has<OwnerId>(entity)) {
-            auto& owner = _registry.get<OwnerId>(entity);
+        if (_registry->has<OwnerId>(entity)) {
+            auto& owner = _registry->get<OwnerId>(entity);
             msg.write(static_cast<uint32_t>(owner.id));
         } else {
-            msg.write(static_cast<uint32_t>(0)); // Default player ID
+            // std::cout << "OWNER ID: " << findPlayerIdByEntity(entity) << std::endl;
+            msg.write(findPlayerIdByEntity(entity)); // Default player ID
         }
 
     } else if (entityType == 1) { // Projectile
-        if (_registry.has<Velocity>(entity)) {
-            auto& vel = _registry.get<Velocity>(entity);
+        if (_registry->has<Velocity>(entity)) {
+            auto& vel = _registry->get<Velocity>(entity);
             msg.write(vel.dx);
             msg.write(vel.dy);
         }
 
-        if (_registry.has<Damage>(entity)) {
-            auto& damage = _registry.get<Damage>(entity);
+        if (_registry->has<Damage>(entity)) {
+            auto& damage = _registry->get<Damage>(entity);
             msg.write(damage.value);
         }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
+        if (_registry->has<Hitbox>(entity)) {
+            auto& hitbox = _registry->get<Hitbox>(entity);
             msg.write(hitbox.width);
             msg.write(hitbox.height);
             msg.write(hitbox.offset_x);
             msg.write(hitbox.offset_y);
         }
 
-        if (_registry.has<OwnerId>(entity)) {
-            auto& owner = _registry.get<OwnerId>(entity);
+        if (_registry->has<OwnerId>(entity)) {
+            auto& owner = _registry->get<OwnerId>(entity);
             msg.write(static_cast<uint32_t>(owner.id));
         }
 
-        if (_registry.has<Lifetime>(entity)) {
-            auto& lifetime = _registry.get<Lifetime>(entity);
+        if (_registry->has<Lifetime>(entity)) {
+            auto& lifetime = _registry->get<Lifetime>(entity);
             msg.write(lifetime.value);
         }
 
     } else if (entityType == 2) { // Platform
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
+        if (_registry->has<Hitbox>(entity)) {
+            auto& hitbox = _registry->get<Hitbox>(entity);
             msg.write(hitbox.width);
             msg.write(hitbox.height);
             msg.write(hitbox.offset_x);
@@ -325,13 +309,13 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         }
 
     } else if (entityType == 3) { // Enemy
-        if (_registry.has<Health>(entity)) {
-            auto& health = _registry.get<Health>(entity);
+        if (_registry->has<Health>(entity)) {
+            auto& health = _registry->get<Health>(entity);
             msg.write(static_cast<uint32_t>(health.hp));
         }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
+        if (_registry->has<Hitbox>(entity)) {
+            auto& hitbox = _registry->get<Hitbox>(entity);
             msg.write(hitbox.width);
             msg.write(hitbox.height);
             msg.write(hitbox.offset_x);
@@ -354,4 +338,29 @@ bool GameInstance::hasStateChanged()
     bool changed = _stateChanged;
     _stateChanged = false;
     return changed;
+}
+
+void GameInstance::savePlayerEntity(const uint32_t t_playerId, Entity& t_entity)
+{
+    std::cout << "Saved player entity: " << t_playerId << std::endl;
+    _playerEntities[t_playerId] = t_entity;
+}
+
+uint32_t GameInstance::findPlayerIdByEntity(const Entity& entity)
+{
+    for (const auto& [playerId, playerEntity] : _playerEntities) {
+        if (playerEntity == entity) {
+            return playerId;
+        }
+    }
+    return 0; // Not found
+}
+
+std::optional<Entity> GameInstance::getPlayerEntity(uint32_t t_playerId)
+{
+    auto it = _playerEntities.find(t_playerId);
+    if (it == _playerEntities.end())
+        return std::nullopt;
+    Entity playerEntity = it->second;
+    return playerEntity;
 }

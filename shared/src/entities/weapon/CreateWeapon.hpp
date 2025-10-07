@@ -7,12 +7,12 @@
 
 #pragma once
 #include "Entity.hpp"
+#include "Parent.hpp"
 #include "Registry.hpp"
 #include <optional>
-#include "Parent.hpp"
 
-//always a parent so they can be turrets
+// always a parent so they can be turrets
 namespace factories {
-    Entity createWeapon(Registry &registry);
-    Entity createWeapon(Registry &registry, Parent parent);
+Entity createWeapon(std::shared_ptr<Registry> registry);
+Entity createWeapon(std::shared_ptr<Registry> registry, Parent parent);
 }

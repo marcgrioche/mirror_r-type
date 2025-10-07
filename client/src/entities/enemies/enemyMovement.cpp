@@ -10,9 +10,9 @@
 #include "components/Tags.hpp"
 #include "components/Velocity.hpp"
 
-void enemyMovement(Registry& registry, float deltaTime)
+void enemyMovement(std::shared_ptr<Registry> registry, float deltaTime)
 {
-    auto view = registry.view<EnemyTag, Velocity>();
+    auto view = registry->view<EnemyTag, Velocity>();
 
     for (auto&& [enemy, vel] : view) {
         vel.dx = -50.0;

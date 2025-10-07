@@ -13,6 +13,6 @@
 #include "components/AllComponents.hpp"
 
 namespace factories {
-Entity createButton(Registry& registry, float x, float y, float width, float height,
+Entity createButton(std::shared_ptr<Registry> registry, float x, float y, float width, float height,
     const std::string& actionId, bool interactable = true);
 }

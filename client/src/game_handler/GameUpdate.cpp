@@ -37,37 +37,43 @@ void Game::updateGameTick()
         updateLocalGameTick();
     }
 
-    buttonSystem(_registry);
+    buttonSystem(m_localGameInstance->getRegistry());
 }
 
 void Game::updateNetworkGameTick()
 {
     auto currentInputs = getCurrentInputs();
+    // auto &registry = m_localGameInstance->getRegistry();
 
     // TODO: update the velocity with the client entity
     // PlayerActions::updateVelocity(currentInputs, _registry, playerEntity);
-    gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
-    projectileSystem(_registry, TICK_DURATION);
-    collisionSystem(_registry, TICK_DURATION);
+    m_localGameInstance->processPlayerInput(m_clientNetwork->getPlayerId(),
+        m_localGameInstance->getCurrentTick(), currentInputs);
+    m_localGameInstance->updateGameState(m_clientNetwork->getPlayerId());
+    // gravitySystem(registry, TICK_DURATION);
+    // movementSystem(registry, TICK_DURATION);
+    // projectileSystem(registry, TICK_DURATION);
+    // collisionSystem(registry, TICK_DURATION);
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_clientNetwork->incrementTick();
 }
 
 void Game::updateLocalGameTick()
 {
-    enemyMovement(_registry, TICK_DURATION);
-    handlePlayerInputs(_inputs, _registry);
-    gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
-    projectileSystem(_registry, TICK_DURATION);
-    collisionSystem(_registry, TICK_DURATION);
-    healthSystem(_registry);
+    auto registry = m_localGameInstance->getRegistry();
+
+    enemyMovement(registry, TICK_DURATION);
+    handlePlayerInputs(_inputs, registry);
+    gravitySystem(registry, TICK_DURATION);
+    movementSystem(registry, TICK_DURATION);
+    projectileSystem(registry, TICK_DURATION);
+    collisionSystem(registry, TICK_DURATION);
+    healthSystem(registry);
 }
 
 void Game::render()
 {
-    renderSystem(_registry);
+    renderSystem(m_localGameInstance->getRegistry());
 }
 
 void Game::startGameplay()

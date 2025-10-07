@@ -6,9 +6,9 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
+#include "components/AllComponents.hpp"
 #include "managers/InputManager.hpp"
 
-void handlePlayerInputs(InputManager& _inputs, Registry& registry);
+void handlePlayerInputs(InputManager& _inputs, std::shared_ptr<Registry> registry);

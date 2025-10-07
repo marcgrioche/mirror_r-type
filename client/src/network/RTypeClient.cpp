@@ -159,6 +159,14 @@ void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
 }
 
+void RTypeClient::handleGameStart(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_peerInfo;
+    std::cout << "Client tick starting" << std::endl;
+    m_currentTick = 0;
+    m_eventsQueue.push(NetworkEvent { MessageType::GAME_RUNNING, t_msg });
+}
+
 void RTypeClient::registerHandlers()
 {
     _handlers[MessageType::CONNECT_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
@@ -175,5 +183,8 @@ void RTypeClient::registerHandlers()
     };
     _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleGameState(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::GAME_RUNNING] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleGameStart(t_msg, t_peerInfo);
     };
 }

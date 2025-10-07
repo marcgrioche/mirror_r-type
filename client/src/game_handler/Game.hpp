@@ -82,6 +82,7 @@ private:
     void handleLobbyInfo(const Client::NetworkEvent& event);
     void handleSpawnEntity(const Client::NetworkEvent& event);
     void handleGameState(const Client::NetworkEvent& event);
+    void handleGameRunning(const Client::NetworkEvent& event);
 
     // Local game updates
     void processLocalGameUpdates();
@@ -89,40 +90,41 @@ private:
     void createLocalEntity(Entity entity);
 
     // Entity deserialization
-    void deserializeAndCreateEntity(const Message& msg, Registry& registry);
-    void deserializeAndUpdateGameState(const Message& msg, Registry& registry);
+    void deserializeAndCreateEntity(const Message& msg, std::shared_ptr<Registry> registry);
+    void deserializeAndUpdateGameState(const Message& msg, std::shared_ptr<Registry> registry);
 
     // Entity creation from messages
-    void createPlayerFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
-    void createProjectileFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
-    void createPlatformFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
-    void createEnemyFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
+    void createPlayerFromMessage(const Message& msg, std::shared_ptr<Registry> registry, uint32_t entityId, float posX, float posY);
+    void createProjectileFromMessage(const Message& msg, std::shared_ptr<Registry> registry, uint32_t entityId, float posX, float posY);
+    void createPlatformFromMessage(const Message& msg, std::shared_ptr<Registry> registry, uint32_t entityId, float posX, float posY);
+    void createEnemyFromMessage(const Message& msg, std::shared_ptr<Registry> registry, uint32_t entityId, float posX, float posY);
 
     // Entity creation helpers
-    void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY);
+    void addPlayerSprite(std::shared_ptr<Registry> registry, Entity entity, float posX, float posY);
     void logUnknownEntityType(uint8_t entityType);
     void logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, float posY);
 
     // Game state updates
-    void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers,
+    void updateNonPredictedEntities(const Message& msg, std::shared_ptr<Registry> registry, uint8_t numPlayers,
         uint32_t t_tick);
-    void updateSingleEntity(const Message& msg, Registry& registry, uint32_t t_tick);
-    Entity findEntityByServerId(Registry& registry, uint32_t serverId);
-    void updateEntityState(Registry& registry, Entity entity, uint32_t health);
-    void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY);
-    void updateEntitySpritePosition(Registry& t_registry, Entity& t_entity);
-    void updateEntityHealth(Registry& registry, Entity entity, uint32_t health);
+    void updateSingleEntity(const Message& msg, std::shared_ptr<Registry> registry, uint32_t t_tick);
+    Entity findEntityByServerId(std::shared_ptr<Registry> registry, uint32_t serverId);
+    void updateEntityState(std::shared_ptr<Registry> registry, Entity entity, uint32_t health);
+    void updateEntityPosition(std::shared_ptr<Registry> registry, Entity entity, float posX, float posY);
+    void updateEntitySpritePosition(std::shared_ptr<Registry> registry, Entity& t_entity);
+    void updateEntityHealth(std::shared_ptr<Registry> registry, Entity entity, uint32_t health);
 
     // Client reconciliation after prediction functions
-    void interpolateEntityPosition(Registry& registry, Entity& entity, float posX, float posY, uint32_t t_serverTick);
-    void simulateLocalPlayerInput(Entity& t_player, const std::vector<std::pair<GameInput, bool>>& t_inputs, Registry& t_registry);
+    void interpolateEntityPosition(std::shared_ptr<Registry> t_registry, Entity& entity, float posX, float posY, uint32_t t_serverTick);
+    void simulateLocalPlayerInput(Entity& t_player, const std::vector<std::pair<GameInput, bool>>& t_inputs, std::shared_ptr<Registry> t_registry);
 
     // Input handling
     std::vector<std::pair<GameInput, bool>> getCurrentInputs();
 
     Menu m_menu;
 
-    Registry _registry;
+    // Registry _registry;
+    std::shared_ptr<Registry> _registry;
     GameTimer _timer;
 
     GraphicsManager& _graphics;

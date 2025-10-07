@@ -8,4 +8,4 @@
 #pragma once
 #include "Registry.hpp"
 
-void renderSystem(Registry& registry);
+void renderSystem(std::shared_ptr<Registry> registry);

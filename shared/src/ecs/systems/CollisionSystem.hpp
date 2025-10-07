@@ -12,7 +12,7 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 
-void collisionSystem(Registry& registry, float deltaTime);
+void collisionSystem(std::shared_ptr<Registry> registry, float deltaTime);
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,

@@ -10,9 +10,9 @@
 
 #include "ProjectileSystem.hpp"
 
-void projectileSystem(Registry& registry, float deltaTime)
+void projectileSystem(std::shared_ptr<Registry> registry, float deltaTime)
 {
-    auto view = registry.view<Projectile, Lifetime>();
+    auto view = registry->view<Projectile, Lifetime>();
 
     for (auto it = view.begin(); it != view.end();) {
         auto [tag, lifetime] = *it;
@@ -21,7 +21,7 @@ void projectileSystem(Registry& registry, float deltaTime)
         if (lifetime.value <= 0.0f) {
             Entity entity_to_kill = it.entity();
             ++it;
-            registry.kill_entity(entity_to_kill);
+            registry->kill_entity(entity_to_kill);
         } else {
             ++it;
         }

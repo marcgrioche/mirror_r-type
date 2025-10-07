@@ -18,10 +18,10 @@ public:
 
     void activate(Page page = Page::Connect);
     void deactivate();
-    void deactivate(Registry& registry);
+    void deactivate(std::shared_ptr<Registry> registry);
 
     void handleEvent(const SDL_Event& e);
-    void render(GraphicsManager& gfx, Registry& registry);
+    void render(GraphicsManager& gfx, std::shared_ptr<Registry> registry);
 
     std::string m_inputCode;
     void onConnected() { m_page = Page::Lobby; }
@@ -62,10 +62,10 @@ public:
     ~Menu() = default;
 
 private:
-    void renderConnectPage(GraphicsManager& gfx, Registry& registry);
-    void renderLobbyPage(GraphicsManager& gfx, Registry& registry);
-    void renderJoinPage(GraphicsManager& gfx, Registry& registry);
-    void renderStartPage(GraphicsManager& gfx, Registry& registry);
+    void renderConnectPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry);
+    void renderLobbyPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry);
+    void renderJoinPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry);
+    void renderStartPage(GraphicsManager& gfx, std::shared_ptr<Registry> registry);
 
     bool m_active = false;
     Page m_page = Page::Connect;

@@ -22,6 +22,6 @@
 #include "components/AllComponents.hpp"
 
 namespace factories {
-Entity createEnemy(Registry& registry);
-Entity createEnemy(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
+Entity createEnemy(std::shared_ptr<Registry> registry);
+Entity createEnemy(std::shared_ptr<Registry> registry, const Position& position, const Health& health, const Hitbox& hitbox);
 }

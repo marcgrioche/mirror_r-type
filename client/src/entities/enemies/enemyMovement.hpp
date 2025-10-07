@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
+#include "components/AllComponents.hpp"
 
-void enemyMovement(Registry& registry, float deltaTime);
+void enemyMovement(std::shared_ptr<Registry> registry, float deltaTime);

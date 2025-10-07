@@ -12,19 +12,19 @@
 
 namespace factories {
 
-Entity createButton(Registry& registry, float x, float y, float width, float height,
+Entity createButton(std::shared_ptr<Registry> registry, float x, float y, float width, float height,
     const std::string& actionId, bool interactable)
 {
-    Entity button = registry.create_entity();
+    Entity button = registry->create_entity();
 
     // Position sur l'écran
-    registry.emplace<Position>(button, x, y);
+    registry->emplace<Position>(button, x, y);
 
     // Zone cliquable
-    registry.emplace<Hitbox>(button, width, height, 0.0f, 0.0f);
+    registry->emplace<Hitbox>(button, width, height, 0.0f, 0.0f);
 
     // State et action du bouton
-    registry.emplace<Button>(button, actionId, false, false, interactable);
+    registry->emplace<Button>(button, actionId, false, false, interactable);
 
     // Optionnel : sprite pour le rendu
     // registry.emplace<Sprite>(button, "button_texture",

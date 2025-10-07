@@ -6,13 +6,13 @@
 */
 
 #include "GravitySystem.hpp"
-#include "components/Tags.hpp"
 #include "components/Health.hpp"
+#include "components/Tags.hpp"
 #include <vector>
 
-void healthSystem(Registry& registry)
+void healthSystem(std::shared_ptr<Registry> registry)
 {
-    auto view = registry.view<Health>();
+    auto view = registry->view<Health>();
 
     // Collect entities to remove to avoid invalidating iterators during iteration
     std::vector<Entity> toKill;
@@ -24,6 +24,6 @@ void healthSystem(Registry& registry)
     }
 
     for (const auto& e : toKill) {
-        registry.kill_entity(e);
+        registry->kill_entity(e);
     }
 }

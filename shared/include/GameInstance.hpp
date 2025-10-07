@@ -23,10 +23,12 @@ public:
     static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND;
 
     GameInstance(uint32_t lobbyId);
+    GameInstance(uint32_t lobbyId, std::shared_ptr<Registry> registry);
     ~GameInstance() = default;
 
     void initialize();
     void update();
+    void updateGameState(std::optional<uint32_t> t_playerId = std::nullopt);
     bool isRunning() const { return _isRunning; }
     void stop() { _isRunning = false; }
 
@@ -73,12 +75,16 @@ public:
      * Returns:
      *     Registry&: Reference to the game registry
      */
-    Registry& getRegistry() { return _registry; }
-    const Registry& getRegistry() const { return _registry; }
+    std::shared_ptr<Registry> getRegistry() { return _registry; }
+    const std::shared_ptr<Registry> getRegistry() const { return _registry; }
+
+    void savePlayerEntity(uint32_t t_playerId, Entity& t_entity);
+    uint32_t findPlayerIdByEntity(const Entity& t_entity);
+    std::optional<Entity> getPlayerEntity(uint32_t t_playerId);
 
 private:
     uint32_t _lobbyId;
-    Registry _registry;
+    std::shared_ptr<Registry> _registry;
     bool _isRunning;
     uint32_t _currentTick;
     std::chrono::steady_clock::time_point _lastTickTime;
@@ -90,7 +96,7 @@ private:
     void updateTick();
     void initializeLevel();
     void processInputs();
-    void simulatePhysics();
+    void simulatePhysics(std::optional<uint32_t> t_playerId = std::nullopt);
     void checkCollisions();
     void cleanupEntities();
 };

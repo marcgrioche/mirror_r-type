@@ -1,14 +1,14 @@
 #include "PlayerActions.hpp"
 
 bool PlayerActions::updateVelocity(const std::vector<std::pair<GameInput, bool>>& t_inputs,
-    Registry& t_registry, Entity& t_player)
+    std::shared_ptr<Registry> t_registry, Entity& t_player)
 {
-    if (!t_registry.has<Velocity>(t_player) || !t_registry.has<Jump>(t_player)) {
+    if (!t_registry->has<Velocity>(t_player) || !t_registry->has<Jump>(t_player)) {
         return false;
     }
 
-    auto& velocity = t_registry.get<Velocity>(t_player);
-    auto& jump = t_registry.get<Jump>(t_player);
+    auto& velocity = t_registry->get<Velocity>(t_player);
+    auto& jump = t_registry->get<Jump>(t_player);
 
     velocity.dx = 0.0f;
 

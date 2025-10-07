@@ -49,6 +49,7 @@ public:
 
     uint32_t getCurrentTick() const { return m_currentTick; }
     void incrementTick() { m_currentTick++; }
+    uint32_t getPlayerId() const { return m_playerId; }
 
 private:
     void registerHandlers() override;
@@ -71,5 +72,6 @@ private:
     void handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameState(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleGameStart(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

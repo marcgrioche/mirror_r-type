@@ -6,6 +6,8 @@
 */
 
 #pragma once
+#include <optional>
+
 #include "Registry.hpp"
 
-void gravitySystem(Registry& registry, float deltaTime);
+void gravitySystem(std::shared_ptr<Registry> registry, float deltaTime, std::optional<Entity> t_onlyEntity = std::nullopt);

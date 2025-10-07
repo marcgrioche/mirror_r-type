@@ -13,7 +13,7 @@
 #include "components/AllComponents.hpp"
 #include <SDL2/SDL.h>
 
-void buttonSystem(Registry& registry)
+void buttonSystem(std::shared_ptr<Registry> registry)
 {
     static bool prevMousePressed = false;
     static bool clickConsumedForThisPress = false;
@@ -31,17 +31,17 @@ void buttonSystem(Registry& registry)
 
     auto& eventMgr = EventManager::getInstance();
 
-    auto view = registry.view<Button, Position, Hitbox>();
-    
+    auto view = registry->view<Button, Position, Hitbox>();
+
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity e = it.entity();
 
-        if (!registry.has<Position>(e) || !registry.has<Hitbox>(e) || !registry.has<Button>(e))
+        if (!registry->has<Position>(e) || !registry->has<Hitbox>(e) || !registry->has<Button>(e))
             continue;
 
-        Button& button = registry.get<Button>(e);
-        Position& pos = registry.get<Position>(e);
-        Hitbox& hitbox = registry.get<Hitbox>(e);
+        Button& button = registry->get<Button>(e);
+        Position& pos = registry->get<Position>(e);
+        Hitbox& hitbox = registry->get<Hitbox>(e);
 
         const bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
         button.is_hovered = hovered && button.interactable;

@@ -34,6 +34,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::GAME_STATE:
         handleGameState(event);
         break;
+    case MessageType::GAME_RUNNING:
+        handleGameRunning(event);
+        break;
     default:
         break;
     }
@@ -48,7 +51,7 @@ void Game::handleSpawnEntity(const Client::NetworkEvent& event)
 {
     if (std::holds_alternative<Message>(event.payload)) {
         const Message& msg = std::get<Message>(event.payload);
-        deserializeAndCreateEntity(msg, _registry);
+        deserializeAndCreateEntity(msg, m_localGameInstance->getRegistry());
     }
 }
 
@@ -56,8 +59,13 @@ void Game::handleGameState(const Client::NetworkEvent& event)
 {
     if (std::holds_alternative<Message>(event.payload)) {
         const Message& msg = std::get<Message>(event.payload);
-        deserializeAndUpdateGameState(msg, _registry);
+        deserializeAndUpdateGameState(msg, m_localGameInstance->getRegistry());
     }
+}
+
+void Game::handleGameRunning(const Client::NetworkEvent& event)
+{
+    _accumulatedTime = 0.0;
 }
 
 void Game::handleLobbyInfo(const Client::NetworkEvent& event)
@@ -78,6 +86,7 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
     }
 
     std::cout << "Joined lobby " << lobbyId << " (server confirmed)" << std::endl;
+    m_localGameInstance = std::make_unique<GameInstance>(lobbyId, _registry);
     m_menu.onCreated();
 }
 
@@ -106,5 +115,5 @@ void Game::createLocalEntity(Entity entity)
     if (msg.getPayload().empty()) {
         return;
     }
-    deserializeAndCreateEntity(msg, _registry);
+    deserializeAndCreateEntity(msg, m_localGameInstance->getRegistry());
 }

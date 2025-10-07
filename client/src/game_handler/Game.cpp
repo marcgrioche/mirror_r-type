@@ -11,7 +11,8 @@
 #include <iostream>
 
 Game::Game(bool isLocalMode, uint16_t clientPort)
-    : _graphics(GraphicsManager::getInstance())
+    : _registry(std::make_shared<Registry>())
+    , _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
     , m_localGameInstance(nullptr)

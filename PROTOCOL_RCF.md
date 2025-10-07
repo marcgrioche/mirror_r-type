@@ -24,22 +24,23 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 
 ## 3. Message Types
 
-| Name         | Value | Direction         | Description                |
-|--------------|-------|-------------------|----------------------------|
-| CONNECT      | 1     | Client → Server   | Request connection         |
-| INPUT        | 2     | Client → Server   | Player input               |
-| PING         | 3     | Client → Server   | Keepalive                  |
-| DISCONNECT   | 4     | Client → Server   | Disconnect request         |
-| CREATE_LOBBY | 5     | Client → Server   | Create a new game lobby    |
-| JOIN_LOBBY   | 6     | Client → Server   | Join an existing lobby     |
-| START_GAME   | 7     | Client → Server   | Start game in lobby        |
-| LOBBY_STATE  | 8     | Client → Server   | Request lobby information  |
-| CONNECT_ACK  | 101   | Server → Client   | Connection accepted        |
-| GAME_STATE   | 102   | Server → Client   | Game state update          |
-| PONG         | 103   | Server → Client   | Keepalive response         |
-| LOBBY_INFO   | 104   | Server → Client   | Lobby creation/join info   |
-| SPAWN_ENTITY | 105   | Server → Client   | Spawn game entity          |
-| ROLLBACK     | 106   | Server → Client   | Rollback game state        |
+| Name         | Value | Direction         | Description               |
+|--------------|-------|-------------------|---------------------------|
+| CONNECT      | 1     | Client → Server   | Request connection        |
+| INPUT        | 2     | Client → Server   | Player input              |
+| PING         | 3     | Client → Server   | Keepalive                 |
+| DISCONNECT   | 4     | Client → Server   | Disconnect request        |
+| CREATE_LOBBY | 5     | Client → Server   | Create a new game lobby   |
+| JOIN_LOBBY   | 6     | Client → Server   | Join an existing lobby    |
+| START_GAME   | 7     | Client → Server   | Start game in lobby       |
+| LOBBY_STATE  | 8     | Client → Server   | Request lobby information |
+| CONNECT_ACK  | 101   | Server → Client   | Connection accepted       |
+| GAME_STATE   | 102   | Server → Client   | Game state update         |
+| PONG         | 103   | Server → Client   | Keepalive response        |
+| LOBBY_INFO   | 104   | Server → Client   | Lobby creation/join info  |
+| SPAWN_ENTITY | 105   | Server → Client   | Spawn game entity         |
+| ROLLBACK     | 106   | Server → Client   | Rollback game state       |
+| GAME_RUNNING | 107   | Server → Client   | Game running with tick    |
 
 ## 4. Encoding Rules
 
@@ -146,6 +147,10 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 ### ROLLBACK
 - **Direction**: Server → Client
 - **Payload**: Rollback state data (TBD - depends on game state)
+
+### GAME_RUNNING
+- **Direction**: Server → Client
+- **Payload**: Empty (0 bytes)
 
 ## 8. Example Packet (CONNECT)
 
