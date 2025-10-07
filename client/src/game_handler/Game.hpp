@@ -80,6 +80,7 @@ private:
     void handleConnectAck();
     void handleLobbyInfo(const Client::NetworkEvent& event);
     void handleSpawnEntity(const Client::NetworkEvent& event);
+    void handleDespawnEntity(const Client::NetworkEvent& event);
     void handleGameState(const Client::NetworkEvent& event);
     void handleGameEndWin();
     void handleGameEndLose();
@@ -98,6 +99,7 @@ private:
     void createProjectileFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
     void createPlatformFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
     void createEnemyFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
+    void createPowerUpFromMessage(const Message& msg, Registry& registry, uint32_t entityId, float posX, float posY);
 
     // Entity creation helpers
     void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY);

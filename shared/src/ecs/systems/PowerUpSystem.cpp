@@ -10,20 +10,19 @@
 
 #include "PowerUpSystem.hpp"
 
-void PowerUpSystem(Registry& registry, float deltaTime)
+void powerUpSystem(Registry& registry, float deltaTime)
 {
-    auto view = registry.view<PowerUpTag, Lifetime>();
+    auto view = registry.view<PowerUpTag>();
 
     for (auto it = view.begin(); it != view.end();) {
-        auto [tag, lifetime] = *it;
-
-        lifetime.value -= deltaTime;
-        if (lifetime.value <= 0.0f) {
-            Entity entity_to_kill = it.entity();
-            ++it;
-            registry.kill_entity(entity_to_kill);
-        } else {
-            ++it;
+        Entity entity = it.entity();
+        ++it;
+        if (registry.has<Lifetime>(entity)) {
+            auto& lifetime = registry.get<Lifetime>(entity);
+            lifetime.value -= deltaTime;
+            if (lifetime.value <= 0.0f) {
+                registry.kill_entity(entity);
+            }
         }
     }
 }

@@ -18,5 +18,7 @@ Entity createPowerUp(Registry& registry,
     const Position& position,
     const Velocity& velocity,
     const Hitbox& hitbox,
-    const Lifetime& lifetime);
+    const Lifetime& lifetime,
+    PowerUpType type,
+    float effectDuration);
 }

@@ -1,11 +1,16 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
 #include "Parent.hpp"
+#include "ecs/systems/ColisionPlayerPowerUpSystem.hpp"
 #include "ecs/systems/DashSystem.hpp"
 #include "ecs/systems/FrequencyUtils.hpp"
 #include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/PowerUpEffectSystem.hpp"
+#include "ecs/systems/PowerUpSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
+#include "entities/powerUp/CreatePowerUp.hpp"
+#include <cstdlib>
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -81,8 +86,11 @@ void GameInstance::updateTick()
     projectileSystem(_registry, TICK_DURATION);
 
     checkCollisions();
+    collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
+    powerUpEffectSystem(_registry, TICK_DURATION);
 
     cleanupEntities();
+    powerUpSystem(_registry, TICK_DURATION);
 
     if (checkLoseCondition()) {
         _gameLost = true;
@@ -121,6 +129,8 @@ void GameInstance::initializeLevel()
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
+
+    spawnRandomPowerUps(3);
 
     // for (int i = 0; i < 8; i++) {
     //     _newEntitiesThisTick.push_back(factories::createPlatform(_registry, i * 100, 520));
@@ -251,17 +261,20 @@ void GameInstance::checkCollisions()
 void GameInstance::cleanupEntities()
 {
     auto view = _registry.view<Lifetime>();
-    for (auto it = view.begin(); it != view.end();) {
+    std::vector<Entity> entitiesToKill;
+
+    for (auto it = view.begin(); it != view.end(); ++it) {
         auto [lifetime] = *it;
         Entity entity = it.entity();
         lifetime.value -= TICK_DURATION;
         if (lifetime.value <= 0.0f) {
-            it = view.end();
-            _registry.kill_entity(entity);
-            break;
-        } else {
-            ++it;
+            entitiesToKill.push_back(entity);
         }
+    }
+
+    for (const auto& entity : entitiesToKill) {
+        _killedEntitiesThisTick.push_back(entity.id);
+        _registry.kill_entity(entity);
     }
 }
 
@@ -313,6 +326,8 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         entityType = 2; // Platform
     } else if (_registry.has<EnemyTag>(entity)) {
         entityType = 3; // Enemy
+    } else if (_registry.has<PowerUpTag>(entity)) {
+        entityType = 4; // Power-up
     }
 
     if (entityType == 255) {
@@ -410,6 +425,25 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_x);
             msg.write(hitbox.offset_y);
         }
+    } else if (entityType == 4) { // Power-up
+        if (_registry.has<PowerUp>(entity)) {
+            auto& powerUp = _registry.get<PowerUp>(entity);
+            msg.write(static_cast<uint8_t>(powerUp.type));
+            msg.write(powerUp.effect_duration);
+        }
+
+        if (_registry.has<Hitbox>(entity)) {
+            auto& hitbox = _registry.get<Hitbox>(entity);
+            msg.write(hitbox.width);
+            msg.write(hitbox.height);
+            msg.write(hitbox.offset_x);
+            msg.write(hitbox.offset_y);
+        }
+
+        if (_registry.has<Lifetime>(entity)) {
+            auto& lifetime = _registry.get<Lifetime>(entity);
+            msg.write(lifetime.value);
+        }
     }
 
     return msg;
@@ -422,9 +456,39 @@ std::vector<Entity> GameInstance::getAndClearNewEntities()
     return entities;
 }
 
+std::vector<uint32_t> GameInstance::getAndClearKilledEntities()
+{
+    std::vector<uint32_t> entities = std::move(_killedEntitiesThisTick);
+    _killedEntitiesThisTick.clear();
+    return entities;
+}
+
 bool GameInstance::hasStateChanged()
 {
     bool changed = _stateChanged;
     _stateChanged = false;
     return changed;
+}
+
+void GameInstance::spawnRandomPowerUps(int count)
+{
+    for (int i = 0; i < count; ++i) {
+        // Random position on screen (adjust based on your screen dimensions)
+        float x = static_cast<float>(rand() % 800 + 100); // Random X between 100-900
+        float y = static_cast<float>(rand() % 300 + 200); // Random Y between 200-500
+
+        // Random power-up type
+        PowerUpType type = (rand() % 2 == 0) ? PowerUpType::HEAL : PowerUpType::DAMAGE_BOOST;
+
+        // Effect duration: 10 seconds for damage boost, instant for heal
+        float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
+
+        Position pos = { x, y };
+        Velocity vel = { 0.0f, 0.0f }; // Stationary power-ups
+        Hitbox hitbox = { 20.0f, 20.0f, 0.0f, 0.0f }; // 20x20 hitbox
+        Lifetime lifetime = { 30.0f }; // 30 seconds lifetime
+
+        Entity powerUp = factories::createPowerUp(_registry, pos, vel, hitbox, lifetime, type, effectDuration);
+        _newEntitiesThisTick.push_back(powerUp);
+    }
 }

@@ -6,6 +6,9 @@
 */
 
 #include "../../../shared/src/ecs/systems/BoundarySystem.hpp"
+#include "../../../shared/src/ecs/systems/ColisionPlayerPowerUpSystem.hpp"
+#include "../../../shared/src/ecs/systems/PowerUpEffectSystem.hpp"
+#include "../../../shared/src/ecs/systems/PowerUpSystem.hpp"
 #include "../../../shared/src/entities/enemies/EnemyMovement.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
@@ -59,7 +62,10 @@ void Game::updateLocalGameTick()
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
     collisionSystem(_registry, TICK_DURATION);
+    collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
+    powerUpEffectSystem(_registry, TICK_DURATION);
     healthSystem(_registry);
+    powerUpSystem(_registry, TICK_DURATION);
 }
 
 void Game::render()

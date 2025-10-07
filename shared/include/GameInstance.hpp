@@ -64,6 +64,14 @@ public:
     std::vector<Entity> getAndClearNewEntities();
 
     /**
+     * Get entities killed this tick and clear the list.
+     *
+     * Returns:
+     *     std::vector<uint32_t>: Entity IDs killed this tick
+     */
+    std::vector<uint32_t> getAndClearKilledEntities();
+
+    /**
      * Check if game state changed this tick and reset the flag.
      *
      * Returns:
@@ -90,6 +98,7 @@ private:
 
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;
+    std::vector<uint32_t> _killedEntitiesThisTick;
 
     bool _gameWon;
     bool _gameLost;
@@ -102,6 +111,7 @@ private:
     void simulatePhysics();
     void checkCollisions();
     void cleanupEntities();
+    void spawnRandomPowerUps(int count);
 
     bool checkLoseCondition() const;
     bool checkWinCondition() const;

@@ -193,6 +193,9 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::SPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleSpawnEntity(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::DESPAWN_ENTITY] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleDespawnEntity(t_msg, t_peerInfo);
+    };
     _handlers[MessageType::GAME_STATE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleGameState(t_msg, t_peerInfo);
     };

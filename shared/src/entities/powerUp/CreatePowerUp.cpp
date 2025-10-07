@@ -11,18 +11,26 @@
 #include "CreatePowerUp.hpp"
 
 namespace factories {
-Entity CreatePowerUp(Registry& registry,
+Entity createPowerUp(Registry& registry,
     const Position& position,
     const Velocity& velocity,
     const Hitbox& hitbox,
-    const Lifetime& lifetime)
+    const Lifetime& lifetime,
+    PowerUpType type,
+    float effectDuration)
 {
-    Entity projectile = registry.create_entity();
-    registry.emplace<Position>(projectile, position);
-    registry.emplace<Velocity>(projectile, velocity);
-    registry.emplace<Hitbox>(projectile, hitbox);
-    registry.emplace<Lifetime>(projectile, lifetime);
-    registry.emplace<PowerUpTag>(projectile);
-    return projectile;
+    Entity powerUp = registry.create_entity();
+    registry.emplace<Position>(powerUp, position);
+    registry.emplace<Velocity>(powerUp, velocity);
+    registry.emplace<Hitbox>(powerUp, hitbox);
+    registry.emplace<Lifetime>(powerUp, lifetime);
+    registry.emplace<PowerUpTag>(powerUp);
+
+    PowerUp powerUpComponent;
+    powerUpComponent.type = type;
+    powerUpComponent.effect_duration = effectDuration;
+    registry.emplace<PowerUp>(powerUp, powerUpComponent);
+
+    return powerUp;
 }
 }
