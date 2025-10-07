@@ -90,7 +90,6 @@ void GameInstance::updateTick()
     }
 
     if (_platformsToAdd > 0) {
-        std::cout << "platforms to add = " << _platformsToAdd << std::endl;
         for (; _platformsToAdd > 0; _platformsToAdd--) {
             auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
             _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
