@@ -6,6 +6,8 @@
 #include "../../shared/src/ecs/components/AllComponents.hpp"
 #include "../../shared/src/ecs/systems/BoundarySystem.hpp"
 #include "../../shared/src/ecs/systems/CollisionSystem.hpp"
+#include "../../shared/src/ecs/systems/CollisionPlayerProjectileSystem.hpp"
+#include "../../shared/src/ecs/systems/CollisionEnemyProjectileSystem.hpp"
 #include "../../shared/src/ecs/systems/GravitySystem.hpp"
 #include "../../shared/src/ecs/systems/MovementSystem.hpp"
 #include "../../shared/src/ecs/systems/ProjectileSystem.hpp"

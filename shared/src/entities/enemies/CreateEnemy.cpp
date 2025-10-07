@@ -15,8 +15,9 @@ Entity createEnemy(Registry& registry)
     registry.emplace<Position>(enemy, 700.0f, 250.0f);
     registry.emplace<PreviousPosition>(enemy, 50.0f, 480.0f);
     registry.emplace<Velocity>(enemy, 0.0f, 0.0f);
-    registry.emplace<Health>(enemy, 100);
+    registry.emplace<Health>(enemy, 1);
     registry.emplace<Hitbox>(enemy, 32.0f, 32.0f, 0.0f, 0.0f);
+    registry.emplace<Dead>(enemy);
     registry.emplace<EnemyTag>(enemy);
     // registry.emplace<Sprite>(enemy, 0, 50, 50);
     createWeapon(registry, Parent { enemy });
@@ -31,6 +32,7 @@ Entity createEnemy(Registry& registry, const Position& position, const Health& h
     registry.add<Velocity>(enemy, Velocity { 0.0f, 0.0f });
     registry.add<Health>(enemy, health);
     registry.add<Hitbox>(enemy, hitbox);
+    registry.emplace<Dead>(enemy);
     registry.add<EnemyTag>(enemy, EnemyTag {});
     // registry.emplace<Sprite>(enemy, 0, 50, 50);
     createWeapon(registry, Parent { enemy });

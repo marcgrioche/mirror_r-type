@@ -51,6 +51,12 @@ void GameInstance::updateTick()
         prevPos.y = pos.y;
     }
 
+    auto deadEntities = _registry.view<Health, Dead>();
+    for (auto&& [hp, dead] : deadEntities) {
+        if (hp.hp <= 0)
+            dead.dead = true;
+    }
+
     processInputs();
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
@@ -195,35 +201,81 @@ void GameInstance::simulatePhysics()
 void GameInstance::checkCollisions()
 {
     collisionSystem(_registry, TICK_DURATION);
+    collisionPlayerProjectileSystem(_registry, TICK_DURATION);
+    collisionEnemyProjectileSystem(_registry, TICK_DURATION);
     // TODO: collisionPlayerProjectileSystem(_registry, TICK_DURATION);
     // Currently disabled due to include path issues from server directory
 }
 
 void GameInstance::cleanupEntities()
 {
-    auto view = _registry.view<Lifetime>();
-    for (auto it = view.begin(); it != view.end();) {
-        auto [lifetime] = *it;
-        Entity entity = it.entity();
-        lifetime.value -= TICK_DURATION;
-        if (lifetime.value <= 0.0f) {
-            it = view.end();
-            _registry.kill_entity(entity);
-            break;
+    // 1) Handle lifetime expiration (collect all that reach 0 this tick)
+    std::vector<Entity> killedThisTick;
+    {
+        auto view = _registry.view<Lifetime>();
+        for (auto it = view.begin(); it != view.end(); ++it) {
+            auto [lifetime] = *it;
+            Entity entity = it.entity();
+            lifetime.value -= TICK_DURATION; // mutate component
+            if (lifetime.value <= 0.0f) {
+                killedThisTick.push_back(entity);
+            }
+        }
+    }
+
+    // 2) Collect entities flagged Dead
+    {
+        auto viewDead = _registry.view<Dead>();
+        for (auto it = viewDead.begin(); it != viewDead.end(); ++it) {
+            auto [dead] = *it;
+            if (dead.dead) {
+                killedThisTick.push_back(it.entity());
+            }
+        }
+    }
+
+    if (killedThisTick.empty())
+        return; // nothing to do
+
+    // 3) Physically remove from registry
+    for (auto e : killedThisTick) {
+        _registry.kill_entity(e);
+    }
+
+    // 4) Purge references in _playerEntities (so they "disappear completely")
+    //    Also remove any player entity whose version no longer matches (already killed) just in case.
+    for (auto it = _playerEntities.begin(); it != _playerEntities.end();) {
+        Entity e = it->second;
+        bool wasKilled = false;
+        for (auto const& k : killedThisTick) {
+            if (k == e) { // uses id+version compare
+                wasKilled = true;
+                break;
+            }
+        }
+        // If entity id reused after kill, version mismatch will make k==e false; also treat lack of any component as invalid.
+        if (wasKilled || (!_registry.has<Health>(e) && !_registry.has<Position>(e))) {
+            it = _playerEntities.erase(it);
+            _stateChanged = true;
         } else {
             ++it;
         }
     }
-    auto view2 = _registry.view<Dead>();
-    std::vector<Entity> toKill;
-    for (auto it = view2.begin(); it != view2.end(); ++it) {
-        auto [dead] = *it;
-        if (dead.dead) {
-            toKill.push_back(it.entity());
-        }
+
+    // 5) Remove from newly spawned list if they died the same tick (avoid ghost spawn messages)
+    if (!_newEntitiesThisTick.empty()) {
+        _newEntitiesThisTick.erase(std::remove_if(_newEntitiesThisTick.begin(), _newEntitiesThisTick.end(), [&](Entity const& cand) {
+            for (auto const& k : killedThisTick) {
+                if (cand == k)
+                    return true;
+            }
+            return false;
+        }), _newEntitiesThisTick.end());
     }
-    for (auto entity : toKill) {
-        _registry.kill_entity(entity);
+
+    // Flag state change if anything died
+    if (!killedThisTick.empty()) {
+        _stateChanged = true;
     }
 }
 

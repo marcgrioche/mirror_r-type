@@ -17,6 +17,7 @@ Entity createPlayer(Registry& registry)
     registry.emplace<Health>(player, 100);
     registry.emplace<Hitbox>(player, 32.0f, 32.0f, 0.0f, 0.0f);
     registry.emplace<Jump>(player);
+    registry.emplace<Dead>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
     createWeapon(registry, Parent { player });
@@ -32,6 +33,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Health>(player, health);
     registry.add<Hitbox>(player, hitbox);
     registry.add<Jump>(player, Jump {});
+    registry.add<Dead>(player, Dead {false});
     registry.add<PlayerTag>(player, PlayerTag {});
     createWeapon(registry, Parent { player });
     return player;

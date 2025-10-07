@@ -47,7 +47,12 @@ bool handlePlayerAttack(
         registry.emplace<Hitbox>(projectileEntity, 50.0f, 50.0f, 0.0f, 0.0f);
         registry.emplace<Parent>(projectileEntity, Parent{weaponIt.entity()});
         registry.emplace<Lifetime>(projectileEntity, 3.0f);
-        registry.emplace<ProjectileTag>(projectileEntity);
+    // Important: we need both the logical Projectile component (queried by systems)
+    // and the ProjectileTag (used for serialization / type id). Previously only the tag
+    // was added, so systems using view<Projectile> never saw any projectiles, hence
+    // collisions (enemy/projectile) and lifetime system didn't run on them.
+    registry.emplace<Projectile>(projectileEntity);
+    registry.emplace<ProjectileTag>(projectileEntity);
         
         // Add to new entities for synchronization
         newEntitiesThisTick.push_back(projectileEntity);
