@@ -44,7 +44,7 @@ bool handlePlayerAttack(
         registry.emplace<Position>(projectileEntity, playerPos.x + 32.0f, playerPos.y + 16.0f);
         registry.emplace<Velocity>(projectileEntity, 500.0f, 0.0f);
         registry.emplace<Damage>(projectileEntity, damage.value);
-        registry.emplace<Hitbox>(projectileEntity, 50.0f, 50.0f, 0.0f, 0.0f);
+        registry.emplace<Hitbox>(projectileEntity, 32.0f, 32.0f, 0.0f, 0.0f);
         registry.emplace<Parent>(projectileEntity, Parent{weaponIt.entity()});
         registry.emplace<Lifetime>(projectileEntity, 3.0f);
         registry.emplace<ProjectileTag>(projectileEntity);
@@ -58,6 +58,49 @@ bool handlePlayerAttack(
     }
     
     return false;
+}
+
+bool handleEnemyAttacks(
+    Registry& registry,
+    std::vector<Entity>& newEntitiesThisTick)
+{
+    bool spawned = false;
+    auto weaponView = registry.view<WeaponTag, Frequency, Parent, Damage>();
+
+    for (auto weaponIt = weaponView.begin(); weaponIt != weaponView.end(); ++weaponIt) {
+        auto [weaponTag, frequency, parent, damage] = *weaponIt;
+
+        Entity owner = parent.parent;
+        if (!registry.has<EnemyTag>(owner)) {
+            continue; // only enemy owned weapons here
+        }
+
+        if (!FrequencyUtils::shouldTrigger(frequency)) {
+            continue; // not ready yet
+        }
+
+        if (!registry.has<Position>(owner)) {
+            continue; // cannot shoot without position
+        }
+        const Position& enemyPos = registry.get<Position>(owner);
+
+        // Create projectile entity
+        Entity projectileEntity = registry.create_entity();
+
+        // Enemies shoot towards the left (player side) for now.
+        registry.emplace<Position>(projectileEntity, enemyPos.x - 16.0f, enemyPos.y + 16.0f);
+        registry.emplace<Velocity>(projectileEntity, -300.0f, 0.0f);
+        registry.emplace<Damage>(projectileEntity, damage.value);
+        registry.emplace<Hitbox>(projectileEntity, 32.0f, 32.0f, 0.0f, 0.0f);
+        registry.emplace<Parent>(projectileEntity, Parent{weaponIt.entity()});
+        registry.emplace<Lifetime>(projectileEntity, 5.0f);
+        registry.emplace<ProjectileTag>(projectileEntity);
+
+        newEntitiesThisTick.push_back(projectileEntity);
+        FrequencyUtils::reset(frequency);
+        spawned = true;
+    }
+    return spawned;
 }
 
 } // namespace WeaponSystem

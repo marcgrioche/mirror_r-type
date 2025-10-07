@@ -35,6 +35,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Health>(player, health);
     registry.add<Hitbox>(player, hitbox);
     registry.add<Jump>(player, Jump {});
+    registry.emplace<Dead>(player);
     registry.add<Dash>(player, Dash { 0.2f, 0.0f, false, 800.0f, Frequency { 0.5 }, 1 });
     registry.add<PlayerTag>(player, PlayerTag {});
     registry.emplace<PowerUp>(player);

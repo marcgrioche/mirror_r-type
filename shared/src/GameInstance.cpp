@@ -93,6 +93,11 @@ void GameInstance::updateTick()
     _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     boundarySystem(_registry);
 
+    // Enemy weapon automatic attacks
+    if (WeaponSystem::handleEnemyAttacks(_registry, _newEntitiesThisTick)) {
+        _stateChanged = true;
+    }
+
     checkCollisions();
     powerUpEffectSystem(_registry, TICK_DURATION);
 

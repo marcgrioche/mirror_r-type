@@ -44,6 +44,10 @@ void collisionPlayerProjectileSystem(Registry& registry, float)
                     Health& h = registry.get<Health>(plE);
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
+                    if (h.hp <= 0) {
+                        Dead& dead = registry.get<Dead>(plE);
+                        dead.dead = true;
+                    }
                     if (registry.has<Lifetime>(projE)) {
                         Lifetime& time = registry.get<Lifetime>(projE);
                         time.value = 0.0f;

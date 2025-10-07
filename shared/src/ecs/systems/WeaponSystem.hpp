@@ -29,4 +29,19 @@ namespace WeaponSystem {
         uint32_t playerId,
         std::vector<Entity>& newEntitiesThisTick
     );
+
+    /**
+     * Handle automatic enemy weapon attacks.
+     * Iterates over all weapons whose parent entity is an Enemy and, if the
+     * weapon frequency allows, spawns a projectile travelling toward players
+     * (currently straight to the left).
+     *
+     * @param registry Game registry
+     * @param newEntitiesThisTick Vector to push newly created projectiles for sync
+     * @return true if at least one projectile was created this tick
+     */
+    bool handleEnemyAttacks(
+        Registry& registry,
+        std::vector<Entity>& newEntitiesThisTick
+    );
 }
