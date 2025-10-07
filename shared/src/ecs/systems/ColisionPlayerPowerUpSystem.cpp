@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 1:56:55 PM 2025 jojo
-** Last update Wed Oct 7 1:59:48 PM 2025 jojo
+** Last update Wed Oct 7 2:06:13 PM 2025 jojo
 */
 
 #include "ColisionPlayerPowerUpSystem.hpp"
@@ -29,7 +29,10 @@ void ColisionPlayerPowerUpSystem(Registry& registry, float)
                 continue;
 
             if (entities_collide(registry, powerE, plE)) {
-                // apply damage if player has Health and projectile has Damage
+                PowerUp& h = registry.get<PowerUp>(plE);
+                Lifetime& time = registry.get<Lifetime>(powerE);
+                time.value = 0.0f;
+                h.is_power = true;
             }
         }
     }
