@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 3:13:29 PM 2025 jojo
-** Last update Wed Oct 7 3:14:36 PM 2025 jojo
+** Last update Wed Oct 7 3:25:04 PM 2025 jojo
 */
 
 #include "TextBoxInputSystem.hpp"
@@ -104,6 +104,29 @@ void textBoxInputSystem(Registry& registry, const SDL_Event& event)
                 // Valide l'input (tu peux émettre un événement ici)
                 input.isFocused = false;
                 SDL_StopTextInput();
+                break;
+            case SDLK_v:
+                if (SDL_GetModState() & KMOD_CTRL) {
+                    // Ctrl+V : Coller depuis le presse-papiers
+                    if (SDL_HasClipboardText()) {
+                        char* clipboardText = SDL_GetClipboardText();
+                        if (clipboardText) {
+                            std::string pasteText = clipboardText;
+
+                            // Limite la longueur totale
+                            size_t availableSpace = input.maxLength - input.inputText.length();
+                            if (pasteText.length() > availableSpace) {
+                                pasteText = pasteText.substr(0, availableSpace);
+                            }
+
+                            // Insère le texte à la position du curseur
+                            input.inputText.insert(input.cursorPosition, pasteText);
+                            input.cursorPosition += pasteText.length();
+
+                            SDL_free(clipboardText);
+                        }
+                    }
+                }
                 break;
             }
         }
