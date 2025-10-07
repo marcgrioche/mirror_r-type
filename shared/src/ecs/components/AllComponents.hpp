@@ -20,6 +20,7 @@
 #include "Platform.hpp"
 #include "Player.hpp"
 #include "Position.hpp"
+#include "PowerUp.hpp"
 #include "PredictedEntity.hpp"
 #include "PreviousPosition.hpp"
 #include "Projectile.hpp"
