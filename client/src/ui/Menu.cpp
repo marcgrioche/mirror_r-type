@@ -19,6 +19,9 @@ void Menu::activate(Registry& _registry, Page page)
     case Page::JOIN_LOBBY:
         m_joinPage.show(_registry);
         break;
+    case Page::LOBBY:
+        m_lobbyPage.show(_registry);
+        break;
     default:
         break;
     }
@@ -62,6 +65,13 @@ void Menu::showJoinPage(Registry& registry)
     m_joinPage.show(registry);
 }
 
+void Menu::showLobbyPage(Registry& registry)
+{
+    hideAllPages(registry);
+    m_currentPage = Page::LOBBY;
+    m_lobbyPage.show(registry);
+}
+
 // void Menu::showParametersPage(Registry& registry)
 // {
 //     hideAllPages(registry);
@@ -95,6 +105,9 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
         break;
     case Page::JOIN_LOBBY:
         m_joinPage.handleEvent(registry, e);
+        break;
+    case Page::LOBBY:
+        m_lobbyPage.handleEvent(registry, e);
         break;
     // case Page::PARAMETERS:
     //     m_parameterPage.handleEvent(registry, e);
@@ -189,6 +202,9 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
     case Page::JOIN_LOBBY:
         m_joinPage.render(gfx, registry);
         break;
+    case Page::LOBBY:
+        m_lobbyPage.render(gfx, registry);
+        break;
         // case Page::PARAMETERS:
         //     m_parameterPage.render(gfx, registry);
         //     break;
@@ -233,6 +249,11 @@ bool Menu::hasCreateRequest() const
     return m_homePage.hasCreateRequest();
 }
 
+bool Menu::hasLobbyRequest() const
+{
+    return m_lobbyPage.hasRequest();
+}
+
 // bool Menu::hasParameterChanges() const
 // {
 //     return m_parameterPage.hasChanges();
@@ -243,5 +264,6 @@ void Menu::clearAllRequests()
     m_connectionPage.clearConnectionRequest();
     m_joinPage.clearConnectionRequest();
     m_homePage.clearRequests();
+    m_lobbyPage.clearRequests();
     // m_parameterPage.clearRequests();
 }

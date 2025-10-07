@@ -5,6 +5,7 @@
 #include "page/ConnectionMenu.hpp"
 #include "page/HomeMenu.hpp"
 #include "page/JoinMenu.hpp"
+#include "page/LobbyMenu.hpp"
 #include "page/ParameterMenu.hpp"
 #include <SDL.h>
 
@@ -14,6 +15,7 @@ public:
         HOME,
         CONNECTION,
         JOIN_LOBBY,
+        LOBBY,
         PARAMETERS,
         WIN,
         LOSE
@@ -39,6 +41,7 @@ public:
     // void showParametersPage(Registry& registry);
     void showWinPage(Registry& registry);
     void showLosePage(Registry& registry);
+    void showLobbyPage(Registry& registry);
 
     // Récupération des données saisies
     std::string getConnectionCode(Registry& registry) const;
@@ -49,6 +52,7 @@ public:
     bool hasConnectionRequest() const;
     bool hasJoinRequest() const;
     bool hasCreateRequest() const;
+    bool hasLobbyRequest() const;
     // bool hasParameterChanges() const;
 
     // Nettoyage des flags de demande
@@ -62,6 +66,7 @@ private:
     HomeMenu m_homePage;
     ConnectionMenu m_connectionPage;
     JoinMenu m_joinPage;
+    LobbyMenu m_lobbyPage;
     // ParameterMenu m_parameterPage;
 
     // Gestion des transitions

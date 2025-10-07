@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:03:28 AM 2025 jojo
-** Last update Wed Oct 7 2:22:54 PM 2025 jojo
+** Last update Wed Oct 7 8:38:49 PM 2025 jojo
 */
 
 #include "TextBox.hpp"
@@ -19,7 +19,7 @@ Entity createTextBox(Registry& registry, const std::string& text,
 
     registry.emplace<Position>(textBox, x, y);
     registry.emplace<TextBox>(textBox, text, fontSize, color,
-        "assets/fonts/default.ttf", true,
+        "client/res/fonts/OpenSans-Medium.ttf", true,
         ::TextBox::Alignment::LEFT);
 
     return textBox;

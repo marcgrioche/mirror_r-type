@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:13:36 AM 2025 jojo
-** Last update Thu Oct 1 2:47:14 PM 2025 jojo
+** Last update Wed Oct 7 8:37:36 PM 2025 jojo
 */
 
 #pragma once
@@ -16,9 +16,8 @@ struct TextBox {
     std::string text;
     int fontSize = 16;
     Color color = { 255, 255, 255, 255 }; // blanc par défaut
-    std::string fontPath = "res/fonts/OpenSans-Medium.ttf";
+    std::string fontPath = "/client/res/fonts/OpenSans-Medium.ttf";
     bool visible = true;
-    // optionnel: alignment (left, center, right)
     enum class Alignment { LEFT,
         CENTER,
         RIGHT } alignment

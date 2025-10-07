@@ -48,10 +48,8 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
 void Game::handleConnectAck()
 {
     std::cout << "Connection acknowledged by server" << std::endl;
-    // Navigation vers la page de join après connexion réussie
-    if (m_menu.isActive()) {
-        m_menu.showJoinPage(_registry);
-    }
+    // CORRIGE : Appelle la méthode helper au lieu de naviguer directement
+    onConnectionSuccess();
 }
 
 void Game::handleSpawnEntity(const Client::NetworkEvent& event)
@@ -82,21 +80,16 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 
     if (lobbyId == 0) {
         std::cout << "Lobby not found or join failed" << std::endl;
-        // Retour à la page d'accueil en cas d'échec
+        // Retour à la page de join en cas d'échec
         if (m_menu.isActive()) {
-            m_menu.showHomePage(_registry);
+            m_menu.showJoinPage(_registry);
         }
         return;
     }
 
-    std::cout << "Joined lobby " << lobbyId << " (server confirmed)" << std::endl;
+    std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
 
-    // Appelle la méthode helper pour gérer la réponse de join lobby
     onLobbyJoined(lobbyId);
-
-    // Ou démarre directement le jeu si le lobby est prêt
-    // m_menu.deactivate(_registry);
-    // startGameplay();
 }
 
 void Game::handleGameEndWin()

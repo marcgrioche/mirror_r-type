@@ -1,35 +1,35 @@
 /*
-** ConnectionMenu.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
+** LobbyMenu.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
 **
 ** Made by jojo
 ** Login   <jojo>
 **
-** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Wed Oct 7 8:27:57 PM 2025 jojo
+** Started on  Tue Oct 7 9:48:35 PM 2025 jojo
+** Last update Wed Oct 7 10:47:53 PM 2025 jojo
 */
 
-#include "ui/page/ConnectionMenu.hpp"
+#include "LobbyMenu.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
 #include <iostream>
 
-ConnectionMenu::ConnectionMenu()
+LobbyMenu::LobbyMenu()
 {
     setupEventHandlers();
 }
 
-ConnectionMenu::~ConnectionMenu() = default;
+LobbyMenu::~LobbyMenu() = default;
 
-void ConnectionMenu::show(Registry& registry)
+void LobbyMenu::show(Registry& registry)
 {
     if (!m_visible) {
         createEntities(registry);
         m_visible = true;
-        m_connectionRequested = false;
+        m_LobbyRequested = false;
     }
 }
 
-void ConnectionMenu::hide(Registry& registry)
+void LobbyMenu::hide(Registry& registry)
 {
     if (m_visible) {
         destroyEntities(registry);
@@ -37,50 +37,50 @@ void ConnectionMenu::hide(Registry& registry)
     }
 }
 
-void ConnectionMenu::createEntities(Registry& registry)
+void LobbyMenu::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
-    m_textBoxEntity = factories::createTextBoxInput(registry,
-        "Enter connection code...", 300.0f, 250.0f, 16, { 255, 255, 255, 255 });
+    // m_textBoxEntity = factories::createTextBoxInput(registry,
+    //     "Enter Lobby code...", 300.0f, 250.0f, 16, { 255, 255, 255, 255 });
 
     // Bouton Connect
     m_connectButtonEntity = factories::createButton(registry,
         320.0f, 320.0f, 160.0f, 50.0f, "connect_to_server", true);
 }
 
-void ConnectionMenu::destroyEntities(Registry& registry)
+void LobbyMenu::destroyEntities(Registry& registry)
 {
-    registry.kill_entity(m_textBoxEntity);
+    // registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
 }
 
-void ConnectionMenu::setupEventHandlers()
+void LobbyMenu::setupEventHandlers()
 {
     auto& eventMgr = EventManager::getInstance();
 
     eventMgr.subscribe(EventType::BUTTON_CLICK, [this](const GameEvent& event) {
         if (event.data == "connect_to_server" && m_visible) {
-            m_connectionRequested = true;
+            m_LobbyRequested = true;
         }
     });
 }
 
-void ConnectionMenu::update(Registry& registry, float deltaTime)
+void LobbyMenu::update(Registry& registry, float deltaTime)
 {
     if (!m_visible)
         return;
-    textBoxInputUpdateSystem(registry, deltaTime);
+    // textBoxInputUpdateSystem(registry, deltaTime);
     buttonSystem(registry);
 }
 
-void ConnectionMenu::handleEvent(Registry& registry, const SDL_Event& event)
+void LobbyMenu::handleEvent(Registry& registry, const SDL_Event& event)
 {
     if (!m_visible)
         return;
-    textBoxInputSystem(registry, event);
+    // textBoxInputSystem(registry, event);
 }
 
-void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
+void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
 {
     if (!m_visible)
         return;
@@ -102,26 +102,16 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_RenderDrawRect(renderer, &menuBox);
 
     // Rendu des composants
-    drawTextBoxInput(gfx, registry, m_textBoxEntity);
+    // drawTextBoxInput(gfx, registry, m_textBoxEntity);
     drawButton(gfx, registry, m_connectButtonEntity);
 }
 
-std::string ConnectionMenu::getConnectionCode(Registry& registry) const
+bool LobbyMenu::hasRequest() const
 {
-    if (!m_visible || !registry.has<TextBoxInput>(m_textBoxEntity)) {
-        return "";
-    }
-
-    const auto& input = registry.get<TextBoxInput>(m_textBoxEntity);
-    return input.inputText;
+    return m_LobbyRequested;
 }
 
-bool ConnectionMenu::hasConnectionRequest() const
+void LobbyMenu::clearRequests()
 {
-    return m_connectionRequested;
-}
-
-void ConnectionMenu::clearConnectionRequest()
-{
-    m_connectionRequested = false;
+    m_LobbyRequested = false;
 }

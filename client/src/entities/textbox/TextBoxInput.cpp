@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 2:31:26 PM 2025 jojo
-** Last update Wed Oct 7 7:50:12 PM 2025 jojo
+** Last update Wed Oct 7 8:40:37 PM 2025 jojo
 */
 
 #include "TextBoxInput.hpp"
@@ -27,7 +27,7 @@ Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
 
     // TextBox pour l'affichage
     registry.emplace<TextBox>(inputBox, placeholder, fontSize, color,
-        "assets/fonts/default.ttf", true, TextBox::Alignment::LEFT);
+        "client/res/fonts/OpenSans-Medium.ttf", true, TextBox::Alignment::LEFT);
 
     // Component input
     registry.emplace<TextBoxInput>(inputBox, "", placeholder, false, true, 100, 0,

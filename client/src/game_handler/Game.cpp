@@ -133,7 +133,7 @@ void Game::runMenuLoop()
     EventManager::getInstance().processEvents();
 
     // Rendu
-    _graphics.clear(10, 10, 30, 255);
+    _graphics.clear(0, 0, 0, 255);
     m_menu.render(_graphics, _registry); // Passe registry
     _graphics.present();
 
