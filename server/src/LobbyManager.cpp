@@ -192,6 +192,7 @@ bool LobbyManager::removePlayer(uint32_t playerId)
         }
 
         if (lobby->players.empty()) {
+            lobby->threadRunning = false;
             if (lobby->gameThread.joinable()) {
                 lobby->gameThread.join();
             }
