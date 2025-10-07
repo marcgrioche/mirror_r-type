@@ -43,5 +43,5 @@ private:
     void setDefaultKeyBindings();
 
     std::unordered_map<GameAction, std::vector<SDL_Keycode>> m_keyBindings;
-    const std::string m_configFileName = "keybindings.json";
+    const std::string m_configFileName = "keybindings.ini";
 };
