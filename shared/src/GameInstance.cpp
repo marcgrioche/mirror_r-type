@@ -11,6 +11,8 @@ GameInstance::GameInstance(uint32_t lobbyId)
     , _isRunning(false)
     , _currentTick(0)
     , _stateChanged(false)
+    , _gameWon(false)
+    , _gameLost(false)
 {
 }
 
@@ -41,6 +43,22 @@ void GameInstance::update()
     _lastTickTime = currentTime - deltaTime;
 }
 
+bool GameInstance::checkLoseCondition() const
+{
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool GameInstance::checkWinCondition() const
+{
+    // TODO: Implement win condition
+    return false;
+}
+
 void GameInstance::updateTick()
 {
     _currentTick++;
@@ -54,14 +72,22 @@ void GameInstance::updateTick()
     processInputs();
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    
+
     _platformsToAdd = movementSystem(_registry, TICK_DURATION);
     boundarySystem(_registry);
     projectileSystem(_registry, TICK_DURATION);
-    
+
     checkCollisions();
 
     cleanupEntities();
+
+    if (checkLoseCondition()) {
+        _gameLost = true;
+        _isRunning = false;
+    } else if (checkWinCondition()) {
+        _gameWon = true;
+        _isRunning = false;
+    }
 
     if (_platformsToAdd > 0) {
         std::cout << "platforms to add = " << _platformsToAdd << std::endl;

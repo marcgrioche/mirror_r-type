@@ -101,6 +101,10 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
         renderJoinPage(gfx, registry);
     else if (m_page == Page::Start)
         renderStartPage(gfx, registry);
+    else if (m_page == Page::Win)
+        renderWinPage(gfx, registry);
+    else if (m_page == Page::Lose)
+        renderLosePage(gfx, registry);
 
     gfx.present();
 }
@@ -450,6 +454,20 @@ void Menu::renderInputText(SDL_Renderer* renderer)
 
     SDL_DestroyTexture(tex);
     SDL_FreeSurface(surf);
+}
+
+void Menu::renderWinPage(GraphicsManager& gfx, Registry& registry)
+{
+    (void)gfx;
+    (void)registry;
+    cout << "You Win!" << endl;
+}
+
+void Menu::renderLosePage(GraphicsManager& gfx, Registry& registry)
+{
+    (void)gfx;
+    (void)registry;
+    cout << "You Lose!" << endl;
 }
 
 void Menu::renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color)
