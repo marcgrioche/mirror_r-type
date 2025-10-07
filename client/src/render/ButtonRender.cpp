@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 5:20:40 PM 2025 jojo
-** Last update Tue Oct 6 10:12:58 AM 2025 jojo
+** Last update Tue Oct 6 3:22:22 PM 2025 jojo
 */
 
 #include "ButtonRender.hpp"
@@ -21,26 +21,8 @@ void drawButton(GraphicsManager& gfx, Registry& registry, Entity entity)
     const Position& pos = registry.get<Position>(entity);
     const Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    SDL_Color bgColor, borderColor;
-
-    switch (button.state) {
-    case ButtonState::Idle:
-        bgColor = { 100, 100, 100, 255 }; // gris
-        borderColor = { 150, 150, 150, 255 }; // gris clair
-        break;
-    case ButtonState::Hovered:
-        bgColor = { 130, 130, 130, 255 }; // gris plus clair
-        borderColor = { 200, 200, 200, 255 }; // gris très clair
-        break;
-    case ButtonState::Pressed:
-        bgColor = { 70, 70, 70, 255 }; // gris foncé
-        borderColor = { 100, 100, 100, 255 }; // gris moyen
-        break;
-    case ButtonState::Disabled:
-        bgColor = { 50, 50, 50, 255 }; // gris très foncé
-        borderColor = { 80, 80, 80, 255 }; // gris sombre
-        break;
-    }
+    SDL_Color bgColor;
+    SDL_Color borderColor;
 
     // Rectangle du bouton
     SDL_Rect buttonRect = {
@@ -57,16 +39,4 @@ void drawButton(GraphicsManager& gfx, Registry& registry, Entity entity)
     // Dessine la bordure
     SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
     SDL_RenderDrawRect(renderer, &buttonRect);
-
-    // Effet d'enfoncement pour l'état pressé
-    if (button.state == ButtonState::Pressed) {
-        SDL_Rect innerRect = {
-            buttonRect.x + 1,
-            buttonRect.y + 1,
-            buttonRect.w - 2,
-            buttonRect.h - 2
-        };
-        SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
-        SDL_RenderDrawRect(renderer, &innerRect);
-    }
 }

@@ -6,7 +6,6 @@
 */
 
 #include "GraphicsManager.hpp"
-#include <SDL_ttf.h>
 #include <iostream>
 
 GraphicsManager& GraphicsManager::getInstance()
