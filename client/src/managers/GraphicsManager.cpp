@@ -26,6 +26,12 @@ bool GraphicsManager::initialize(const char* title, int width, int height)
         return false;
     }
 
+    if (TTF_Init() == -1) {
+        std::cerr << "TTF_Init Error: " << TTF_GetError() << std::endl;
+        SDL_Quit();
+        return false;
+    }
+
     m_window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -62,6 +68,7 @@ void GraphicsManager::cleanup()
             m_window = nullptr;
         }
         SDL_Quit();
+        TTF_Quit();
         m_initialized = false;
         std::cout << "GraphicsManager cleaned up." << std::endl;
     }

@@ -13,3 +13,5 @@ struct PlatformTag { };
 struct ProjectileTag { };
 struct WeaponTag { };
 struct PowerUpTag { };
+struct ButtonTag { };
+struct TextBoxTag { };
