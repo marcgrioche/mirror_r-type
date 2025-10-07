@@ -34,6 +34,12 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::GAME_STATE:
         handleGameState(event);
         break;
+    case MessageType::GAME_END_WIN:
+        handleGameEndWin();
+        break;
+    case MessageType::GAME_END_LOSE:
+        handleGameEndLose();
+        break;
     default:
         break;
     }
@@ -79,6 +85,18 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 
     std::cout << "Joined lobby " << lobbyId << " (server confirmed)" << std::endl;
     m_menu.onCreated();
+}
+
+void Game::handleGameEndWin()
+{
+    std::cout << "Game ended - You won!" << std::endl;
+    m_menu.activate(Menu::Page::Win);
+}
+
+void Game::handleGameEndLose()
+{
+    std::cout << "Game ended - You lost!" << std::endl;
+    m_menu.activate(Menu::Page::Lose);
 }
 
 void Game::processLocalGameUpdates()

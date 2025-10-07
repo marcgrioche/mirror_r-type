@@ -1,11 +1,11 @@
 #include "../include/GameInstance.hpp"
 #include "../include/Message.hpp"
-#include "ecs/systems/MovementSystem.hpp"
-#include "ecs/systems/WeaponSystem.hpp"
+#include "Parent.hpp"
 #include "ecs/systems/DashSystem.hpp"
 #include "ecs/systems/FrequencyUtils.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/EnemyMovement.hpp"
-#include "Parent.hpp"
 #include <iostream>
 
 GameInstance::GameInstance(uint32_t lobbyId)
@@ -13,6 +13,8 @@ GameInstance::GameInstance(uint32_t lobbyId)
     , _isRunning(false)
     , _currentTick(0)
     , _stateChanged(false)
+    , _gameWon(false)
+    , _gameLost(false)
 {
 }
 
@@ -43,6 +45,22 @@ void GameInstance::update()
     _lastTickTime = currentTime - deltaTime;
 }
 
+bool GameInstance::checkLoseCondition() const
+{
+    for (const auto& [playerId, entity] : _playerEntities) {
+        if (_registry.has<Health>(entity) && _registry.get<Health>(entity).hp > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool GameInstance::checkWinCondition() const
+{
+    // TODO: Implement win condition
+    return false;
+}
+
 void GameInstance::updateTick()
 {
     _currentTick++;
@@ -57,12 +75,30 @@ void GameInstance::updateTick()
     dashSystem(_registry, TICK_DURATION);
     enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
+
+    _platformsToAdd = movementSystem(_registry, TICK_DURATION);
+    boundarySystem(_registry);
     projectileSystem(_registry, TICK_DURATION);
 
     checkCollisions();
 
     cleanupEntities();
+
+    if (checkLoseCondition()) {
+        _gameLost = true;
+        _isRunning = false;
+    } else if (checkWinCondition()) {
+        _gameWon = true;
+        _isRunning = false;
+    }
+
+    if (_platformsToAdd > 0) {
+        for (; _platformsToAdd > 0; _platformsToAdd--) {
+            auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
+            _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
+            std::cout << _platformsToAdd << std::endl;
+        }
+    }
 
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
@@ -309,7 +345,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
             msg.write(hitbox.offset_y);
         }
 
-        msg.write(static_cast<uint32_t>(entity.id)); //compability with server ?
+        msg.write(static_cast<uint32_t>(entity.id)); // compability with server ?
 
     } else if (entityType == 1) { // Projectile
         if (_registry.has<Velocity>(entity)) {

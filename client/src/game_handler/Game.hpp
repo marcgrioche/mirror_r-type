@@ -81,6 +81,8 @@ private:
     void handleLobbyInfo(const Client::NetworkEvent& event);
     void handleSpawnEntity(const Client::NetworkEvent& event);
     void handleGameState(const Client::NetworkEvent& event);
+    void handleGameEndWin();
+    void handleGameEndLose();
 
     // Local game updates
     void processLocalGameUpdates();

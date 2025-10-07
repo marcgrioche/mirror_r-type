@@ -49,8 +49,5 @@ int movementSystem(Registry& registry, float deltaTime)
         pos.y += vel.dy * deltaTime;
     }
     int outPlatforms = movementPlatform(registry, deltaTime);
-    if (outPlatforms > 0) {
-        std::cout << "Platforms left screen this tick: " << outPlatforms << std::endl;
-    }
     return outPlatforms;
 }
