@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Wed Oct 7 6:23:48 PM 2025 jojo
+** Last update Wed Oct 7 8:13:13 PM 2025 jojo
 */
 
 #include "ui/page/ConnectionMenu.hpp"
@@ -86,20 +86,6 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
         return;
 
     SDL_Renderer* renderer = gfx.getRenderer();
-
-    // Fond semi-transparent
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
-    SDL_Rect overlay = { 0, 0, 800, 600 };
-    SDL_RenderFillRect(renderer, &overlay);
-
-    // Boîte du menu
-    SDL_SetRenderDrawColor(renderer, 40, 45, 60, 255);
-    SDL_Rect menuBox = { 250, 200, 300, 200 };
-    SDL_RenderFillRect(renderer, &menuBox);
-
-    // Bordure
-    SDL_SetRenderDrawColor(renderer, 100, 120, 150, 255);
-    SDL_RenderDrawRect(renderer, &menuBox);
 
     // Rendu des composants
     drawTextBoxInput(gfx, registry, m_textBoxEntity);

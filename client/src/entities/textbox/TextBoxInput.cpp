@@ -5,14 +5,14 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 2:31:26 PM 2025 jojo
-** Last update Wed Oct 7 2:36:10 PM 2025 jojo
+** Last update Wed Oct 7 7:50:12 PM 2025 jojo
 */
 
 #include "TextBoxInput.hpp"
 
 namespace factories {
 
-Entity TextBoxInput(Registry& registry, const std::string& placeholder,
+Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
     float x, float y, int fontSize, Color color)
 {
     Entity inputBox = registry.create_entity();

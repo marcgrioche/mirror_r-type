@@ -5,10 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 2:39:23 PM 2025 jojo
-** Last update Thu Oct 1 2:40:26 PM 2025 jojo
+** Last update Wed Oct 7 7:44:14 PM 2025 jojo
 */
 
 #pragma once
+#include <cstdint>
 
 struct Color {
     uint8_t a;
