@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include <algorithm>
 #include <iostream>
 #include <vector>

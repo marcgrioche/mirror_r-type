@@ -1,0 +1,40 @@
+# Build artifacts
+build/
+cmake-build-*/
+*.o
+*.so
+*.a
+
+# Git
+.git/
+.gitignore
+.github/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+*.md
+README*
+COMPARATIVE_STUDY.md
+PROTOCOL_RCF.md
+
+# Docker files (avoid recursive copying)
+Docker/
+docker-compose*.yml
+Dockerfile*
+
+# Temporary files
+*~
+*.tmp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Pre-commit hooks
+.pre-commit-config.yaml

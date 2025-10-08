@@ -9,30 +9,56 @@
 */
 
 #include "ColisionPlayerPowerUpSystem.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Health.hpp"
+#include "components/PowerUp.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
+#include "components/componentutils/HitboxUtils.hpp"
+#include <iostream>
+#include <algorithm>
 
-void ColisionPlayerPowerUpSystem(Registry& registry, float)
+void collisionPlayerPowerUpSystem(Registry& registry, float)
 {
     auto powerView = registry.view<PowerUpTag>();
-    auto playerView = registry.view<Player>();
+    auto playerView = registry.view<PlayerTag>();
 
     for (auto it = powerView.begin(); it != powerView.end(); ++it) {
         Entity powerE = it.entity();
 
-        // require Position + Hitbox on both sides
         if (!registry.has<Position>(powerE) || !registry.has<Hitbox>(powerE))
             continue;
 
-        // check against all players
         for (auto pIt = playerView.begin(); pIt != playerView.end(); ++pIt) {
             Entity plE = pIt.entity();
             if (!registry.has<Position>(plE) || !registry.has<Hitbox>(plE))
                 continue;
 
             if (entities_collide(registry, powerE, plE)) {
-                PowerUp& h = registry.get<PowerUp>(plE);
-                Lifetime& time = registry.get<Lifetime>(powerE);
-                time.value = 0.0f;
-                h.is_power = true;
+                auto& powerUpData = registry.get<PowerUp>(powerE);
+
+                if (powerUpData.type == PowerUpType::HEAL) {
+                    if (registry.has<Health>(plE)) {
+                        auto& health = registry.get<Health>(plE);
+                        health.hp = std::min(health.hp + 20, 100);
+                        std::cout << "Player healed! Health: " << health.hp << std::endl;
+                    }
+                } else if (powerUpData.type == PowerUpType::DAMAGE_BOOST) {
+                    std::cout << "Player got damage boost!" << std::endl;
+                }
+
+                if (registry.has<PowerUp>(plE)) {
+                    auto& playerPowerUp = registry.get<PowerUp>(plE);
+                    playerPowerUp.is_power = true;
+                    playerPowerUp.type = powerUpData.type;
+                    playerPowerUp.remaining_time = powerUpData.effect_duration;
+                }
+
+                if (registry.has<Lifetime>(powerE)) {
+                    Lifetime& time = registry.get<Lifetime>(powerE);
+                    time.value = 0.0f;
+                }
             }
         }
     }

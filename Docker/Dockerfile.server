@@ -1,0 +1,53 @@
+# Multi-stage build for R-Type server
+FROM ubuntu:22.04 AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Download CPM.cmake
+RUN mkdir -p cmake && \
+    wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
+
+RUN rm -rf build && \
+    mkdir -p build && cd build && \
+    cmake -S .. -B . && \
+    cmake --build . --target r-type_server
+
+# Runtime stage
+FROM ubuntu:22.04
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN useradd -m rtype
+USER rtype
+
+# Set working directory
+WORKDIR /home/rtype
+
+# Copy the built server executable
+COPY --from=builder /app/build/r-type_server .
+
+# Expose UDP port for server networking
+EXPOSE 4242/udp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD nc -z -u localhost 4242 || exit 1
+
+# Default command
+CMD ["./r-type_server"]

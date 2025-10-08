@@ -31,6 +31,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::SPAWN_ENTITY:
         handleSpawnEntity(event);
         break;
+    case MessageType::DESPAWN_ENTITY:
+        handleDespawnEntity(event);
+        break;
     case MessageType::GAME_STATE:
         handleGameState(event);
         break;
@@ -57,6 +60,21 @@ void Game::handleSpawnEntity(const Client::NetworkEvent& event)
     if (std::holds_alternative<Message>(event.payload)) {
         const Message& msg = std::get<Message>(event.payload);
         deserializeAndCreateEntity(msg, _registry);
+    }
+}
+
+void Game::handleDespawnEntity(const Client::NetworkEvent& event)
+{
+    if (std::holds_alternative<Message>(event.payload)) {
+        const Message& raw = std::get<Message>(event.payload);
+        Message msg = raw;
+        msg.resetReadPosition();
+        uint32_t entityId = msg.readU32();
+
+        Entity entity = findEntityByServerId(_registry, entityId);
+        if (entity.id != 0) {
+            _registry.kill_entity(entity);
+        }
     }
 }
 

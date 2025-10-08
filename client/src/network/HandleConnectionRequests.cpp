@@ -39,3 +39,11 @@ void RTypeClient::handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo)
     // Push the message to the event queue for Game to process
     m_eventsQueue.push({ MessageType::SPAWN_ENTITY, t_msg });
 }
+
+void RTypeClient::handleDespawnEntity(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_peerInfo;
+
+    // Push the message to the event queue for Game to process
+    m_eventsQueue.push({ MessageType::DESPAWN_ENTITY, t_msg });
+}

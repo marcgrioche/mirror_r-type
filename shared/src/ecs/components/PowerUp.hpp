@@ -10,6 +10,14 @@
 
 #pragma once
 
+enum class PowerUpType {
+    HEAL,
+    DAMAGE_BOOST
+};
+
 struct PowerUp {
     bool is_power = false;
+    PowerUpType type = PowerUpType::HEAL;
+    float effect_duration = 0.0f;
+    float remaining_time = 0.0f;
 };

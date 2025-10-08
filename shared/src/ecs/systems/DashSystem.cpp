@@ -6,7 +6,8 @@
 */
 
 #include "DashSystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Dash.hpp"
+#include "components/Velocity.hpp"
 #include "Dash.hpp"
 #include "FrequencyUtils.hpp"
 #include <iostream>
@@ -19,8 +20,8 @@ void dashSystem(Registry& registry, float deltaTime)
         if (dash.isDashing) {
             dash.remaining -= deltaTime;
 
-            velocity.dx = dash.dashSpeed * dash.direction;
-            velocity.dy = 0.0f;
+            velocity.dx = dash.dashSpeed * dash.direction.x;
+            velocity.dy = dash.dashSpeed * dash.direction.y;
 
             if (dash.remaining <= 0.0f) {
                 dash.isDashing = false;

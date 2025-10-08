@@ -7,7 +7,13 @@
 
 #include "MovementSystem.hpp"
 #include "../../include/Config.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/PreviousPosition.hpp"
+#include "components/Health.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Dead.hpp"
+#include "components/Tags.hpp"
 #include <array>
 #include <random>
 
@@ -48,6 +54,7 @@ int movementSystem(Registry& registry, float deltaTime)
         pos.x += vel.dx * deltaTime;
         pos.y += vel.dy * deltaTime;
     }
+
     int outPlatforms = movementPlatform(registry, deltaTime);
     return outPlatforms;
 }

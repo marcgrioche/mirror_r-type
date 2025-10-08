@@ -101,6 +101,7 @@ void InputManager::setDefaultKeyBindings()
     bindKeysForAction(GameAction::MOVE_RIGHT, config.getKeysForAction(GameAction::MOVE_RIGHT));
     bindKeysForAction(GameAction::SHOOT, config.getKeysForAction(GameAction::SHOOT));
     bindKeysForAction(GameAction::QUIT, config.getKeysForAction(GameAction::QUIT));
+    bindKeysForAction(GameAction::DASH, config.getKeysForAction(GameAction::DASH));
 
     bindKey(SDLK_UP, GameAction::MOVE_UP);
     bindKey(SDLK_DOWN, GameAction::MOVE_DOWN);

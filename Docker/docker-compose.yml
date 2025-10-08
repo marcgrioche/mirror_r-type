@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  rtype-server:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.server
+    container_name: rtype-server
+    ports:
+      - "4242:4242/udp"
+    networks:
+      - rtype-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "-u", "localhost", "4242"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  rtype-client:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.client
+    container_name: rtype-client
+    depends_on:
+      rtype-server:
+        condition: service_healthy
+    ports:
+      - "4243:4243/udp"
+    networks:
+      - rtype-network
+    restart: unless-stopped
+    # For GUI applications, you might need to run with:
+    # environment:
+    #   - DISPLAY=$DISPLAY
+    # volumes:
+    #   - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    # But this requires X11 forwarding and is platform-specific
+
+  # Additional client instances can be added as needed
+  # rtype-client-2:
+  #   build:
+  #     context: ..
+  #     dockerfile: Docker/Dockerfile.client
+  #   container_name: rtype-client-2
+  #   depends_on:
+  #     rtype-server:
+  #       condition: service_healthy
+  #   ports:
+  #     - "4244:4243/udp"
+  #   networks:
+  #     - rtype-network
+  #   restart: unless-stopped
+
+networks:
+  rtype-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+# Optional: For development with volume mounting
+# volumes:
+#   client-build:
+#   server-build:

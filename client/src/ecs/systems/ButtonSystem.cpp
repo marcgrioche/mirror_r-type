@@ -10,7 +10,9 @@
 
 #include "ButtonSystem.hpp"
 #include "../../managers/EventManager.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Button.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Position.hpp"
 #include <SDL2/SDL.h>
 #include <algorithm>
 

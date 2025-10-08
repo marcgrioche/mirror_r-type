@@ -1,0 +1,64 @@
+# Multi-stage build for R-Type client
+FROM ubuntu:22.04 AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install SDL2 dependencies
+RUN apt-get update && apt-get install -y \
+    libsdl2-dev \
+    libsdl2-image-dev \
+    libsdl2-ttf-dev \
+    libsdl2-mixer-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Download CPM.cmake
+RUN mkdir -p cmake && \
+    wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
+
+RUN rm -rf build && \
+    mkdir -p build && cd build && \
+    cmake -S .. -B . && \
+    cmake --build . --target r-type_client
+
+# Runtime stage
+FROM ubuntu:22.04
+
+# Install runtime SDL2 libraries
+RUN apt-get update && apt-get install -y \
+    libsdl2-2.0-0 \
+    libsdl2-image-2.0-0 \
+    libsdl2-ttf-2.0-0 \
+    libsdl2-mixer-2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN useradd -m rtype
+USER rtype
+
+# Set working directory
+WORKDIR /home/rtype
+
+# Copy the built client executable
+COPY --from=builder /app/build/r-type_client .
+
+# Copy client resources
+COPY --from=builder /app/client/res ./res
+
+# Expose port for client networking (if needed)
+EXPOSE 4243/udp
+
+# Default command
+CMD ["./r-type_client"]

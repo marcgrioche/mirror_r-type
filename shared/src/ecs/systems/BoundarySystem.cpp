@@ -7,17 +7,23 @@
 
 #include "BoundarySystem.hpp"
 #include "../../include/Config.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Dead.hpp"
+#include "components/Health.hpp"
+#include "components/Tags.hpp"
 
 void boundarySystem(Registry& registry)
 {
-    auto view = registry.view<PlayerTag, Position, Hitbox, Health>();
+    auto view = registry.view<Position, Hitbox, Health, Dead>();
 
-    for (auto&& [player, pos, hitbox, health] : view) {
-        float playerBottom = pos.y + hitbox.offset_y + hitbox.height;
+    for (auto&& [pos, hitbox, health, dead] : view) {
+        float X = pos.x + hitbox.offset_x + hitbox.width;
+        float Y = pos.y + hitbox.offset_y + hitbox.height;
 
-        if (playerBottom > SCREEN_HEIGHT + 200.0f) {
+        if (Y > SCREEN_HEIGHT + 200.0f || X < -200.0f || X > SCREEN_WIDTH + 200.0f) {
             health.hp = 0;
+            dead.dead = true;
         }
     }
 }

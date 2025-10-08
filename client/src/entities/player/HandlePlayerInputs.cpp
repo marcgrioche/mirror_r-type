@@ -6,6 +6,9 @@
 */
 
 #include "HandlePlayerInputs.hpp"
+#include "components/Velocity.hpp"
+#include "components/Jump.hpp"
+#include "components/Tags.hpp"
 #include "Jump.hpp"
 #include <iostream>
 

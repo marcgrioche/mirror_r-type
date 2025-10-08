@@ -200,4 +200,5 @@ void ConfigManager::setDefaultKeyBindings()
     m_keyBindings[GameAction::MOVE_RIGHT] = { SDLK_d };
     m_keyBindings[GameAction::SHOOT] = { SDLK_SPACE };
     m_keyBindings[GameAction::QUIT] = { SDLK_ESCAPE };
+    m_keyBindings[GameAction::DASH] = {SDLK_LSHIFT};
 }

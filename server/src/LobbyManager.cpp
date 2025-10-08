@@ -256,6 +256,7 @@ std::vector<uint32_t> LobbyManager::getLobbyPlayers(uint32_t lobbyId) const
 
 void LobbyManager::runLobbyThread(Lobby* lobby)
 {
+    // TODO: Refactor
     std::cout << "Started game thread for lobby " << lobby->id << std::endl;
 
     bool hadRealInputsThisTick = false;
@@ -298,6 +299,13 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
                 if (!spawnMsg.getPayload().empty()) {
                     _server->broadcastToLobby(lobby->id, spawnMsg);
                 }
+            }
+
+            auto killedEntities = lobby->gameInstance->getAndClearKilledEntities();
+            for (uint32_t entityId : killedEntities) {
+                Message despawnMsg(MessageType::DESPAWN_ENTITY);
+                despawnMsg.write(entityId);
+                _server->broadcastToLobby(lobby->id, despawnMsg);
             }
 
             if (hadRealInputsThisTick || lobby->gameInstance->hasStateChanged()) {

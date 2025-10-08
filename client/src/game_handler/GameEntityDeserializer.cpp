@@ -6,10 +6,18 @@
 */
 
 #include "Game.hpp"
-#include "ecs/components/AllComponents.hpp"
+#include "ecs/components/Position.hpp"
+#include "ecs/components/Velocity.hpp"
+#include "ecs/components/Health.hpp"
+#include "ecs/components/Hitbox.hpp"
+#include "ecs/components/Damage.hpp"
+#include "ecs/components/Lifetime.hpp"
+#include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/PowerUp.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
+#include "entities/powerUp/CreatePowerUp.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
 #include <iostream>
 
@@ -34,6 +42,9 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
         break;
     case 3:
         createEnemyFromMessage(msg, registry, entityId, posX, posY);
+        break;
+    case 4:
+        createPowerUpFromMessage(msg, registry, entityId, posX, posY);
         break;
     default:
         logUnknownEntityType(entityType);
@@ -75,7 +86,6 @@ void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
-    (void)entityId;
     float velX = msg.readFloat();
     float velY = msg.readFloat();
     float damageValue = msg.readFloat();
@@ -87,7 +97,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
     uint32_t parentVersion = msg.readU32();
     float lifetimeValue = msg.readFloat();
 
-    factories::createProjectile(
+    Entity projectile = factories::createProjectile(
         registry,
         Position { posX, posY },
         Velocity { velX, velY },
@@ -95,12 +105,13 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Hitbox { width, height, offsetX, offsetY },
         Parent { Entity { parentId, parentVersion } },
         Lifetime { lifetimeValue });
+
+    registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
-    (void)entityId;
     float width = msg.readFloat();
     (void)width;
     float height = msg.readFloat();
@@ -110,9 +121,11 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     float offsetY = msg.readFloat();
     (void)offsetY;
 
-    factories::createOneWayPlatform(registry,
+    Entity platform = factories::createOneWayPlatform(registry,
         posX,
         posY);
+
+    registry.add<ServerEntityId>(platform, ServerEntityId { entityId });
 }
 
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
@@ -130,7 +143,9 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
-        Hitbox { width, height, offsetX, offsetY });
+        Hitbox { width, height, offsetX, offsetY },
+        Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}
+    );
 
     if (registry.has<Velocity>(enemy)) {
         auto& velocity = registry.get<Velocity>(enemy);
@@ -139,6 +154,31 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
+}
+
+void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
+    uint32_t entityId, float posX, float posY)
+{
+    uint8_t powerUpTypeValue = msg.readU8();
+    float effectDuration = msg.readFloat();
+    float width = msg.readFloat();
+    float height = msg.readFloat();
+    float offsetX = msg.readFloat();
+    float offsetY = msg.readFloat();
+    float lifetimeValue = msg.readFloat();
+
+    PowerUpType type = static_cast<PowerUpType>(powerUpTypeValue);
+
+    Entity powerUp = factories::createPowerUp(
+        registry,
+        Position { posX, posY },
+        Velocity { 0.0f, 0.0f }, // Stationary
+        Hitbox { width, height, offsetX, offsetY },
+        Lifetime { lifetimeValue },
+        type,
+        effectDuration);
+
+    registry.add<ServerEntityId>(powerUp, ServerEntityId { entityId });
 }
 
 void Game::logUnknownEntityType(uint8_t entityType)

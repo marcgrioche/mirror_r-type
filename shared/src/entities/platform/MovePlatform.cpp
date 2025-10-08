@@ -6,6 +6,8 @@
 */
 
 #include "MovePlatform.hpp"
+#include "components/Velocity.hpp"
+#include "components/Tags.hpp"
 #include <iostream>
 
 void movePlatform(Registry& registry)

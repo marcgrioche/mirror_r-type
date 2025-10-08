@@ -8,7 +8,7 @@
 ** Last update Wed Sep 23 2:53:21 PM 2025 jojo
 */
 
-#include "CollisionPlayerProjectileSystem.hpp"
+#include "CollisionEnemyProjectileSystem.hpp"
 #include "components/Position.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Health.hpp"
@@ -20,48 +20,49 @@
 #include "Parent.hpp"
 #include <iostream>
 
-void collisionPlayerProjectileSystem(Registry& registry, float)
+void collisionEnemyProjectileSystem(Registry& registry, float)
 {
+    // Pattern calqué sur collision power-up: on utilise les Tags pour filtrer
     auto projView = registry.view<ProjectileTag>();
-    auto playerView = registry.view<PlayerTag>();
-
+    auto enemyView = registry.view<EnemyTag>();
+    
     for (auto it = projView.begin(); it != projView.end(); ++it) {
         Entity projE = it.entity();
-
+        
         // require Position + Hitbox on both sides
         if (!registry.has<Position>(projE) || !registry.has<Hitbox>(projE))
             continue;
-
-        // check against all players
-        for (auto pIt = playerView.begin(); pIt != playerView.end(); ++pIt) {
-            Entity plE = pIt.entity();
-            if (!registry.has<Position>(plE) || !registry.has<Hitbox>(plE))
-                continue;
-
+        
+        // check against all enemies
+        for (auto eIT = enemyView.begin(); eIT != enemyView.end(); ++eIT) {
+            Entity EnE = eIT.entity();
+            if (!registry.has<Position>(EnE) || !registry.has<Hitbox>(EnE))
+            continue;
+            
             // avoid friendly fire by checking Parent
             if (registry.has<Parent>(projE)) {
                 Entity weaponEntity = registry.get<Parent>(projE).parent;
                 if (registry.has<Parent>(weaponEntity)) {
                     Entity ownerEntity = registry.get<Parent>(weaponEntity).parent;
-                    if (ownerEntity.id == plE.id)
-                        continue;
+                    if (ownerEntity.id == EnE.id)
+                    continue;
                 }
             }
-
-            if (entities_collide(registry, projE, plE)) {
-                if (registry.has<Health>(plE) && registry.has<Damage>(projE)) {
-                    Health& h = registry.get<Health>(plE);
+            
+            if (entities_collide(registry, projE, EnE)) {
+                if (registry.has<Health>(EnE) && registry.has<Damage>(projE)) {
+                    Health& h = registry.get<Health>(EnE);
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
+                    std::cout << "[Collision] Enemy " << EnE.id << " hit by projectile " << projE.id << " dmg=" << dmg << " hp=" << h.hp << "\n";
                     if (h.hp <= 0) {
-                        Dead& dead = registry.get<Dead>(plE);
+                        Dead& dead = registry.get<Dead>(EnE);
                         dead.dead = true;
                     }
                     if (registry.has<Lifetime>(projE)) {
                         Lifetime& time = registry.get<Lifetime>(projE);
-                        time.value = 0.0f;
+                        time.value = 0.0f; // détruire le projectile
                     }
-                    std::cout << "[Collision] Player " << plE.id << " hit by projectile " << projE.id << " dmg=" << dmg << " hp=" << h.hp << "\n";
                 }
             }
         }

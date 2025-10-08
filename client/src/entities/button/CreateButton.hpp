@@ -10,7 +10,9 @@
 
 #pragma once
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Button.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
 
 namespace factories {
 Entity createButton(Registry& registry, float x, float y, float width, float height,

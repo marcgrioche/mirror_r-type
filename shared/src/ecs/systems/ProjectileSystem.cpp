@@ -9,21 +9,17 @@
 */
 
 #include "ProjectileSystem.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
 
 void projectileSystem(Registry& registry, float deltaTime)
 {
-    auto view = registry.view<Projectile, Lifetime>();
+    // Utilise le tag pour rester cohérent avec les collisions
+    auto view = registry.view<ProjectileTag, Lifetime>();
 
-    for (auto it = view.begin(); it != view.end();) {
+    for (auto it = view.begin(); it != view.end(); ++it) {
         auto [tag, lifetime] = *it;
-
         lifetime.value -= deltaTime;
-        if (lifetime.value <= 0.0f) {
-            Entity entity_to_kill = it.entity();
-            ++it;
-            registry.kill_entity(entity_to_kill);
-        } else {
-            ++it;
-        }
+        // Ne pas tuer ici: cleanupEntities() gère la suppression propre et évite les invalidations
     }
 }

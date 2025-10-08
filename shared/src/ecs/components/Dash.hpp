@@ -7,12 +7,13 @@
 
 #pragma once
 #include "Frequency.hpp"
+#include "Vector2.hpp"
 
 struct Dash {
-    float duration;        // Total duration of the dash (0.2 seconds)
-    float remaining;       // Remaining time of current dash
-    bool isDashing;        // Whether currently dashing
-    float dashSpeed;       // Speed during dash
-    Frequency cooldown;    // Cooldown between dashes (uses Frequency)
-    int direction;         // Direction of dash: -1 (left), 1 (right)
+    float duration = 0.08f;
+    float remaining = 0.0f;
+    bool isDashing = false;
+    float dashSpeed = 1000.0f;
+    Frequency cooldown = Frequency {0.5};
+    Vector2 direction = {0, 0};
 };

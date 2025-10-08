@@ -72,6 +72,7 @@ private:
     void handleLobbyJoint(const Message& t_msg, PeerInfo& t_peerInfo);
     void handlePongReceipt(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleSpawnEntity(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleDespawnEntity(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameState(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo);

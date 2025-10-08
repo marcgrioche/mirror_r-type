@@ -11,12 +11,18 @@
 #pragma once
 #include "Parent.hpp"
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
+#include "components/PowerUp.hpp"
 
 namespace factories {
 Entity createPowerUp(Registry& registry,
     const Position& position,
     const Velocity& velocity,
     const Hitbox& hitbox,
-    const Lifetime& lifetime);
+    const Lifetime& lifetime,
+    PowerUpType type,
+    float effectDuration);
 }
