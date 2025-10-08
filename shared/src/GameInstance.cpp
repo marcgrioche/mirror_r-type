@@ -1,23 +1,5 @@
 #include "../include/GameInstance.hpp"
-#include "../include/Message.hpp"
-#include "Parent.hpp"
-#include "ecs/components/PreviousPosition.hpp"
-#include "ecs/components/Dash.hpp"
-#include "ecs/components/Dead.hpp"
-#include "ecs/components/Jump.hpp"
-#include "ecs/components/Velocity.hpp"
-#include "ecs/systems/ColisionPlayerPowerUpSystem.hpp"
-#include "ecs/systems/DashSystem.hpp"
-#include "ecs/systems/FrequencyUtils.hpp"
-#include "ecs/systems/MovementSystem.hpp"
-#include "ecs/systems/PowerUpEffectSystem.hpp"
-#include "ecs/systems/PowerUpSystem.hpp"
-#include "ecs/systems/WeaponSystem.hpp"
-#include "entities/enemies/EnemyMovement.hpp"
-#include "entities/powerUp/CreatePowerUp.hpp"
-#include <cstdlib>
-#include <iostream>
-#include <unordered_set>
+
 
 GameInstance::GameInstance(uint32_t lobbyId)
     : _lobbyId(lobbyId)
@@ -85,7 +67,6 @@ void GameInstance::updateTick()
 
     processInputs();
     dashSystem(_registry, TICK_DURATION);
-    enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
 
     _platformsToAdd = movementSystem(_registry, TICK_DURATION);
@@ -142,11 +123,11 @@ void GameInstance::initializeLevel()
 {
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 100}, Health {15}, Hitbox {32, 32}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 200}, Health {15}, Hitbox {32, 32}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 300}, Health {15}, Hitbox {32, 32}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 400}, Health {15}, Hitbox {32, 32}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 500}, Health {15}, Hitbox {32, 32}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 100.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 200.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 300.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 400.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 500.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
@@ -170,6 +151,7 @@ void GameInstance::removePlayer(uint32_t playerId)
 
 bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
 {
+    (void)tick; // currently unused (reserved for rollback / prediction tick validation)
     // TODO : refactor
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
@@ -257,7 +239,7 @@ void GameInstance::processInputs()
 void GameInstance::simulatePhysics()
 {
     // Run shared physics systems
-    enemyMovement(_registry, TICK_DURATION);
+    // enemyMovement(_registry, TICK_DURATION);
     gravitySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
@@ -398,7 +380,7 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 {
-    // TODO: Implement state deserialization for rollback
+    (void)data; // TODO: Implement state deserialization for rollback
 }
 
 Message GameInstance::serializeEntitySpawn(Entity entity)
