@@ -106,6 +106,10 @@ target_link_libraries(r-type_client PRIVATE
     SDL2_mixer::SDL2_mixer
 )
 
+if(WIN32)
+    target_link_libraries(r-type_client PRIVATE ws2_32)
+endif()
+
 
 if(WIN32)
 
