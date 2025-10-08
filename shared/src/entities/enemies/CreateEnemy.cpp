@@ -11,6 +11,7 @@
 #include "components/Velocity.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
 #include "components/Dead.hpp"
 #include "components/Tags.hpp"
 #include "../components/Frequency.hpp"
