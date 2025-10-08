@@ -1,6 +1,5 @@
 #include "../include/GameInstance.hpp"
 
-
 GameInstance::GameInstance(uint32_t lobbyId)
     : _lobbyId(lobbyId)
     , _isRunning(false)
@@ -123,11 +122,11 @@ void GameInstance::initializeLevel()
 {
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 100.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 200.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 300.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 400.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700.0f, 500.0f}, Health {15}, Hitbox {32.0f, 32.0f}, Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 300.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
@@ -169,7 +168,7 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     if (!dash.isDashing) {
         velocity.dx = 0.0f;
-        dash.direction = {0.0f, 0.0f};
+        dash.direction = { 0.0f, 0.0f };
     }
 
     const float speed = 250.0f;
@@ -303,13 +302,12 @@ void GameInstance::cleanupEntities()
                 float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
                 _newEntitiesThisTick.push_back(factories::createPowerUp(
                     _registry,
-                    Position{pos.x, pos.y},
-                    Velocity{-10.0f, 0.0f},
-                    Hitbox{POWERUP_WIDTH, POWERUP_HEIGHT},
-                    Lifetime{POWERUP_LIFETIME},
+                    Position { pos.x, pos.y },
+                    Velocity { -10.0f, 0.0f },
+                    Hitbox { POWERUP_WIDTH, POWERUP_HEIGHT },
+                    Lifetime { POWERUP_LIFETIME },
                     type,
-                    effectDuration
-                ));
+                    effectDuration));
             }
             _registry.kill_entity(e);
         }
@@ -343,7 +341,8 @@ void GameInstance::cleanupEntities()
                     return true;
             }
             return false;
-        }), _newEntitiesThisTick.end());
+        }),
+            _newEntitiesThisTick.end());
     }
 
     // Flag state change if anything died
@@ -390,133 +389,143 @@ void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
 
 Message GameInstance::serializeEntitySpawn(Entity entity)
 {
-    uint8_t entityType = 255;
+    std::vector<Entity> entities = { entity };
+    return serializeEntityBatch(entities);
+}
 
-    if (_registry.has<PlayerTag>(entity)) {
-        entityType = 0; // Player
-    } else if (_registry.has<ProjectileTag>(entity)) {
-        entityType = 1; // Projectile
-    } else if (_registry.has<PlatformTag>(entity)) {
-        entityType = 2; // Platform
-    } else if (_registry.has<EnemyTag>(entity)) {
-        entityType = 3; // Enemy
-    } else if (_registry.has<PowerUpTag>(entity)) {
-        entityType = 4; // Power-up
-    }
-
-    if (entityType == 255) {
-        return Message(MessageType::SPAWN_ENTITY);
-    }
-
+Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
+{
     Message msg(MessageType::SPAWN_ENTITY);
-    msg.write(static_cast<uint32_t>(entity.id));
-    msg.write(entityType);
+    msg.write(static_cast<uint8_t>(entities.size()));
 
-    if (_registry.has<Position>(entity)) {
-        auto& pos = _registry.get<Position>(entity);
-        msg.write(pos.x);
-        msg.write(pos.y);
-    } else {
-        return Message(MessageType::SPAWN_ENTITY);
-    }
+    for (Entity entity : entities) {
+        uint8_t entityType = 255;
 
-    if (entityType == 0) { // Player
-        if (_registry.has<Health>(entity)) {
-            auto& health = _registry.get<Health>(entity);
-            msg.write(static_cast<uint32_t>(health.hp));
+        if (_registry.has<PlayerTag>(entity)) {
+            entityType = 0; // Player
+        } else if (_registry.has<ProjectileTag>(entity)) {
+            entityType = 1; // Projectile
+        } else if (_registry.has<PlatformTag>(entity)) {
+            entityType = 2; // Platform
+        } else if (_registry.has<EnemyTag>(entity)) {
+            entityType = 3; // Enemy
+        } else if (_registry.has<PowerUpTag>(entity)) {
+            entityType = 4; // Power-up
         }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
-            msg.write(hitbox.width);
-            msg.write(hitbox.height);
-            msg.write(hitbox.offset_x);
-            msg.write(hitbox.offset_y);
+        if (entityType == 255) {
+            continue; // Skip invalid entities
         }
 
-        msg.write(static_cast<uint32_t>(entity.id)); // compability with server ?
+        msg.write(static_cast<uint32_t>(entity.id));
+        msg.write(entityType);
 
-    } else if (entityType == 1) { // Projectile
-        if (_registry.has<Velocity>(entity)) {
-            auto& vel = _registry.get<Velocity>(entity);
-            msg.write(vel.dx);
-            msg.write(vel.dy);
-        }
-
-        if (_registry.has<Damage>(entity)) {
-            auto& damage = _registry.get<Damage>(entity);
-            msg.write(damage.value);
-        }
-
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
-            msg.write(hitbox.width);
-            msg.write(hitbox.height);
-            msg.write(hitbox.offset_x);
-            msg.write(hitbox.offset_y);
-        }
-
-        // Send parent entity ID and version
-        if (_registry.has<Parent>(entity)) {
-            auto& parent = _registry.get<Parent>(entity);
-            msg.write(static_cast<uint32_t>(parent.parent.id));
-            msg.write(static_cast<uint32_t>(parent.parent.version));
+        if (_registry.has<Position>(entity)) {
+            auto& pos = _registry.get<Position>(entity);
+            msg.write(pos.x);
+            msg.write(pos.y);
         } else {
-            msg.write(static_cast<uint32_t>(0));
-            msg.write(static_cast<uint32_t>(0));
+            continue; // Skip entities without position
         }
 
-        if (_registry.has<Lifetime>(entity)) {
-            auto& lifetime = _registry.get<Lifetime>(entity);
-            msg.write(lifetime.value);
-        }
+        if (entityType == 0) { // Player
+            if (_registry.has<Health>(entity)) {
+                auto& health = _registry.get<Health>(entity);
+                msg.write(static_cast<uint32_t>(health.hp));
+            }
 
-    } else if (entityType == 2) { // Platform
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
-            msg.write(hitbox.width);
-            msg.write(hitbox.height);
-            msg.write(hitbox.offset_x);
-            msg.write(hitbox.offset_y);
-        }
+            if (_registry.has<Hitbox>(entity)) {
+                auto& hitbox = _registry.get<Hitbox>(entity);
+                msg.write(hitbox.width);
+                msg.write(hitbox.height);
+                msg.write(hitbox.offset_x);
+                msg.write(hitbox.offset_y);
+            }
 
-    } else if (entityType == 3) { // Enemy
-        if (_registry.has<Velocity>(entity)) {
-            auto& vel = _registry.get<Velocity>(entity);
-            msg.write(vel.dx);
-            msg.write(vel.dy);
-        }
+            msg.write(static_cast<uint32_t>(entity.id)); // compatibility with server ?
 
-        if (_registry.has<Health>(entity)) {
-            auto& health = _registry.get<Health>(entity);
-            msg.write(static_cast<uint32_t>(health.hp));
-        }
+        } else if (entityType == 1) { // Projectile
+            if (_registry.has<Velocity>(entity)) {
+                auto& vel = _registry.get<Velocity>(entity);
+                msg.write(vel.dx);
+                msg.write(vel.dy);
+            }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
-            msg.write(hitbox.width);
-            msg.write(hitbox.height);
-            msg.write(hitbox.offset_x);
-            msg.write(hitbox.offset_y);
-        }
-    } else if (entityType == 4) { // Power-up
-        if (_registry.has<PowerUp>(entity)) {
-            auto& powerUp = _registry.get<PowerUp>(entity);
-            msg.write(static_cast<uint8_t>(powerUp.type));
-            msg.write(powerUp.effect_duration);
-        }
+            if (_registry.has<Damage>(entity)) {
+                auto& damage = _registry.get<Damage>(entity);
+                msg.write(damage.value);
+            }
 
-        if (_registry.has<Hitbox>(entity)) {
-            auto& hitbox = _registry.get<Hitbox>(entity);
-            msg.write(hitbox.width);
-            msg.write(hitbox.height);
-            msg.write(hitbox.offset_x);
-            msg.write(hitbox.offset_y);
-        }
+            if (_registry.has<Hitbox>(entity)) {
+                auto& hitbox = _registry.get<Hitbox>(entity);
+                msg.write(hitbox.width);
+                msg.write(hitbox.height);
+                msg.write(hitbox.offset_x);
+                msg.write(hitbox.offset_y);
+            }
 
-        if (_registry.has<Lifetime>(entity)) {
-            auto& lifetime = _registry.get<Lifetime>(entity);
-            msg.write(lifetime.value);
+            // Send parent entity ID and version
+            if (_registry.has<Parent>(entity)) {
+                auto& parent = _registry.get<Parent>(entity);
+                msg.write(static_cast<uint32_t>(parent.parent.id));
+                msg.write(static_cast<uint32_t>(parent.parent.version));
+            } else {
+                msg.write(static_cast<uint32_t>(0));
+                msg.write(static_cast<uint32_t>(0));
+            }
+
+            if (_registry.has<Lifetime>(entity)) {
+                auto& lifetime = _registry.get<Lifetime>(entity);
+                msg.write(lifetime.value);
+            }
+
+        } else if (entityType == 2) { // Platform
+            if (_registry.has<Hitbox>(entity)) {
+                auto& hitbox = _registry.get<Hitbox>(entity);
+                msg.write(hitbox.width);
+                msg.write(hitbox.height);
+                msg.write(hitbox.offset_x);
+                msg.write(hitbox.offset_y);
+            }
+
+        } else if (entityType == 3) { // Enemy
+            if (_registry.has<Velocity>(entity)) {
+                auto& vel = _registry.get<Velocity>(entity);
+                msg.write(vel.dx);
+                msg.write(vel.dy);
+            }
+
+            if (_registry.has<Health>(entity)) {
+                auto& health = _registry.get<Health>(entity);
+                msg.write(static_cast<uint32_t>(health.hp));
+            }
+
+            if (_registry.has<Hitbox>(entity)) {
+                auto& hitbox = _registry.get<Hitbox>(entity);
+                msg.write(hitbox.width);
+                msg.write(hitbox.height);
+                msg.write(hitbox.offset_x);
+                msg.write(hitbox.offset_y);
+            }
+        } else if (entityType == 4) { // Power-up
+            if (_registry.has<PowerUp>(entity)) {
+                auto& powerUp = _registry.get<PowerUp>(entity);
+                msg.write(static_cast<uint8_t>(powerUp.type));
+                msg.write(powerUp.effect_duration);
+            }
+
+            if (_registry.has<Hitbox>(entity)) {
+                auto& hitbox = _registry.get<Hitbox>(entity);
+                msg.write(hitbox.width);
+                msg.write(hitbox.height);
+                msg.write(hitbox.offset_x);
+                msg.write(hitbox.offset_y);
+            }
+
+            if (_registry.has<Lifetime>(entity)) {
+                auto& lifetime = _registry.get<Lifetime>(entity);
+                msg.write(lifetime.value);
+            }
         }
     }
 

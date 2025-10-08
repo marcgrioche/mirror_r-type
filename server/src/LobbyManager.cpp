@@ -294,8 +294,13 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
         if (_server) {
             auto newEntities = lobby->gameInstance->getAndClearNewEntities();
-            for (Entity entity : newEntities) {
-                Message spawnMsg = lobby->gameInstance->serializeEntitySpawn(entity);
+
+            const size_t BATCH_SIZE = 10;
+            for (size_t i = 0; i < newEntities.size(); i += BATCH_SIZE) {
+                size_t batchEnd = std::min(i + BATCH_SIZE, newEntities.size());
+                std::vector<Entity> batch(newEntities.begin() + i, newEntities.begin() + batchEnd);
+
+                Message spawnMsg = lobby->gameInstance->serializeEntityBatch(batch);
                 if (!spawnMsg.getPayload().empty()) {
                     _server->broadcastToLobby(lobby->id, spawnMsg);
                 }
