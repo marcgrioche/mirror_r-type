@@ -21,15 +21,6 @@ void gravitySystem(Registry& registry, float deltaTime)
             continue;
         }
 
-        // Handle active drop-through timer
-        if (jump.dropping) {
-            jump.dropTimer -= deltaTime;
-            if (jump.dropTimer <= 0.f) {
-                jump.dropping = false;
-                jump.dropTimer = 0.f;
-            }
-        }
-
         if (vel.dy < 0.f) {
             vel.dy += GRAVITY_UP * deltaTime;
         } else {

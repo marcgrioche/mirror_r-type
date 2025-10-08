@@ -31,14 +31,14 @@ void collisionSystem(Registry& registry, float deltaTime)
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
-                resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
+                resolvePlatformCollision(playerPos, playerVel, playerHitbox,
                     platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
-                resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
+                resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox,
                     platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
             }
         }
@@ -53,7 +53,7 @@ void collisionSystem(Registry& registry, float deltaTime)
 }
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
-    Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
+    const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     (void)originalPos;
@@ -104,7 +104,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 }
 
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
-    Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
+    const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     if (playerVel.dy <= 0) {

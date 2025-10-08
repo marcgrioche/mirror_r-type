@@ -195,10 +195,8 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             if (!dash.isDashing) {
                 if (jump.isJumping && velocity.dy > 0) {
                     velocity.dy += 300.0f; // Fast-fall
-                } else if (!jump.isJumping && jump.canJump && !jump.dropping) {
+                } else if (!jump.isJumping && jump.canJump) {
                     // Initiate drop-through: small downward impulse and short timer
-                    jump.dropping = true;
-                    jump.dropTimer = 0.25f; // 250ms window
                     velocity.dy = std::max(velocity.dy, 50.0f); // ensure downward movement
                 }
                 dash.direction.y = 1;

@@ -15,9 +15,9 @@
 void collisionSystem(Registry& registry, float deltaTime);
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
-    Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
+    const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform);
 
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
-    Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
+    const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform);

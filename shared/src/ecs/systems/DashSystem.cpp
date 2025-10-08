@@ -28,6 +28,7 @@ void dashSystem(Registry& registry, float deltaTime)
                 dash.remaining = 0.0f;
                 FrequencyUtils::reset(dash.cooldown);
                 velocity.dx = 0.0f;
+                velocity.dy = 0.0f;
             }
         }
     }
