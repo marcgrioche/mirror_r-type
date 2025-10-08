@@ -23,6 +23,7 @@
 #include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
+#include "components/RigidBody.hpp"
 #include "../include/Message.hpp"
 #include "Parent.hpp"
 #include "ecs/components/Dash.hpp"
