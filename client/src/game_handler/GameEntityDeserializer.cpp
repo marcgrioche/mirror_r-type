@@ -6,14 +6,14 @@
 */
 
 #include "Game.hpp"
-#include "ecs/components/Position.hpp"
-#include "ecs/components/Velocity.hpp"
+#include "ecs/components/Damage.hpp"
 #include "ecs/components/Health.hpp"
 #include "ecs/components/Hitbox.hpp"
-#include "ecs/components/Damage.hpp"
 #include "ecs/components/Lifetime.hpp"
-#include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/Position.hpp"
 #include "ecs/components/PowerUp.hpp"
+#include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/Velocity.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
@@ -25,30 +25,34 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
 {
     const_cast<Message&>(msg).resetReadPosition();
 
-    uint32_t entityId = msg.readU32();
-    uint8_t entityType = msg.readU8();
-    float posX = msg.readFloat();
-    float posY = msg.readFloat();
+    uint8_t entityCount = msg.readU8();
 
-    switch (entityType) {
-    case 0:
-        createPlayerFromMessage(msg, registry, entityId, posX, posY);
-        break;
-    case 1:
-        createProjectileFromMessage(msg, registry, entityId, posX, posY);
-        break;
-    case 2:
-        createPlatformFromMessage(msg, registry, entityId, posX, posY);
-        break;
-    case 3:
-        createEnemyFromMessage(msg, registry, entityId, posX, posY);
-        break;
-    case 4:
-        createPowerUpFromMessage(msg, registry, entityId, posX, posY);
-        break;
-    default:
-        logUnknownEntityType(entityType);
-        break;
+    for (uint8_t i = 0; i < entityCount; ++i) {
+        uint32_t entityId = msg.readU32();
+        uint8_t entityType = msg.readU8();
+        float posX = msg.readFloat();
+        float posY = msg.readFloat();
+
+        switch (entityType) {
+        case 0:
+            createPlayerFromMessage(msg, registry, entityId, posX, posY);
+            break;
+        case 1:
+            createProjectileFromMessage(msg, registry, entityId, posX, posY);
+            break;
+        case 2:
+            createPlatformFromMessage(msg, registry, entityId, posX, posY);
+            break;
+        case 3:
+            createEnemyFromMessage(msg, registry, entityId, posX, posY);
+            break;
+        case 4:
+            createPowerUpFromMessage(msg, registry, entityId, posX, posY);
+            break;
+        default:
+            logUnknownEntityType(entityType);
+            break;
+        }
     }
 }
 
@@ -144,8 +148,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
         Hitbox { width, height, offsetX, offsetY },
-        Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}
-    );
+        Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y });
 
     if (registry.has<Velocity>(enemy)) {
         auto& velocity = registry.get<Velocity>(enemy);
