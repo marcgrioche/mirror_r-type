@@ -83,13 +83,6 @@ void GameInstance::updateTick()
         prevPos.y = pos.y;
     }
 
-    // auto deadEntities = _registry.view<Health, Dead>();
-    // for (auto&& [hp, dead] : deadEntities) {
-    //     if (hp.hp <= 0) {
-    //         dead.dead = true;
-    //     }
-    // }
-
     processInputs();
     dashSystem(_registry, TICK_DURATION);
     enemyMovement(_registry, TICK_DURATION);
@@ -128,10 +121,11 @@ void GameInstance::updateTick()
     auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceLastSpawn = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - _lastPowerUpSpawnTime);
 
-    if (timeSinceLastSpawn.count() >= POWER_UP_SPAWN_INTERVAL && !_playerEntities.empty()) {
-        spawnRandomPowerUps(static_cast<int>(_playerEntities.size()));
-        _lastPowerUpSpawnTime = currentTime;
-    }
+    // It spwans random powerups on random coords, useless
+    // if (timeSinceLastSpawn.count() >= POWER_UP_SPAWN_INTERVAL && !_playerEntities.empty()) {
+    //     spawnRandomPowerUps(static_cast<int>(_playerEntities.size()));
+    //     _lastPowerUpSpawnTime = currentTime;
+    // }
 
     for (const auto& [playerId, entity] : _playerEntities) {
         if (_registry.has<Velocity>(entity)) {
@@ -148,7 +142,11 @@ void GameInstance::initializeLevel()
 {
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 100}, Health {15}, Hitbox {32, 32}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 200}, Health {15}, Hitbox {32, 32}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 300}, Health {15}, Hitbox {32, 32}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 400}, Health {15}, Hitbox {32, 32}));
+    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position {700, 500}, Health {15}, Hitbox {32, 32}));
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
@@ -271,8 +269,6 @@ void GameInstance::checkCollisions()
     collisionPlayerProjectileSystem(_registry, TICK_DURATION);
     collisionEnemyProjectileSystem(_registry, TICK_DURATION);
     collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
-    // TODO: collisionPlayerProjectileSystem(_registry, TICK_DURATION);
-    // Currently disabled due to include path issues from server directory
 }
 
 void GameInstance::cleanupEntities()
@@ -311,6 +307,22 @@ void GameInstance::cleanupEntities()
         for (auto e : killedThisTick) {
             if (already.insert(e.id).second) {
                 _killedEntitiesThisTick.push_back(e.id);
+            }
+            if (_registry.has<EnemyTag>(e) && rand() % 3 == 0) {
+                Position& pos = _registry.get<Position>(e);
+                PowerUpType type = (rand() % 2 == 0)
+                    ? PowerUpType::HEAL
+                    : PowerUpType::DAMAGE_BOOST;
+                float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
+                _newEntitiesThisTick.push_back(factories::createPowerUp(
+                    _registry,
+                    Position{pos.x, pos.y},
+                    Velocity{-10.0f, 0.0f},
+                    Hitbox{POWERUP_WIDTH, POWERUP_HEIGHT},
+                    Lifetime{POWERUP_LIFETIME},
+                    type,
+                    effectDuration
+                ));
             }
             _registry.kill_entity(e);
         }
