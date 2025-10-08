@@ -6,7 +6,10 @@
 */
 
 #include "GravitySystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Velocity.hpp"
+#include "components/Jump.hpp"
+#include "components/Health.hpp"
+#include "components/Tags.hpp"
 
 void gravitySystem(Registry& registry, float deltaTime)
 {

@@ -9,7 +9,16 @@
 */
 
 #include "CollisionEnemyProjectileSystem.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Health.hpp"
+#include "components/Damage.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Dead.hpp"
+#include "components/Tags.hpp"
+#include "components/componentutils/HitboxUtils.hpp"
 #include "Parent.hpp"
+#include <iostream>
 
 void collisionEnemyProjectileSystem(Registry& registry, float)
 {

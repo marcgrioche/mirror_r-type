@@ -9,6 +9,11 @@
 */
 
 #include "PowerUpEffectSystem.hpp"
+#include "components/PowerUp.hpp"
+#include "components/Damage.hpp"
+#include "components/Tags.hpp"
+#include "components/Parent.hpp"
+#include <iostream>
 
 void powerUpEffectSystem(Registry& registry, float deltaTime)
 {

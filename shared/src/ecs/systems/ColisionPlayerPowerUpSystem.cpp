@@ -9,6 +9,15 @@
 */
 
 #include "ColisionPlayerPowerUpSystem.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Health.hpp"
+#include "components/PowerUp.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
+#include "components/componentutils/HitboxUtils.hpp"
+#include <iostream>
+#include <algorithm>
 
 void collisionPlayerPowerUpSystem(Registry& registry, float)
 {

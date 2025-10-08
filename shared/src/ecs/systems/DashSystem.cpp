@@ -6,7 +6,8 @@
 */
 
 #include "DashSystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Dash.hpp"
+#include "components/Velocity.hpp"
 #include "Dash.hpp"
 #include "FrequencyUtils.hpp"
 #include <iostream>

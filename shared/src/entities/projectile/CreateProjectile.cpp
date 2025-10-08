@@ -9,6 +9,7 @@
 */
 
 #include "CreateProjectile.hpp"
+#include "components/Tags.hpp"
 
 namespace factories {
 Entity createProjectile(Registry& registry,

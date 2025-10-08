@@ -6,7 +6,13 @@
 */
 
 #include "CollisionSystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Jump.hpp"
+#include "components/PreviousPosition.hpp"
+#include "components/Platform.hpp"
+#include "components/Tags.hpp"
 #include "components/componentutils/HitboxUtils.hpp"
 #include <algorithm>
 #include <iostream>

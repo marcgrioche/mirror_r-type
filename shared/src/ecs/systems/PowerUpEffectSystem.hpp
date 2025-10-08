@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include "components/Parent.hpp"
 #include <algorithm>
 #include <iostream>

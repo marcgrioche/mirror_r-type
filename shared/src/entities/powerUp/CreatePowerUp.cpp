@@ -9,6 +9,7 @@
 */
 
 #include "CreatePowerUp.hpp"
+#include "components/Tags.hpp"
 
 namespace factories {
 Entity createPowerUp(Registry& registry,

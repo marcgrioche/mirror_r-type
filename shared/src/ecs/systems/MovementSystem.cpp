@@ -7,7 +7,13 @@
 
 #include "MovementSystem.hpp"
 #include "../../include/Config.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/PreviousPosition.hpp"
+#include "components/Health.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Dead.hpp"
+#include "components/Tags.hpp"
 #include <array>
 #include <random>
 

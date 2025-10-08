@@ -9,6 +9,8 @@
 */
 
 #include "PowerUpSystem.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
 
 void powerUpSystem(Registry& registry, float deltaTime)
 {

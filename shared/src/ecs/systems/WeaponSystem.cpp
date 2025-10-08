@@ -6,7 +6,12 @@
 */
 
 #include "WeaponSystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Damage.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
 #include "Parent.hpp"
 #include "FrequencyUtils.hpp"
 #include <iostream>

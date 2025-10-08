@@ -6,7 +6,14 @@
 */
 
 #include "Game.hpp"
-#include "ecs/components/AllComponents.hpp"
+#include "ecs/components/Position.hpp"
+#include "ecs/components/Velocity.hpp"
+#include "ecs/components/Health.hpp"
+#include "ecs/components/Hitbox.hpp"
+#include "ecs/components/Damage.hpp"
+#include "ecs/components/Lifetime.hpp"
+#include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/PowerUp.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"

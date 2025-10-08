@@ -11,7 +11,11 @@
 #pragma once
 #include "Parent.hpp"
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
+#include "components/PowerUp.hpp"
 
 namespace factories {
 Entity createPowerUp(Registry& registry,

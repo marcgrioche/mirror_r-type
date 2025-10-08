@@ -1,7 +1,9 @@
 #include "Menu.hpp"
 #include "../entities/button/CreateButton.hpp"
 #include "../managers/GraphicsManager.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Button.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
 
 #include <filesystem>
 #include <iostream>

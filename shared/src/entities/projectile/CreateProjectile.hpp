@@ -11,7 +11,11 @@
 #pragma once
 #include "Parent.hpp"
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Damage.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
 
 namespace factories {
 Entity createProjectile(Registry& registry,

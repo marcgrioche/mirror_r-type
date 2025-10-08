@@ -6,7 +6,6 @@
 */
 
 #pragma once
-#include "components/AllComponents.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
 

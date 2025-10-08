@@ -9,6 +9,8 @@
 */
 
 #include "ProjectileSystem.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Tags.hpp"
 
 void projectileSystem(Registry& registry, float deltaTime)
 {

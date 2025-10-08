@@ -7,7 +7,10 @@
 
 #include "BoundarySystem.hpp"
 #include "../../include/Config.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Health.hpp"
+#include "components/Tags.hpp"
 
 void boundarySystem(Registry& registry)
 {

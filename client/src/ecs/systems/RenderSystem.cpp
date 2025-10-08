@@ -6,7 +6,10 @@
 */
 
 #include "RenderSystem.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Position.hpp"
+#include "components/Button.hpp"
+#include "components/Tags.hpp"
 #include "managers/GraphicsManager.hpp"
 #include <SDL.h>
 

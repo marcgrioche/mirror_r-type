@@ -19,7 +19,9 @@
 
 #pragma once
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
+#include "components/Position.hpp"
+#include "components/Health.hpp"
+#include "components/Hitbox.hpp"
 
 namespace factories {
 Entity createEnemy(Registry& registry);

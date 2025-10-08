@@ -6,6 +6,17 @@
 */
 #include "CreatePlayer.hpp"
 #include "../weapon/CreateWeapon.hpp"
+#include "components/Position.hpp"
+#include "components/PreviousPosition.hpp"
+#include "components/Velocity.hpp"
+#include "components/Health.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Jump.hpp"
+#include "components/Dead.hpp"
+#include "components/Dash.hpp"
+#include "components/PowerUp.hpp"
+#include "components/Tags.hpp"
+#include "../components/Frequency.hpp"
 
 namespace factories {
 Entity createPlayer(Registry& registry)
