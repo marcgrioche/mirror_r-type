@@ -26,28 +26,35 @@ void collisionSystem(Registry& registry, float deltaTime)
     auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
     for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView) {
-
         Position originalPos = { prevPos.x, prevPos.y };
+        bool isPlayerOnPlatform = false;
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos, platformVel);
+                    platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox, playerJump,
-                    platformPos, platformHitbox, originalPos, platformVel);
+                    platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
             }
+        }
+        //handle player jump (after collision detection)
+        if (isPlayerOnPlatform) {
+            playerJump.isJumping = false;
+            playerJump.canJump = true;
+        } else {
+            playerJump.canJump = false;
         }
     }
 }
 
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel)
+    const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     (void)originalPos;
     float playerLeft = playerPos.x + playerHitbox.offset_x;
@@ -82,10 +89,9 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
             playerPos.y = platformTop - (playerHitbox.offset_y + playerHitbox.height);
             if (playerVel.dy >= 0) {
                 playerVel.dy = 0.0f;
-                playerJump.isJumping = false; // Player can jump again
-                playerJump.canJump = true; // Reset jump ability
                 float inputVel = playerVel.dx;
                 playerVel.dx = 2 * platformVel.dx + inputVel;
+                isPlayerOnPlatform = true;
             }
         } else {
             playerPos.y = platformBottom - playerHitbox.offset_y;
@@ -99,7 +105,7 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     Jump& playerJump, const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel)
+    const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     if (playerVel.dy <= 0) {
         return; // Player is not falling, ignore collision
@@ -112,9 +118,8 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
     if (originalPlayerBottom <= platformTop + 5.0f) {
         playerPos.y = platformTop - (playerHitbox.offset_y + playerHitbox.height);
         playerVel.dy = 0.0f;
-        playerJump.isJumping = false;
-        playerJump.canJump = true;
         float inputVel = playerVel.dx;
         playerVel.dx = 2 * platformVel.dx + inputVel;
+        isPlayerOnPlatform = true;
     }
 }
