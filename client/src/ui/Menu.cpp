@@ -22,6 +22,11 @@ void Menu::activate(Registry& _registry, Page page)
     case Page::LOBBY:
         m_lobbyPage.show(_registry);
         break;
+    case Page::WIN:
+        m_endPage.show(_registry, true);
+        break;
+    case Page::LOSE:
+        m_endPage.show(_registry, false);
     default:
         break;
     }
@@ -113,11 +118,10 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
     //     m_parameterPage.handleEvent(registry, e);
     //     break;
     case Page::WIN:
+        m_endPage.handleEvent(registry, e);
+        break;
     case Page::LOSE:
-        // Gestion basique des événements pour Win/Lose
-        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
-            showHomePage(registry);
-        }
+        m_endPage.handleEvent(registry, e);
         break;
     }
 }
@@ -188,7 +192,18 @@ void Menu::processPageTransitions(Registry& registry)
         //         showHomePage(registry);
         //     }
         //     break;
-
+    case Page::WIN:
+        if (m_endPage.hasReturnRequest()) {
+            m_endPage.clearConnectionRequest();
+            showLobbyPage(registry);
+        }
+        break;
+    case Page::LOSE:
+        if (m_endPage.hasReturnRequest()) {
+            m_endPage.clearConnectionRequest();
+            showLobbyPage(registry);
+        }
+        break;
     default:
         break;
     }
@@ -216,12 +231,12 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
         // case Page::PARAMETERS:
         //     m_parameterPage.render(gfx, registry);
         //     break;
-        // case Page::WIN:
-        //     renderWinPage(gfx);
-        //     break;
-        // case Page::LOSE:
-        //     renderLosePage(gfx);
-        //     break;
+    case Page::WIN:
+        m_endPage.render(gfx, registry);
+        break;
+    case Page::LOSE:
+        m_endPage.render(gfx, registry);
+        break;
     }
 }
 

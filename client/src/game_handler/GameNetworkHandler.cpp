@@ -100,6 +100,7 @@ void Game::handleGameEndWin()
         m_menu.showWinPage(_registry);
     } else {
         // Réactive le menu pour afficher la page Win
+        _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::WIN);
     }
 }
@@ -112,6 +113,7 @@ void Game::handleGameEndLose()
         m_menu.showLosePage(_registry);
     } else {
         // Réactive le menu pour afficher la page Lose
+        _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::LOSE);
     }
 }

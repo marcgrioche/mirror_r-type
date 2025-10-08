@@ -3,6 +3,7 @@
 #include "Registry.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "page/ConnectionMenu.hpp"
+#include "page/EndMenu.hpp"
 #include "page/HomeMenu.hpp"
 #include "page/JoinMenu.hpp"
 #include "page/LobbyMenu.hpp"
@@ -53,6 +54,7 @@ public:
     bool hasJoinRequest() const;
     bool hasCreateRequest() const;
     bool hasLobbyRequest() const;
+    bool hasEndRequest() const;
     // bool hasParameterChanges() const;
 
     // Nettoyage des flags de demande
@@ -67,6 +69,7 @@ private:
     ConnectionMenu m_connectionPage;
     JoinMenu m_joinPage;
     LobbyMenu m_lobbyPage;
+    EndMenu m_endPage;
     // ParameterMenu m_parameterPage;
 
     // Gestion des transitions
