@@ -20,12 +20,12 @@
 void collisionSystem(Registry& registry, float deltaTime)
 {
     (void)deltaTime;
-    auto playerView = registry.view<Position, Velocity, Hitbox, PreviousPosition, RigidBody>();
+    auto bodiesView = registry.view<Position, Velocity, Hitbox, PreviousPosition, RigidBody>();
 
     auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
     auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
-    for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : playerView) {
+    for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : bodiesView) {
         Position originalPos = { prevPos.x, prevPos.y };
         rigidBody.IsOnPlatform = false;
 
