@@ -7,16 +7,16 @@
 
 #include "GravitySystem.hpp"
 #include "components/Velocity.hpp"
-#include "components/Jump.hpp"
 #include "components/Health.hpp"
 #include "components/Tags.hpp"
 #include "components/Dash.hpp"
+#include "Config.hpp"
 
 void gravitySystem(Registry& registry, float deltaTime)
 {
-    auto view = registry.view<PlayerTag, Velocity, Jump, Health, Dash>();
+    auto view = registry.view<PlayerTag, Velocity, Health, Dash>();
 
-    for (auto&& [player, vel, jump, health, dash] : view) {
+    for (auto&& [player, vel, health, dash] : view) {
         if (health.hp <= 0 || dash.isDashing) {
             continue;
         }
