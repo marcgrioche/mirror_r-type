@@ -27,7 +27,6 @@
 #include "Parent.hpp"
 #include "ecs/components/Dash.hpp"
 #include "ecs/components/Dead.hpp"
-#include "ecs/components/Jump.hpp"
 #include "ecs/components/PreviousPosition.hpp"
 #include "ecs/components/Velocity.hpp"
 #include "ecs/systems/ColisionPlayerPowerUpSystem.hpp"

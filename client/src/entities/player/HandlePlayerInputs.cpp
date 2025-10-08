@@ -7,26 +7,24 @@
 
 #include "HandlePlayerInputs.hpp"
 #include "components/Velocity.hpp"
-#include "components/Jump.hpp"
 #include "components/Tags.hpp"
-#include "Jump.hpp"
+#include "Config.hpp"
+#include "RigidBody.hpp"
 #include <iostream>
 
 void handlePlayerInputs(InputManager& _inputs, Registry& registry)
 {
-    auto view = registry.view<PlayerTag, Velocity, Jump>();
+    auto view = registry.view<PlayerTag, Velocity, RigidBody>();
 
-    for (auto [tag, velocity, jump] : view) {
+    for (auto [tag, velocity, rigidBody] : view) {
 
         const float speed = 250.0f;
 
         velocity.dx = 0.0f;
 
         if (_inputs.isUp()) {
-            if (!jump.isJumping && jump.canJump) {
+            if (rigidBody.IsOnPlatform) {
                 velocity.dy = -V0;
-                jump.isJumping = true;
-                jump.canJump = false;
             }
         }
         if (_inputs.isLeft()) {
@@ -36,7 +34,7 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
             velocity.dx = speed;
         }
 
-        if (_inputs.isDown() && jump.isJumping && velocity.dy > 0) {
+        if (_inputs.isDown() && !rigidBody.IsOnPlatform && velocity.dy > 0) {
             velocity.dy += 300.0f;
         }
     }
