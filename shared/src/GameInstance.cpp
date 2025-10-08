@@ -195,6 +195,11 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             if (!dash.isDashing) {
                 if (jump.isJumping && velocity.dy > 0) {
                     velocity.dy += 300.0f; // Fast-fall
+                } else if (!jump.isJumping && jump.canJump && !jump.dropping) {
+                    // Initiate drop-through: small downward impulse and short timer
+                    jump.dropping = true;
+                    jump.dropTimer = 0.25f; // 250ms window
+                    velocity.dy = std::max(velocity.dy, 50.0f); // ensure downward movement
                 }
                 dash.direction.y = 1;
             }
@@ -267,7 +272,7 @@ void GameInstance::cleanupEntities()
         for (auto it = view.begin(); it != view.end(); ++it) {
             auto [lifetime] = *it;
             Entity entity = it.entity();
-            lifetime.value -= TICK_DURATION; // mutate component
+            lifetime.value -= TICK_DURATION;
             if (lifetime.value <= 0.0f) {
                 killedThisTick.push_back(entity);
             }
@@ -286,16 +291,17 @@ void GameInstance::cleanupEntities()
     }
 
     if (killedThisTick.empty())
-        return; // nothing to do
+        return;
 
     // 3) Record killed entity IDs (deduplicated) then physically remove from registry
     {
-        std::unordered_set<uint32_t> already; // dedupe by raw id for network despawn
+        std::unordered_set<uint32_t> already;
         for (auto e : killedThisTick) {
             if (already.insert(e.id).second) {
                 _killedEntitiesThisTick.push_back(e.id);
             }
-            if (_registry.has<EnemyTag>(e) && rand() % 3 == 0) {
+            // You can re-activate the random condition to make powerup drop not on every enemies
+            if (_registry.has<EnemyTag>(e) /*&& rand() % 3 == 0*/) {
                 Position& pos = _registry.get<Position>(e);
                 PowerUpType type = (rand() % 2 == 0)
                     ? PowerUpType::HEAL
