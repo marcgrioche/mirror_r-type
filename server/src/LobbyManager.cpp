@@ -297,7 +297,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
             const size_t BATCH_SIZE = 10;
             for (size_t i = 0; i < newEntities.size(); i += BATCH_SIZE) {
-                size_t batchEnd = std::min(i + BATCH_SIZE, newEntities.size());
+                size_t batchEnd = (std::min)(i + BATCH_SIZE, newEntities.size());
                 std::vector<Entity> batch(newEntities.begin() + i, newEntities.begin() + batchEnd);
 
                 Message spawnMsg = lobby->gameInstance->serializeEntityBatch(batch);

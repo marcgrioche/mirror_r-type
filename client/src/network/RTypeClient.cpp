@@ -10,6 +10,7 @@
 using namespace Client;
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 static std::atomic<bool> stop_requested { false };
 
