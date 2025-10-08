@@ -8,7 +8,6 @@
 #pragma once
 #include "../Registry.hpp"
 #include "components/Hitbox.hpp"
-#include "components/Jump.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 

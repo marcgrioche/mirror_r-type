@@ -9,68 +9,61 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
-#include "components/Jump.hpp"
 #include "components/PreviousPosition.hpp"
 #include "components/Platform.hpp"
 #include "components/Tags.hpp"
 #include "components/componentutils/HitboxUtils.hpp"
 #include <algorithm>
 #include <iostream>
+#include "components/RigidBody.hpp"
 
 void collisionSystem(Registry& registry, float deltaTime)
 {
     (void)deltaTime;
-    auto playerView = registry.view<PlayerTag, Position, Velocity, Hitbox, Jump, PreviousPosition>();
+    auto playerView = registry.view<Position, Velocity, Hitbox, PreviousPosition, RigidBody>();
 
     auto platformView = registry.view<NoPassPlatform, Position, Hitbox, Velocity>();
     auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
-    for (auto&& [playerTag, playerPos, playerVel, playerHitbox, playerJump, prevPos] : playerView) {
+    for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : playerView) {
         Position originalPos = { prevPos.x, prevPos.y };
-        bool isPlayerOnPlatform = false;
+        rigidBody.IsOnPlatform = false;
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
-            if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
-                resolvePlatformCollision(playerPos, playerVel, playerHitbox,
-                    platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
+            if (aabb_overlap_world(pos, hitbox, platformPos, platformHitbox)) {
+                resolvePlatformCollision(pos, vel, hitbox,
+                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.IsOnPlatform);
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
-            if (aabb_overlap_world(playerPos, playerHitbox, platformPos, platformHitbox)) {
-                resolveOneWayPlatformCollision(playerPos, playerVel, playerHitbox,
-                    platformPos, platformHitbox, originalPos, platformVel, isPlayerOnPlatform);
+            if (aabb_overlap_world(pos, hitbox, platformPos, platformHitbox)) {
+                resolveOneWayPlatformCollision(pos, vel, hitbox,
+                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.IsOnPlatform);
             }
-        }
-        //handle player jump (after collision detection)
-        if (isPlayerOnPlatform) {
-            playerJump.isJumping = false;
-            playerJump.canJump = true;
-        } else {
-            playerJump.canJump = false;
         }
     }
 }
 
-void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
+void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     (void)originalPos;
-    float playerLeft = playerPos.x + playerHitbox.offset_x;
-    float playerRight = playerLeft + playerHitbox.width;
-    float playerTop = playerPos.y + playerHitbox.offset_y;
-    float playerBottom = playerTop + playerHitbox.height;
+    float bodyLeft = pos.x + hitbox.offset_x;
+    float bodyRight = bodyLeft + hitbox.width;
+    float bodyTop = pos.y + hitbox.offset_y;
+    float bodyBottom = bodyTop + hitbox.height;
 
     float platformLeft = platformPos.x + platformHitbox.offset_x;
     float platformRight = platformLeft + platformHitbox.width;
     float platformTop = platformPos.y + platformHitbox.offset_y;
     float platformBottom = platformTop + platformHitbox.height;
 
-    float overlapLeft = playerRight - platformLeft;
-    float overlapRight = platformRight - playerLeft;
-    float overlapTop = playerBottom - platformTop;
-    float overlapBottom = platformBottom - playerTop;
+    float overlapLeft = bodyRight - platformLeft;
+    float overlapRight = platformRight - bodyLeft;
+    float overlapTop = bodyBottom - platformTop;
+    float overlapBottom = platformBottom - bodyTop;
 
     // plus l'overlap est petit, plus ça veut dire que ça "vient" de toucher
     float minOverlapX = std::min(overlapLeft, overlapRight);
@@ -78,48 +71,48 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 
     if (minOverlapX < minOverlapY) {
         if (overlapLeft < overlapRight) {
-            playerPos.x = platformLeft - (playerHitbox.offset_x + playerHitbox.width);
+            pos.x = platformLeft - (hitbox.offset_x + hitbox.width);
         } else {
-            playerPos.x = platformRight - playerHitbox.offset_x;
+            pos.x = platformRight - hitbox.offset_x;
         }
-        playerVel.dx = platformVel.dx;
+        vel.dx = platformVel.dx;
         std::cout << "Horizontal collision resolved!" << std::endl;
     } else {
         if (overlapTop < overlapBottom) {
-            playerPos.y = platformTop - (playerHitbox.offset_y + playerHitbox.height);
-            if (playerVel.dy >= 0) {
-                playerVel.dy = 0.0f;
-                float inputVel = playerVel.dx;
-                playerVel.dx = 2 * platformVel.dx + inputVel;
+            pos.y = platformTop - (hitbox.offset_y + hitbox.height);
+            if (vel.dy >= 0) {
+                vel.dy = 0.0f;
+                float inputVel = vel.dx;
+                vel.dx = 2 * platformVel.dx + inputVel;
                 isPlayerOnPlatform = true;
             }
         } else {
-            playerPos.y = platformBottom - playerHitbox.offset_y;
-            if (playerVel.dy < 0) {
-                playerVel.dy = 0.0f;
+            pos.y = platformBottom - hitbox.offset_y;
+            if (vel.dy < 0) {
+                vel.dy = 0.0f;
                 std::cout << "Player hit ceiling!" << std::endl;
             }
         }
     }
 }
 
-void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
+void resolveOneWayPlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
-    if (playerVel.dy <= 0) {
+    if (vel.dy <= 0) {
         return; // Player is not falling, ignore collision
     }
 
-    // Check if player was above the platform in the previous frame
-    float originalPlayerBottom = originalPos.y + playerHitbox.offset_y + playerHitbox.height;
+    // Check if body was above the platform in the previous frame
+    float originalBodyBottom = originalPos.y + hitbox.offset_y + hitbox.height;
     float platformTop = platformPos.y + platformHitbox.offset_y;
 
-    if (originalPlayerBottom <= platformTop + 5.0f) {
-        playerPos.y = platformTop - (playerHitbox.offset_y + playerHitbox.height);
-        playerVel.dy = 0.0f;
-        float inputVel = playerVel.dx;
-        playerVel.dx = 2 * platformVel.dx + inputVel;
+    if (originalBodyBottom <= platformTop + 5.0f) {
+        pos.y = platformTop - (hitbox.offset_y + hitbox.height);
+        vel.dy = 0.0f;
+        float inputVel = vel.dx;
+        vel.dx = 2 * platformVel.dx + inputVel;
         isPlayerOnPlatform = true;
     }
 }
