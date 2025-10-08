@@ -169,6 +169,7 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
 
     if (!dash.isDashing) {
         velocity.dx = 0.0f;
+        dash.direction = {0.0f, 0.0f};
     }
 
     const float speed = 250.0f;
@@ -181,27 +182,33 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
         hasRealInputs = true;
         switch (input) {
         case GameInput::UP:
-            if (!jump.isJumping && jump.canJump) {
-                velocity.dy = -V0;
-                jump.isJumping = true;
-                jump.canJump = false;
+            if (!dash.isDashing) {
+                if (!jump.isJumping && jump.canJump) {
+                    velocity.dy = -V0;
+                    jump.isJumping = true;
+                    jump.canJump = false;
+                }
+                dash.direction.y = -1;
             }
             break;
         case GameInput::DOWN:
-            if (jump.isJumping && velocity.dy > 0) {
-                velocity.dy += 300.0f; // Fast-fall
+            if (!dash.isDashing) {
+                if (jump.isJumping && velocity.dy > 0) {
+                    velocity.dy += 300.0f; // Fast-fall
+                }
+                dash.direction.y = 1;
             }
             break;
         case GameInput::LEFT:
             if (!dash.isDashing) {
                 velocity.dx = -speed;
-                dash.direction = -1;
+                dash.direction.x = -1;
             }
             break;
         case GameInput::RIGHT:
             if (!dash.isDashing) {
                 velocity.dx = speed;
-                dash.direction = 1;
+                dash.direction.x = 1;
             }
             break;
         case GameInput::ATTACK:
@@ -212,12 +219,10 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
         case GameInput::DASH:
             if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
                 dash.isDashing = true;
+                jump.canJump = false;
                 dash.remaining = dash.duration;
-                if (velocity.dx < 0) {
-                    dash.direction = -1;
-                } else if (velocity.dx > 0) {
-                    dash.direction = 1;
-                }
+                if (dash.direction.x == 0 & dash.direction.y == 0)
+                    dash.direction.y = -1;
                 _stateChanged = true;
             }
             break;
