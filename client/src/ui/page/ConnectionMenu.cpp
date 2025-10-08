@@ -5,11 +5,12 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Wed Oct 7 8:27:57 PM 2025 jojo
+** Last update Thu Oct 8 12:45:52 PM 2025 jojo
 */
 
 #include "ui/page/ConnectionMenu.hpp"
 #include "entities/button/CreateButton.hpp"
+#include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
 #include <iostream>
 
@@ -41,17 +42,21 @@ void ConnectionMenu::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
     m_textBoxEntity = factories::createTextBoxInput(registry,
-        "Enter connection code...", 300.0f, 250.0f, 16, { 255, 255, 255, 255 });
+        "Enter connection code...", 300.0f, 250.0f, 16, { 0, 0, 0, 255 });
 
     // Bouton Connect
     m_connectButtonEntity = factories::createButton(registry,
         320.0f, 320.0f, 160.0f, 50.0f, "connect_to_server", true);
+
+    m_connectTextBoxEntity = factories::createTextBox(registry, "CONNECT",
+        320.0f, 340.0f, 16, { 255, 0, 0, 0 }, TextBox::Alignment::CENTER);
 }
 
 void ConnectionMenu::destroyEntities(Registry& registry)
 {
     registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
+    registry.kill_entity(m_connectTextBoxEntity);
 }
 
 void ConnectionMenu::setupEventHandlers()
@@ -104,6 +109,7 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
     // Rendu des composants
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
     drawButton(gfx, registry, m_connectButtonEntity);
+    drawTextBox(gfx, registry, m_connectTextBoxEntity);
 }
 
 std::string ConnectionMenu::getConnectionCode(Registry& registry) const

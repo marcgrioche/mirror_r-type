@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 9:48:07 PM 2025 jojo
-** Last update Wed Oct 7 10:47:57 PM 2025 jojo
+** Last update Thu Oct 8 1:22:44 PM 2025 jojo
 */
 
 #pragma once
@@ -37,13 +37,17 @@ public:
 
     // Vérifie si l'utilisateur a cliqué "Connect"
     bool hasRequest() const;
+    bool hasReturnRequest() const;
     void clearRequests();
 
 private:
     // Entity m_textBoxEntity;
     Entity m_connectButtonEntity;
+    Entity m_connectTextBoxEntity;
+    Entity m_returnButtonEntity;
     bool m_visible = false;
     bool m_LobbyRequested = false;
+    bool m_returnRequested = false;
 
     void createEntities(Registry& registry);
     void destroyEntities(Registry& registry);

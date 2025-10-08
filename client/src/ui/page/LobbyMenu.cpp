@@ -5,12 +5,12 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 9:48:35 PM 2025 jojo
-** Last update Wed Oct 7 10:47:53 PM 2025 jojo
+** Last update Thu Oct 8 1:24:54 PM 2025 jojo
 */
 
 #include "LobbyMenu.hpp"
 #include "entities/button/CreateButton.hpp"
-#include "entities/textbox/TextBoxInput.hpp"
+#include "entities/textbox/TextBox.hpp"
 #include <iostream>
 
 LobbyMenu::LobbyMenu()
@@ -25,7 +25,7 @@ void LobbyMenu::show(Registry& registry)
     if (!m_visible) {
         createEntities(registry);
         m_visible = true;
-        m_LobbyRequested = false;
+        clearRequests();
     }
 }
 
@@ -46,12 +46,20 @@ void LobbyMenu::createEntities(Registry& registry)
     // Bouton Connect
     m_connectButtonEntity = factories::createButton(registry,
         320.0f, 320.0f, 160.0f, 50.0f, "connect_to_server", true);
+
+    m_returnButtonEntity = factories::createButton(registry,
+        320.0f, 380.0f, 160.0f, 50.0f, "return_to_home", true);
+
+    m_connectTextBoxEntity = factories::createTextBox(registry,
+        "READY", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
 }
 
 void LobbyMenu::destroyEntities(Registry& registry)
 {
     // registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
+    registry.kill_entity(m_returnButtonEntity);
+    registry.kill_entity(m_connectTextBoxEntity);
 }
 
 void LobbyMenu::setupEventHandlers()
@@ -61,6 +69,12 @@ void LobbyMenu::setupEventHandlers()
     eventMgr.subscribe(EventType::BUTTON_CLICK, [this](const GameEvent& event) {
         if (event.data == "connect_to_server" && m_visible) {
             m_LobbyRequested = true;
+        }
+    });
+
+    eventMgr.subscribe(EventType::BUTTON_CLICK, [this](const GameEvent& event) {
+        if (event.data == "return_to_home" && m_visible) {
+            m_returnRequested = true;
         }
     });
 }
@@ -104,6 +118,8 @@ void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
     // Rendu des composants
     // drawTextBoxInput(gfx, registry, m_textBoxEntity);
     drawButton(gfx, registry, m_connectButtonEntity);
+    drawTextBox(gfx, registry, m_connectTextBoxEntity);
+    drawButton(gfx, registry, m_returnButtonEntity);
 }
 
 bool LobbyMenu::hasRequest() const
@@ -111,7 +127,13 @@ bool LobbyMenu::hasRequest() const
     return m_LobbyRequested;
 }
 
+bool LobbyMenu::hasReturnRequest() const
+{
+    return m_returnRequested;
+}
+
 void LobbyMenu::clearRequests()
 {
     m_LobbyRequested = false;
+    m_returnRequested = false;
 }

@@ -5,11 +5,12 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:59:23 PM 2025 jojo
-** Last update Wed Oct 7 7:18:04 PM 2025 jojo
+** Last update Thu Oct 8 11:25:56 AM 2025 jojo
 */
 
 #include "ui/page/HomeMenu.hpp"
 #include "entities/button/CreateButton.hpp"
+#include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
 #include <iostream>
 
@@ -51,6 +52,11 @@ void HomeMenu::createEntities(Registry& registry)
     // Bouton Create
     m_createButtonEntity = factories::createButton(registry,
         430.0f, 280.0f, 120.0f, 50.0f, "home_create", true);
+
+    m_textBoxCreateEntity = factories::createTextBox(registry,
+        "CREATE LOBBY", 430.0f, 280.0f, 16, { 255, 0, 0, 0 });
+    m_textBoxJoinEntity = factories::createTextBox(registry,
+        "JOIN LOBBY", 250.0f, 280.0f, 16, { 255, 0, 0, 0 });
 }
 
 void HomeMenu::destroyEntities(Registry& registry)
@@ -58,6 +64,8 @@ void HomeMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_joinButtonEntity);
     registry.kill_entity(m_createButtonEntity);
+    registry.kill_entity(m_textBoxCreateEntity);
+    registry.kill_entity(m_textBoxJoinEntity);
 }
 
 void HomeMenu::setupEventHandlers()
@@ -109,6 +117,8 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
     drawButton(gfx, registry, m_joinButtonEntity);
     drawButton(gfx, registry, m_createButtonEntity);
     drawButton(gfx, registry, m_paramButtonEntity);
+    drawTextBox(gfx, registry, m_textBoxCreateEntity);
+    drawTextBox(gfx, registry, m_textBoxJoinEntity);
 }
 
 std::string HomeMenu::getPseudo(Registry& registry) const

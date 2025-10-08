@@ -169,8 +169,16 @@ void Menu::processPageTransitions(Registry& registry)
     case Page::CONNECTION:
         // Transition gérée par le système principal via hasConnectionRequest()
         break;
-
+    case Page::LOBBY:
+        if (m_lobbyPage.hasReturnRequest()) {
+            m_lobbyPage.clearRequests();
+            showHomePage(registry);
+        }
     case Page::JOIN_LOBBY:
+        if (m_joinPage.hasReturnRequest()) {
+            m_joinPage.clearConnectionRequest();
+            showHomePage(registry);
+        }
         // Transition gérée par le système principal via hasJoinRequest()
         break;
 

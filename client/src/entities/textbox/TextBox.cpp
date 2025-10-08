@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:03:28 AM 2025 jojo
-** Last update Wed Oct 7 8:38:49 PM 2025 jojo
+** Last update Thu Oct 8 12:47:15 PM 2025 jojo
 */
 
 #include "TextBox.hpp"
@@ -13,14 +13,14 @@
 namespace factories {
 
 Entity createTextBox(Registry& registry, const std::string& text,
-    float x, float y, int fontSize, Color color)
+    float x, float y, int fontSize, Color color, TextBox::Alignment alignement)
 {
     Entity textBox = registry.create_entity();
 
     registry.emplace<Position>(textBox, x, y);
     registry.emplace<TextBox>(textBox, text, fontSize, color,
         "client/res/fonts/OpenSans-Medium.ttf", true,
-        ::TextBox::Alignment::LEFT);
+        alignement);
 
     return textBox;
 }
