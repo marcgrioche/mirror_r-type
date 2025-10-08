@@ -5,12 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:02:34 AM 2025 jojo
-** Last update Thu Oct 8 12:45:11 PM 2025 jojo
+** Last update Thu Oct 8 2:32:52 PM 2025 jojo
 */
 
 #pragma once
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include "components/TextBox.hpp"
 
 namespace factories {

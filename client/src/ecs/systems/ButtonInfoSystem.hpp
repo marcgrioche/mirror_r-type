@@ -5,12 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 2:30:55 PM 2025 jojo
-** Last update Thu Oct 1 2:32:43 PM 2025 jojo
+** Last update Thu Oct 8 2:32:45 PM 2025 jojo
 */
 
 #pragma once
 
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 
 void buttonInfoSystem(Registry& registry);

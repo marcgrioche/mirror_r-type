@@ -2,7 +2,6 @@
 #include "../textbox/TextBox.hpp"
 #include "CreateButton.hpp"
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include "components/ButtonInfo.hpp"
 
 namespace factories {

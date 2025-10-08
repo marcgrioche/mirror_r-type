@@ -5,14 +5,13 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 8 1:33:59 PM 2025 jojo
-** Last update Thu Oct 8 2:12:21 PM 2025 jojo
+** Last update Thu Oct 8 2:32:55 PM 2025 jojo
 */
 
 #pragma once
 
 #include "Entity.hpp"
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include "managers/EventManager.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "render/ButtonRender.hpp"

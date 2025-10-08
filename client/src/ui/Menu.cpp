@@ -1,17 +1,13 @@
 #include "Menu.hpp"
-<<<<<<< HEAD
-=======
 #include "../entities/button/CreateButton.hpp"
 #include "../managers/GraphicsManager.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
-
 #include <filesystem>
-    >>>>>>> 5e4db1692445249209895cd5a27ac0fbf93f2781
 #include <iostream>
 
-    Menu::Menu()
+Menu::Menu()
     = default;
 Menu::~Menu() = default;
 

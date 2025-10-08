@@ -5,10 +5,14 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 3:13:29 PM 2025 jojo
-** Last update Wed Oct 7 3:25:04 PM 2025 jojo
+** Last update Thu Oct 8 2:38:11 PM 2025 jojo
 */
 
 #include "TextBoxInputSystem.hpp"
+#include "Hitbox.hpp"
+#include "Position.hpp"
+#include "components/TextBox.hpp"
+#include "components/TextBoxInput.hpp"
 
 void textBoxInputSystem(Registry& registry, const SDL_Event& event)
 {

@@ -5,10 +5,14 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 2:31:26 PM 2025 jojo
-** Last update Wed Oct 7 8:40:37 PM 2025 jojo
+** Last update Thu Oct 8 2:36:46 PM 2025 jojo
 */
 
 #include "TextBoxInput.hpp"
+#include "Hitbox.hpp"
+#include "Position.hpp"
+#include "components/TextBox.hpp"
+#include "components/TextBoxInput.hpp"
 
 namespace factories {
 

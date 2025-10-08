@@ -5,12 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 2:15:59 PM 2025 jojo
-** Last update Wed Oct 7 2:30:49 PM 2025 jojo
+** Last update Thu Oct 8 2:32:33 PM 2025 jojo
 */
 
 #pragma once
 #include "Registry.hpp"
-#include "components/AllComponents.hpp"
 #include "components/TextBox.hpp"
 #include "components/TextBoxInput.hpp"
 

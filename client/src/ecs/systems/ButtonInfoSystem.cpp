@@ -5,10 +5,14 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 2:30:59 PM 2025 jojo
-** Last update Thu Oct 1 2:47:43 PM 2025 jojo
+** Last update Thu Oct 8 2:39:02 PM 2025 jojo
 */
 
 #include "ButtonInfoSystem.hpp"
+#include "Button.hpp"
+#include "ButtonInfo.hpp"
+#include "Position.hpp"
+#include "components/TextBox.hpp"
 
 void buttonInfoSystem(Registry& registry)
 {
