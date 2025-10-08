@@ -301,7 +301,7 @@ void GameInstance::cleanupEntities()
                 _killedEntitiesThisTick.push_back(e.id);
             }
             // You can re-activate the random condition to make powerup drop not on every enemies
-            if (_registry.has<EnemyTag>(e) /*&& rand() % 3 == 0*/) {
+            if (_registry.has<EnemyTag>(e) && _registry.has<Position>(e) /*&& rand() % 3 == 0*/) {
                 Position& pos = _registry.get<Position>(e);
                 PowerUpType type = (rand() % 2 == 0)
                     ? PowerUpType::HEAL
