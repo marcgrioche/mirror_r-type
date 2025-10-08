@@ -54,6 +54,7 @@ int movementSystem(Registry& registry, float deltaTime)
         pos.x += vel.dx * deltaTime;
         pos.y += vel.dy * deltaTime;
     }
+
     int outPlatforms = movementPlatform(registry, deltaTime);
     return outPlatforms;
 }

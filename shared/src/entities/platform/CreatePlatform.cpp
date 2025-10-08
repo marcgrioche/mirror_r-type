@@ -1,12 +1,5 @@
 #include "CreatePlatform.hpp"
-#include "Dead.hpp"
-#include "Hitbox.hpp"
-#include "Platform.hpp"
-#include "Position.hpp"
-#include "Tags.hpp"
-#include "Velocity.hpp"
-#include <array>
-#include <random>
+
 
 Entity factories::createOneWayPlatform(Registry& registry, float posx, float posy)
 {
@@ -125,6 +118,25 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
 
         placed.push_back({ x, y });
         platformsEntities.push_back(createOneWayPlatform(registry, x, y));
+
+        // std::uniform_real_distribution<float> powerUpChance(0.0f, 1.0f);
+        // if (powerUpChance(gen) < 0.33f) {
+        //     float PUx = x + (rand() % (int)PLATFORM_WIDTH);
+        //     float PUy = y - POWERUP_HEIGHT;
+        //     PowerUpType type = (std::uniform_int_distribution<int>(0,1)(gen) == 0)
+        //         ? PowerUpType::HEAL
+        //         : PowerUpType::DAMAGE_BOOST;
+        //     float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
+        //     platformsEntities.push_back(factories::createPowerUp(
+        //         registry,
+        //         Position{PUx, PUy},
+        //         Velocity{-10.0f, 0.0f},
+        //         Hitbox{POWERUP_WIDTH, POWERUP_HEIGHT},
+        //         Lifetime{POWERUP_LIFETIME},
+        //         type,
+        //         effectDuration
+        //     ));
+        // }
     }
 
     return platformsEntities;

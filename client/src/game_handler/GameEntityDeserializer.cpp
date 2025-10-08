@@ -143,7 +143,9 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
         registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
-        Hitbox { width, height, offsetX, offsetY });
+        Hitbox { width, height, offsetX, offsetY },
+        Velocity {ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y}
+    );
 
     if (registry.has<Velocity>(enemy)) {
         auto& velocity = registry.get<Velocity>(enemy);
