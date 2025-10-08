@@ -13,3 +13,4 @@ struct PlatformTag { };
 struct ProjectileTag { };
 struct WeaponTag { };
 struct PowerUpTag { };
+struct BossTag { };
