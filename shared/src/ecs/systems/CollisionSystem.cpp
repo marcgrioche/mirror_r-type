@@ -105,6 +105,11 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         return; // Player is not falling, ignore collision
     }
 
+    // If player initiated a drop-through, ignore collisions until timer ends
+    if (playerJump.dropping) {
+        return;
+    }
+
     // Check if player was above the platform in the previous frame
     float originalPlayerBottom = originalPos.y + playerHitbox.offset_y + playerHitbox.height;
     float platformTop = platformPos.y + platformHitbox.offset_y;
@@ -114,6 +119,8 @@ void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, co
         playerVel.dy = 0.0f;
         playerJump.isJumping = false;
         playerJump.canJump = true;
+        playerJump.dropping = false; // landing cancels drop-through state
+        playerJump.dropTimer = 0.f;
         float inputVel = playerVel.dx;
         playerVel.dx = 2 * platformVel.dx + inputVel;
     }
