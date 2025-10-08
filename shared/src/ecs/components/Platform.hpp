@@ -1,3 +1,5 @@
+#pragma once
+
 struct BottomPassPlatform { };
 struct NoPassPlatform { };
 

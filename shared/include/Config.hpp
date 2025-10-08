@@ -23,8 +23,14 @@ constexpr float MAX_FALL = 800.0f;
 
 // Platform system constants
 constexpr float PLATFORM_WIDTH = 120.0f;
+constexpr float PLATFORM_HEIGHT = 20.0f;
 constexpr float PLATFORM_LEVELS[] = { 200.0f, 300.0f, 400.0f, 500.0f };
 constexpr int PLATFORM_LEVELS_COUNT = 4;
+
+// PowerUp system constants
+constexpr float POWERUP_WIDTH = 20.0f;
+constexpr float POWERUP_HEIGHT = 20.0f;
+constexpr float POWERUP_LIFETIME = 30.0f;
 
 constexpr float PLATFORM_MIN_DIST_X = 200.0f;
 constexpr float PLATFORM_MAX_DIST_X = 270.0f;
