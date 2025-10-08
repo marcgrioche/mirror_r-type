@@ -17,7 +17,7 @@ void gravitySystem(Registry& registry, float deltaTime)
     auto view = registry.view<PlayerTag, Velocity, Jump, Health, Dash>();
 
     for (auto&& [player, vel, jump, health, dash] : view) {
-        if (health.hp <= 0 | dash.isDashing) {
+        if (health.hp <= 0 || dash.isDashing) {
             continue;
         }
 
