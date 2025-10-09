@@ -50,6 +50,7 @@ bool GameInstance::checkLoseCondition() const
 
 bool GameInstance::checkWinCondition() const
 {
+    checkLoseCondition();
     // Win if there are no remaining Boss-tagged entities in the registry
     // Use const-friendly storage access (view() is non-const)
     const auto* bossStorage = _registry.get_storage_if_exists<BossTag>();
@@ -134,7 +135,7 @@ void GameInstance::initializeLevel()
     // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
     // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
     // Create Boss
-    _newEntitiesThisTick.push_back(factories::createBoss(_registry, Position {700.0f, 0.0f}, Health {5}, Hitbox {300.0f, 800.0f}, Velocity {0.0f, 0.0f}));
+    _newEntitiesThisTick.push_back(factories::createBoss(_registry, Position {700.0f, 0.0f}, Health {BOSS_HEALTH}, Hitbox {BOSS_WIDTH, BOSS_HEIGHT}, Velocity {0.0f, 0.0f}));
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
