@@ -8,8 +8,8 @@
 #pragma once
 
 // Screen dimensions
-constexpr int SCREEN_WIDTH = 800;
-constexpr int SCREEN_HEIGHT = 600;
+constexpr int SCREEN_WIDTH = 1920;
+constexpr int SCREEN_HEIGHT = 1080;
 
 // Jump and gravity constants
 constexpr float JUMP_HEIGHT = 200.0f; // pixels
@@ -19,7 +19,7 @@ constexpr float FALL_MULT = 2.0f;
 constexpr float V0 = 2.0f * JUMP_HEIGHT / JUMP_TIME;
 constexpr float GRAVITY_UP = 2.0f * JUMP_HEIGHT / (JUMP_TIME * JUMP_TIME);
 constexpr float GRAVITY_DOWN = FALL_MULT * GRAVITY_UP;
-constexpr float MAX_FALL = 800.0f;
+constexpr float MAX_FALL = SCREEN_WIDTH;
 
 // Platform system constants
 constexpr float PLATFORM_WIDTH = 120.0f;
@@ -43,7 +43,7 @@ constexpr int ENEMY_HEALTH = 10;
 
 // Boss system constants
 constexpr float BOSS_WIDTH = 300.0f;
-constexpr float BOSS_HEIGHT = 800.0f;
+constexpr float BOSS_HEIGHT = SCREEN_HEIGHT;
 constexpr int BOSS_HEALTH = 500;
 
 // Projectile system constants
