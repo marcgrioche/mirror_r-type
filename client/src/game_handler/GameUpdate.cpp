@@ -20,6 +20,7 @@
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
 
 void Game::update(float deltaTime)
@@ -47,6 +48,7 @@ void Game::updateNetworkGameTick()
 {
     enemyMovement(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
@@ -66,6 +68,7 @@ void Game::updateLocalGameTick()
     powerUpEffectSystem(_registry, TICK_DURATION);
     healthSystem(_registry);
     powerUpSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
 }
 
 void Game::render()

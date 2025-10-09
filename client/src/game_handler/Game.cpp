@@ -9,6 +9,7 @@
 #include "ButtonSystem.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
 #include "managers/EventManager.hpp" // Ajoute cet include
+#include "managers/ResourceManager.hpp"
 #include <SDL.h>
 #include <iostream>
 
@@ -33,6 +34,13 @@ bool Game::initialize()
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", 800, 600)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
+    }
+
+    auto& resourceManager = ResourceManager::getInstance();
+    SDL_Renderer* renderer = _graphics.getRenderer();
+
+    if (!resourceManager.loadTexture(renderer, "player_sprite.png", "client/res/sprites/player_sprite.png")) {
+        std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
     }
 
     _timer.start();
