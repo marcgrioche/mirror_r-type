@@ -1,4 +1,5 @@
 build/*
+build-win/*
 CMakeCache.txt
 CMakeFiles/*
 cmake_install.cmake
