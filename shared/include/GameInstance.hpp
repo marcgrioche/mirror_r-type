@@ -3,30 +3,49 @@
 #include "../../shared/include/GameInputs.hpp"
 #include "../../shared/include/Message.hpp"
 #include "../../shared/src/ecs/Registry.hpp"
-#include "../../shared/src/ecs/components/Position.hpp"
-#include "../../shared/src/ecs/components/Velocity.hpp"
+#include "../../shared/src/ecs/components/Damage.hpp"
 #include "../../shared/src/ecs/components/Health.hpp"
 #include "../../shared/src/ecs/components/Hitbox.hpp"
-#include "../../shared/src/ecs/components/Player.hpp"
-#include "../../shared/src/ecs/components/Damage.hpp"
 #include "../../shared/src/ecs/components/Lifetime.hpp"
+#include "../../shared/src/ecs/components/Player.hpp"
+#include "../../shared/src/ecs/components/Position.hpp"
 #include "../../shared/src/ecs/components/PowerUp.hpp"
-#include "../../shared/src/ecs/components/Tags.hpp"
 #include "../../shared/src/ecs/components/Projectile.hpp"
+#include "../../shared/src/ecs/components/Tags.hpp"
+#include "../../shared/src/ecs/components/Velocity.hpp"
 #include "../../shared/src/ecs/systems/BoundarySystem.hpp"
-#include "../../shared/src/ecs/systems/CollisionSystem.hpp"
-#include "../../shared/src/ecs/systems/CollisionPlayerProjectileSystem.hpp"
 #include "../../shared/src/ecs/systems/CollisionEnemyProjectileSystem.hpp"
+#include "../../shared/src/ecs/systems/CollisionPlayerProjectileSystem.hpp"
+#include "../../shared/src/ecs/systems/CollisionSystem.hpp"
 #include "../../shared/src/ecs/systems/GravitySystem.hpp"
 #include "../../shared/src/ecs/systems/MovementSystem.hpp"
 #include "../../shared/src/ecs/systems/ProjectileSystem.hpp"
 #include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
+#include "components/RigidBody.hpp"
+#include "../include/Message.hpp"
+#include "Parent.hpp"
+#include "ecs/components/Dash.hpp"
+#include "ecs/components/Dead.hpp"
+#include "ecs/components/PreviousPosition.hpp"
+#include "ecs/components/Velocity.hpp"
+#include "ecs/systems/ColisionPlayerPowerUpSystem.hpp"
+#include "ecs/systems/DashSystem.hpp"
+#include "ecs/systems/FrequencyUtils.hpp"
+#include "ecs/systems/MovementSystem.hpp"
+#include "ecs/systems/PowerUpEffectSystem.hpp"
+#include "ecs/systems/PowerUpSystem.hpp"
+#include "ecs/systems/WeaponSystem.hpp"
+#include "entities/enemies/CreateEnemy.hpp"
+#include "entities/powerUp/CreatePowerUp.hpp"
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
+#include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class GameInstance {
@@ -65,6 +84,17 @@ public:
      *     std::vector<uint8_t>: Serialized spawn data, or empty if entity type not supported
      */
     Message serializeEntitySpawn(Entity entity);
+
+    /**
+     * Serialize multiple entities spawn data for SPAWN_ENTITY message.
+     *
+     * Args:
+     *     entities (const std::vector<Entity>&): The entities to serialize
+     *
+     * Returns:
+     *     Message: Serialized spawn message with count prefix
+     */
+    Message serializeEntityBatch(const std::vector<Entity>& entities);
 
     /**
      * Get newly spawned entities from this tick and clear the list.

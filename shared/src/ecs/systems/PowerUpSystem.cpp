@@ -15,16 +15,20 @@
 void powerUpSystem(Registry& registry, float deltaTime)
 {
     auto view = registry.view<PowerUpTag>();
+    std::vector<Entity> toKill;
 
-    for (auto it = view.begin(); it != view.end();) {
+    for (auto it = view.begin(); it != view.end(); ++it) {
         Entity entity = it.entity();
-        ++it;
         if (registry.has<Lifetime>(entity)) {
             auto& lifetime = registry.get<Lifetime>(entity);
             lifetime.value -= deltaTime;
             if (lifetime.value <= 0.0f) {
-                registry.kill_entity(entity);
+                toKill.push_back(entity);
             }
         }
+    }
+
+    for (auto entity : toKill) {
+        registry.kill_entity(entity);
     }
 }

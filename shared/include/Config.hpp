@@ -32,6 +32,12 @@ constexpr float POWERUP_WIDTH = 20.0f;
 constexpr float POWERUP_HEIGHT = 20.0f;
 constexpr float POWERUP_LIFETIME = 30.0f;
 
+// Enemy system constants
+constexpr float ENEMY_VELOCITY_X = -50.0f;
+constexpr float ENEMY_VELOCITY_Y = 0.0f;
+constexpr float ENEMY_WIDTH = 32.0f;
+constexpr float ENEMY_HEIGHT = 32.0f;
+
 constexpr float PLATFORM_MIN_DIST_X = 200.0f;
 constexpr float PLATFORM_MAX_DIST_X = 270.0f;
 constexpr float PLATFORM_CROSS_DIST_X = PLATFORM_WIDTH * 1.5f;
