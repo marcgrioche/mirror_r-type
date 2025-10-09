@@ -39,6 +39,11 @@ constexpr float ENEMY_WIDTH = 32.0f;
 constexpr float ENEMY_HEIGHT = 32.0f;
 constexpr int ENEMY_HEALTH = 10;
 
+// Boss system constants
+constexpr float BOSS_WIDTH = 300.0f;
+constexpr float BOSS_HEIGHT = 800.0f;
+constexpr int BOSS_HEALTH = 500;
+
 // Projectile system constants
 constexpr float PROJECTILE_VELOCITY_X = -300.0f;
 constexpr float PROJECTILE_VELOCITY_Y = 0.0f;
