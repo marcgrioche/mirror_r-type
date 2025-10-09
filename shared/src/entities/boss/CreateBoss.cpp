@@ -16,6 +16,9 @@ Entity createBoss(Registry& registry)
 Entity createBoss(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const Velocity& velocity)
 {
     Entity boss = createEnemy(registry, position, health, hitbox, velocity);
+
+    registry.emplace<BossTag>(boss);
+
     Entity enemy = factories::createEnemyTemplate(
         registry,
         Health {ENEMY_HEALTH},

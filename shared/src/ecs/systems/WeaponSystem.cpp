@@ -19,6 +19,7 @@
 #include "../../entities/projectile/CreateProjectile.hpp"
 #include "../../entities/enemies/CreateEnemy.hpp"
 #include <iostream>
+#include <algorithm>
 
 
 namespace WeaponSystem {
@@ -51,7 +52,7 @@ bool handlePlayerAttack(
         // If the weapon has a ProjectileType, add this entity type in the registry
         if (registry.has<ProjectileType>(weaponIt.entity())) {
             const Entity tpl = registry.get<ProjectileType>(weaponIt.entity()).entity;
-            const Position spawnPos { playerPos.x + 32.0f, playerPos.y + 16.0f };
+            const Position spawnPos { playerPos.x + registry.get<Hitbox>(playerEntity).width / 2, playerPos.y + registry.get<Hitbox>(playerEntity).height / 2 - registry.get<Hitbox>(tpl).height / 2};
             const Parent spawnParent { weaponIt.entity() };
 
             Entity spawned;
@@ -117,12 +118,21 @@ bool handleEnemyAttacks(
         }
         const Position& enemyPos = registry.get<Position>(owner);
 
-        // Create entity based on the weapon's ProjectileType template by cloning it
         if (registry.has<ProjectileType>(weaponIt.entity())) {
             const Entity tpl = registry.get<ProjectileType>(weaponIt.entity()).entity;
-            const Position spawnPos { enemyPos.x, enemyPos.y + rand() % (int)registry.get<Hitbox>(owner).height};
-            const Parent spawnParent { weaponIt.entity() };
+            // If the shooter is a simple enemy, the Y pos is centered
+            const Hitbox &ownerHit = registry.get<Hitbox>(owner);
+            const Hitbox &projHit = registry.get<Hitbox>(tpl);
+            Position spawnPos { enemyPos.x, enemyPos.y + ownerHit.height / 2 - projHit.height / 2 };
 
+            // If the shooter is a boss, randomize Y within the boss height
+            if (registry.has<BossTag>(owner)) {
+                int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height));
+                int offset = maxOffset > 0 ? rand() % (maxOffset + 1) : 0;
+                spawnPos.y = enemyPos.y + offset;
+            }
+            const Parent spawnParent { weaponIt.entity() };
+            
             Entity spawned;
             if (registry.has<ProjectileTag>(tpl)) {
                 Velocity vel = registry.has<Velocity>(tpl) ? registry.get<Velocity>(tpl) : Velocity { -300.0f, 0.0f };
