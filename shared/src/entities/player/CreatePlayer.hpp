@@ -10,6 +10,7 @@
 #include "components/Position.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"
+#include "Config.hpp"
 
 namespace factories {
 Entity createPlayer(Registry& registry);
