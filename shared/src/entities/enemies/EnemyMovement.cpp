@@ -11,6 +11,7 @@
 
 void enemyMovement(Registry& registry, float deltaTime)
 {
+    (void)deltaTime;
     auto view = registry.view<EnemyTag, Velocity>();
 
     for (auto&& [enemy, vel] : view) {

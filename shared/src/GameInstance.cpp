@@ -214,7 +214,7 @@ bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const st
             if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
                 dash.isDashing = true;
                 dash.remaining = dash.duration;
-                if (dash.direction.x == 0 & dash.direction.y == 0)
+                if (dash.direction.x == 0 && dash.direction.y == 0)
                     dash.direction.y = -1;
                 _stateChanged = true;
             }
