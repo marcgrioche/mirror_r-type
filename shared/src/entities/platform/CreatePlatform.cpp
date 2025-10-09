@@ -1,5 +1,5 @@
 #include "CreatePlatform.hpp"
-
+#include "Config.hpp"
 
 Entity factories::createOneWayPlatform(Registry& registry, float posx, float posy)
 {

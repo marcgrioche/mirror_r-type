@@ -26,6 +26,8 @@ constexpr float PLATFORM_WIDTH = 120.0f;
 constexpr float PLATFORM_HEIGHT = 20.0f;
 constexpr float PLATFORM_LEVELS[] = { 200.0f, 300.0f, 400.0f, 500.0f };
 constexpr int PLATFORM_LEVELS_COUNT = 4;
+constexpr int PLATFORM_VELOCITY_X = -15.0f;
+constexpr int PLATFORM_VELOCITY_Y = 0.0f;
 
 // PowerUp system constants
 constexpr float POWERUP_WIDTH = 20.0f;
@@ -37,6 +39,20 @@ constexpr float ENEMY_VELOCITY_X = -50.0f;
 constexpr float ENEMY_VELOCITY_Y = 0.0f;
 constexpr float ENEMY_WIDTH = 32.0f;
 constexpr float ENEMY_HEIGHT = 32.0f;
+constexpr int ENEMY_HEALTH = 10;
+
+// Boss system constants
+constexpr float BOSS_WIDTH = 300.0f;
+constexpr float BOSS_HEIGHT = 800.0f;
+constexpr int BOSS_HEALTH = 500;
+
+// Projectile system constants
+constexpr float PROJECTILE_VELOCITY_X = -300.0f;
+constexpr float PROJECTILE_VELOCITY_Y = 0.0f;
+constexpr float PROJECTILE_WIDTH = 25.0f;
+constexpr float PROJECTILE_HEIGHT = 25.0f;
+constexpr float PROJECTILE_DAMAGE = 5.0f;
+constexpr float PROJECTILE_LIFETIME = 30.0f;
 
 constexpr float PLATFORM_MIN_DIST_X = 200.0f;
 constexpr float PLATFORM_MAX_DIST_X = 270.0f;

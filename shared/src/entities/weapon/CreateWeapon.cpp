@@ -9,6 +9,7 @@
 #include "Damage.hpp"
 #include "Magazine.hpp"
 #include "Frequency.hpp"
+#include "ProjectileType.hpp"
 #include "Tags.hpp"
 
 Entity factories::createWeapon(Registry &registry)
@@ -21,9 +22,10 @@ Entity factories::createWeapon(Registry &registry)
     return weapon;
 }
 
-Entity factories::createWeapon(Registry &registry, Parent parent)
+Entity factories::createWeapon(Registry &registry, Parent parent, Entity projectile)
 {
     Entity weapon = createWeapon(registry);
     registry.emplace<Parent>(weapon, parent);
+    registry.emplace<ProjectileType>(weapon, projectile);
     return weapon;
 }

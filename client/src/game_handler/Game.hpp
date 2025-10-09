@@ -52,7 +52,7 @@ private:
     void initializeMenuMode();
     void processGameMode();
     void handleInputEvents(SDL_Event& event);
-    void runMenuLoop();
+    void runMenuLoop(); // Ajoute deltaTime parameter
     void runGameLoop(float deltaTime);
     void cleanupNetwork();
     void sendDisconnectMessage();
@@ -68,6 +68,13 @@ private:
     void updateLocalGameTick();
 
     // Menu handling
+    void processMenuRequests();
+    void handleMenuConnectionRequest(const std::string& connectionCode);
+    void handleMenuJoinRequest(const std::string& lobbyCode, const std::string& pseudo);
+    void handleMenuCreateRequest(const std::string& pseudo);
+    void connectToServer(const std::string& serverIp, uint16_t serverPort);
+
+    // Conserver les méthodes existantes du GameMenuHandler.cpp
     void processMenuEvents();
     void handleMenuConnectRequest();
     void handleMenuCreateLobbyRequest();
@@ -117,6 +124,9 @@ private:
     // Input handling
     std::vector<std::pair<GameInput, bool>> getCurrentInputs();
 
+    // Entity cleanup
+    void clearGameEntities();
+
     Menu m_menu;
 
     Registry _registry;
@@ -139,4 +149,10 @@ private:
     float _accumulatedTime = 0.0f;
     GameState _state = GameState::MENU;
     bool m_networkStarted = false;
+
+    // Nouvelles méthodes pour les réponses serveur
+    void onConnectionSuccess();
+    void onLobbyJoined(uint32_t lobbyId);
+    void onLobbyCreated(uint32_t lobbyId);
+    void onGameStarted();
 };

@@ -1,76 +1,70 @@
 #pragma once
-#include "../entities/button/CreateButton.hpp"
 #include "Entity.hpp"
+#include "Registry.hpp"
+#include "managers/GraphicsManager.hpp"
+#include "page/ConnectionMenu.hpp"
+#include "page/EndMenu.hpp"
+#include "page/HomeMenu.hpp"
+#include "page/JoinMenu.hpp"
+#include "page/LobbyMenu.hpp"
+#include "page/ParameterMenu.hpp"
 #include <SDL.h>
-#include <SDL_ttf.h>
-
-#include <string>
-
-class GraphicsManager;
-class Registry;
 
 class Menu {
 public:
-    enum class Page { Connect,
-        Lobby,
-        Join,
-        Start,
-        Win,
-        Lose };
+    enum class Page {
+        HOME,
+        CONNECTION,
+        JOIN_LOBBY,
+        LOBBY,
+        PARAMETERS,
+        WIN,
+        LOSE
+    };
 
-    void activate(Page page = Page::Connect);
-    void deactivate();
+    Menu();
+    ~Menu();
+
+    // Interface principale
+    void activate(Registry& registry, Page page = Page::HOME);
     void deactivate(Registry& registry);
+    bool isActive() const { return m_active; }
 
-    void handleEvent(const SDL_Event& e);
+    // Gestion des événements et rendu
+    void handleEvent(const SDL_Event& e, Registry& registry);
+    void update(Registry& registry, float deltaTime);
     void render(GraphicsManager& gfx, Registry& registry);
 
-    std::string m_inputCode;
-    void onConnected() { m_page = Page::Lobby; }
-    void onJoint()
-    {
-        m_page = Page::Join;
-        m_inputFocused = true;
-        m_inputCode.clear();
-        m_joinConfirmCreated = false;
-    }
-    void onCreated() { m_page = Page::Start; }
+    // Navigation entre pages
+    void showHomePage(Registry& registry);
+    void showConnectionPage(Registry& registry);
+    void showJoinPage(Registry& registry);
+    // void showParametersPage(Registry& registry);
+    void showWinPage(Registry& registry);
+    void showLosePage(Registry& registry);
+    void showLobbyPage(Registry& registry);
+    void showLobbyPageAfterGame(Registry& registry);
 
-    bool popConnectRequest()
-    {
-        bool v = m_requestConnect;
-        m_requestConnect = false;
-        return v;
-    }
-    bool popCreateLobbyRequest()
-    {
-        bool v = m_requestCreate;
-        m_requestCreate = false;
-        return v;
-    }
-    bool popJoinLobbyRequest()
-    {
-        bool v = m_requestJoin;
-        m_requestJoin = false;
-        return v;
-    }
-    bool popStartRequest()
-    {
-        bool v = m_requestStart;
-        m_requestStart = false;
-        return v;
-    }
+    // Récupération des données saisies
+    std::string getConnectionCode(Registry& registry) const;
+    std::string getJoinCode(Registry& registry) const;
+    std::string getUserPseudo(Registry& registry) const;
 
-    ~Menu() = default;
+    // Vérification des demandes utilisateur
+    bool hasConnectionRequest() const;
+    bool hasJoinRequest() const;
+    bool hasCreateRequest() const;
+    bool hasLobbyRequest() const;
+    bool hasEndRequest() const;
+    // bool hasParameterChanges() const;
+
+    // Nettoyage des flags de demande
+    void clearAllRequests();
+
+    // Entity management
+    void clearGameEntities(Registry& registry);
 
 private:
-    void renderConnectPage(GraphicsManager& gfx, Registry& registry);
-    void renderLobbyPage(GraphicsManager& gfx, Registry& registry);
-    void renderJoinPage(GraphicsManager& gfx, Registry& registry);
-    void renderStartPage(GraphicsManager& gfx, Registry& registry);
-    void renderWinPage(GraphicsManager& gfx, Registry& registry);
-    void renderLosePage(GraphicsManager& gfx, Registry& registry);
-
     bool m_active = false;
     Page m_currentPage = Page::HOME;
 
@@ -80,6 +74,7 @@ private:
     JoinMenu m_joinPage;
     LobbyMenu m_lobbyPage;
     EndMenuPage m_endPage;
+
     // ParameterMenu m_parameterPage;
 
     // Gestion des transitions

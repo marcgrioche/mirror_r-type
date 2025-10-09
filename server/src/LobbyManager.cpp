@@ -17,11 +17,9 @@ Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
 
 Lobby::~Lobby()
 {
-    if (threadRunning) {
-        threadRunning = false;
-        if (gameThread.joinable()) {
-            gameThread.join();
-        }
+    threadRunning = false;
+    if (gameThread.joinable()) {
+        gameThread.join();
     }
 }
 
@@ -137,6 +135,10 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
 
     for (uint32_t player : lobby->players) {
         lobby->gameInstance->addPlayer(player);
+    }
+
+    if (lobby->gameThread.joinable()) {
+        lobby->gameThread.join();
     }
 
     lobby->threadRunning = true;

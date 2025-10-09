@@ -9,7 +9,6 @@
 #include "../../../shared/src/ecs/systems/ColisionPlayerPowerUpSystem.hpp"
 #include "../../../shared/src/ecs/systems/PowerUpEffectSystem.hpp"
 #include "../../../shared/src/ecs/systems/PowerUpSystem.hpp"
-#include "../../../shared/src/entities/enemies/EnemyMovement.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
@@ -20,6 +19,7 @@
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
 
 void Game::update(float deltaTime)
@@ -45,8 +45,8 @@ void Game::updateGameTick()
 
 void Game::updateNetworkGameTick()
 {
-    enemyMovement(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
@@ -55,7 +55,6 @@ void Game::updateNetworkGameTick()
 
 void Game::updateLocalGameTick()
 {
-    enemyMovement(_registry, TICK_DURATION);
     handlePlayerInputs(_inputs, _registry);
     handleWeaponInputs(_inputs, _registry);
     gravitySystem(_registry, TICK_DURATION);
@@ -66,6 +65,7 @@ void Game::updateLocalGameTick()
     powerUpEffectSystem(_registry, TICK_DURATION);
     healthSystem(_registry);
     powerUpSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
 }
 
 void Game::render()
@@ -76,4 +76,47 @@ void Game::render()
 void Game::startGameplay()
 {
     _state = GameState::PLAYING;
+}
+
+void Game::clearGameEntities()
+{
+    std::vector<Entity> entitiesToKill;
+
+    // Collect entities with game-related tags
+    auto playerView = _registry.view<PlayerTag>();
+    for (auto it = playerView.begin(); it != playerView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    auto enemyView = _registry.view<EnemyTag>();
+    for (auto it = enemyView.begin(); it != enemyView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    auto platformView = _registry.view<PlatformTag>();
+    for (auto it = platformView.begin(); it != platformView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    auto projectileView = _registry.view<ProjectileTag>();
+    for (auto it = projectileView.begin(); it != projectileView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    auto weaponView = _registry.view<WeaponTag>();
+    for (auto it = weaponView.begin(); it != weaponView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    auto powerUpView = _registry.view<PowerUpTag>();
+    for (auto it = powerUpView.begin(); it != powerUpView.end(); ++it) {
+        entitiesToKill.push_back(it.entity());
+    }
+
+    // Kill all collected entities
+    for (const auto& entity : entitiesToKill) {
+        _registry.kill_entity(entity);
+    }
+
+    std::cout << "Cleared " << entitiesToKill.size() << " game entities from registry" << std::endl;
 }
