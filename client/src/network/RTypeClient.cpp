@@ -167,16 +167,19 @@ void RTypeClient::lobbyStartRequest()
 
 void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
 {
+    (void)t_peerInfo;
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_STATE, t_msg });
 }
 
 void RTypeClient::handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo)
 {
+    (void)t_peerInfo;
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_WIN, t_msg });
 }
 
 void RTypeClient::handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo)
 {
+    (void)t_peerInfo;
     m_eventsQueue.push(NetworkEvent { MessageType::GAME_END_LOSE, t_msg });
 }
 
