@@ -43,6 +43,7 @@ public:
     void showWinPage(Registry& registry);
     void showLosePage(Registry& registry);
     void showLobbyPage(Registry& registry);
+    void showLobbyPageAfterGame(Registry& registry);
 
     // Récupération des données saisies
     std::string getConnectionCode(Registry& registry) const;
@@ -59,6 +60,9 @@ public:
 
     // Nettoyage des flags de demande
     void clearAllRequests();
+
+    // Entity management
+    void clearGameEntities(Registry& registry);
 
 private:
     bool m_active = false;

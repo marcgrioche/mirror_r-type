@@ -113,6 +113,7 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 void Game::handleGameEndWin()
 {
     std::cout << "Game ended - You won!" << std::endl;
+    clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
         m_menu.showWinPage(_registry);
@@ -126,6 +127,7 @@ void Game::handleGameEndWin()
 void Game::handleGameEndLose()
 {
     std::cout << "Game ended - You lost!" << std::endl;
+    clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
         m_menu.showLosePage(_registry);

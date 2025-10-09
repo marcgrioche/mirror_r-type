@@ -26,6 +26,7 @@ public:
 
     // Interface simple
     void show(Registry& registry);
+    void showAfterGameEnd(Registry& registry);
     void hide(Registry& registry);
     bool isVisible() const { return m_visible; }
 
@@ -47,6 +48,7 @@ private:
     bool m_visible = false;
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;
+    bool m_isReturningFromGame = false;
 
     void createEntities(Registry& registry);
     void destroyEntities(Registry& registry);

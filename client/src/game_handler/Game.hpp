@@ -124,6 +124,9 @@ private:
     // Input handling
     std::vector<std::pair<GameInput, bool>> getCurrentInputs();
 
+    // Entity cleanup
+    void clearGameEntities();
+
     Menu m_menu;
 
     Registry _registry;

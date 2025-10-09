@@ -84,6 +84,19 @@ void Menu::showLobbyPage(Registry& registry)
     m_lobbyPage.show(registry);
 }
 
+void Menu::showLobbyPageAfterGame(Registry& registry)
+{
+    hideAllPages(registry);
+    m_currentPage = Page::LOBBY;
+    m_lobbyPage.showAfterGameEnd(registry);
+}
+
+void Menu::clearGameEntities(Registry& registry)
+{
+    // This method will be called by the Game class to clear entities
+    // Implementation is in Game::clearGameEntities()
+}
+
 // void Menu::showParametersPage(Registry& registry)
 // {
 //     hideAllPages(registry);
@@ -202,13 +215,13 @@ void Menu::processPageTransitions(Registry& registry)
     case Page::WIN:
         if (m_endPage.hasReturnRequest()) {
             m_endPage.clearConnectionRequest();
-            showLobbyPage(registry);
+            showLobbyPageAfterGame(registry);
         }
         break;
     case Page::LOSE:
         if (m_endPage.hasReturnRequest()) {
             m_endPage.clearConnectionRequest();
-            showLobbyPage(registry);
+            showLobbyPageAfterGame(registry);
         }
         break;
     default:

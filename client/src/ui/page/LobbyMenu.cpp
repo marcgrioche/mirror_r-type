@@ -26,6 +26,17 @@ void LobbyMenu::show(Registry& registry)
         createEntities(registry);
         m_visible = true;
         clearRequests();
+        m_isReturningFromGame = false;
+    }
+}
+
+void LobbyMenu::showAfterGameEnd(Registry& registry)
+{
+    if (!m_visible) {
+        createEntities(registry);
+        m_visible = true;
+        clearRequests();
+        m_isReturningFromGame = true;
     }
 }
 
