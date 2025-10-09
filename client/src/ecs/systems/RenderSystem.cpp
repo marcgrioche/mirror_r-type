@@ -6,6 +6,7 @@
 */
 
 #include "RenderSystem.hpp"
+#include "ParallaxBackgroundSystem.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
@@ -27,6 +28,8 @@ void renderSystem(Registry& registry)
     auto& resourceManager = ResourceManager::getInstance();
 
     graphics.clear(20, 30, 50, 255);
+
+    parallaxBackgroundSystem(registry);
 
     auto spriteView = registry.view<Sprite, Position>();
     for (auto it = spriteView.begin(); it != spriteView.end(); ++it) {

@@ -76,7 +76,7 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         Hitbox { width, height, offsetX, offsetY });
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
-    SpriteManager::addPlayerSprite(registry, entity, posX, posY, 2.0f);
+    SpriteManager::addPlayerSprite(registry, entity, posX, posY, 1.5f);
 }
 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,

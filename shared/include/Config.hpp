@@ -26,6 +26,8 @@ constexpr float PLATFORM_WIDTH = 120.0f;
 constexpr float PLATFORM_HEIGHT = 20.0f;
 constexpr float PLATFORM_LEVELS[] = { 200.0f, 300.0f, 400.0f, 500.0f };
 constexpr int PLATFORM_LEVELS_COUNT = 4;
+constexpr int PLATFORM_VELOCITY_X = -15.0f;
+constexpr int PLATFORM_VELOCITY_Y = 0.0f;
 
 // PowerUp system constants
 constexpr float POWERUP_WIDTH = 20.0f;
