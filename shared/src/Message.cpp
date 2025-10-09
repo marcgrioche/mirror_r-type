@@ -36,6 +36,16 @@ Message::Message(MessageType type, const std::vector<uint8_t>& payload, uint16_t
 {
 }
 
+Message::Message(const Message& other)
+    : sequence_number(other.sequence_number)
+    , player_id(other.player_id)
+    , version(other.version)
+    , type(other.type)
+    , payload(other.payload)
+    , readPos(0)
+{
+}
+
 void Message::write(uint8_t value)
 {
     payload.push_back(value);
@@ -85,16 +95,16 @@ void Message::write(const std::vector<uint8_t>& data)
 
 uint8_t Message::readU8() const
 {
-    if (readPos >= payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(sizeof(uint8_t))) {
+        throw std::runtime_error("Read beyond message bounds: trying to read uint8_t, " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     return payload[readPos++];
 }
 
 uint16_t Message::readU16() const
 {
-    if (readPos + sizeof(uint16_t) > payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(sizeof(uint16_t))) {
+        throw std::runtime_error("Read beyond message bounds: trying to read uint16_t, " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     uint16_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
@@ -104,8 +114,8 @@ uint16_t Message::readU16() const
 
 uint32_t Message::readU32() const
 {
-    if (readPos + sizeof(uint32_t) > payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(sizeof(uint32_t))) {
+        throw std::runtime_error("Read beyond message bounds: trying to read uint32_t, " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     uint32_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
@@ -115,8 +125,8 @@ uint32_t Message::readU32() const
 
 uint64_t Message::readU64() const
 {
-    if (readPos + sizeof(uint64_t) > payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(sizeof(uint64_t))) {
+        throw std::runtime_error("Read beyond message bounds: trying to read uint64_t, " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     uint64_t value;
     std::memcpy(&value, &payload[readPos], sizeof(value));
@@ -134,8 +144,8 @@ float Message::readFloat() const
 
 std::string Message::readString(uint8_t length) const
 {
-    if (readPos + length > payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(length)) {
+        throw std::runtime_error("Read beyond message bounds: trying to read string of length " + std::to_string(length) + ", " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     std::string value(payload.begin() + readPos, payload.begin() + readPos + length);
     readPos += length;
@@ -144,8 +154,8 @@ std::string Message::readString(uint8_t length) const
 
 std::vector<uint8_t> Message::readBytes(size_t length) const
 {
-    if (readPos + length > payload.size()) {
-        throw std::runtime_error("Read beyond message bounds");
+    if (!canRead(length)) {
+        throw std::runtime_error("Read beyond message bounds: trying to read " + std::to_string(length) + " bytes, " + std::to_string(remainingBytes()) + " bytes remaining");
     }
     std::vector<uint8_t> data(payload.begin() + readPos, payload.begin() + readPos + length);
     readPos += length;
