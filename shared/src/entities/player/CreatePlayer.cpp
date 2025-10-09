@@ -6,12 +6,15 @@
 */
 #include "CreatePlayer.hpp"
 #include "../weapon/CreateWeapon.hpp"
+#include "../projectile/CreateProjectile.hpp"
 #include "components/Position.hpp"
 #include "components/PreviousPosition.hpp"
 #include "components/Velocity.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Jump.hpp"
+#include "components/Damage.hpp"
+#include "components/Lifetime.hpp"
 #include "components/Dead.hpp"
 #include "components/Dash.hpp"
 #include "components/PowerUp.hpp"
@@ -33,7 +36,13 @@ Entity createPlayer(Registry& registry)
     registry.emplace<PowerUp>(player);
     registry.emplace<PlayerTag>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
-    createWeapon(registry, Parent { player });
+    Entity projectile = factories::createProjectileTemplate(
+        registry,
+        Velocity {-PROJECTILE_VELOCITY_X, PROJECTILE_VELOCITY_Y},
+        Damage {PROJECTILE_DAMAGE},
+        Hitbox {PROJECTILE_WIDTH, PROJECTILE_HEIGHT}
+    );
+    createWeapon(registry, Parent { player }, projectile);
     return player;
 }
 
@@ -50,7 +59,13 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Dash>(player, Dash{});
     registry.add<PlayerTag>(player, PlayerTag {});
     registry.emplace<PowerUp>(player);
-    createWeapon(registry, Parent { player });
+     Entity projectile = factories::createProjectileTemplate(
+        registry,
+        Velocity {-PROJECTILE_VELOCITY_X, PROJECTILE_VELOCITY_Y},
+        Damage {PROJECTILE_DAMAGE},
+        Hitbox {PROJECTILE_WIDTH, PROJECTILE_HEIGHT}
+    );
+    createWeapon(registry, Parent { player }, projectile);
     return player;
 }
 }

@@ -14,5 +14,5 @@
 //always a parent so they can be turrets
 namespace factories {
     Entity createWeapon(Registry &registry);
-    Entity createWeapon(Registry &registry, Parent parent);
+    Entity createWeapon(Registry &registry, Parent parent, Entity projectile);
 }

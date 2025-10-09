@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include "../enemies/CreateEnemy.hpp"
 #include "../../ecs/systems/FrequencyUtils.hpp"
 #include "../components/Frequency.hpp"
 #include "../weapon/CreateWeapon.hpp"
@@ -26,5 +27,5 @@
 
 namespace factories {
 Entity createBoss(Registry& registry);
-Entity createBoss(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
+Entity createBoss(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const Velocity& velocity);
 }

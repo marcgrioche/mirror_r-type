@@ -22,6 +22,7 @@
 #include "Config.hpp"
 #include "components/Position.hpp"
 #include "../weapon/CreateWeapon.hpp"
+#include "../projectile/CreateProjectile.hpp"
 #include "components/Position.hpp"
 #include "components/PreviousPosition.hpp"
 #include "components/Velocity.hpp"
@@ -37,4 +38,7 @@
 namespace factories {
 Entity createEnemy(Registry& registry);
 Entity createEnemy(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const Velocity& velocity);
+
+// Blueprint-only enemy used as a template for spawners/weapons (no Position/Weapon)
+Entity createEnemyTemplate(Registry& registry, const Health& health, const Hitbox& hitbox, const Velocity& velocity);
 }

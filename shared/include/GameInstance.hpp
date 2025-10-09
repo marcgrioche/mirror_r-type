@@ -38,6 +38,7 @@
 #include "ecs/systems/PowerUpSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
+#include "entities/boss/CreateBoss.hpp"
 #include "entities/powerUp/CreatePowerUp.hpp"
 #include <chrono>
 #include <cstdint>

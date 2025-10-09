@@ -37,6 +37,15 @@ constexpr float ENEMY_VELOCITY_X = -50.0f;
 constexpr float ENEMY_VELOCITY_Y = 0.0f;
 constexpr float ENEMY_WIDTH = 32.0f;
 constexpr float ENEMY_HEIGHT = 32.0f;
+constexpr int ENEMY_HEALTH = 10;
+
+// Projectile system constants
+constexpr float PROJECTILE_VELOCITY_X = -300.0f;
+constexpr float PROJECTILE_VELOCITY_Y = 0.0f;
+constexpr float PROJECTILE_WIDTH = 25.0f;
+constexpr float PROJECTILE_HEIGHT = 25.0f;
+constexpr float PROJECTILE_DAMAGE = 5.0f;
+constexpr float PROJECTILE_LIFETIME = 30.0f;
 
 constexpr float PLATFORM_MIN_DIST_X = 200.0f;
 constexpr float PLATFORM_MAX_DIST_X = 270.0f;

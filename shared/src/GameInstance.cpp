@@ -122,11 +122,13 @@ void GameInstance::initializeLevel()
 {
     auto platformList = factories::generateRandomPlatforms(_registry, 8);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 300.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 300.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // Create Boss
+    _newEntitiesThisTick.push_back(factories::createBoss(_registry, Position {700.0f, 0.0f}, Health {500}, Hitbox {300.0f, 800.0f}, Velocity {0.0f, 0.0f}));
 }
 
 void GameInstance::addPlayer(uint32_t playerId)
