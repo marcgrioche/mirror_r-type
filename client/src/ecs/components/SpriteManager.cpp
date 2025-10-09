@@ -26,17 +26,50 @@ void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float pos
     const float SPRITE_WIDTH = 623.0f;
     const float SPRITE_HEIGHT = 623.0f;
 
-    float scale = (hitbox.width < hitbox.height) ? hitbox.width / SPRITE_WIDTH : hitbox.height / SPRITE_HEIGHT;
+    float scale_x = hitbox.width / SPRITE_WIDTH;
+    float scale_y = hitbox.height / SPRITE_HEIGHT;
 
-    float rendered_width = SPRITE_WIDTH * scale;
-    float rendered_height = SPRITE_HEIGHT * scale;
+    float rendered_width = SPRITE_WIDTH * scale_x;
+    float rendered_height = SPRITE_HEIGHT * scale_y;
     float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createStaticSprite(
         "player_sprite.png", // texture ID
         0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect (x, y, w, h) - full image
-        scale, // scale to fit hitbox
+        scale_x, scale_y, // separate scales for exact hitbox matching
+        offset_x, offset_y // offset to center on entity
+    );
+
+    registry.add<Sprite>(entity, sprite);
+}
+
+void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float posX, float posY)
+{
+    (void)posX; // Unused parameter, kept for API compatibility
+    (void)posY; // Unused parameter, kept for API compatibility
+
+    if (!registry.has<Hitbox>(entity)) {
+        return; // Cannot add sprite without hitbox
+    }
+
+    Hitbox& hitbox = registry.get<Hitbox>(entity);
+
+    const float SPRITE_WIDTH = 420.0f;
+    const float SPRITE_HEIGHT = 190.0f;
+
+    float scale_x = hitbox.width / SPRITE_WIDTH;
+    float scale_y = hitbox.height / SPRITE_HEIGHT;
+
+    float rendered_width = SPRITE_WIDTH * scale_x;
+    float rendered_height = SPRITE_HEIGHT * scale_y;
+    float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
+    float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+
+    Sprite sprite = SpriteFactory::createStaticSprite(
+        "WallOfFlesh.png", // texture ID
+        0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect (x, y, w, h) - full image
+        scale_x, scale_y, // separate scales for exact hitbox matching
         offset_x, offset_y // offset to center on entity
     );
 
@@ -60,10 +93,12 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
     const int TOTAL_FRAMES = 7;
     const float FRAME_DURATION = 0.1f; // 100ms per frame
 
-    float scale = (hitbox.width < hitbox.height) ? hitbox.width / FRAME_WIDTH : hitbox.height / FRAME_HEIGHT;
+    // Calculate separate scales for exact hitbox matching (may distort aspect ratio)
+    float scale_x = hitbox.width / FRAME_WIDTH;
+    float scale_y = hitbox.height / FRAME_HEIGHT;
 
-    float rendered_width = FRAME_WIDTH * scale;
-    float rendered_height = FRAME_HEIGHT * scale;
+    float rendered_width = FRAME_WIDTH * scale_x;
+    float rendered_height = FRAME_HEIGHT * scale_y;
     float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
@@ -71,7 +106,7 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
         "eye_spritesheet.png", // texture ID
         FRAME_WIDTH, FRAME_HEIGHT, // frame dimensions
         TOTAL_FRAMES, FRAME_DURATION, // animation parameters
-        scale, // scale to fit hitbox
+        scale_x, scale_y, // separate scales for exact hitbox matching
         offset_x, offset_y // offset to center on entity
     );
 

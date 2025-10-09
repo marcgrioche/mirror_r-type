@@ -123,6 +123,7 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
         posY);
 
     registry.add<ServerEntityId>(platform, ServerEntityId { entityId });
+    SpriteManager::addPlatformSprite(registry, platform, posX, posY);
 }
 
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,

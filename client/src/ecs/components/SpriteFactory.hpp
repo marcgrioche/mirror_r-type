@@ -13,12 +13,12 @@ class SpriteFactory {
 public:
     static Sprite createStaticSprite(const std::string& textureId,
         int x, int y, int width, int height,
-        float scale = 1.0f, int offsetX = 0, int offsetY = 0);
+        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0);
 
     static Sprite createAnimatedSprite(const std::string& textureId,
         int frameWidth, int frameHeight,
         int totalFrames, float frameDuration = 0.1f,
-        float scale = 1.0f, int offsetX = 0, int offsetY = 0);
+        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0);
 
     static Sprite createCustomSprite(const std::string& textureId,
         SDL_Rect srcRect, SDL_Rect dstRect,

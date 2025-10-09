@@ -28,4 +28,13 @@ void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY);
  * @param posY Entity Y position (unused, for future compatibility)
  */
 void addProjectileSprite(Registry& registry, Entity entity, float posX, float posY);
+
+/**
+ * @brief Adds a static sprite component to a platform entity, automatically sizing and centering it
+ * @param registry The ECS registry
+ * @param entity The entity to add the sprite to
+ * @param posX Entity X position (unused, for future compatibility)
+ * @param posY Entity Y position (unused, for future compatibility)
+ */
+void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY);
 } // namespace SpriteManager

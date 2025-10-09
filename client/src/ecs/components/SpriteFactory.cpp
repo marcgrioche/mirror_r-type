@@ -9,7 +9,7 @@
 
 Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
     int x, int y, int width, int height,
-    float scale, int offsetX, int offsetY)
+    float scaleX, float scaleY, int offsetX, int offsetY)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
@@ -17,7 +17,9 @@ Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
     sprite.dstRect = { 0, 0, width, height };
     sprite.offset_x = offsetX;
     sprite.offset_y = offsetY;
-    sprite.scale = scale;
+    sprite.scale = scaleX;
+    sprite.scale_x = scaleX;
+    sprite.scale_y = scaleY;
     sprite.rotation = 0.0f;
 
     sprite.total_frames = 1;
@@ -33,7 +35,7 @@ Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
 Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     int frameWidth, int frameHeight,
     int totalFrames, float frameDuration,
-    float scale, int offsetX, int offsetY)
+    float scaleX, float scaleY, int offsetX, int offsetY)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
@@ -41,7 +43,9 @@ Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     sprite.dstRect = { 0, 0, frameWidth, frameHeight };
     sprite.offset_x = offsetX;
     sprite.offset_y = offsetY;
-    sprite.scale = scale;
+    sprite.scale = scaleX;
+    sprite.scale_x = scaleX;
+    sprite.scale_y = scaleY; // Independent Y scaling
     sprite.rotation = 0.0f;
 
     sprite.total_frames = totalFrames;

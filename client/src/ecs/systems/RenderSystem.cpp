@@ -39,15 +39,15 @@ void renderSystem(Registry& registry)
         SDL_Rect dstRect = {
             static_cast<int>(pos.x + sprite.offset_x),
             static_cast<int>(pos.y + sprite.offset_y),
-            static_cast<int>(sprite.dstRect.w * sprite.scale),
-            static_cast<int>(sprite.dstRect.h * sprite.scale)
+            static_cast<int>(sprite.dstRect.w * sprite.scale_x),
+            static_cast<int>(sprite.dstRect.h * sprite.scale_y)
         };
 
         if (dstRect.w == 0) {
-            dstRect.w = static_cast<int>(sprite.srcRect.w * sprite.scale);
+            dstRect.w = static_cast<int>(sprite.srcRect.w * sprite.scale_x);
         }
         if (dstRect.h == 0) {
-            dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale);
+            dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale_y);
         }
 
         if (texture) {
