@@ -156,7 +156,7 @@ bool handleEnemyAttacks(
 
             if (registry.has<BossTag>(owner)) {
                 int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height));
-                int offset = maxOffset > 0 ? rand() % (maxOffset + 1) : 0;
+                int offset = maxOffset > 0 ? rand() % maxOffset : 0;
                 spawnPos.y = enemyPos.y + offset;
             }
             const Parent spawnParent { weaponEntity };

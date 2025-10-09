@@ -10,6 +10,7 @@
 #include "components/ParallaxState.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/ResourceManager.hpp"
+#include "Config.hpp"
 #include <SDL.h>
 #include <iostream>
 
@@ -58,7 +59,7 @@ void parallaxBackgroundSystem(Registry& registry)
         SDL_QueryTexture(texture, nullptr, nullptr, &textureWidth, &textureHeight);
 
         // Calculate how many tiles we need to cover the screen
-        int screenWidth = 800; // Should get from GraphicsManager
+        int screenWidth = SCREEN_WIDTH; // Should get from GraphicsManager
         int tilesNeeded = (screenWidth / textureWidth) + 2; // +2 for seamless scrolling
 
         // Render tiled background
@@ -74,7 +75,7 @@ void parallaxBackgroundSystem(Registry& registry)
                 x,
                 0, // Background starts at top
                 textureWidth,
-                600 // Screen height
+                SCREEN_HEIGHT // Screen height
             };
 
             SDL_Rect srcRect = {

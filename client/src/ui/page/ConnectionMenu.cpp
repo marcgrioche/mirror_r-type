@@ -12,6 +12,7 @@
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
+#include "Config.hpp"
 #include <iostream>
 
 ConnectionMenu::ConnectionMenu()
@@ -94,7 +95,7 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
 
     // Ajoute un fond comme dans les autres menus
     SDL_SetRenderDrawColor(renderer, 20, 25, 40, 255); // Fond sombre
-    SDL_Rect fullBg = { 0, 0, 800, 600 };
+    SDL_Rect fullBg = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &fullBg);
 
     // Boîte du menu

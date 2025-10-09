@@ -12,6 +12,7 @@
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
+#include "Config.hpp"
 #include <iostream>
 
 HomeMenu::HomeMenu()
@@ -109,7 +110,7 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
 
     // Fond complet pour le menu principal
     SDL_SetRenderDrawColor(renderer, 15, 20, 35, 255);
-    SDL_Rect fullBg = { 0, 0, 800, 600 };
+    SDL_Rect fullBg = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &fullBg);
 
     // Rendu des composants

@@ -12,6 +12,7 @@
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
 #include <SDL.h>
+#include "Config.hpp"
 #include <iostream>
 
 Game::Game(bool isLocalMode, uint16_t clientPort)
@@ -32,7 +33,7 @@ Game::~Game()
 
 bool Game::initialize()
 {
-    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", 800, 600)) {
+    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", SCREEN_WIDTH, SCREEN_HEIGHT)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
