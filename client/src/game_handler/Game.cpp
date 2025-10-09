@@ -43,6 +43,10 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "eye_spritesheet.png", "client/res/sprites/eye_spritesheet.png")) {
+        std::cout << "Warning: Failed to load eye spritesheet texture - using fallback rectangles" << std::endl;
+    }
+
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;

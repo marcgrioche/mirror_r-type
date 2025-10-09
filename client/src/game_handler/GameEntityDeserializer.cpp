@@ -103,6 +103,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 
     registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
+    SpriteManager::addProjectileSprite(registry, projectile, posX, posY);
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
