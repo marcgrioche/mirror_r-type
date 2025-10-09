@@ -5,7 +5,11 @@ Entity factories::createOneWayPlatform(Registry& registry, float posx, float pos
 {
     Entity platform = registry.create_entity();
     registry.emplace<Position>(platform, Position { posx, posy });
-    registry.emplace<Velocity>(platform, -10.0f, 0.0f);
+    registry.emplace<Velocity>(
+        platform,
+        static_cast<float>(PLATFORM_VELOCITY_X),
+        static_cast<float>(PLATFORM_VELOCITY_Y)
+    );
     registry.emplace<Hitbox>(platform, Hitbox { 120, 20, 0, 0 });
     registry.emplace<PlatformTag>(platform);
     registry.emplace<BottomPassPlatform>(platform);
@@ -17,7 +21,11 @@ Entity factories::createPlatform(Registry& registry, float posx, float posy)
 {
     Entity platform = registry.create_entity();
     registry.emplace<Position>(platform, Position { posx, posy });
-    registry.emplace<Velocity>(platform, -10.0f, 0.0f);
+    registry.emplace<Velocity>(
+        platform,
+        static_cast<float>(PLATFORM_VELOCITY_X),
+        static_cast<float>(PLATFORM_VELOCITY_Y)
+    );
     registry.emplace<Hitbox>(platform, Hitbox { 120, 20, 0, 0 });
     registry.emplace<PlatformTag>(platform);
     registry.emplace<NoPassPlatform>(platform);

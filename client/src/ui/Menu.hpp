@@ -72,37 +72,17 @@ private:
     void renderLosePage(GraphicsManager& gfx, Registry& registry);
 
     bool m_active = false;
-    Page m_page = Page::Connect;
+    Page m_currentPage = Page::HOME;
 
-    bool m_inputFocused = true;
-    SDL_Rect m_inputRect { 800 / 2 - 200, 600 / 2 - 80, 400, 50 };
-    SDL_Rect m_connectBtnRect { 800 / 2 - 100, 600 / 2 + 0, 200, 60 };
-    Entity m_joinServerButton {};
-    bool m_joinButtonCreated = false;
-    bool m_requestConnect = false;
+    // Pages modulaires
+    HomeMenu m_homePage;
+    ConnectionMenu m_connectionPage;
+    JoinMenu m_joinPage;
+    LobbyMenu m_lobbyPage;
+    EndMenuPage m_endPage;
+    // ParameterMenu m_parameterPage;
 
-    SDL_Rect m_createBtnRect { 800 / 2 - 220, 600 / 2 - 30, 200, 60 };
-    SDL_Rect m_joinBtnRect { 800 / 2 + 20, 600 / 2 - 30, 200, 60 };
-    Entity m_createLobbyButton {};
-    Entity m_joinLobbyButton {};
-    bool m_lobbyButtonsCreated = false;
-    bool m_requestCreate = false;
-    bool m_requestJoin = false;
-    bool m_requestStart = false;
-
-    Entity m_joinConfirmButton {};
-    bool m_joinConfirmCreated = false;
-
-    SDL_Rect m_startBtnRect { 800 / 2 - 100, 600 / 2 - 30, 200, 60 };
-    Entity m_startButton {};
-    bool m_startButtonCreated = false;
-
-    TTF_Font* m_font = nullptr;
-    int m_fontSize = 22;
-    SDL_Color m_textColor { 240, 240, 255, 255 };
-
-    void ensureFont();
-    std::string findFontPath() const;
-    void renderInputText(SDL_Renderer* renderer);
-    void renderTextCentered(SDL_Renderer* renderer, const SDL_Rect& rect, const std::string& text, SDL_Color color);
+    // Gestion des transitions
+    void hideAllPages(Registry& registry);
+    void processPageTransitions(Registry& registry);
 };

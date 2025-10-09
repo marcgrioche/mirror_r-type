@@ -6,6 +6,8 @@ cmake_install.cmake
 Makefile
 *.cmake
 *.o
+out/
+.vs/
 *.obj
 *.exe
 *.dll
