@@ -5,10 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Sep 29 1:02:08 PM 2025 jojo
-** Last update Tue Sep 29 1:02:11 PM 2025 jojo
+** Last update Wed Oct 7 7:44:27 PM 2025 jojo
 */
 
 #pragma once
+#include "Color.hpp"
 #include <string>
 
 // Component bouton
@@ -17,4 +18,6 @@ struct Button {
     bool is_hovered = false;
     bool was_pressed = false;
     bool interactable = true;
+    Color bg = (Color) { 255, 255, 255, 255 };
+    Color border = (Color) { 0, 0, 0, 0 };
 };

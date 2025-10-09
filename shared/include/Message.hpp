@@ -54,6 +54,7 @@ public:
 
     Message(MessageType type, uint16_t seq = 0, uint32_t pid = 0, uint8_t ver = 1);
     Message(MessageType type, const std::vector<uint8_t>& payload, uint16_t seq = 0, uint32_t pid = 0, uint8_t ver = 1);
+    Message(const Message& other);
 
     void write(uint8_t value);
     void write(uint16_t value);
@@ -80,6 +81,10 @@ public:
     const std::vector<uint8_t>& getPayload() const { return payload; }
     size_t getReadPosition() const { return readPos; }
     void resetReadPosition() { readPos = 0; }
+
+    bool canRead(size_t bytes) const { return readPos + bytes <= payload.size(); }
+    size_t remainingBytes() const { return payload.size() - readPos; }
+    bool isValid() const { return payload.size() >= readPos; }
 
 private:
     MessageType type;

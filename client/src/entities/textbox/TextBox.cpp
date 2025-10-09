@@ -1,0 +1,30 @@
+/*
+** TextBox.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/entities/textbox
+**
+** Made by jojo
+** Login   <jojo>
+**
+** Started on  Wed Oct 1 11:03:28 AM 2025 jojo
+** Last update Thu Oct 8 2:35:44 PM 2025 jojo
+*/
+
+#include "TextBox.hpp"
+#include "Position.hpp"
+#include "TextBox.hpp"
+
+namespace factories {
+
+Entity createTextBox(Registry& registry, const std::string& text,
+    float x, float y, int fontSize, Color color, TextBox::Alignment alignement)
+{
+    Entity textBox = registry.create_entity();
+
+    registry.emplace<Position>(textBox, x, y);
+    registry.emplace<TextBox>(textBox, text, fontSize, color,
+        "client/res/fonts/OpenSans-Medium.ttf", true,
+        alignement);
+
+    return textBox;
+}
+
+}

@@ -7,6 +7,8 @@
 
 #include "Game.hpp"
 #include "ButtonSystem.hpp"
+#include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
+#include "managers/EventManager.hpp" // Ajoute cet include
 #include <SDL.h>
 #include <iostream>
 
@@ -64,7 +66,7 @@ void Game::initializeLocalMode()
 void Game::initializeMenuMode()
 {
     _state = GameState::MENU;
-    m_menu.activate(Menu::Page::Connect);
+    m_menu.activate(_registry, Menu::Page::CONNECTION); // Change Connect -> HOME pour commencer par la page d'accueil
 }
 
 void Game::run()
@@ -113,16 +115,31 @@ void Game::handleInputEvents(SDL_Event& event)
     while (SDL_PollEvent(&event)) {
         _inputs.handleSDLEvent(event);
         if (_state == GameState::MENU) {
-            m_menu.handleEvent(event);
+            m_menu.handleEvent(event, _registry); // Passe registry
         }
     }
 }
 
 void Game::runMenuLoop()
 {
-    processMenuEvents();
+    // Traite les événements du nouveau système de menu
+    processMenuEvents(); // Utilise la version adaptée
+
+    // Met à jour et rendu du menu
+    m_menu.update(_registry, _timer.getDeltaTime()); // Passe registry et deltaTime
     buttonSystem(_registry);
-    m_menu.render(_graphics, _registry);
+
+    // Traitement des événements
+    EventManager::getInstance().processEvents();
+
+    // Rendu
+    _graphics.clear(0, 0, 0, 255);
+    m_menu.render(_graphics, _registry); // Passe registry
+    _graphics.present();
+
+    // Nettoie les événements pour la frame suivante
+    EventManager::getInstance().clear();
+
     SDL_Delay(16);
 }
 
@@ -168,4 +185,89 @@ void Game::sendDisconnectMessage()
     } catch (const std::exception& e) {
         std::cerr << "Failed to send disconnect message: " << e.what() << std::endl;
     }
+}
+
+void Game::processMenuRequests()
+{
+    // Vérifie les demandes de connexion
+    if (m_menu.hasConnectionRequest()) {
+        std::string connectionCode = m_menu.getConnectionCode(_registry);
+        handleMenuConnectionRequest(connectionCode);
+        m_menu.clearAllRequests();
+    }
+
+    // Vérifie les demandes de rejoindre un lobby
+    if (m_menu.hasJoinRequest()) {
+        std::string lobbyCode = m_menu.getJoinCode(_registry);
+        std::string pseudo = m_menu.getUserPseudo(_registry);
+        handleMenuJoinRequest(lobbyCode, pseudo);
+        m_menu.clearAllRequests();
+    }
+
+    // Vérifie les demandes de création de lobby
+    if (m_menu.hasCreateRequest()) {
+        std::string pseudo = m_menu.getUserPseudo(_registry);
+        handleMenuCreateRequest(pseudo);
+        m_menu.clearAllRequests();
+    }
+}
+
+void Game::handleMenuConnectionRequest(const std::string& connectionCode)
+{
+    if (connectionCode.empty()) {
+        std::cout << "Please enter a connection code" << std::endl;
+        return;
+    }
+
+    // Decode IP and port (utilise la logique existante de GameMenuHandler.cpp)
+    std::string ip;
+    int port;
+    decodeIp(connectionCode, ip, port);
+    ip = ip.empty() ? "127.0.0.1" : ip;
+    port = (port == 0) ? 4242 : port;
+
+    connectToServer(ip, port);
+}
+
+void Game::handleMenuJoinRequest(const std::string& lobbyCode, const std::string& pseudo)
+{
+    if (!m_clientNetwork) {
+        std::cout << "ERROR: Not connected to server. Use Connect first." << std::endl;
+        return;
+    }
+
+    if (lobbyCode.empty()) {
+        std::cout << "Please enter a lobby code" << std::endl;
+        return;
+    }
+
+    try {
+        uint32_t lobbyId = static_cast<uint32_t>(std::stoul(lobbyCode));
+        m_clientNetwork->joinLobbyRequest(lobbyId);
+        std::cout << "Joining lobby " << lobbyId << " as " << pseudo << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "ERROR: Invalid lobby code: " << lobbyCode << std::endl;
+    }
+}
+
+void Game::handleMenuCreateRequest(const std::string& pseudo)
+{
+    if (!m_clientNetwork) {
+        std::cout << "ERROR: Not connected to server. Use Connect first." << std::endl;
+        return;
+    }
+
+    m_clientNetwork->createLobbyRequest();
+    std::cout << "Creating lobby as " << pseudo << std::endl;
+}
+
+void Game::connectToServer(const std::string& serverIp, uint16_t serverPort)
+{
+    std::cout << "Connecting to " << serverIp << ":" << serverPort << std::endl;
+
+    m_clientNetwork = std::make_unique<Client::RTypeClient>(serverIp, serverPort, m_clientPort, m_events);
+    m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
+    m_clientNetwork->connectToServerRequest();
+
+    // Optionnel: changer vers une page "connecting" ou garder le menu
 }

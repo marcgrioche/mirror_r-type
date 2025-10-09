@@ -5,15 +5,16 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Sep 29 1:26:02 PM 2025 jojo
-** Last update Tue Sep 29 1:26:04 PM 2025 jojo
+** Last update Wed Oct 7 3:13:55 PM 2025 jojo
 */
 
 #include "ButtonSystem.hpp"
 #include "../../managers/EventManager.hpp"
 #include "components/Button.hpp"
-#include "components/Position.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Position.hpp"
 #include <SDL2/SDL.h>
+#include <algorithm>
 
 void buttonSystem(Registry& registry)
 {
@@ -34,7 +35,7 @@ void buttonSystem(Registry& registry)
     auto& eventMgr = EventManager::getInstance();
 
     auto view = registry.view<Button, Position, Hitbox>();
-    
+
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity e = it.entity();
 
