@@ -51,6 +51,10 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "bydo_flying.png", "client/res/sprites/bydo_flying.png")) {
+        std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
+    }
+
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;

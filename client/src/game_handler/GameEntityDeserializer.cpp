@@ -76,7 +76,7 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         Hitbox { width, height, offsetX, offsetY });
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
-    SpriteManager::addPlayerSprite(registry, entity, posX, posY);
+    SpriteManager::addPlayerSprite(registry, entity, posX, posY, 2.0f);
 }
 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
@@ -103,7 +103,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 
     registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
-    SpriteManager::addProjectileSprite(registry, projectile, posX, posY);
+    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, 1.5f);
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
@@ -151,6 +151,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
+    SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
