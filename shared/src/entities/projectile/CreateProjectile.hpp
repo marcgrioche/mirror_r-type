@@ -25,4 +25,12 @@ Entity createProjectile(Registry& registry,
     const Hitbox& hitbox,
     const Parent& parent,
     const Lifetime& lifetime);
+
+// Lightweight blueprint entity used only as a template (no Position/Lifetime)
+// so it's not processed by gameplay systems (movement/lifetime) and won't expire.
+Entity createProjectileTemplate(
+    Registry& registry,
+    const Velocity& velocity,
+    const Damage& damage,
+    const Hitbox& hitbox);
 }

@@ -44,13 +44,15 @@ void collisionEnemyProjectileSystem(Registry& registry, float)
                 Entity weaponEntity = registry.get<Parent>(projE).parent;
                 if (registry.has<Parent>(weaponEntity)) {
                     Entity ownerEntity = registry.get<Parent>(weaponEntity).parent;
-                    if (ownerEntity.id == EnE.id)
-                    continue;
+                    if (ownerEntity.id == EnE.id || registry.has<EnemyTag>(ownerEntity))
+                        continue;
                 }
             }
             
             if (entities_collide(registry, projE, EnE)) {
-                if (registry.has<Health>(EnE) && registry.has<Damage>(projE)) {
+                if (registry.has<Health>(EnE) && registry.has<Damage>(projE) &&
+                    registry.has<Parent>(projE) /*&& registry.has<PlayerTag>(registry.get<Parent>(projE).parent)*/) {
+
                     Health& h = registry.get<Health>(EnE);
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);

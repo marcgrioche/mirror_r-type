@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include "Config.hpp"
 #include "Registry.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"

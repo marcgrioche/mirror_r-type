@@ -13,6 +13,9 @@
 #include "ecs/components/Position.hpp"
 #include "ecs/components/PowerUp.hpp"
 #include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/Sprite.hpp"
+#include "ecs/components/SpriteFactory.hpp"
+#include "ecs/components/SpriteManager.hpp"
 #include "ecs/components/Velocity.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
@@ -78,18 +81,7 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         TextBox { username, 10 });
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
-    addPlayerSprite(registry, entity, posX, posY);
-}
-
-void Game::addPlayerSprite(Registry& registry, Entity entity, float posX, float posY)
-{
-    Sprite sprite;
-    sprite.texture_id = "player_sprite.png";
-    sprite.frame_width = 32;
-    sprite.frame_height = 32;
-    sprite.srcRect = { 0, 0, 32, 32 };
-    sprite.dstRect = { static_cast<int>(posX), static_cast<int>(posY), 32, 32 };
-    registry.add<Sprite>(entity, sprite);
+    SpriteManager::addPlayerSprite(registry, entity, posX, posY, 1.5f);
 }
 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
@@ -116,6 +108,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 
     registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
+    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, 1.5f);
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
@@ -135,6 +128,7 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
         posY);
 
     registry.add<ServerEntityId>(platform, ServerEntityId { entityId });
+    SpriteManager::addPlatformSprite(registry, platform, posX, posY);
 }
 
 void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
@@ -162,6 +156,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
+    SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,

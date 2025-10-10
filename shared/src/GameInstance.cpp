@@ -50,8 +50,15 @@ bool GameInstance::checkLoseCondition() const
 
 bool GameInstance::checkWinCondition() const
 {
-    // TODO: Implement win condition
-    return false;
+    checkLoseCondition();
+    // Win if there are no remaining Boss-tagged entities in the registry
+    // Use const-friendly storage access (view() is non-const)
+    const auto* bossStorage = _registry.get_storage_if_exists<BossTag>();
+    if (bossStorage == nullptr) {
+        // No storage means no BossTag entities were ever created or they were all removed
+        return true;
+    }
+    return bossStorage->dense_size() == 0;
 }
 
 void GameInstance::updateTick()
@@ -120,13 +127,16 @@ void GameInstance::updateTick()
 
 void GameInstance::initializeLevel()
 {
-    auto platformList = factories::generateRandomPlatforms(_registry, 8);
+    auto platformList = factories::generateRandomPlatforms(_registry, 22);
+    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 0.0f, SCREEN_HEIGHT / 2));
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 300.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
-    _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 300.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 400.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
+    // Create Boss
+    _newEntitiesThisTick.push_back(factories::createBoss(_registry, Position { SCREEN_WIDTH - BOSS_WIDTH, 0.0f }, Health { BOSS_HEALTH }, Hitbox { BOSS_WIDTH, BOSS_HEIGHT }, Velocity { 0.0f, 0.0f }));
 }
 
 void GameInstance::addPlayer(uint32_t playerId, const std::string& username)
@@ -559,7 +569,7 @@ void GameInstance::spawnRandomPowerUps(int count)
 {
     for (int i = 0; i < count; ++i) {
         // Random position on screen (adjust based on your screen dimensions)
-        float x = static_cast<float>(rand() % 800 + 100); // Random X between 100-900
+        float x = static_cast<float>(rand() % SCREEN_WIDTH + 100); // Random X between 100-900
         float y = static_cast<float>(rand() % 300 + 200); // Random Y between 200-500
 
         // Random power-up type

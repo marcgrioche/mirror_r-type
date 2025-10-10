@@ -24,6 +24,7 @@
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
 #include "../include/Message.hpp"
+#include "Config.hpp"
 #include "Parent.hpp"
 #include "components/RigidBody.hpp"
 #include "ecs/components/Dash.hpp"
@@ -37,6 +38,7 @@
 #include "ecs/systems/PowerUpEffectSystem.hpp"
 #include "ecs/systems/PowerUpSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
+#include "entities/boss/CreateBoss.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/powerUp/CreatePowerUp.hpp"
 #include <chrono>

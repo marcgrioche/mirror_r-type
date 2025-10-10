@@ -30,4 +30,19 @@ Entity createProjectile(Registry& registry,
     registry.emplace<ProjectileTag>(projectile);
     return projectile;
 }
+
+Entity createProjectileTemplate(
+    Registry& registry,
+    const Velocity& velocity,
+    const Damage& damage,
+    const Hitbox& hitbox)
+{
+    // This entity is a blueprint: no Position/Lifetime/Parent so systems ignore it
+    Entity tpl = registry.create_entity();
+    registry.emplace<Velocity>(tpl, velocity);
+    registry.emplace<Damage>(tpl, damage);
+    registry.emplace<Hitbox>(tpl, hitbox);
+    registry.emplace<ProjectileTag>(tpl);
+    return tpl;
+}
 }

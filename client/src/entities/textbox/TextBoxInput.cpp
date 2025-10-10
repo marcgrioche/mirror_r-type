@@ -34,8 +34,19 @@ Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
         "client/res/fonts/OpenSans-Medium.ttf", true, TextBox::Alignment::LEFT);
 
     // Component input
-    registry.emplace<TextBoxInput>(inputBox, "", placeholder, false, true, 100, 0,
-        0.0f, true, color, color);
+    registry.emplace<TextBoxInput>(
+        inputBox,
+        "",
+        placeholder,
+        false,
+        true,
+        static_cast<size_t>(100),
+        static_cast<size_t>(0),
+        0.0f,
+        true,
+        color,
+        color
+    );
 
     return inputBox;
 }

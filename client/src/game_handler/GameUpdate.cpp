@@ -9,7 +9,6 @@
 #include "../../../shared/src/ecs/systems/ColisionPlayerPowerUpSystem.hpp"
 #include "../../../shared/src/ecs/systems/PowerUpEffectSystem.hpp"
 #include "../../../shared/src/ecs/systems/PowerUpSystem.hpp"
-#include "../../../shared/src/entities/enemies/EnemyMovement.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
@@ -20,6 +19,7 @@
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
 
 void Game::update(float deltaTime)
@@ -45,8 +45,8 @@ void Game::updateGameTick()
 
 void Game::updateNetworkGameTick()
 {
-    enemyMovement(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
@@ -55,7 +55,6 @@ void Game::updateNetworkGameTick()
 
 void Game::updateLocalGameTick()
 {
-    enemyMovement(_registry, TICK_DURATION);
     handlePlayerInputs(_inputs, _registry);
     handleWeaponInputs(_inputs, _registry);
     gravitySystem(_registry, TICK_DURATION);
@@ -66,6 +65,7 @@ void Game::updateLocalGameTick()
     powerUpEffectSystem(_registry, TICK_DURATION);
     healthSystem(_registry);
     powerUpSystem(_registry, TICK_DURATION);
+    spriteAnimationSystem(_registry, TICK_DURATION);
 }
 
 void Game::render()

@@ -12,6 +12,7 @@
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
+#include "Config.hpp"
 #include <iostream>
 
 JoinMenu::JoinMenu()
@@ -103,7 +104,7 @@ void JoinMenu::render(GraphicsManager& gfx, Registry& registry)
 
     // Fond semi-transparent
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
-    SDL_Rect overlay = { 0, 0, 800, 600 };
+    SDL_Rect overlay = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &overlay);
 
     // Boîte du menu
