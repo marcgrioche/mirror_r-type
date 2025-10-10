@@ -36,7 +36,7 @@ CPMAddPackage(
 
         "SDL_X11 ON"
         "SDL_WAYLAND ON"
-        "SDL_OSS ON"
+        "SDL_OSS OFF"
 
         "SDL_LIBUDEV OFF"
         "SDL_IBUS OFF"

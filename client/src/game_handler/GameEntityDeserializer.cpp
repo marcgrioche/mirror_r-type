@@ -13,6 +13,7 @@
 #include "ecs/components/Position.hpp"
 #include "ecs/components/PowerUp.hpp"
 #include "ecs/components/ServerEntityId.hpp"
+#include "ecs/components/Sound.hpp"
 #include "ecs/components/Sprite.hpp"
 #include "ecs/components/SpriteFactory.hpp"
 #include "ecs/components/SpriteManager.hpp"
@@ -22,6 +23,7 @@
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/powerUp/CreatePowerUp.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
+#include "managers/SoundManager.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -77,6 +79,11 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
     SpriteManager::addPlayerSprite(registry, entity, posX, posY, 1.5f);
+
+    // Play player spawn sound
+    auto soundEntity = registry.create_entity();
+    registry.emplace<Sound>(soundEntity, Sound { "anvil", true, false, 128, false, -1, true });
+    registry.emplace<Lifetime>(soundEntity, 1.0f);
 }
 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
@@ -152,6 +159,11 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
     SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
+
+    // Play enemy spawn sound
+    auto soundEntity = registry.create_entity();
+    registry.emplace<Sound>(soundEntity, Sound { "phantom", true, false, 128, false, -1, true });
+    registry.emplace<Lifetime>(soundEntity, 1.0f);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,

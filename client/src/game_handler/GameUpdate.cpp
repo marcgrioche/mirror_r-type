@@ -11,6 +11,7 @@
 #include "../../../shared/src/ecs/systems/PowerUpSystem.hpp"
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
+#include "ecs/components/Sound.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/GravitySystem.hpp"
 #include "ecs/systems/HealthSystem.hpp"
@@ -18,7 +19,9 @@
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
+#include "managers/SoundManager.hpp"
 #include "systems/RenderSystem.hpp"
+#include "systems/SoundSystem.hpp"
 #include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
 
@@ -47,6 +50,7 @@ void Game::updateNetworkGameTick()
 {
     movementSystem(_registry, TICK_DURATION);
     spriteAnimationSystem(_registry, TICK_DURATION);
+    soundSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
@@ -66,6 +70,7 @@ void Game::updateLocalGameTick()
     healthSystem(_registry);
     powerUpSystem(_registry, TICK_DURATION);
     spriteAnimationSystem(_registry, TICK_DURATION);
+    soundSystem(_registry, TICK_DURATION);
 }
 
 void Game::render()
@@ -76,6 +81,12 @@ void Game::render()
 void Game::startGameplay()
 {
     _state = GameState::PLAYING;
+
+    // Start background music
+    auto& soundManager = SoundManager::getInstance();
+    soundManager.stopSound("vivaldi");
+    auto bgmEntity = _registry.create_entity();
+    _registry.emplace<Sound>(bgmEntity, Sound { "vivaldi", true, true, 64, false, -1, false });
 }
 
 void Game::clearGameEntities()

@@ -7,12 +7,13 @@
 
 #include "Game.hpp"
 #include "ButtonSystem.hpp"
+#include "Config.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
 #include "ecs/components/ParallaxState.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "managers/SoundManager.hpp"
 #include <SDL.h>
-#include "Config.hpp"
 #include <iostream>
 
 Game::Game(bool isLocalMode, uint16_t clientPort)
@@ -73,6 +74,11 @@ bool Game::initialize()
     if (!resourceManager.loadTexture(renderer, "Sky.png", "client/res/sprites/ParallaxBackground/Sky.png")) {
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
+
+    auto& soundManager = SoundManager::getInstance();
+    soundManager.loadSound("vivaldi", "client/res/sounds/vivaldi.ogg");
+    soundManager.loadSound("anvil", "client/res/sounds/Anvil_land.ogg");
+    soundManager.loadSound("phantom", "client/res/sounds/Phantom_swoop1.ogg");
 
     _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
 

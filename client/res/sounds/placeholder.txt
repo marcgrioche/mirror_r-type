@@ -1,0 +1,11 @@
+This directory is for sound files (.wav, .ogg, .mp3).
+
+Add your sound files here and load them in Game::initialize() using:
+SoundManager::getInstance().loadSound("sound_id", "client/res/sounds/filename.wav");
+
+Example sounds:
+- player_spawn.wav
+- enemy_death.wav
+- shoot.wav
+- explosion.wav
+- background_music.ogg
