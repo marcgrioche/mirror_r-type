@@ -7,10 +7,10 @@
 
 #include "ParallaxBackgroundSystem.hpp"
 #include "../../../shared/include/Config.hpp" // For PLATFORM_VELOCITY_X
+#include "Config.hpp"
 #include "components/ParallaxState.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/ResourceManager.hpp"
-#include "Config.hpp"
 #include <SDL.h>
 #include <iostream>
 
@@ -34,8 +34,8 @@ void parallaxBackgroundSystem(Registry& registry)
         { "Sky.png", 0.2f, &parallaxState.skyOffset }, // Sky: 20% of platform speed
         { "DownLayer.png", 0.4f, &parallaxState.downLayerOffset }, // Down layer: 40% of platform speed
         { "MiddleLayer.png", 0.6f, &parallaxState.middleLayerOffset }, // Middle layer: 60% of platform speed
-        { "Light.png", 0.8f, &parallaxState.lightOffset }, // Light: 80% of platform speed
-        { "TopLayer.png", 1.0f, &parallaxState.topLayerOffset } // Top layer: 100% of platform speed (same as platforms)
+        { "Light.png", 0.8f, &parallaxState.lightOffset } // Light: 80% of platform speed
+        // { "TopLayer.png", 1.0f, &parallaxState.topLayerOffset } // Top layer: 100% of platform speed (same as platforms)
     };
 
     // Use platform velocity from config (positive speed)
