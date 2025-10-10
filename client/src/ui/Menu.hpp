@@ -39,7 +39,7 @@ public:
     void showHomePage(Registry& registry);
     void showConnectionPage(Registry& registry);
     void showJoinPage(Registry& registry);
-    // void showParametersPage(Registry& registry);
+    void showParametersPage(Registry& registry);
     void showWinPage(Registry& registry);
     void showLosePage(Registry& registry);
     void showLobbyPage(Registry& registry);
@@ -56,7 +56,7 @@ public:
     bool hasCreateRequest() const;
     bool hasLobbyRequest() const;
     bool hasEndRequest() const;
-    // bool hasParameterChanges() const;
+    bool hasParameterChanges() const;
 
     // Nettoyage des flags de demande
     void clearAllRequests();
@@ -74,7 +74,7 @@ private:
     JoinMenu m_joinPage;
     LobbyMenu m_lobbyPage;
     EndMenu m_endPage;
-    // ParameterMenu m_parameterPage;
+    ParameterMenu m_parameterPage;
 
     // Gestion des transitions
     void hideAllPages(Registry& registry);

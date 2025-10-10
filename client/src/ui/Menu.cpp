@@ -97,12 +97,12 @@ void Menu::clearGameEntities(Registry& registry)
     // Implementation is in Game::clearGameEntities()
 }
 
-// void Menu::showParametersPage(Registry& registry)
-// {
-//     hideAllPages(registry);
-//     m_currentPage = Page::PARAMETERS;
-//     m_parameterPage.show(registry);
-// }
+void Menu::showParametersPage(Registry& registry)
+{
+    hideAllPages(registry);
+    m_currentPage = Page::PARAMETERS;
+    m_parameterPage.show(registry);
+}
 
 void Menu::showWinPage(Registry& registry)
 {
@@ -134,9 +134,9 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
     case Page::LOBBY:
         m_lobbyPage.handleEvent(registry, e);
         break;
-    // case Page::PARAMETERS:
-    //     m_parameterPage.handleEvent(registry, e);
-    //     break;
+    case Page::PARAMETERS:
+        m_parameterPage.handleEvent(registry, e);
+        break;
     case Page::WIN:
         m_endPage.handleEvent(registry, e);
         break;
@@ -162,9 +162,9 @@ void Menu::update(Registry& registry, float deltaTime)
     case Page::JOIN_LOBBY:
         m_joinPage.update(registry, deltaTime);
         break;
-    // case Page::PARAMETERS:
-    //     m_parameterPage.update(registry, deltaTime);
-    //     break;
+    case Page::PARAMETERS:
+        m_parameterPage.update(registry, deltaTime);
+        break;
     default:
         break;
     }
@@ -183,11 +183,10 @@ void Menu::processPageTransitions(Registry& registry)
         } else if (m_homePage.hasCreateRequest()) {
             m_homePage.clearRequests();
             showConnectionPage(registry);
+        } else if (m_homePage.hasParamRequest()) {
+            m_homePage.clearRequests();
+            showParametersPage(registry);
         }
-        // else if (m_homePage.hasParamRequest()) {
-        //     m_homePage.clearRequests();
-        //     showParametersPage(registry);
-        // }
         break;
 
     case Page::CONNECTION:
@@ -206,12 +205,12 @@ void Menu::processPageTransitions(Registry& registry)
         // Transition gérée par le système principal via hasJoinRequest()
         break;
 
-        // case Page::PARAMETERS:
-        //     if (m_parameterPage.hasBackRequest()) {
-        //         m_parameterPage.clearRequests();
-        //         showHomePage(registry);
-        //     }
-        //     break;
+    case Page::PARAMETERS:
+        if (m_parameterPage.hasReturnRequest()) {
+            m_parameterPage.clearRequests();
+            showHomePage(registry);
+        }
+        break;
     case Page::WIN:
         if (m_endPage.hasReturnRequest()) {
             m_endPage.clearConnectionRequest();
@@ -248,9 +247,9 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
     case Page::LOBBY:
         m_lobbyPage.render(gfx, registry);
         break;
-        // case Page::PARAMETERS:
-        //     m_parameterPage.render(gfx, registry);
-        //     break;
+    case Page::PARAMETERS:
+        m_parameterPage.render(gfx, registry);
+        break;
     case Page::WIN:
         m_endPage.render(gfx, registry);
         break;
@@ -297,16 +296,11 @@ bool Menu::hasLobbyRequest() const
     return m_lobbyPage.hasRequest();
 }
 
-// bool Menu::hasParameterChanges() const
-// {
-//     return m_parameterPage.hasChanges();
-// }
-
 void Menu::clearAllRequests()
 {
     m_connectionPage.clearConnectionRequest();
     m_joinPage.clearConnectionRequest();
     m_homePage.clearRequests();
     m_lobbyPage.clearRequests();
-    // m_parameterPage.clearRequests();
+    m_parameterPage.clearRequests();
 }

@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:56:33 PM 2025 jojo
-** Last update Thu Oct 8 2:32:59 PM 2025 jojo
+** Last update Sat Oct 10 3:56:45 PM 2025 jojo
 */
 
 #pragma once
@@ -50,6 +50,8 @@ private:
     Entity m_createButtonEntity;
     Entity m_textBoxCreateEntity;
     Entity m_textBoxJoinEntity;
+    Entity m_textBoxParamEntity;
+    Entity m_ParamButtonEntity;
     bool m_visible = false;
     bool m_joinRequested = false;
     bool m_createRequested = false;

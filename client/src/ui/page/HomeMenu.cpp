@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:59:23 PM 2025 jojo
-** Last update Thu Oct 8 11:25:56 AM 2025 jojo
+** Last update Sat Oct 10 4:17:20 PM 2025 jojo
 */
 
 #include "ui/page/HomeMenu.hpp"
@@ -41,31 +41,37 @@ void HomeMenu::hide(Registry& registry)
 
 void HomeMenu::createEntities(Registry& registry)
 {
-    // TextBoxInput pour le pseudo
     m_textBoxEntity = factories::createTextBoxInput(registry,
         "Enter your username...", 300.0f, 200.0f, 18, { 255, 255, 255, 255 });
 
-    // Bouton Join
     m_joinButtonEntity = factories::createButton(registry,
         250.0f, 280.0f, 120.0f, 50.0f, "home_join", true);
 
-    // Bouton Create
     m_createButtonEntity = factories::createButton(registry,
-        430.0f, 280.0f, 120.0f, 50.0f, "home_create", true);
+        250.0f, 350.0f, 120.0f, 50.0f, "home_create", true);
 
-    m_textBoxCreateEntity = factories::createTextBox(registry,
-        "CREATE LOBBY", 430.0f, 280.0f, 16, { 255, 0, 0, 0 });
+    m_paramButtonEntity = factories::createButton(registry,
+        250.0f, 420.0f, 120.0f, 50.0f, "home_param", true);
+
     m_textBoxJoinEntity = factories::createTextBox(registry,
         "JOIN LOBBY", 250.0f, 280.0f, 16, { 255, 0, 0, 0 });
+    m_textBoxCreateEntity = factories::createTextBox(registry,
+        "CREATE LOBBY", 250.0f, 350.0f, 16, { 255, 0, 0, 0 });
+    m_textBoxParamEntity = factories::createTextBox(registry,
+        "PARAMETER", 250.0f, 420.0f, 16, { 255, 0, 0, 0 });
 }
 
 void HomeMenu::destroyEntities(Registry& registry)
 {
     registry.kill_entity(m_textBoxEntity);
+
     registry.kill_entity(m_joinButtonEntity);
     registry.kill_entity(m_createButtonEntity);
+    registry.kill_entity(m_paramButtonEntity);
+
     registry.kill_entity(m_textBoxCreateEntity);
     registry.kill_entity(m_textBoxJoinEntity);
+    registry.kill_entity(m_textBoxParamEntity);
 }
 
 void HomeMenu::setupEventHandlers()
@@ -82,6 +88,9 @@ void HomeMenu::setupEventHandlers()
         } else if (event.data == "home_create") {
             m_createRequested = true;
             std::cout << "Home Create requested!" << std::endl;
+        } else if (event.data == "home_param") {
+            std::cout << "Home Param requested!" << std::endl;
+            m_paramRequested = true;
         }
     });
 }
@@ -114,11 +123,15 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
 
     // Rendu des composants
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
+
     drawButton(gfx, registry, m_joinButtonEntity);
     drawButton(gfx, registry, m_createButtonEntity);
     drawButton(gfx, registry, m_paramButtonEntity);
+    // drawButton(gfx, registry, m_paramButtonEntity);
+
     drawTextBox(gfx, registry, m_textBoxCreateEntity);
     drawTextBox(gfx, registry, m_textBoxJoinEntity);
+    drawTextBox(gfx, registry, m_textBoxParamEntity);
 }
 
 std::string HomeMenu::getPseudo(Registry& registry) const
@@ -150,5 +163,5 @@ void HomeMenu::clearRequests()
 {
     m_joinRequested = false;
     m_createRequested = false;
-    m_paramRequested;
+    m_paramRequested = false;
 }
