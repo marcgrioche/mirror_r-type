@@ -118,15 +118,22 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
     }
 
     Lobby* lobby = it->second.get();
-    if (lobby->creatorId != playerId) {
-        return false;
-    }
-
     if (lobby->state != LobbyState::WAITING) {
         return false;
     }
 
     if (lobby->players.size() < 1) {
+        return false;
+    }
+
+    if (std::find(lobby->players.begin(), lobby->players.end(), playerId) == lobby->players.end()) {
+        return false;
+    }
+
+    lobby->readyPlayers.insert(playerId);
+    std::cout << "Player " << playerId << " is ready in lobby " << lobbyId << " (" << lobby->readyPlayers.size() << "/" << lobby->players.size() << " ready)" << std::endl;
+
+    if (lobby->readyPlayers.size() != lobby->players.size()) {
         return false;
     }
 
@@ -145,7 +152,7 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
     lobby->gameThread = std::thread(&LobbyManager::runLobbyThread, this, lobby);
 
     lobby->state = LobbyState::RUNNING;
-    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << " with " << lobby->players.size() << " players" << std::endl;
+    std::cout << "Game started in lobby " << lobbyId << " - all " << lobby->players.size() << " players ready" << std::endl;
     return true;
 }
 
@@ -192,6 +199,8 @@ bool LobbyManager::removePlayer(uint32_t playerId)
         if (playerIt != lobby->players.end()) {
             lobby->players.erase(playerIt);
         }
+
+        lobby->readyPlayers.erase(playerId);
 
         if (lobby->players.empty()) {
             lobby->threadRunning = false;
@@ -282,6 +291,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;
             lobby->gameInstance.reset();
+            lobby->readyPlayers.clear();
             lobby->threadRunning = false;
             break;
         } else if (lobby->gameInstance->hasLost()) {
@@ -290,6 +300,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;
             lobby->gameInstance.reset();
+            lobby->readyPlayers.clear();
             lobby->threadRunning = false;
             break;
         }

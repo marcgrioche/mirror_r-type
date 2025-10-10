@@ -33,6 +33,7 @@ struct Lobby {
     std::atomic<bool> threadRunning;
     std::queue<PlayerInput> inputQueue;
     std::mutex inputMutex;
+    std::unordered_set<uint32_t> readyPlayers;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
     ~Lobby();
