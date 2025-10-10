@@ -155,7 +155,7 @@ bool handleEnemyAttacks(
             Position spawnPos { enemyPos.x, enemyPos.y + ownerHit.height / 2 - projHit.height / 2 };
 
             if (registry.has<BossTag>(owner)) {
-                int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height));
+                int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height * 2));
                 int offset = maxOffset > 0 ? rand() % maxOffset : 0;
                 spawnPos.y = enemyPos.y + offset;
             }
