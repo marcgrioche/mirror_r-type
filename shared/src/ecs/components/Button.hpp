@@ -18,6 +18,6 @@ struct Button {
     bool is_hovered = false;
     bool was_pressed = false;
     bool interactable = true;
-    Color bg = (Color) { 255, 255, 255, 255 };
-    Color border = (Color) { 0, 0, 0, 0 };
+    Color bg{ 255, 255, 255, 255 };
+    Color border{ 0, 0, 0, 0 };
 };

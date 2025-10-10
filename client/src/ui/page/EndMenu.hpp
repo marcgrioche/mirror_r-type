@@ -1,5 +1,5 @@
 /*
-** EndMenu.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
+** EndMenuPage.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
 **
 ** Made by jojo
 ** Login   <jojo>
@@ -20,10 +20,10 @@
 #include "systems/TextBoxInputSystem.hpp"
 #include <string>
 
-class EndMenu {
+class EndMenuPage {
 public:
-    EndMenu();
-    ~EndMenu();
+    EndMenuPage();
+    ~EndMenuPage();
 
     // Interface simple
     void show(Registry& registry, bool State);

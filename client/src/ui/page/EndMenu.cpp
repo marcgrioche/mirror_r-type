@@ -1,5 +1,5 @@
 /*
-** EndMenu.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
+** EndMenuPage.cpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ui/page
 **
 ** Made by jojo
 ** Login   <jojo>
@@ -15,14 +15,14 @@
 #include "Config.hpp"
 #include <iostream>
 
-EndMenu::EndMenu()
+EndMenuPage::EndMenuPage()
 {
     setupEventHandlers();
 }
 
-EndMenu::~EndMenu() = default;
+EndMenuPage::~EndMenuPage() = default;
 
-void EndMenu::show(Registry& registry, bool state)
+void EndMenuPage::show(Registry& registry, bool state)
 {
     m_state = (state == true) ? "WIN" : "LOSE";
 
@@ -33,7 +33,7 @@ void EndMenu::show(Registry& registry, bool state)
     }
 }
 
-void EndMenu::hide(Registry& registry)
+void EndMenuPage::hide(Registry& registry)
 {
     if (m_visible) {
         destroyEntities(registry);
@@ -41,7 +41,7 @@ void EndMenu::hide(Registry& registry)
     }
 }
 
-void EndMenu::createEntities(Registry& registry)
+void EndMenuPage::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
     m_textBoxStateEntity = factories::createTextBox(registry,
@@ -54,14 +54,14 @@ void EndMenu::createEntities(Registry& registry)
         "RETURN", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
 }
 
-void EndMenu::destroyEntities(Registry& registry)
+void EndMenuPage::destroyEntities(Registry& registry)
 {
     registry.kill_entity(m_textBoxStateEntity);
     registry.kill_entity(m_textBoxReturnEntity);
     registry.kill_entity(m_returnButtonEntity);
 }
 
-void EndMenu::setupEventHandlers()
+void EndMenuPage::setupEventHandlers()
 {
     auto& eventMgr = EventManager::getInstance();
 
@@ -72,7 +72,7 @@ void EndMenu::setupEventHandlers()
     });
 }
 
-void EndMenu::update(Registry& registry, float deltaTime)
+void EndMenuPage::update(Registry& registry, float deltaTime)
 {
     if (!m_visible)
         return;
@@ -80,14 +80,14 @@ void EndMenu::update(Registry& registry, float deltaTime)
     buttonSystem(registry);
 }
 
-void EndMenu::handleEvent(Registry& registry, const SDL_Event& event)
+void EndMenuPage::handleEvent(Registry& registry, const SDL_Event& event)
 {
     if (!m_visible)
         return;
     textBoxInputSystem(registry, event);
 }
 
-void EndMenu::render(GraphicsManager& gfx, Registry& registry)
+void EndMenuPage::render(GraphicsManager& gfx, Registry& registry)
 {
     if (!m_visible)
         return;
@@ -114,12 +114,12 @@ void EndMenu::render(GraphicsManager& gfx, Registry& registry)
     drawTextBox(gfx, registry, m_textBoxReturnEntity);
 }
 
-bool EndMenu::hasReturnRequest() const
+bool EndMenuPage::hasReturnRequest() const
 {
     return m_returnRequested;
 }
 
-void EndMenu::clearConnectionRequest()
+void EndMenuPage::clearConnectionRequest()
 {
     m_returnRequested = false;
 }
