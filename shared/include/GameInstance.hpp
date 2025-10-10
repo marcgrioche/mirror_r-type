@@ -23,9 +23,9 @@
 #include "../../shared/src/entities/enemies/CreateEnemy.hpp"
 #include "../../shared/src/entities/platform/CreatePlatform.hpp"
 #include "../../shared/src/entities/player/CreatePlayer.hpp"
-#include "components/RigidBody.hpp"
 #include "../include/Message.hpp"
 #include "Parent.hpp"
+#include "components/RigidBody.hpp"
 #include "ecs/components/Dash.hpp"
 #include "ecs/components/Dead.hpp"
 #include "ecs/components/PreviousPosition.hpp"
@@ -67,12 +67,13 @@ public:
     uint32_t getLobbyId() const { return _lobbyId; }
     uint32_t getCurrentTick() const { return _currentTick; }
 
-    void addPlayer(uint32_t playerId);
+    void addPlayer(uint32_t playerId, const std::string& username);
     void removePlayer(uint32_t playerId);
     bool processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs);
 
     std::vector<uint8_t> serializeGameState() const;
     void deserializeGameState(const std::vector<uint8_t>& data);
+    uint32_t findPlayerIdByEntity(const Entity& t_entity);
 
     /**
      * Serialize entity spawn data for SPAWN_ENTITY message.
@@ -128,6 +129,7 @@ public:
      */
     Registry& getRegistry() { return _registry; }
     const Registry& getRegistry() const { return _registry; }
+    std::optional<uint32_t> getPlayerEntityIdById(uint32_t playerId);
 
 private:
     uint32_t _lobbyId;
@@ -140,6 +142,7 @@ private:
     std::unordered_map<uint32_t, Entity> _playerEntities;
     std::vector<Entity> _newEntitiesThisTick;
     std::vector<uint32_t> _killedEntitiesThisTick;
+    std::unordered_map<uint32_t, std::string> _usernames;
 
     bool _gameWon;
     bool _gameLost;

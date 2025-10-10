@@ -128,6 +128,7 @@ std::string HomeMenu::getPseudo(Registry& registry) const
     }
 
     const auto& input = registry.get<TextBoxInput>(m_textBoxEntity);
+    std::cout << "Original pseudo name: " << input.inputText << std::endl;
     return input.inputText;
 }
 

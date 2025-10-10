@@ -57,7 +57,7 @@ void Game::initializeLocalMode()
 {
     m_localGameInstance = std::make_unique<GameInstance>(0);
     m_localGameInstance->initialize();
-    m_localGameInstance->addPlayer(1);
+    m_localGameInstance->addPlayer(1, "");
 
     _state = GameState::PLAYING;
     std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
@@ -187,6 +187,7 @@ void Game::sendDisconnectMessage()
     }
 }
 
+// This function is never called
 void Game::processMenuRequests()
 {
     // Vérifie les demandes de connexion

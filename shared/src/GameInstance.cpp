@@ -129,13 +129,14 @@ void GameInstance::initializeLevel()
     _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 500.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
 }
 
-void GameInstance::addPlayer(uint32_t playerId)
+void GameInstance::addPlayer(uint32_t playerId, const std::string& username)
 {
-    std::cout << "Adding player " << playerId << " to game instance" << std::endl;
+    std::cout << "Adding player " << playerId << " to game instance with username: " << username << std::endl;
     Entity playerEntity = factories::createPlayer(_registry);
     _playerEntities[playerId] = playerEntity;
     _newEntitiesThisTick.push_back(playerEntity);
     _stateChanged = true;
+    _usernames[playerEntity.id] = username;
 }
 
 void GameInstance::removePlayer(uint32_t playerId)
@@ -437,7 +438,13 @@ Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
                 msg.write(hitbox.offset_y);
             }
 
-            msg.write(static_cast<uint32_t>(entity.id)); // compatibility with server ?
+            msg.write(findPlayerIdByEntity(entity)); // compatibility with server ?
+            auto itUsername = _usernames.find(entity.id);
+            if (itUsername != _usernames.end()) {
+                msg.write(itUsername->second);
+            } else {
+                msg.write(std::to_string(entity.id));
+            }
 
         } else if (entityType == 1) { // Projectile
             if (_registry.has<Velocity>(entity)) {
@@ -569,4 +576,24 @@ void GameInstance::spawnRandomPowerUps(int count)
         Entity powerUp = factories::createPowerUp(_registry, pos, vel, hitbox, lifetime, type, effectDuration);
         _newEntitiesThisTick.push_back(powerUp);
     }
+}
+
+uint32_t GameInstance::findPlayerIdByEntity(const Entity& entity)
+{
+    for (const auto& [playerId, playerEntity] : _playerEntities) {
+        if (playerEntity == entity) {
+            return playerId;
+        }
+    }
+    return 0; // Not found
+}
+
+std::optional<uint32_t> GameInstance::getPlayerEntityIdById(const uint32_t playerId)
+{
+    auto it = _playerEntities.find(playerId);
+    if (it == _playerEntities.end()) {
+        return std::nullopt;
+    }
+    auto& playerEntity = it->second;
+    return playerEntity.id;
 }

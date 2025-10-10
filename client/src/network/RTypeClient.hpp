@@ -40,6 +40,7 @@ public:
     void connectToServerRequest();
     void disconnectFromServerRequest();
     void createLobbyRequest();
+    void createUsernameRequest(const std::string& t_username);
     void joinLobbyRequest(uint32_t t_lobbyId);
     void startGameRequest();
     void lobbyStartRequest();
@@ -76,5 +77,6 @@ private:
     void handleGameState(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleUsernameRequestState(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

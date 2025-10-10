@@ -7,5 +7,7 @@
 
 #pragma once
 #include "Registry.hpp"
+#include <SDL.h>
 
 void renderSystem(Registry& registry);
+void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer);

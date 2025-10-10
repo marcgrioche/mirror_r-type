@@ -209,4 +209,7 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::GAME_END_LOSE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleGameEndLose(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::USERNAME_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleUsernameRequestState(t_msg, t_peerInfo);
+    };
 }

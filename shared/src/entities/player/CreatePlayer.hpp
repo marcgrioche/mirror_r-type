@@ -7,11 +7,13 @@
 
 #pragma once
 #include "Registry.hpp"
-#include "components/Position.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Position.hpp"
+#include "components/TextBox.hpp"
 
 namespace factories {
 Entity createPlayer(Registry& registry);
 Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox);
 }
