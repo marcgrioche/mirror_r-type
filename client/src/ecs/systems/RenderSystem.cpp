@@ -153,7 +153,7 @@ void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer)
             if (textTexture) {
                 SDL_Rect dstRect;
                 dstRect.x = static_cast<int>(pos.x);
-                dstRect.y = static_cast<int>(pos.y) - textSurface->h; // Render above the entity
+                dstRect.y = static_cast<int>(pos.y) - textSurface->h - 4.f; // Render above the entity
                 dstRect.w = textSurface->w;
                 dstRect.h = textSurface->h;
                 SDL_RenderCopy(renderer, textTexture, nullptr, &dstRect);
