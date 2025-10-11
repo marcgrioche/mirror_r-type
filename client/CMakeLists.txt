@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(r-type_client)
 
-include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
-
 file(GLOB_RECURSE CLIENT_SOURCES src/*.cpp)
 file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
 include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
