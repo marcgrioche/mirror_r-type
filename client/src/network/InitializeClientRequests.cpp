@@ -8,5 +8,4 @@ void RTypeClient::createUsernameRequest(const std::string& t_username)
 
     msg.write(t_username);
     sendMessage(msg);
-    std::cout << "Username sent" << std::endl;
 }
