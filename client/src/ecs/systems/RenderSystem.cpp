@@ -7,6 +7,7 @@
 
 #include "RenderSystem.hpp"
 #include "ParallaxBackgroundSystem.hpp"
+#include "PlayerListRenderSystem.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
@@ -110,6 +111,7 @@ void renderSystem(Registry& registry)
         SDL_RenderDrawRect(renderer, &rect);
     }
     playerPseudoRenderSystem(registry, renderer);
+    playerListRenderSystem(registry, renderer);
 
     graphics.present();
 }
