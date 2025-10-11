@@ -448,12 +448,13 @@ Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
                 msg.write(hitbox.offset_y);
             }
 
-            msg.write(findPlayerIdByEntity(entity)); // compatibility with server ?
+            const auto playerId = findPlayerIdByEntity(entity);
+            msg.write(playerId); // compatibility with server ?
             auto itUsername = _usernames.find(entity.id);
             if (itUsername != _usernames.end()) {
                 msg.write(itUsername->second);
             } else {
-                msg.write(std::to_string(entity.id));
+                msg.write(std::to_string(playerId));
             }
 
         } else if (entityType == 1) { // Projectile
