@@ -91,6 +91,7 @@ private:
     void handleGameState(const Client::NetworkEvent& event);
     void handleGameEndWin();
     void handleGameEndLose();
+    void handleUsername(const Client::NetworkEvent& event);
 
     // Local game updates
     void processLocalGameUpdates();

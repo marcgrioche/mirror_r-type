@@ -34,6 +34,7 @@ struct Lobby {
     std::queue<PlayerInput> inputQueue;
     std::mutex inputMutex;
     std::unordered_set<uint32_t> readyPlayers;
+    std::unordered_map<uint32_t, std::string> _usernames;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
     ~Lobby();
@@ -158,6 +159,7 @@ public:
      *     std::vector<uint32_t>: List of player IDs in the lobby
      */
     std::vector<uint32_t> getLobbyPlayers(uint32_t lobbyId) const;
+    bool addUsername(uint32_t playerId, const std::string& username);
 
 private:
     std::unordered_map<uint32_t, std::unique_ptr<Lobby>> _lobbies;

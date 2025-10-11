@@ -63,6 +63,7 @@ private:
     std::unordered_map<uint32_t, PeerInfo> _clients;
     LobbyManager _lobbyManager;
     uint32_t _nextPlayerId;
+    std::unordered_map<uint32_t, std::string> _usernames;
 
     static void handleSignal(int);
 
@@ -75,7 +76,11 @@ private:
     void handleJoinLobby(const Message& msg, PeerInfo& peerInfo);
     void handleStartGame(const Message& msg, PeerInfo& peerInfo);
     void handleLobbyState(const Message& msg, PeerInfo& peerInfo);
+    void handleUsername(const Message& msg, PeerInfo& peerInfo);
     // ...other handlers per message type
+
+    // utility methods
+    bool addUsername(uint32_t playerId, const std::string& username);
 
     /**
      * Register all protocol message handlers in the handler map.

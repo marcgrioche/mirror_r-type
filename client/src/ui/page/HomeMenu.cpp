@@ -9,10 +9,10 @@
 */
 
 #include "ui/page/HomeMenu.hpp"
+#include "Config.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
-#include "Config.hpp"
 #include <iostream>
 
 HomeMenu::HomeMenu()
@@ -151,5 +151,5 @@ void HomeMenu::clearRequests()
 {
     m_joinRequested = false;
     m_createRequested = false;
-    m_paramRequested;
+    // m_paramRequested;
 }

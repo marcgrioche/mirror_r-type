@@ -16,7 +16,7 @@ struct TextBox {
     std::string text;
     int fontSize = 16;
     Color color = { 255, 255, 255, 255 }; // blanc par défaut
-    std::string fontPath = "/client/res/fonts/OpenSans-Medium.ttf";
+    std::string fontPath = "client/res/fonts/OpenSans-Medium.ttf";
     bool visible = true;
     enum class Alignment { LEFT,
         CENTER,

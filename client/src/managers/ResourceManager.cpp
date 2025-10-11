@@ -28,6 +28,35 @@ void ResourceManager::unloadAll()
         SDL_DestroyTexture(kv.second);
     }
     textures.clear();
+    for (auto it = fonts.begin(); it != fonts.end(); ++it) {
+        if (it->second) {
+            TTF_CloseFont(it->second);
+        }
+    }
+    fonts.clear();
+}
+
+void ResourceManager::loadFonts(const std::string& t_fontPath, const int t_fontSize)
+{
+    auto loaded = fonts.find(t_fontSize);
+    if (loaded == fonts.end()) {
+        fonts[t_fontSize] = TTF_OpenFont(t_fontPath.c_str(), t_fontSize);
+        if (!fonts[t_fontSize]) {
+            std::cerr << "Failed to load default font: " << TTF_GetError() << std::endl;
+        }
+    }
+}
+
+TTF_Font* ResourceManager::getFont(const int t_fontSize)
+{
+    if (!fonts[t_fontSize]) {
+        fonts[t_fontSize] = TTF_OpenFont(defaultFontPath.c_str(), t_fontSize);
+        if (!fonts[t_fontSize]) {
+            std::cerr << "Failed to load default font: " << TTF_GetError() << std::endl;
+            return nullptr;
+        }
+    }
+    return fonts[t_fontSize];
 }
 
 ResourceManager::~ResourceManager()

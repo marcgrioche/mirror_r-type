@@ -6,6 +6,7 @@ using namespace Client;
 // requests handlers
 void RTypeClient::createLobbyRequest()
 {
+    std::cout << "Creating lobby request" << std::endl;
     sendMessage(MessageType::CREATE_LOBBY);
 }
 

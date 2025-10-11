@@ -33,6 +33,7 @@ enum class MessageType : uint8_t {
     JOIN_LOBBY = 6,
     START_GAME = 7,
     LOBBY_STATE = 8,
+    SET_USERNAME = 9,
 
     // Server to Client Messages
     CONNECT_ACK = 101,
@@ -43,7 +44,8 @@ enum class MessageType : uint8_t {
     DESPAWN_ENTITY = 106,
     ROLLBACK = 107,
     GAME_END_WIN = 108,
-    GAME_END_LOSE = 109
+    GAME_END_LOSE = 109,
+    USERNAME_ACK = 110
 };
 
 class Message {
