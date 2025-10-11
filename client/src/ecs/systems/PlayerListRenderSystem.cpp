@@ -57,6 +57,8 @@ void playerListRenderSystem(Registry& registry, SDL_Renderer* renderer)
         // Draw HP (green)
         if (hp < 25) {
             SDL_SetRenderDrawColor(renderer, 200, 60, 60, 255); // Red for low HP
+        } else if (hp < 70) {
+            SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange for medium HP
         } else {
             SDL_SetRenderDrawColor(renderer, 60, 200, 60, 255); // Green for normal HP
         }
