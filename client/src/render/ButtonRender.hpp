@@ -17,4 +17,10 @@
 #include "components/Tags.hpp"
 #include "managers/GraphicsManager.hpp"
 
+/**
+ * @brief Draws a button entity on the screen
+ * @param gfx The graphics manager for rendering
+ * @param registry The ECS registry containing the entity
+ * @param button The button entity to draw
+ */
 void drawButton(GraphicsManager& gfx, Registry& registry, Entity button);

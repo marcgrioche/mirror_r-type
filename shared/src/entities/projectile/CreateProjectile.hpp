@@ -11,13 +11,24 @@
 #pragma once
 #include "Parent.hpp"
 #include "Registry.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
 #include "components/Damage.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Lifetime.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
 
 namespace factories {
+/**
+ * @brief Creates a projectile entity with specified properties
+ * @param registry The ECS registry to create the entity in
+ * @param position The initial position of the projectile
+ * @param velocity The velocity component for movement
+ * @param damage The damage component for collision effects
+ * @param hitbox The hitbox component for collision detection
+ * @param parent The parent entity that spawned this projectile
+ * @param lifetime The lifetime component for automatic removal
+ * @return The created projectile entity
+ */
 Entity createProjectile(Registry& registry,
     const Position& position,
     const Velocity& velocity,
@@ -26,8 +37,14 @@ Entity createProjectile(Registry& registry,
     const Parent& parent,
     const Lifetime& lifetime);
 
-// Lightweight blueprint entity used only as a template (no Position/Lifetime)
-// so it's not processed by gameplay systems (movement/lifetime) and won't expire.
+/**
+ * @brief Creates a projectile template entity without position/lifetime (used as blueprint)
+ * @param registry The ECS registry to create the entity in
+ * @param velocity The velocity component for movement
+ * @param damage The damage component for collision effects
+ * @param hitbox The hitbox component for collision detection
+ * @return The created projectile template entity
+ */
 Entity createProjectileTemplate(
     Registry& registry,
     const Velocity& velocity,

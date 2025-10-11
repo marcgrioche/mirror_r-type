@@ -12,15 +12,19 @@
 #include "Color.hpp"
 #include <string>
 
+/**
+ * @brief Component that manages interactive text input fields for UI
+ * Handles user input, cursor positioning, focus states, and visual feedback for text input widgets
+ */
 struct TextBoxInput {
-    std::string inputText = ""; // texte saisi par l'utilisateur
-    std::string placeholder = "Enter text..."; // texte d'aide
-    bool isFocused = false; // si la textbox a le focus
-    bool isActive = true; // si elle peut recevoir input
-    size_t maxLength = 100; // limite de caractères
-    size_t cursorPosition = 0; // position du curseur
-    float cursorBlinkTimer = 0.0f; // pour animation curseur
-    bool showCursor = true; // état clignotement
-    Color focusColor = { 100, 150, 255, 255 }; // couleur quand focus
-    Color normalColor = { 150, 150, 150, 255 }; // couleur normale
+    std::string inputText = ""; /**< Text entered by the user */
+    std::string placeholder = "Enter text..."; /**< Placeholder text shown when input is empty */
+    bool isFocused = false; /**< Whether the text box currently has input focus */
+    bool isActive = true; /**< Whether the text box can receive input */
+    size_t maxLength = 100; /**< Maximum number of characters allowed */
+    size_t cursorPosition = 0; /**< Current cursor position in the text */
+    float cursorBlinkTimer = 0.0f; /**< Timer for cursor blinking animation */
+    bool showCursor = true; /**< Current cursor visibility state for blinking */
+    Color focusColor = { 100, 150, 255, 255 }; /**< Border color when text box has focus */
+    Color normalColor = { 150, 150, 150, 255 }; /**< Border color when text box is not focused */
 };

@@ -17,6 +17,7 @@ namespace SpriteManager {
  * @param entity The entity to add the sprite to
  * @param posX Entity X position (unused, for future compatibility)
  * @param posY Entity Y position (unused, for future compatibility)
+ * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 
@@ -26,6 +27,7 @@ void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY, 
  * @param entity The entity to add the sprite to
  * @param posX Entity X position (unused, for future compatibility)
  * @param posY Entity Y position (unused, for future compatibility)
+ * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addProjectileSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 
@@ -35,6 +37,7 @@ void addProjectileSprite(Registry& registry, Entity entity, float posX, float po
  * @param entity The entity to add the sprite to
  * @param posX Entity X position (unused, for future compatibility)
  * @param posY Entity Y position (unused, for future compatibility)
+ * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 
@@ -44,6 +47,7 @@ void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY
  * @param entity The entity to add the sprite to
  * @param posX Entity X position (unused, for future compatibility)
  * @param posY Entity Y position (unused, for future compatibility)
+ * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 } // namespace SpriteManager

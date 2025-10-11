@@ -9,12 +9,30 @@
 
 #include <chrono>
 
+/**
+ * @brief Class for managing game timing and delta time calculations
+ */
 class GameTimer {
 public:
+    /**
+     * @brief Constructs a new GameTimer
+     */
     GameTimer();
 
+    /**
+     * @brief Starts the timer
+     */
     void start();
+
+    /**
+     * @brief Gets the delta time since the last call
+     * @return The time elapsed in seconds since the last getDeltaTime call
+     */
     float getDeltaTime();
+
+    /**
+     * @brief Resets the timer
+     */
     void reset();
 
 private:

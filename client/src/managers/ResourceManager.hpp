@@ -7,12 +7,45 @@
 
 class ResourceManager {
 public:
+    /**
+     * @brief Gets the singleton instance of ResourceManager
+     * @return Reference to the singleton ResourceManager instance
+     */
     static ResourceManager& getInstance();
 
+    /**
+     * @brief Loads a texture from file and stores it with the given ID
+     * @param renderer The SDL renderer to create the texture with
+     * @param id Unique identifier for the texture
+     * @param path File path to the image file
+     * @return Pointer to the loaded SDL texture, or nullptr on failure
+     */
     SDL_Texture* loadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path);
+
+    /**
+     * @brief Retrieves a previously loaded texture by ID
+     * @param id The unique identifier of the texture
+     * @return Pointer to the SDL texture, or nullptr if not found
+     */
     SDL_Texture* getTexture(const std::string& id) const;
+
+    /**
+     * @brief Loads a font at the specified size
+     * @param t_fontPath Path to the font file
+     * @param t_fontSize Size of the font to load
+     */
     void loadFonts(const std::string& t_fontPath, int t_fontSize);
+
+    /**
+     * @brief Retrieves a previously loaded font by size
+     * @param t_fontSize The size of the font to retrieve
+     * @return Pointer to the TTF font, or nullptr if not found
+     */
     TTF_Font* getFont(int t_fontSize);
+
+    /**
+     * @brief Unloads all loaded textures and fonts, freeing memory
+     */
     void unloadAll();
 
 private:

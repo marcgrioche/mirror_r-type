@@ -15,4 +15,10 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * @brief System that manages power-up spawning and collection
+ * Handles the creation of power-ups at random intervals and processes player collection
+ * @param registry The ECS registry containing all game entities and components
+ * @param deltaTime Time elapsed since the last frame in seconds
+ */
 void powerUpSystem(Registry& registry, float deltaTime);

@@ -9,52 +9,44 @@
 class RTypeServer : public RTypeNetwork {
 public:
     /**
-     * RTypeServer manages UDP communication and protocol logic for the r-type game server.
-     *
-     * Args:
-     *     port (uint16_t): UDP port to bind the server.
+     * @brief RTypeServer manages UDP communication and protocol logic for the r-type game server
+     * @param port UDP port to bind the server
      */
     explicit RTypeServer(uint16_t port);
 
     /**
-     * Start the server (begin receiving and processing messages).
+     * @brief Starts the server (begin receiving and processing messages).
      * Runs the main loop until stop is requested.
      */
     void start();
 
     /**
-     * Request the server to stop (sets running flag to false).
+     * @brief Requests the server to stop (sets running flag to false)
      */
     void requestStop();
 
     /**
-     * Stop the server and release resources.
+     * @brief Stops the server and releases resources
      */
     void stop();
 
     /**
-     * Send a message to a specific client.
-     *
-     * Args:
-     *     playerId (uint32_t): Target client player ID.
-     *     msg (const Message&): Message to send.
+     * @brief Sends a message to a specific client
+     * @param playerId Target client player ID
+     * @param msg Message to send
      */
     void sendToClient(uint32_t playerId, const Message& msg);
 
     /**
-     * Broadcast a message to all connected clients.
-     *
-     * Args:
-     *     msg (const Message&): Message to broadcast.
+     * @brief Broadcasts a message to all connected clients
+     * @param msg Message to broadcast
      */
     void broadcast(const Message& msg);
 
     /**
-     * Broadcast a message to all players in a specific lobby.
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby to broadcast to.
-     *     msg (const Message&): Message to broadcast.
+     * @brief Broadcasts a message to all players in a specific lobby
+     * @param lobbyId ID of the lobby to broadcast to
+     * @param msg Message to broadcast
      */
     void broadcastToLobby(uint32_t lobbyId, const Message& msg);
 

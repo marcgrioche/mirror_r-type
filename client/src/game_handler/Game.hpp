@@ -27,58 +27,191 @@
 #include <string>
 
 class Game {
+    /**
+     * @brief Enumeration of possible game states
+     */
     enum class GameState {
-        MENU,
-        PLAYING,
-        PAUSED,
-        GAME_OVER
+        MENU, /**< Main menu state */
+        PLAYING, /**< Active gameplay state */
+        PAUSED, /**< Game paused state */
+        GAME_OVER /**< Game ended state */
     };
 
 public:
-    static constexpr uint32_t TICKS_PER_SECOND = 60;
-    static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND;
+    static constexpr uint32_t TICKS_PER_SECOND = 60; /**< Number of game ticks per second */
+    static constexpr float TICK_DURATION = 1.0f / TICKS_PER_SECOND; /**< Duration of each game tick in seconds */
 
+    /**
+     * @brief Constructs a Game instance
+     * @param isLocalMode Whether to run in local mode (no networking)
+     * @param clientPort The port to use for client networking
+     */
     Game(bool isLocalMode = false, uint16_t clientPort = 2020);
+
+    /**
+     * @brief Destructor for Game
+     */
     ~Game();
 
+    /**
+     * @brief Initializes the game and all subsystems
+     * @return True if initialization succeeded, false otherwise
+     */
     bool initialize();
+
+    /**
+     * @brief Runs the main game loop
+     */
     void run();
+
+    /**
+     * @brief Cleans up game resources and shuts down subsystems
+     */
     void cleanup();
 
 private:
     // Core initialization and loop helpers
+
+    /**
+     * @brief Initializes the game for networked multiplayer mode
+     */
     void initializeGameMode();
+
+    /**
+     * @brief Initializes the game for local single-player mode
+     */
     void initializeLocalMode();
+
+    /**
+     * @brief Initializes the menu system
+     */
     void initializeMenuMode();
+
+    /**
+     * @brief Processes the main game mode logic
+     */
     void processGameMode();
+
+    /**
+     * @brief Handles SDL input events
+     * @param event The SDL event to process
+     */
     void handleInputEvents(SDL_Event& event);
-    void runMenuLoop(); // Ajoute deltaTime parameter
+
+    /**
+     * @brief Runs the menu loop with delta time parameter
+     */
+    void runMenuLoop();
+
+    /**
+     * @brief Runs the main game loop
+     * @param deltaTime Time elapsed since last update
+     */
     void runGameLoop(float deltaTime);
+
+    /**
+     * @brief Cleans up network resources
+     */
     void cleanupNetwork();
+
+    /**
+     * @brief Sends a disconnect message to the server
+     */
     void sendDisconnectMessage();
 
     // Core update and render
+
+    /**
+     * @brief Updates the game state
+     * @param deltaTime Time elapsed since last update
+     */
     void update(float deltaTime);
+
+    /**
+     * @brief Renders the current game state
+     */
     void render();
+
+    /**
+     * @brief Starts the gameplay session
+     */
     void startGameplay();
 
     // Game tick updates
+
+    /**
+     * @brief Updates the game for the current tick
+     */
     void updateGameTick();
+
+    /**
+     * @brief Updates the game tick for networked mode
+     */
     void updateNetworkGameTick();
+
+    /**
+     * @brief Updates the game tick for local mode
+     */
     void updateLocalGameTick();
 
     // Menu handling
+
+    /**
+     * @brief Processes pending menu requests from the user
+     */
     void processMenuRequests();
+
+    /**
+     * @brief Handles a menu connection request
+     * @param connectionCode The connection code entered by the user
+     */
     void handleMenuConnectionRequest(const std::string& connectionCode);
+
+    /**
+     * @brief Handles a menu join lobby request
+     * @param lobbyCode The lobby code to join
+     * @param pseudo The username entered by the user
+     */
     void handleMenuJoinRequest(const std::string& lobbyCode, const std::string& pseudo);
+
+    /**
+     * @brief Handles a menu create lobby request
+     * @param pseudo The username entered by the user
+     */
     void handleMenuCreateRequest(const std::string& pseudo);
+
+    /**
+     * @brief Connects to a server at the specified address and port
+     * @param serverIp The server IP address
+     * @param serverPort The server port number
+     */
     void connectToServer(const std::string& serverIp, uint16_t serverPort);
 
     // Conserver les méthodes existantes du GameMenuHandler.cpp
+
+    /**
+     * @brief Processes menu events (legacy method)
+     */
     void processMenuEvents();
+
+    /**
+     * @brief Handles menu connect request (legacy method)
+     */
     void handleMenuConnectRequest();
+
+    /**
+     * @brief Handles menu create lobby request (legacy method)
+     */
     void handleMenuCreateLobbyRequest();
+
+    /**
+     * @brief Handles menu join lobby request (legacy method)
+     */
     void handleMenuJoinLobbyRequest();
+
+    /**
+     * @brief Handles menu start request (legacy method)
+     */
     void handleMenuStartRequest();
 
     // Network event handling

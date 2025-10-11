@@ -5,49 +5,77 @@
 #include <unordered_map>
 #include <vector>
 
-// Types d'événements de base
+/**
+ * @brief Enumeration of base event types in the game
+ */
 enum class EventType {
-    BUTTON_CLICK,
-    COLLISION_DETECTED,
-    PLAYER_DIED,
-    LEVEL_COMPLETE,
-    CUSTOM_EVENT
+    BUTTON_CLICK, /**< Button click event */
+    COLLISION_DETECTED, /**< Collision detection event */
+    PLAYER_DIED, /**< Player death event */
+    LEVEL_COMPLETE, /**< Level completion event */
+    CUSTOM_EVENT /**< Custom user-defined event */
 };
 
-// Structure d'événement générique
+/**
+ * @brief Generic game event structure
+ */
 struct GameEvent {
-    EventType type;
-    Entity source; // qui a émis l'événement
-    Entity target; // cible optionnelle
-    std::string data; // données sérialisées (JSON/custom)
-    float timestamp; // quand l'événement s'est produit
+    EventType type; /**< Type of the event */
+    Entity source; /**< Entity that emitted the event */
+    Entity target; /**< Optional target entity */
+    std::string data; /**< Serialized data (JSON/custom format) */
+    float timestamp; /**< When the event occurred */
 };
 
-// Handler = fonction callback
+/**
+ * @brief Event handler function type (callback)
+ */
 using EventHandler = std::function<void(const GameEvent&)>;
 
+/**
+ * @brief Singleton manager for handling game events
+ */
 class EventManager {
 public:
+    /**
+     * @brief Gets the singleton instance of EventManager
+     * @return Reference to the EventManager instance
+     */
     static EventManager& getInstance();
 
-    // S'abonner à un type d'événement
+    /**
+     * @brief Subscribes to a specific event type
+     * @param type The event type to subscribe to
+     * @param handler The callback function to handle the event
+     */
     void subscribe(EventType type, EventHandler handler);
 
-    // Émettre un événement (ajouté à la queue)
+    /**
+     * @brief Emits an event (adds it to the event queue)
+     * @param event The event to emit
+     */
     void emit(const GameEvent& event);
 
-    // Helper pour boutons
+    /**
+     * @brief Helper function to emit a button click event
+     * @param buttonEntity The button entity that was clicked
+     * @param actionId The action identifier associated with the button
+     */
     void emitButtonClick(Entity buttonEntity, const std::string& actionId);
 
-    // Traiter tous les événements en attente (à appeler chaque frame)
+    /**
+     * @brief Processes all pending events (call this every frame)
+     */
     void processEvents();
 
-    // Vider la queue (fin de frame)
+    /**
+     * @brief Clears the event queue (call at end of frame)
+     */
     void clear();
 
 private:
     EventManager() = default;
 
-    std::vector<GameEvent> eventQueue;
-    std::unordered_map<EventType, std::vector<EventHandler>> subscribers;
+    std::vector<GameEvent> eventQueue; /**< Queue of pending events */
+    std::unordered_map<EventType, std::vector<EventHandler>> subscribers; /**< Event subscribers */
 };

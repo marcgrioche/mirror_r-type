@@ -19,4 +19,10 @@
 #include "components/TextBoxInput.hpp"
 #include "managers/GraphicsManager.hpp"
 
+/**
+ * @brief Draws a text box input entity on the screen
+ * @param gfx The graphics manager for rendering
+ * @param registry The ECS registry containing the entity
+ * @param entity The entity to draw
+ */
 void drawTextBoxInput(GraphicsManager& gfx, Registry& registry, Entity entity);
