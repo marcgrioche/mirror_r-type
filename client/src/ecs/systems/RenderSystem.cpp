@@ -118,6 +118,7 @@ void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer)
 {
     if (!renderer)
         return;
+    auto& resourceManager = ResourceManager::getInstance();
     auto view = registry.view<TextBox, Position>();
     for (auto it = view.begin(); it != view.end(); ++it) {
         Entity e = it.entity();
@@ -128,16 +129,7 @@ void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer)
         }
 
         // Prepare SDL_Color
-        TTF_Font* font = TTF_OpenFont(textBox.fontPath.c_str(), textBox.fontSize);
-        if (!font) {
-            std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
-            // Essaie un chemin de police par défaut
-            font = TTF_OpenFont("client/res/fonts/OpenSans-Medium.ttf", textBox.fontSize);
-            if (!font) {
-                std::cerr << "Failed to load default font: " << TTF_GetError() << std::endl;
-                return;
-            }
-        }
+        TTF_Font* font = resourceManager.getFont(textBox.fontSize);
 
         SDL_Color color = {
             textBox.color.r,
