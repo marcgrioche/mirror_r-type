@@ -2,7 +2,6 @@
 
 #include "Registry.hpp"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 /**
  * @brief System that renders player list with names and health bars
