@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Fri Oct 10 3:47:00 PM 2025 jojo
-** Last update Sat Oct 10 4:38:33 PM 2025 jojo
+** Last update Mon Oct 12 11:16:50 AM 2025 jojo
 */
 
 #include "ParameterMenu.hpp"
@@ -124,6 +124,38 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
     textBoxInputSystem(registry, event);
 
     // existing parameter handling
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (m_waitingForKey) {
+            int mouseBtn = static_cast<int>(event.button.button);
+            int storedCode = -mouseBtn; // negative => mouse button
+            if (m_selectedIndex < m_bindings.size()) {
+                m_bindings[m_selectedIndex].second.clear();
+                m_bindings[m_selectedIndex].second.push_back(storedCode);
+                saveBindings();
+                auto btnName = (mouseBtn == SDL_BUTTON_LEFT) ? "Mouse Left" : (mouseBtn == SDL_BUTTON_RIGHT) ? "Mouse Right"
+                    : (mouseBtn == SDL_BUTTON_MIDDLE)                                                        ? "Mouse Middle"
+                                                                                                             : ("Mouse Button " + std::to_string(mouseBtn)).c_str();
+                std::cout << "Rebound " << m_bindings[m_selectedIndex].first
+                          << " to " << btnName << " (" << storedCode << ")\n";
+            }
+            m_waitingForKey = false;
+            return;
+        }
+
+        // not waiting: use click to select/rebind (existing behavior)
+        int my = event.button.y;
+        int top = 120;
+        int lineH = 36;
+        if (my >= top) {
+            size_t idx = (my - top) / lineH;
+            if (idx < m_bindings.size()) {
+                m_selectedIndex = idx;
+                m_waitingForKey = true;
+                std::cout << "Click -> rebinding " << m_bindings[m_selectedIndex].first << std::endl;
+            }
+        }
+        return;
+    }
     if (event.type == SDL_KEYDOWN) {
         SDL_Keycode kc = event.key.keysym.sym;
 
@@ -138,14 +170,12 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
                 m_bindings[m_selectedIndex].second.clear();
                 m_bindings[m_selectedIndex].second.push_back(keycode);
                 saveBindings();
-                std::cout << "Rebound " << m_bindings[m_selectedIndex].first
-                          << " to " << SDL_GetKeyName(kc) << " (" << keycode << ")\n";
             }
             m_waitingForKey = false;
             return;
         }
 
-        if (kc == SDLK_w || kc == SDLK_UP) {
+        if (kc == SDLK_z || kc == SDLK_UP) {
             if (m_selectedIndex > 0)
                 m_selectedIndex--;
         } else if (kc == SDLK_s || kc == SDLK_DOWN) {
@@ -153,11 +183,11 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
                 m_selectedIndex++;
         } else if (kc == SDLK_RETURN || kc == SDLK_KP_ENTER) {
             m_waitingForKey = true;
-            std::cout << "Press a key to bind to action: " << m_bindings[m_selectedIndex].first << std::endl;
         }
     }
 
     // mouse selection: map Y position to index (similar to earlier approach)
+    // TODO make a function
     if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         int mx = event.button.x;
         int my = event.button.y;
@@ -168,7 +198,6 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
             if (idx < m_bindings.size()) {
                 m_selectedIndex = idx;
                 m_waitingForKey = true;
-                std::cout << "Click -> rebinding " << m_bindings[m_selectedIndex].first << std::endl;
             }
         }
     }
@@ -211,13 +240,6 @@ void ParameterMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_Renderer* renderer = gfx.getRenderer();
     if (!renderer)
         return;
-
-    // title
-    Entity title = registry.create_entity();
-    registry.emplace<Position>(title, 300.0f, 60.0f);
-    registry.emplace<TextBox>(title, "KEY BINDINGS", 24, Color { 255, 255, 255, 255 }, "client/res/fonts/OpenSans-Medium.ttf", true, ::TextBox::Alignment::CENTER);
-    drawTextBox(gfx, registry, title);
-    registry.kill_entity(title);
 
     // draw entries
     for (Entity e : m_actionTextEntities)
@@ -270,7 +292,7 @@ void ParameterMenu::loadBindings()
             try {
                 int v = std::stoi(token);
                 codes.push_back(v);
-            } catch (...) { /* ignore */
+            } catch (...) {
             }
         }
         if (!key.empty())
@@ -315,7 +337,16 @@ std::string ParameterMenu::keysToString(const std::vector<int>& keys) const
     for (size_t i = 0; i < keys.size(); ++i) {
         if (i)
             ss << ",";
-        ss << SDL_GetKeyName(static_cast<SDL_Keycode>(keys[i]));
+        int code = keys[i];
+        if (code < 0) { // mouse button encoding (negative)
+            int mb = -code;
+            const char* name = (mb == SDL_BUTTON_LEFT) ? "Mouse Left" : (mb == SDL_BUTTON_RIGHT) ? "Mouse Right"
+                : (mb == SDL_BUTTON_MIDDLE)                                                      ? "Mouse Middle"
+                                                                                                 : ("Mouse " + std::to_string(mb)).c_str();
+            ss << name;
+        } else {
+            ss << SDL_GetKeyName(static_cast<SDL_Keycode>(code));
+        }
     }
     return ss.str();
 }
