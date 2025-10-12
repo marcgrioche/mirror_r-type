@@ -19,7 +19,9 @@ struct Sprite {
     SDL_Rect dstRect; // position/size on the screen
     int offset_x = 0;
     int offset_y = 0;
-    float scale = 1.0f;
+    float scale = 1.0f; // Legacy single scale (maintains aspect ratio)
+    float scale_x = 1.0f; // Independent X scaling for exact hitbox matching
+    float scale_y = 1.0f; // Independent Y scaling for exact hitbox matching
     float rotation = 0.0f; // in degrees
     int total_frames = 1; // for animated sprites
     int current_frame = 0;

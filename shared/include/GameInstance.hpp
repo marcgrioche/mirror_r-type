@@ -38,6 +38,7 @@
 #include "ecs/systems/PowerUpSystem.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
+#include "entities/boss/CreateBoss.hpp"
 #include "entities/powerUp/CreatePowerUp.hpp"
 #include <chrono>
 #include <cstdint>
@@ -47,6 +48,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include "Config.hpp"
 
 class GameInstance {
 public:

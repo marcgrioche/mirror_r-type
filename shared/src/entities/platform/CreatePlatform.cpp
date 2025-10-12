@@ -1,11 +1,16 @@
 #include "CreatePlatform.hpp"
-
+#include "Config.hpp"
+#include <cmath>
 
 Entity factories::createOneWayPlatform(Registry& registry, float posx, float posy)
 {
     Entity platform = registry.create_entity();
     registry.emplace<Position>(platform, Position { posx, posy });
-    registry.emplace<Velocity>(platform, -10.0f, 0.0f);
+    registry.emplace<Velocity>(
+        platform,
+        static_cast<float>(PLATFORM_VELOCITY_X),
+        static_cast<float>(PLATFORM_VELOCITY_Y)
+    );
     registry.emplace<Hitbox>(platform, Hitbox { 120, 20, 0, 0 });
     registry.emplace<PlatformTag>(platform);
     registry.emplace<BottomPassPlatform>(platform);
@@ -17,7 +22,11 @@ Entity factories::createPlatform(Registry& registry, float posx, float posy)
 {
     Entity platform = registry.create_entity();
     registry.emplace<Position>(platform, Position { posx, posy });
-    registry.emplace<Velocity>(platform, -10.0f, 0.0f);
+    registry.emplace<Velocity>(
+        platform,
+        static_cast<float>(PLATFORM_VELOCITY_X),
+        static_cast<float>(PLATFORM_VELOCITY_Y)
+    );
     registry.emplace<Hitbox>(platform, Hitbox { 120, 20, 0, 0 });
     registry.emplace<PlatformTag>(platform);
     registry.emplace<NoPassPlatform>(platform);
@@ -28,10 +37,13 @@ Entity factories::createPlatform(Registry& registry, float posx, float posy)
 std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int quantity)
 {
     std::vector<Entity> platformsEntities;
-    constexpr float SCREEN_W = 800.0f + 200.0f; // on génère un peu plus loin que l'écran initial
+    constexpr float SCREEN_W = SCREEN_WIDTH + 200.0f; // on génère un peu plus loin que l'écran initial
     constexpr float PLATFORM_W = 120.0f;
-    constexpr float MIN_Y = 180.0f; // bande jouable haute
-    constexpr float MAX_Y = 540.0f; // bande jouable basse
+    // Répartit les couches sur quasiment toute la hauteur d'écran, avec marges de sécurité
+    constexpr float TOP_MARGIN = 80.0f;
+    constexpr float BOTTOM_MARGIN = 100.0f;
+    constexpr float MIN_Y = TOP_MARGIN; // bande jouable haute
+    constexpr float MAX_Y = SCREEN_HEIGHT - BOTTOM_MARGIN - PLATFORM_HEIGHT; // bande jouable basse
     constexpr float SAME_LVL_EPS = 28.0f; // seuil pour considérer même "étage"
     constexpr float MIN_DIST_X_SAME = 200.0f; // distance minimale sur même étage
     constexpr float CROSS_DIST_X = PLATFORM_W * 1.5f; // distance min entre étages proches
@@ -42,11 +54,7 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distX(0.0f, SCREEN_W - PLATFORM_W);
 
-    // --- Discrétisation en 4 "layers" verticaux ---
-    // On veut 4 niveaux accessibles : l'écart doit être <= MAX_DIFF_Y.
-    // L'écart naturel (MAX_Y - MIN_Y) / 3 = 120 (> 110) donc on "compresse" les layers
-    // pour garder une marge haute/basse tout en restant atteignable.
-    constexpr int LAYER_COUNT = 4;
+    constexpr int LAYER_COUNT = 8;
     const float availableSpan = (MAX_Y - MIN_Y);
     const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
     const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
@@ -118,25 +126,6 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
 
         placed.push_back({ x, y });
         platformsEntities.push_back(createOneWayPlatform(registry, x, y));
-
-        // std::uniform_real_distribution<float> powerUpChance(0.0f, 1.0f);
-        // if (powerUpChance(gen) < 0.33f) {
-        //     float PUx = x + (rand() % (int)PLATFORM_WIDTH);
-        //     float PUy = y - POWERUP_HEIGHT;
-        //     PowerUpType type = (std::uniform_int_distribution<int>(0,1)(gen) == 0)
-        //         ? PowerUpType::HEAL
-        //         : PowerUpType::DAMAGE_BOOST;
-        //     float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
-        //     platformsEntities.push_back(factories::createPowerUp(
-        //         registry,
-        //         Position{PUx, PUy},
-        //         Velocity{-10.0f, 0.0f},
-        //         Hitbox{POWERUP_WIDTH, POWERUP_HEIGHT},
-        //         Lifetime{POWERUP_LIFETIME},
-        //         type,
-        //         effectDuration
-        //     ));
-        // }
     }
 
     return platformsEntities;
@@ -145,11 +134,14 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
 std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int quantity)
 {
     std::vector<Entity> platformsEntities;
-    constexpr float SCREEN_W = 800.0f;
+    constexpr float SCREEN_W = SCREEN_WIDTH;
     constexpr float PLATFORM_W = 120.0f;
     constexpr float SPAWN_OFFSET = 80.0f; // démarre juste hors écran
-    constexpr float MIN_Y = 180.0f;
-    constexpr float MAX_Y = 540.0f;
+    // Même logique de distribution verticale que l'initialisation
+    constexpr float TOP_MARGIN = 80.0f;
+    constexpr float BOTTOM_MARGIN = 100.0f;
+    constexpr float MIN_Y = TOP_MARGIN;
+    constexpr float MAX_Y = SCREEN_HEIGHT - BOTTOM_MARGIN - PLATFORM_HEIGHT;
     constexpr float SAME_LVL_EPS = 28.0f;
     constexpr float MIN_DIST_X_SAME = 200.0f;
     constexpr float CROSS_DIST_X = PLATFORM_W * 1.5f;
@@ -161,14 +153,14 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
     std::uniform_real_distribution<float> distX(SCREEN_W, SCREEN_W + SPAWN_OFFSET);
 
     // Même logique de layers que dans generateRandomPlatforms
-    constexpr int LAYER_COUNT = 4;
+    constexpr int LAYER_COUNT = 8;
     const float availableSpan = (MAX_Y - MIN_Y);
-    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f);
+    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
     const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
-    const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f;
+    const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f; // centre les layers dans la fenêtre jouable
     std::array<float, LAYER_COUNT> layers {};
     for (int i = 0; i < LAYER_COUNT; ++i)
-        layers[i] = verticalOffset + targetSpacing * i;
+        layers[i] = verticalOffset + targetSpacing * i; // valeurs exactes sans jitter
     std::uniform_int_distribution<int> pickLayer(0, LAYER_COUNT - 1);
 
     struct Plat {

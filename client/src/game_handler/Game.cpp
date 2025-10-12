@@ -8,8 +8,11 @@
 #include "Game.hpp"
 #include "ButtonSystem.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
+#include "ecs/components/ParallaxState.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
+#include "managers/ResourceManager.hpp"
 #include <SDL.h>
+#include "Config.hpp"
 #include <iostream>
 
 Game::Game(bool isLocalMode, uint16_t clientPort)
@@ -30,10 +33,48 @@ Game::~Game()
 
 bool Game::initialize()
 {
-    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", 800, 600)) {
+    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", SCREEN_WIDTH, SCREEN_HEIGHT)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
+
+    auto& resourceManager = ResourceManager::getInstance();
+    SDL_Renderer* renderer = _graphics.getRenderer();
+
+    if (!resourceManager.loadTexture(renderer, "player_sprite.png", "client/res/sprites/player_sprite.png")) {
+        std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "eye_spritesheet.png", "client/res/sprites/eye_spritesheet.png")) {
+        std::cout << "Warning: Failed to load eye spritesheet texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "WallOfFlesh.png", "client/res/sprites/WallOfFlesh.png")) {
+        std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "bydo_flying.png", "client/res/sprites/bydo_flying.png")) {
+        std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
+    }
+
+    // Load parallax background textures
+    if (!resourceManager.loadTexture(renderer, "TopLayer.png", "client/res/sprites/ParallaxBackground/TopLayer.png")) {
+        std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "Light.png", "client/res/sprites/ParallaxBackground/Light.png")) {
+        std::cout << "Warning: Failed to load Light texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", "client/res/sprites/ParallaxBackground/MiddleLayer.png")) {
+        std::cout << "Warning: Failed to load MiddleLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "DownLayer.png", "client/res/sprites/ParallaxBackground/DownLayer.png")) {
+        std::cout << "Warning: Failed to load DownLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "Sky.png", "client/res/sprites/ParallaxBackground/Sky.png")) {
+        std::cout << "Warning: Failed to load Sky texture" << std::endl;
+    }
+
+    _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
 
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();

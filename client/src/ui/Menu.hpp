@@ -73,7 +73,7 @@ private:
     ConnectionMenu m_connectionPage;
     JoinMenu m_joinPage;
     LobbyMenu m_lobbyPage;
-    EndMenu m_endPage;
+    EndMenuPage m_endPage;
     ParameterMenu m_parameterPage;
 
     // Gestion des transitions
