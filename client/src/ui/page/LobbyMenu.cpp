@@ -93,6 +93,7 @@ void LobbyMenu::setupEventHandlers()
 
 void LobbyMenu::update(Registry& registry, float deltaTime)
 {
+    (void)deltaTime;
     if (!m_visible)
         return;
     // textBoxInputUpdateSystem(registry, deltaTime);
@@ -101,6 +102,8 @@ void LobbyMenu::update(Registry& registry, float deltaTime)
 
 void LobbyMenu::handleEvent(Registry& registry, const SDL_Event& event)
 {
+    (void)registry;
+    (void)event;
     if (!m_visible)
         return;
     // textBoxInputSystem(registry, event);

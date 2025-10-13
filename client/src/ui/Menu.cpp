@@ -34,6 +34,7 @@ void Menu::activate(Registry& _registry, Page page)
         break;
     case Page::LOSE:
         m_endPage.show(_registry, false);
+        break;
     default:
         break;
     }
@@ -93,6 +94,7 @@ void Menu::showLobbyPageAfterGame(Registry& registry)
 
 void Menu::clearGameEntities(Registry& registry)
 {
+    (void)registry;
     // This method will be called by the Game class to clear entities
     // Implementation is in Game::clearGameEntities()
 }
@@ -142,6 +144,8 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
         break;
     case Page::LOSE:
         m_endPage.handleEvent(registry, e);
+        break;
+    default:
         break;
     }
 }
@@ -198,6 +202,7 @@ void Menu::processPageTransitions(Registry& registry)
             m_lobbyPage.clearRequests();
             showHomePage(registry);
         }
+        break;
     case Page::JOIN_LOBBY:
         if (m_joinPage.hasReturnRequest()) {
             m_joinPage.clearConnectionRequest();
@@ -256,6 +261,8 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
         break;
     case Page::LOSE:
         m_endPage.render(gfx, registry);
+        break;
+    default:
         break;
     }
 }

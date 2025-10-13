@@ -118,11 +118,13 @@ void Game::onConnectionSuccess()
 
 void Game::onLobbyJoined(uint32_t lobbyId)
 {
+    (void)lobbyId;
     m_menu.showLobbyPage(_registry);
 }
 
 void Game::onLobbyCreated(uint32_t lobbyId)
 {
+    (void)lobbyId;
     m_menu.showLobbyPage(_registry);
 }
 

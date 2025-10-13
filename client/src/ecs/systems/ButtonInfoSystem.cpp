@@ -27,7 +27,6 @@ void buttonInfoSystem(Registry& registry)
 
         const Button& button = registry.get<Button>(buttonEntity);
         const ButtonInfo& btnInfo = registry.get<ButtonInfo>(buttonEntity);
-        const Position& btnPos = registry.get<Position>(buttonEntity);
 
         // Vérifie si le tooltip existe toujours
         Entity tooltipEntity = btnInfo.tooltipEntity;
@@ -36,7 +35,6 @@ void buttonInfoSystem(Registry& registry)
         }
 
         TextBox& tooltip = registry.get<TextBox>(tooltipEntity);
-        Position& tooltipPos = registry.get<Position>(tooltipEntity);
 
         // Affiche/cache le tooltip selon l'état hover du bouton
         if (button.is_hovered && btnInfo.showOnHover) {

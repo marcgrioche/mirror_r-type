@@ -103,8 +103,6 @@ bool handleEnemyAttacks(
     Registry& registry,
     std::vector<Entity>& newEntitiesThisTick)
 {
-    bool spawned = false;
-
     std::vector<Entity> weaponsToFire;
     auto weaponView = registry.view<WeaponTag, Frequency, Parent, Damage>();
 

@@ -151,5 +151,6 @@ void HomeMenu::clearRequests()
 {
     m_joinRequested = false;
     m_createRequested = false;
-    m_paramRequested;
+    // j'ai modifié la ligne suivante en la mettant à false car elle n'avait aucune valeur renseigné. Et c'est un Warning
+    m_paramRequested = false;
 }
