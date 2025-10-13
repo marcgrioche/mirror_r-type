@@ -103,7 +103,6 @@ void GameInstance::updateTick()
         for (; _platformsToAdd > 0; _platformsToAdd--) {
             auto platformTmp = factories::reGenerateRandomPlatforms(_registry, 1);
             _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
-            std::cout << _platformsToAdd << std::endl;
         }
     }
 
