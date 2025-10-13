@@ -68,4 +68,7 @@ private:
     std::vector<Entity> m_keyTextEntities; // right column
     Entity m_returnButtonEntity { 0, 0 };
     Entity m_returnTextEntity { 0, 0 };
+    Entity m_autoShootButtonEntity { 0, 0 };
+    Entity m_autoShootTextEntity { 0, 0 };
+    bool m_autoShoot = false;
 };

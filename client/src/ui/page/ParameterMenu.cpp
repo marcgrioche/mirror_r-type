@@ -54,6 +54,10 @@ void ParameterMenu::createEntities(Registry& registry)
     // Build text entities for each binding
     rebuildTextEntities(registry);
 
+    // auto-shoot toggle button
+    m_autoShootButtonEntity = factories::createButton(registry, 120.0f, 450.0f, 100.0f, 40.0f, "auto_shoot_toggle", true);
+    m_autoShootTextEntity = factories::createTextBox(registry, m_autoShoot ? "AUTO ON" : "AUTO OFF", 170.0f, 465.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::CENTER);
+
     // return button
     m_returnButtonEntity = factories::createButton(registry, 320.0f, 520.0f, 160.0f, 50.0f, "return_to_home", true);
     m_returnTextEntity = factories::createTextBox(registry, "RETURN", 360.0f, 535.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::CENTER);
@@ -77,6 +81,15 @@ void ParameterMenu::destroyEntities(Registry& registry)
         registry.kill_entity(m_returnTextEntity);
         m_returnTextEntity = { 0, 0 };
     }
+    if (m_autoShootTextEntity.id != 0) {
+        registry.kill_entity(m_autoShootTextEntity);
+        m_autoShootTextEntity = { 0, 0 };
+    }
+    if (m_autoShootButtonEntity.id != 0) {
+        registry.kill_entity(m_autoShootButtonEntity);
+        m_autoShootButtonEntity = { 0, 0 };
+    }
+
     if (m_returnButtonEntity.id != 0) {
         registry.kill_entity(m_returnButtonEntity);
         m_returnButtonEntity = { 0, 0 };
@@ -89,6 +102,9 @@ void ParameterMenu::setupEventHandlers()
     eventMgr.subscribe(EventType::BUTTON_CLICK, [this](const GameEvent& event) {
         if (event.data == "return_to_home" && m_visible) {
             m_returnRequested = true;
+        } else if (event.data == "auto_shoot_toggle" && m_visible) {
+            m_autoShoot = !m_autoShoot;
+            saveBindings();
         }
     });
 }
@@ -113,6 +129,10 @@ void ParameterMenu::update(Registry& registry, float deltaTime)
                 registry.get<TextBox>(m_keyTextEntities[i]).color = Color { 200, 200, 200, 255 };
             }
         }
+    }
+
+    if (registry.has<TextBox>(m_autoShootTextEntity)) {
+        registry.get<TextBox>(m_autoShootTextEntity).text = m_autoShoot ? "AUTO ON" : "AUTO OFF";
     }
 }
 
@@ -248,6 +268,11 @@ void ParameterMenu::render(GraphicsManager& gfx, Registry& registry)
     for (Entity e : m_keyTextEntities)
         drawTextBox(gfx, registry, e);
 
+    if (m_autoShootButtonEntity.id != 0)
+        drawButton(gfx, registry, m_autoShootButtonEntity);
+    if (m_autoShootTextEntity.id != 0)
+        drawTextBox(gfx, registry, m_autoShootTextEntity);
+
     // draw return button + text
     if (m_returnButtonEntity.id != 0)
         drawButton(gfx, registry, m_returnButtonEntity);
@@ -299,6 +324,32 @@ void ParameterMenu::loadBindings()
         if (!key.empty())
             m_bindings.emplace_back(key, codes);
     }
+
+    std::ifstream ifs_auto(m_iniPath);
+    if (ifs_auto.is_open()) {
+        std::string line;
+        while (std::getline(ifs_auto, line)) {
+            if (line.empty() || line[0] == '#')
+                continue;
+            auto pos = line.find('=');
+            if (pos != std::string::npos) {
+                std::string key = line.substr(0, pos);
+                std::string val = line.substr(pos + 1);
+                key.erase(key.find_last_not_of(" \t") + 1);
+                key.erase(0, key.find_first_not_of(" \t"));
+                val.erase(val.find_last_not_of(" \t") + 1);
+                val.erase(0, val.find_first_not_of(" \t"));
+                if (key == "auto_shoot") {
+                    try {
+                        m_autoShoot = (std::stoi(val) != 0);
+                    } catch (...) {
+                        m_autoShoot = false;
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void ParameterMenu::saveBindings()
@@ -319,6 +370,7 @@ void ParameterMenu::saveBindings()
         }
         ofs << "\n";
     }
+    ofs << "auto_shoot=" << (m_autoShoot ? "1" : "0") << "\n";
     ofs.close();
     std::cout << "ParameterMenu: saved keybindings to " << m_iniPath << std::endl;
 

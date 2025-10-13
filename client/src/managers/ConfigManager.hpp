@@ -67,6 +67,18 @@ public:
      */
     void resetToDefaults();
 
+    /**
+     * @brief Gets the auto-shoot setting
+     * @return True if auto-shoot is enabled, false otherwise
+     */
+    bool getAutoShoot() const;
+
+    /**
+     * @brief Sets the auto-shoot setting
+     * @param enabled Whether auto-shoot should be enabled
+     */
+    void setAutoShoot(bool enabled);
+
 private:
     ConfigManager();
     ~ConfigManager() = default;
@@ -78,5 +90,6 @@ private:
     void setDefaultKeyBindings();
 
     std::unordered_map<GameAction, std::vector<SDL_Keycode>> m_keyBindings;
+    bool m_autoShoot = false;
     const std::string m_configFileName = "keybindings.ini";
 };

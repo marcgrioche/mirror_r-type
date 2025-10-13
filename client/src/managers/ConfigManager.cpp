@@ -70,7 +70,14 @@ bool ConfigManager::loadKeyBindings()
             else if (actionStr == "quit")
                 action = GameAction::QUIT;
 
-            if (action != GameAction::ACTION_COUNT) {
+            if (actionStr == "auto_shoot") {
+                try {
+                    int value = std::stoi(keyStr);
+                    m_autoShoot = (value != 0);
+                } catch (const std::exception&) {
+                    std::cerr << "Invalid value for auto_shoot: " << keyStr << std::endl;
+                }
+            } else if (action != GameAction::ACTION_COUNT) {
                 std::vector<SDL_Keycode> keys;
                 std::istringstream keyStream(keyStr);
                 std::string keyToken;
@@ -152,6 +159,8 @@ bool ConfigManager::saveKeyBindings()
         file << std::endl;
     }
 
+    file << "auto_shoot=" << (m_autoShoot ? "1" : "0") << std::endl;
+
     file.close();
     std::cout << "Saved keybindings to: " << configPath << std::endl;
     return true;
@@ -200,5 +209,15 @@ void ConfigManager::setDefaultKeyBindings()
     m_keyBindings[GameAction::MOVE_RIGHT] = { SDLK_d };
     m_keyBindings[GameAction::SHOOT] = { SDLK_SPACE };
     m_keyBindings[GameAction::QUIT] = { SDLK_ESCAPE };
-    m_keyBindings[GameAction::DASH] = {SDLK_LSHIFT};
+    m_keyBindings[GameAction::DASH] = { SDLK_LSHIFT };
+}
+
+bool ConfigManager::getAutoShoot() const
+{
+    return m_autoShoot;
+}
+
+void ConfigManager::setAutoShoot(bool enabled)
+{
+    m_autoShoot = enabled;
 }
