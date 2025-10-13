@@ -2,11 +2,18 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** Hitbox Component
+** Hitbox Component - Collision detection boundaries for entities
 */
 
 #pragma once
 
+/**
+ * @brief Component defining collision boundaries for entities
+ * @param width Width of the hitbox in pixels
+ * @param height Height of the hitbox in pixels
+ * @param offset_x X offset from entity position to hitbox center
+ * @param offset_y Y offset from entity position to hitbox center
+ */
 struct Hitbox {
     float width = 1.0f;
     float height = 1.0f;

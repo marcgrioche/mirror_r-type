@@ -14,5 +14,10 @@
 #include <iostream>
 #include <vector>
 
-// Projectile system - updates entity projectile
+/**
+ * @brief System that manages projectile lifecycle and behavior
+ * Updates projectile positions, handles lifetime expiration, and manages projectile-specific logic
+ * @param registry The ECS registry containing all game entities and components
+ * @param deltaTime Time elapsed since the last frame in seconds
+ */
 void projectileSystem(Registry& registry, float deltaTime);

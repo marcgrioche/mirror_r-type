@@ -7,11 +7,13 @@
 
 #include "RenderSystem.hpp"
 #include "ParallaxBackgroundSystem.hpp"
+#include "PlayerListRenderSystem.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
 #include "components/Sprite.hpp"
 #include "components/Tags.hpp"
+#include "components/TextBox.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "managers/ResourceManager.hpp"
 #include <SDL.h>
@@ -108,6 +110,50 @@ void renderSystem(Registry& registry)
         SDL_RenderFillRect(renderer, &rect);
         SDL_RenderDrawRect(renderer, &rect);
     }
+    playerPseudoRenderSystem(registry, renderer);
+    playerListRenderSystem(registry, renderer);
 
     graphics.present();
+}
+
+void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer)
+{
+    if (!renderer)
+        return;
+    auto& resourceManager = ResourceManager::getInstance();
+    auto view = registry.view<TextBox, Position>();
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        Entity e = it.entity();
+        TextBox& textBox = registry.get<TextBox>(e);
+        Position& pos = registry.get<Position>(e);
+        if (!registry.has<PlayerTag>(e)) {
+            continue;
+        }
+
+        // Prepare SDL_Color
+        TTF_Font* font = resourceManager.getFont(textBox.fontSize);
+
+        SDL_Color color = {
+            textBox.color.r,
+            textBox.color.g,
+            textBox.color.b,
+            textBox.color.a
+        };
+
+        // Render the text with SDL_ttf
+        SDL_Surface* textSurface = TTF_RenderUTF8_Blended(font, textBox.text.c_str(), color);
+        if (textSurface) {
+            SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            if (textTexture) {
+                SDL_Rect dstRect;
+                dstRect.x = static_cast<int>(pos.x);
+                dstRect.y = static_cast<int>(pos.y) - textSurface->h - 4.f; // Render above the entity
+                dstRect.w = textSurface->w;
+                dstRect.h = textSurface->h;
+                SDL_RenderCopy(renderer, textTexture, nullptr, &dstRect);
+                SDL_DestroyTexture(textTexture);
+            }
+            SDL_FreeSurface(textSurface);
+        }
+    }
 }

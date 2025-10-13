@@ -9,10 +9,10 @@
 */
 
 #include "ui/page/HomeMenu.hpp"
+#include "Config.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
-#include "Config.hpp"
 #include <iostream>
 
 HomeMenu::HomeMenu()
@@ -151,6 +151,5 @@ void HomeMenu::clearRequests()
 {
     m_joinRequested = false;
     m_createRequested = false;
-    // j'ai modifié la ligne suivante en la mettant à false car elle n'avait aucune valeur renseigné. Et c'est un Warning
-    m_paramRequested = false;
+    // m_paramRequested;
 }

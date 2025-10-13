@@ -182,6 +182,7 @@ void Menu::processPageTransitions(Registry& registry)
     switch (m_currentPage) {
     case Page::HOME:
         if (m_homePage.hasJoinRequest()) {
+            m_joinPage.setUserName(m_homePage.getPseudo(registry));
             m_homePage.clearRequests();
             showJoinPage(registry);
         } else if (m_homePage.hasCreateRequest()) {
@@ -280,6 +281,8 @@ std::string Menu::getJoinCode(Registry& registry) const
 
 std::string Menu::getUserPseudo(Registry& registry) const
 {
+    if (m_currentPage == Page::JOIN_LOBBY)
+        return m_joinPage.getPseudo();
     return m_homePage.getPseudo(registry);
 }
 

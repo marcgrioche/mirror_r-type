@@ -27,6 +27,7 @@ void Game::handleMenuConnectRequest()
     std::cout << "Connected to server " << ip << ":" << port << std::endl;
 }
 
+// HERE
 void Game::handleMenuCreateLobbyRequest()
 {
     if (!m_clientNetwork) {
@@ -38,6 +39,7 @@ void Game::handleMenuCreateLobbyRequest()
     std::string pseudo = m_menu.getUserPseudo(_registry);
 
     m_clientNetwork->createLobbyRequest();
+    m_clientNetwork->createUsernameRequest(pseudo);
     printf("Lobby creation requested by %s, waiting for server response...\n", pseudo.c_str());
 }
 
@@ -60,6 +62,7 @@ void Game::handleMenuJoinLobbyRequest()
     try {
         uint32_t lobbyId = static_cast<uint32_t>(std::stoul(lobbyCode));
         m_clientNetwork->joinLobbyRequest(lobbyId);
+        m_clientNetwork->createUsernameRequest(pseudo);
         std::cout << "Join lobby " << lobbyId << " requested by " << pseudo << ", waiting for server response..." << std::endl;
     } catch (const std::exception& e) {
         std::cout << "ERROR: Invalid lobby ID: " << lobbyCode << " - " << e.what() << std::endl;

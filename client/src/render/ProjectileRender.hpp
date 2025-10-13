@@ -16,4 +16,10 @@
 #include "components/Position.hpp"
 #include "managers/GraphicsManager.hpp"
 
+/**
+ * @brief Draws a projectile entity on the screen
+ * @param gfx The graphics manager for rendering
+ * @param registry The ECS registry containing the entity
+ * @param platform The projectile entity to draw
+ */
 void drawProjectil(GraphicsManager& gfx, Registry& registry, Entity platform);

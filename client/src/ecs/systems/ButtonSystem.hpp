@@ -1,5 +1,5 @@
 /*
-** ButtonSystem.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/shared/src/ecs/systems
+** ButtonSystem.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ecs/systems
 **
 ** Made by jojo
 ** Login   <jojo>
@@ -16,4 +16,9 @@
 #include "ecs/Registry.hpp"
 #include <SDL.h>
 
+/**
+ * @brief System that handles button interactions and click detection
+ * Processes mouse input to detect button clicks and hover states for UI buttons
+ * @param registry The ECS registry containing all game entities and components
+ */
 void buttonSystem(Registry& registry);

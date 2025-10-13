@@ -12,4 +12,8 @@
 
 #include "Registry.hpp"
 
+/**
+ * @brief System that handles button information updates in the ECS registry
+ * @param registry The ECS registry containing button entities
+ */
 void buttonInfoSystem(Registry& registry);

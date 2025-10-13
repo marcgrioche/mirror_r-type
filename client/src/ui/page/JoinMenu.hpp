@@ -33,6 +33,8 @@ public:
     void update(Registry& registry, float deltaTime);
     void render(GraphicsManager& gfx, Registry& registry);
     void handleEvent(Registry& registry, const SDL_Event& event);
+    void setUserName(const std::string& t_pseudo) { m_userName = t_pseudo; };
+    std::string getPseudo() const { return m_userName; };
 
     // Récupère le code de connexion saisi
     std::string getConnectionCode(Registry& registry) const;
@@ -50,6 +52,7 @@ private:
     bool m_visible = false;
     bool m_connectionRequested = false;
     bool m_returnRequested = false;
+    std::string m_userName;
 
     void createEntities(Registry& registry);
     void destroyEntities(Registry& registry);

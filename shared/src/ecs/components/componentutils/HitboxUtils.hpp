@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** HitboxUtil - Utilities for hitbox collision detection
+** HitboxUtils - Utilities for hitbox collision detection
 */
 
 #pragma once
@@ -11,7 +11,15 @@
 #include "../Hitbox.hpp"
 #include "../Position.hpp"
 
-// AABB test in world coordinates (Position + Hitbox.offset)
+/**
+ * @brief Performs Axis-Aligned Bounding Box (AABB) collision test in world coordinates
+ * Tests if two rectangles overlap by comparing their positions and dimensions
+ * @param pa Position of the first entity
+ * @param ha Hitbox component of the first entity
+ * @param pb Position of the second entity
+ * @param hb Hitbox component of the second entity
+ * @return true if the hitboxes overlap, false otherwise
+ */
 inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,
     const Position& pb, const Hitbox& hb)
 {
@@ -38,7 +46,14 @@ inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,
     return true;
 }
 
-// High-level: check two entities (must have Position + Hitbox)
+/**
+ * @brief High-level collision check between two entities
+ * Checks if two entities collide by verifying they have required components and performing AABB test
+ * @param registry The ECS registry containing all entities and components
+ * @param a First entity to check for collision
+ * @param b Second entity to check for collision
+ * @return true if entities collide and both have Position and Hitbox components, false otherwise
+ */
 inline bool entities_collide(Registry& registry, Entity a, Entity b)
 {
     if (!registry.has<Position>(a) || !registry.has<Hitbox>(a))
