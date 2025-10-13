@@ -54,7 +54,10 @@ void Menu::hideAllPages(Registry& registry)
     m_homePage.hide(registry);
     m_connectionPage.hide(registry);
     m_joinPage.hide(registry);
-    // m_parameterPage.hide(registry);
+    // Hide all other pages to avoid leaving stale UI/entities around
+    m_lobbyPage.hide(registry);
+    m_endPage.hide(registry);
+    m_parameterPage.hide(registry);
 }
 
 void Menu::showHomePage(Registry& registry)
@@ -110,12 +113,16 @@ void Menu::showWinPage(Registry& registry)
 {
     hideAllPages(registry);
     m_currentPage = Page::WIN;
+    // Ensure end page entities/state are (re)created with WIN state
+    m_endPage.show(registry, true);
 }
 
 void Menu::showLosePage(Registry& registry)
 {
     hideAllPages(registry);
     m_currentPage = Page::LOSE;
+    // Ensure end page entities/state are (re)created with LOSE state
+    m_endPage.show(registry, false);
 }
 
 void Menu::handleEvent(const SDL_Event& e, Registry& registry)

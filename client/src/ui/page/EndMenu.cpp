@@ -25,12 +25,15 @@ EndMenuPage::~EndMenuPage() = default;
 void EndMenuPage::show(Registry& registry, bool state)
 {
     m_state = (state == true) ? "WIN" : "LOSE";
-
-    if (!m_visible) {
-        createEntities(registry);
-        m_visible = true;
+    // If already visible, rebuild with the new state to update text
+    if (m_visible) {
+        destroyEntities(registry);
         clearConnectionRequest();
+        m_visible = false;
     }
+    createEntities(registry);
+    m_visible = true;
+    clearConnectionRequest();
 }
 
 void EndMenuPage::hide(Registry& registry)
@@ -38,6 +41,8 @@ void EndMenuPage::hide(Registry& registry)
     if (m_visible) {
         destroyEntities(registry);
         m_visible = false;
+        // Reset any pending UI flags so next show starts fresh
+        clearConnectionRequest();
     }
 }
 

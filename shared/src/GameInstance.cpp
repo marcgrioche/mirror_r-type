@@ -12,6 +12,7 @@ GameInstance::GameInstance(uint32_t lobbyId)
 
 void GameInstance::initialize()
 {
+    _gameLost, _gameWon = false;
     std::cout << "Initializing game instance for lobby " << _lobbyId << std::endl;
     initializeLevel();
     _lastTickTime = std::chrono::steady_clock::now();
@@ -50,7 +51,8 @@ bool GameInstance::checkLoseCondition() const
 
 bool GameInstance::checkWinCondition() const
 {
-    checkLoseCondition();
+    // if (checkLoseCondition())
+    //     return false;
     // Win if there are no remaining Boss-tagged entities in the registry
     // Use const-friendly storage access (view() is non-const)
     const auto* bossStorage = _registry.get_storage_if_exists<BossTag>();

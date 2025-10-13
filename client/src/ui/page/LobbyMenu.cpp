@@ -46,6 +46,8 @@ void LobbyMenu::hide(Registry& registry)
     if (m_visible) {
         destroyEntities(registry);
         m_visible = false;
+        // Reset pending requests when leaving lobby to avoid sticky state
+        clearRequests();
     }
 }
 
