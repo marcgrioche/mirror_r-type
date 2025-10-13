@@ -128,7 +128,7 @@ void GameInstance::updateTick()
 void GameInstance::initializeLevel()
 {
     auto platformList = factories::generateRandomPlatforms(_registry, 22);
-    _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 0.0f, SCREEN_HEIGHT / 2));
+    // _newEntitiesThisTick.push_back(factories::createOneWayPlatform(_registry, 0.0f, SCREEN_HEIGHT / 2));
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
     // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 100.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));
     // _newEntitiesThisTick.push_back(factories::createEnemy(_registry, Position { 700.0f, 200.0f }, Health { 15 }, Hitbox { 32.0f, 32.0f }, Velocity { ENEMY_VELOCITY_X, ENEMY_VELOCITY_Y }));

@@ -73,6 +73,9 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
     int topCount = 0, bottomCount = 0;
     const int edgeQuota = std::max(1, quantity / 3); // limiter empilement extrême haut/bas
 
+    placed.push_back({ 0.0f, SCREEN_HEIGHT / 2 });
+    platformsEntities.push_back(createOneWayPlatform(registry, 0.0f, SCREEN_HEIGHT / 2));
+
     for (int i = 0; i < quantity; ++i) {
         float x = 0.f, y = 0.f;
         bool accepted = false;
