@@ -11,6 +11,7 @@
 #include "ParameterMenu.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
+#include "managers/ConfigManager.hpp"
 #include <iostream>
 
 ParameterMenu::ParameterMenu()
@@ -322,10 +323,11 @@ void ParameterMenu::saveBindings()
     std::cout << "ParameterMenu: saved keybindings to " << m_iniPath << std::endl;
 
     try {
+        ConfigManager::getInstance().loadKeyBindings();
         InputManager::getInstance().reloadKeyBindings();
-        std::cout << "ParameterMenu: reloaded InputManager keybindings" << std::endl;
+        std::cout << "ParameterMenu: reloaded keybindings" << std::endl;
     } catch (const std::exception& e) {
-        std::cerr << "ParameterMenu: failed to reload InputManager: " << e.what() << std::endl;
+        std::cerr << "ParameterMenu: failed to reload keybindings: " << e.what() << std::endl;
     }
 }
 
