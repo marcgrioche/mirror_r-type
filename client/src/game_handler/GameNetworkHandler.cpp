@@ -43,6 +43,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::GAME_END_LOSE:
         handleGameEndLose();
         break;
+    case MessageType::USERNAME_ACK:
+        handleUsername(event);
+        break;
     default:
         break;
     }
@@ -135,6 +138,14 @@ void Game::handleGameEndLose()
         // Réactive le menu pour afficher la page Lose
         _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::LOSE);
+    }
+}
+
+void Game::handleUsername(const Client::NetworkEvent& event)
+{
+    if (std::holds_alternative<bool>(event.payload)) {
+        const auto state = std::get<bool>(event.payload);
+        std::cout << "Username creation state: " << state << std::endl;
     }
 }
 

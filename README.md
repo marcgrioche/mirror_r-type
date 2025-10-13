@@ -15,8 +15,6 @@ A C++17 client-server project built with CMake.
 Clone the repository using git and proceed with the following command inside the cloned repository.
 
 ```sh
-mkdir -p cmake
-wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
 cmake -S . -B build
 cmake --build build
 ```

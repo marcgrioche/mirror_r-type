@@ -14,9 +14,19 @@
 #include "components/TextBoxInput.hpp"
 #include <SDL2/SDL.h>
 
-// Système qui gère les événements clavier pour les TextBoxInput
+/**
+ * @brief System that handles keyboard input events for text box components
+ * Processes SDL keyboard events to update text input fields and handle text editing
+ * @param registry The ECS registry containing all game entities and components
+ * @param event The SDL event containing keyboard input information
+ */
 void textBoxInputSystem(Registry& registry, const SDL_Event& event);
 
-// Système qui met à jour l'affichage et le curseur
+/**
+ * @brief System that updates text box display and cursor animation
+ * Manages cursor blinking and text display updates for input text boxes
+ * @param registry The ECS registry containing all game entities and components
+ * @param deltaTime Time elapsed since the last frame in seconds
+ */
 void textBoxInputUpdateSystem(Registry& registry, float deltaTime);
 // ...existing code...

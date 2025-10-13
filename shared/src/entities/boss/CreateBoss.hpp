@@ -9,9 +9,9 @@
 */
 
 #pragma once
-#include "../enemies/CreateEnemy.hpp"
 #include "../../ecs/systems/FrequencyUtils.hpp"
 #include "../components/Frequency.hpp"
+#include "../enemies/CreateEnemy.hpp"
 #include "../weapon/CreateWeapon.hpp"
 #include "Config.hpp"
 #include "Registry.hpp"
@@ -26,6 +26,21 @@
 #include <iostream>
 
 namespace factories {
+/**
+ * @brief Creates a boss entity with default properties at the right edge of the screen
+ * @param registry The ECS registry to create the entity in
+ * @return The created boss entity
+ */
 Entity createBoss(Registry& registry);
+
+/**
+ * @brief Creates a boss entity with custom properties
+ * @param registry The ECS registry to create the entity in
+ * @param position The initial position of the boss
+ * @param health The health component for the boss
+ * @param hitbox The hitbox component for collision detection
+ * @param velocity The velocity component for movement
+ * @return The created boss entity
+ */
 Entity createBoss(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const Velocity& velocity);
 }

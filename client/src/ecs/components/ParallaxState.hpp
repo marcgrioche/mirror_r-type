@@ -10,6 +10,11 @@
 /**
  * @brief Component that stores the current scroll offsets for parallax background layers
  * This ensures the background scrolls continuously instead of resetting each frame
+ * @param skyOffset Current scroll offset for the sky background layer
+ * @param downLayerOffset Current scroll offset for the down background layer
+ * @param middleLayerOffset Current scroll offset for the middle background layer
+ * @param lightOffset Current scroll offset for the light background layer
+ * @param topLayerOffset Current scroll offset for the top background layer
  */
 struct ParallaxState {
     float skyOffset; // Sky layer scroll offset

@@ -7,5 +7,8 @@
 
 #pragma once
 
+/**
+ * @brief Empty tag component identifying projectile entities (bullets, missiles, etc.)
+ */
 struct Projectile {
 };

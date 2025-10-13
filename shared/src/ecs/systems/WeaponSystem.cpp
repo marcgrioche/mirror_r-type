@@ -103,8 +103,6 @@ bool handleEnemyAttacks(
     Registry& registry,
     std::vector<Entity>& newEntitiesThisTick)
 {
-    bool spawned = false;
-
     std::vector<Entity> weaponsToFire;
     auto weaponView = registry.view<WeaponTag, Frequency, Parent, Damage>();
 
@@ -155,7 +153,7 @@ bool handleEnemyAttacks(
             Position spawnPos { enemyPos.x, enemyPos.y + ownerHit.height / 2 - projHit.height / 2 };
 
             if (registry.has<BossTag>(owner)) {
-                int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height));
+                int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height * 2));
                 int offset = maxOffset > 0 ? rand() % maxOffset : 0;
                 spawnPos.y = enemyPos.y + offset;
             }

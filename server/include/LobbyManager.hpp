@@ -33,6 +33,8 @@ struct Lobby {
     std::atomic<bool> threadRunning;
     std::queue<PlayerInput> inputQueue;
     std::mutex inputMutex;
+    std::unordered_set<uint32_t> readyPlayers;
+    std::unordered_map<uint32_t, std::string> _usernames;
 
     Lobby(uint32_t lobbyId, uint32_t creator);
     ~Lobby();
@@ -47,116 +49,88 @@ class RTypeServer; // Forward declaration
 class LobbyManager {
 public:
     /**
-     * LobbyManager handles creation, management, and state tracking of game lobbies.
+     * @brief LobbyManager handles creation, management, and state tracking of game lobbies.
      * Thread-safe for concurrent access from multiple threads.
      */
     LobbyManager();
 
     /**
-     * Set the server reference for broadcasting messages.
-     *
-     * Args:
-     *     server (RTypeServer*): Pointer to the server instance
+     * @brief Sets the server reference for broadcasting messages
+     * @param server Pointer to the server instance
      */
     void setServer(RTypeServer* server);
 
     /**
-     * Create a new lobby with the specified creator.
-     *
-     * Args:
-     *     creatorId (uint32_t): Player ID of the lobby creator
-     *
-     * Returns:
-     *     uint32_t: Unique lobby ID, or 0 if creation failed
+     * @brief Creates a new lobby with the specified creator
+     * @param creatorId Player ID of the lobby creator
+     * @return Unique lobby ID, or 0 if creation failed
      */
     uint32_t createLobby(uint32_t creatorId);
 
     /**
-     * Join an existing lobby.
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby to join
-     *     playerId (uint32_t): Player ID wanting to join
-     *
-     * Returns:
-     *     bool: True if join was successful, false otherwise
+     * @brief Joins an existing lobby
+     * @param lobbyId ID of the lobby to join
+     * @param playerId Player ID wanting to join
+     * @return True if join was successful, false otherwise
      */
     bool joinLobby(uint32_t lobbyId, uint32_t playerId);
 
     /**
-     * Start a game in the specified lobby (only lobby creator can do this).
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby to start
-     *     playerId (uint32_t): Player ID attempting to start (must be creator)
-     *
-     * Returns:
-     *     bool: True if game start was successful, false otherwise
+     * @brief Starts a game in the specified lobby (only lobby creator can do this)
+     * @param lobbyId ID of the lobby to start
+     * @param playerId Player ID attempting to start (must be creator)
+     * @return True if game start was successful, false otherwise
      */
     bool startGame(uint32_t lobbyId, uint32_t playerId);
 
     /**
-     * Get lobby information.
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby to query
-     *
-     * Returns:
-     *     const Lobby*: Pointer to lobby info, or nullptr if not found
+     * @brief Gets lobby information
+     * @param lobbyId ID of the lobby to query
+     * @return Pointer to lobby info, or nullptr if not found
      */
     const Lobby* getLobby(uint32_t lobbyId) const;
 
     /**
-     * Get the lobby ID that a player is currently in.
-     *
-     * Args:
-     *     playerId (uint32_t): Player ID to check
-     *
-     * Returns:
-     *     uint32_t: Lobby ID, or 0 if player is not in any lobby
+     * @brief Gets the lobby ID that a player is currently in
+     * @param playerId Player ID to check
+     * @return Lobby ID, or 0 if player is not in any lobby
      */
     uint32_t getPlayerLobby(uint32_t playerId) const;
 
     /**
-     * Remove a player from their current lobby.
-     *
-     * Args:
-     *     playerId (uint32_t): Player ID to remove
-     *
-     * Returns:
-     *     bool: True if player was removed, false if not in any lobby
+     * @brief Removes a player from their current lobby
+     * @param playerId Player ID to remove
+     * @return True if player was removed, false if not in any lobby
      */
     bool removePlayer(uint32_t playerId);
 
     /**
-     * Get all active lobbies.
-     *
-     * Returns:
-     *     std::vector<uint32_t>: List of active lobby IDs
+     * @brief Gets all active lobbies
+     * @return List of active lobby IDs
      */
     std::vector<uint32_t> getActiveLobbies() const;
 
     /**
-     * Get the GameInstance for a lobby.
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby
-     *
-     * Returns:
-     *     GameInstance*: Pointer to the game instance, or nullptr if not running
+     * @brief Gets the GameInstance for a lobby
+     * @param lobbyId ID of the lobby
+     * @return Pointer to the game instance, or nullptr if not running
      */
     GameInstance* getGameInstance(uint32_t lobbyId);
 
     /**
-     * Get the players in a lobby (thread-safe).
-     *
-     * Args:
-     *     lobbyId (uint32_t): ID of the lobby
-     *
-     * Returns:
-     *     std::vector<uint32_t>: List of player IDs in the lobby
+     * @brief Gets the players in a lobby (thread-safe)
+     * @param lobbyId ID of the lobby
+     * @return List of player IDs in the lobby
      */
     std::vector<uint32_t> getLobbyPlayers(uint32_t lobbyId) const;
+
+    /**
+     * @brief Adds a username for a player
+     * @param playerId Player ID to set username for
+     * @param username The username to set
+     * @return True if username was added successfully, false otherwise
+     */
+    bool addUsername(uint32_t playerId, const std::string& username);
 
 private:
     std::unordered_map<uint32_t, std::unique_ptr<Lobby>> _lobbies;

@@ -120,5 +120,25 @@ void RTypeServer::registerHandlers()
     _handlers[MessageType::JOIN_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) { handleJoinLobby(msg, peerInfo); };
     _handlers[MessageType::START_GAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleStartGame(msg, peerInfo); };
     _handlers[MessageType::LOBBY_STATE] = [this](const Message& msg, PeerInfo& peerInfo) { handleLobbyState(msg, peerInfo); };
+    _handlers[MessageType::SET_USERNAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleUsername(msg, peerInfo); };
     // Add more handlers as needed for other message types
+}
+
+bool RTypeServer::addUsername(uint32_t playerId, const std::string& username)
+{
+    // Protocol restriction: max 255 characters, non-empty
+    std::string realUsername = username;
+    if (username.length() > 255)
+        return false;
+    if (username.empty()) {
+        realUsername = std::to_string(playerId);
+    }
+
+    // Find the username for this player
+    auto usernameIt = _usernames.find(playerId);
+    if (usernameIt == _usernames.end()) {
+        realUsername = std::to_string(playerId);
+    }
+    _usernames[playerId] = realUsername;
+    return true;
 }

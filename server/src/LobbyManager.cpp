@@ -118,10 +118,6 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
     }
 
     Lobby* lobby = it->second.get();
-    if (lobby->creatorId != playerId) {
-        return false;
-    }
-
     if (lobby->state != LobbyState::WAITING) {
         return false;
     }
@@ -130,11 +126,27 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
         return false;
     }
 
+    if (std::find(lobby->players.begin(), lobby->players.end(), playerId) == lobby->players.end()) {
+        return false;
+    }
+
+    lobby->readyPlayers.insert(playerId);
+    std::cout << "Player " << playerId << " is ready in lobby " << lobbyId << " (" << lobby->readyPlayers.size() << "/" << lobby->players.size() << " ready)" << std::endl;
+
+    if (lobby->readyPlayers.size() != lobby->players.size()) {
+        return false;
+    }
+
     lobby->gameInstance = std::make_unique<GameInstance>(lobbyId);
     lobby->gameInstance->initialize();
 
     for (uint32_t player : lobby->players) {
-        lobby->gameInstance->addPlayer(player);
+        std::string username;
+        auto itName = lobby->_usernames.find(player);
+        if (itName != lobby->_usernames.end()) {
+            username = itName->second;
+        }
+        lobby->gameInstance->addPlayer(player, username);
     }
 
     if (lobby->gameThread.joinable()) {
@@ -145,7 +157,7 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
     lobby->gameThread = std::thread(&LobbyManager::runLobbyThread, this, lobby);
 
     lobby->state = LobbyState::RUNNING;
-    std::cout << "Game started in lobby " << lobbyId << " by player " << playerId << " with " << lobby->players.size() << " players" << std::endl;
+    std::cout << "Game started in lobby " << lobbyId << " - all " << lobby->players.size() << " players ready" << std::endl;
     return true;
 }
 
@@ -192,6 +204,8 @@ bool LobbyManager::removePlayer(uint32_t playerId)
         if (playerIt != lobby->players.end()) {
             lobby->players.erase(playerIt);
         }
+
+        lobby->readyPlayers.erase(playerId);
 
         if (lobby->players.empty()) {
             lobby->threadRunning = false;
@@ -282,6 +296,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;
             lobby->gameInstance.reset();
+            lobby->readyPlayers.clear();
             lobby->threadRunning = false;
             break;
         } else if (lobby->gameInstance->hasLost()) {
@@ -290,6 +305,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;
             lobby->gameInstance.reset();
+            lobby->readyPlayers.clear();
             lobby->threadRunning = false;
             break;
         }
@@ -326,4 +342,32 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
     }
 
     std::cout << "Game thread ended for lobby " << lobby->id << std::endl;
+}
+
+bool LobbyManager::addUsername(uint32_t playerId, const std::string& username)
+{
+    // Protocol restriction: max 255 characters, non-empty
+    if (username.empty() || username.length() > 255)
+        return false;
+
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    // Find the lobby for this player
+    auto lobbyIt = _playerToLobby.find(playerId);
+    if (lobbyIt == _playerToLobby.end())
+        return false;
+
+    auto lobbyObjIt = _lobbies.find(lobbyIt->second);
+    if (lobbyObjIt == _lobbies.end())
+        return false;
+
+    Lobby* lobby = lobbyObjIt->second.get();
+
+    for (const auto& entry : lobby->_usernames) {
+        if (entry.second == username)
+            return false; // Username already taken in this lobby
+    }
+
+    lobby->_usernames[playerId] = username;
+    return true;
 }

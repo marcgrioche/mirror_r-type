@@ -17,4 +17,10 @@
 #include "components/TextBox.hpp"
 #include "managers/GraphicsManager.hpp"
 
+/**
+ * @brief Draws a text box entity on the screen
+ * @param gfx The graphics manager for rendering
+ * @param registry The ECS registry containing the entity
+ * @param entity The entity to draw
+ */
 void drawTextBox(GraphicsManager& gfx, Registry& registry, Entity entity);

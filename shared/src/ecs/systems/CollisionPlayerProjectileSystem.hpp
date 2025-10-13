@@ -1,5 +1,5 @@
 /*
-** CollisionPlayerProjectileSystem.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/client/src/ecs/systems
+** CollisionPlayerProjectileSystem.hpp for mirror_r-type in /home/jojodelanight/Project/semestre1/mirror_r-type/shared/src/ecs/systems
 **
 ** Made by jojo
 ** Login   <jojo>
@@ -15,7 +15,11 @@
 #include <algorithm>
 #include <vector>
 
-/// Detect and handle collisions between projectiles and players.
-/// - appel depuis la boucle de jeu après movementSystem(...)
-/// - deltaTime fourni pour éventuelles extensions (animation, effets)
+/**
+ * @brief System that handles collisions between projectiles and players
+ * Detects when player entities are hit by projectiles and applies damage accordingly
+ * Called from the game loop after movementSystem for proper collision detection
+ * @param registry The ECS registry containing all game entities and components
+ * @param deltaTime Time elapsed since the last frame in seconds (for potential animation/effect extensions)
+ */
 void collisionPlayerProjectileSystem(Registry& registry, float deltaTime);

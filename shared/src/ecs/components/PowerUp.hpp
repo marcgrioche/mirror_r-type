@@ -10,11 +10,21 @@
 
 #pragma once
 
+/**
+ * @brief Enumeration of different power-up types available in the game
+ */
 enum class PowerUpType {
-    HEAL,
-    DAMAGE_BOOST
+    HEAL, /**< Restores health to the player */
+    DAMAGE_BOOST /**< Temporarily increases player damage output */
 };
 
+/**
+ * @brief Component representing power-up entities and their effects
+ * @param is_power True if this entity is currently a power-up (can be collected)
+ * @param type The type of power-up effect this entity provides
+ * @param effect_duration How long the power-up effect lasts in seconds
+ * @param remaining_time Time remaining for the active power-up effect
+ */
 struct PowerUp {
     bool is_power = false;
     PowerUpType type = PowerUpType::HEAL;

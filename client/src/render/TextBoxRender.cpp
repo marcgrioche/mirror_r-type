@@ -26,14 +26,14 @@ void drawTextBox(GraphicsManager& gfx, Registry& registry, Entity entity)
     const TextBox& textbox = registry.get<TextBox>(entity);
     const Position& pos = registry.get<Position>(entity);
 
-    // Utilise Hitbox seulement si présent
-    float width = 200.0f; // largeur par défaut
-    float height = 30.0f; // hauteur par défaut
-    if (registry.has<Hitbox>(entity)) {
-        const Hitbox& hitbox = registry.get<Hitbox>(entity);
-        width = hitbox.width;
-        height = hitbox.height;
-    }
+    // Utilise Hitbox seulement si présent. USELESS 'CAUSE UNUSED !!!!
+    // float width = 200.0f; // largeur par défaut
+    // float height = 30.0f; // hauteur par défaut
+    // if (registry.has<Hitbox>(entity)) {
+    //     const Hitbox& hitbox = registry.get<Hitbox>(entity);
+    //     width = hitbox.width;
+    //     height = hitbox.height;
+    // }
 
     if (!textbox.visible || textbox.text.empty())
         return;

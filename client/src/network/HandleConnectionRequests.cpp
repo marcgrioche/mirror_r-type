@@ -47,3 +47,14 @@ void RTypeClient::handleDespawnEntity(const Message& t_msg, PeerInfo& t_peerInfo
     // Push the message to the event queue for Game to process
     m_eventsQueue.push({ MessageType::DESPAWN_ENTITY, t_msg });
 }
+
+void RTypeClient::handleUsernameRequestState(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_peerInfo;
+    Message msg = t_msg;
+    msg.resetReadPosition();
+    const auto state = msg.readU8();
+
+    bool result = state == 1;
+    m_eventsQueue.push({ MessageType::USERNAME_ACK, result });
+}

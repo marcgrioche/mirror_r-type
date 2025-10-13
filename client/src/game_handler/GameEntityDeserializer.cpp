@@ -69,11 +69,16 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
     float offsetY = msg.readFloat();
     uint32_t serverPlayerId = msg.readU32();
     (void)serverPlayerId;
+    uint8_t usernameLength = msg.readU8();
+
+    // Extract the actual username
+    std::string username = msg.readString(usernameLength);
 
     Entity entity = factories::createPlayer(registry,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
-        Hitbox { width, height, offsetX, offsetY });
+        Hitbox { width, height, offsetX, offsetY },
+        TextBox { username, 12 });
 
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
     SpriteManager::addPlayerSprite(registry, entity, posX, posY, 1.5f);

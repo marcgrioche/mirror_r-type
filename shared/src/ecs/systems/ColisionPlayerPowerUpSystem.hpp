@@ -15,4 +15,10 @@
 #include <algorithm>
 #include <vector>
 
+/**
+ * @brief System that handles collisions between players and power-ups
+ * Detects when players come into contact with power-up entities and applies power-up effects
+ * @param registry The ECS registry containing all game entities and components
+ * @param deltaTime Time elapsed since the last frame in seconds
+ */
 void collisionPlayerPowerUpSystem(Registry& registry, float deltaTime);

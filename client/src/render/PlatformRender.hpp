@@ -17,4 +17,10 @@
 #include "components/Tags.hpp"
 #include "managers/GraphicsManager.hpp"
 
+/**
+ * @brief Draws a platform entity on the screen
+ * @param gfx The graphics manager for rendering
+ * @param registry The ECS registry containing the entity
+ * @param platform The platform entity to draw
+ */
 void drawPlatform(GraphicsManager& gfx, Registry& registry, Entity platform);

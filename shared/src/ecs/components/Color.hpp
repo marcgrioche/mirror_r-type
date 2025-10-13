@@ -11,6 +11,13 @@
 #pragma once
 #include <cstdint>
 
+/**
+ * @brief Component representing RGBA color values for rendering
+ * @param a Alpha channel (transparency) 0-255
+ * @param r Red channel 0-255
+ * @param g Green channel 0-255
+ * @param b Blue channel 0-255
+ */
 struct Color {
     uint8_t a;
     uint8_t r;

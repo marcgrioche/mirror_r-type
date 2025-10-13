@@ -8,4 +8,9 @@
 #pragma once
 #include "Registry.hpp"
 
+/**
+ * @brief System that checks and handles entities that go beyond screen boundaries
+ * Entities that move outside the screen boundaries are typically destroyed or repositioned
+ * @param registry The ECS registry containing all game entities and components
+ */
 void boundarySystem(Registry& registry);

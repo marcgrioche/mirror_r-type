@@ -7,12 +7,12 @@
 
 #include "Game.hpp"
 #include "ButtonSystem.hpp"
+#include "Config.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
 #include "ecs/components/ParallaxState.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
 #include <SDL.h>
-#include "Config.hpp"
 #include <iostream>
 
 Game::Game(bool isLocalMode, uint16_t clientPort)
@@ -98,7 +98,7 @@ void Game::initializeLocalMode()
 {
     m_localGameInstance = std::make_unique<GameInstance>(0);
     m_localGameInstance->initialize();
-    m_localGameInstance->addPlayer(1);
+    m_localGameInstance->addPlayer(1, "");
 
     _state = GameState::PLAYING;
     std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
@@ -228,6 +228,7 @@ void Game::sendDisconnectMessage()
     }
 }
 
+// This function is never called
 void Game::processMenuRequests()
 {
     // Vérifie les demandes de connexion

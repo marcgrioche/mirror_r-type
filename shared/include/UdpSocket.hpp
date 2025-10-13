@@ -24,66 +24,56 @@ using socket_t = int;
 #endif
 
 /**
- * UdpSocket wraps UDP socket operations using standard sockets.
- *
- * Args:
- *     port (uint16_t): UDP port to bind the socket.
+ * @brief UdpSocket wraps UDP socket operations using standard sockets
+ * @param port UDP port to bind the socket
  */
 class UdpSocket {
 public:
+    /**
+     * @brief Constructs a UDP socket bound to the specified port
+     * @param port UDP port to bind the socket
+     */
     explicit UdpSocket(uint16_t port);
+
+    /**
+     * @brief Destroys the UDP socket and releases resources
+     */
     ~UdpSocket();
 
     /**
-     * Receive data synchronously.
-     *
-     * Args:
-     *     buffer (std::vector<uint8_t>&): Buffer to store received data.
-     *     sender_ip (std::string&): Sender IP address.
-     *     sender_port (uint16_t&): Sender port.
-     *
-     * Returns:
-     *     ssize_t: Number of bytes received, or -1 on error.
+     * @brief Receives data synchronously from any sender
+     * @param buffer Buffer to store received data
+     * @param sender_ip Output parameter: sender IP address
+     * @param sender_port Output parameter: sender port
+     * @return Number of bytes received, or -1 on error
      */
     ssize_t receive(std::vector<uint8_t>& buffer, std::string& sender_ip, uint16_t& sender_port);
 
     /**
-     * Send data to a recipient.
-     *
-     * Args:
-     *     data (const std::vector<uint8_t>&): Data to send.
-     *     recipient_ip (const std::string&): Recipient IP address.
-     *     recipient_port (uint16_t): Recipient port.
-     *
-     * Returns:
-     *     ssize_t: Number of bytes sent, or -1 on error.
+     * @brief Sends data to a specific recipient
+     * @param data Data to send
+     * @param recipient_ip Recipient IP address
+     * @param recipient_port Recipient port
+     * @return Number of bytes sent, or -1 on error
      */
     ssize_t send(const std::vector<uint8_t>& data, const std::string& recipient_ip, uint16_t recipient_port);
 
     /**
-     * Poll for incoming data with timeout.
-     *
-     * Args:
-     *     timeout_ms (int): Timeout in milliseconds (-1 for infinite).
-     *
-     * Returns:
-     *     bool: True if data is available, false otherwise.
+     * @brief Polls for incoming data with timeout
+     * @param timeout_ms Timeout in milliseconds (-1 for infinite wait)
+     * @return True if data is available, false otherwise
      */
     bool pollForData(int timeout_ms = -1);
 
     /**
-     * Poll for write readiness with timeout.
-     *
-     * Args:
-     *     timeout_ms (int): Timeout in milliseconds (-1 for infinite).
-     *
-     * Returns:
-     *     bool: True if socket is ready for writing, false otherwise.
+     * @brief Polls for write readiness with timeout
+     * @param timeout_ms Timeout in milliseconds (-1 for infinite wait)
+     * @return True if socket is ready for writing, false otherwise
      */
     bool pollForWrite(int timeout_ms = -1);
 
     /**
-     * Close the socket and release resources.
+     * @brief Closes the socket and releases resources
      */
     void close();
 

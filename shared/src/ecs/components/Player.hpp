@@ -10,5 +10,8 @@
 
 #pragma once
 
+/**
+ * @brief Empty tag component identifying player-controlled entities
+ */
 struct Player {
 };

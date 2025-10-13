@@ -13,6 +13,24 @@
 
 #pragma once
 
+/**
+ * @brief Component representing a visual sprite for rendering entities
+ * @param texture_id ID referencing a texture in the resource manager
+ * @param srcRect Source rectangle defining the area to render from the texture/sprite-sheet
+ * @param dstRect Destination rectangle defining position and size on screen
+ * @param offset_x X offset for sprite positioning relative to entity position
+ * @param offset_y Y offset for sprite positioning relative to entity position
+ * @param scale Legacy single scale factor (maintains aspect ratio)
+ * @param scale_x Independent horizontal scaling factor for precise hitbox matching
+ * @param scale_y Independent vertical scaling factor for precise hitbox matching
+ * @param rotation Rotation angle in degrees
+ * @param total_frames Total number of animation frames (1 for static sprites)
+ * @param current_frame Current animation frame index
+ * @param frame_duration Time in seconds each animation frame is displayed
+ * @param elapsed_time Time elapsed since last frame change
+ * @param frame_width Width of each animation frame in pixels
+ * @param frame_height Height of each animation frame in pixels
+ */
 struct Sprite {
     std::string texture_id; // ID referencing a texture in a texture manager, not raw SDL_Texture, too big
     SDL_Rect srcRect; // texture rect in sprite-sheet
