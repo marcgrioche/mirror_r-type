@@ -14,4 +14,5 @@
  * @param registry The ECS registry containing all game entities and components
  * @param deltaTime Time elapsed since the last frame in seconds
  */
-void gravitySystem(Registry& registry, float deltaTime);
+
+void rigidBodySystem(Registry& registry, float deltaTime);

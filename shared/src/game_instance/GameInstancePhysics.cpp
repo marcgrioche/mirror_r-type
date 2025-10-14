@@ -2,7 +2,7 @@
 #include "../ecs/components/Position.hpp"
 #include "../ecs/components/PreviousPosition.hpp"
 #include "../ecs/systems/DashSystem.hpp"
-#include "../ecs/systems/GravitySystem.hpp"
+#include "../ecs/systems/RigidBodySystem.hpp"
 #include "../ecs/systems/MovementSystem.hpp"
 #include "../ecs/systems/BoundarySystem.hpp"
 #include "../ecs/systems/PowerUpSystem.hpp"
@@ -24,7 +24,7 @@ void GameInstancePhysics::updatePreviousPositions(Registry& registry)
 int GameInstancePhysics::updateSystems(Registry& registry, float tickDuration)
 {
     dashSystem(registry, tickDuration);
-    gravitySystem(registry, tickDuration);
+    rigidBodySystem(registry, tickDuration);
     int platformsToAdd = movementSystem(registry, tickDuration);
     boundarySystem(registry);
     powerUpEffectSystem(registry, tickDuration);

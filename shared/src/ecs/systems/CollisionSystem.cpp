@@ -27,19 +27,19 @@ void collisionSystem(Registry& registry, float deltaTime)
 
     for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : bodiesView) {
         Position originalPos = { prevPos.x, prevPos.y };
-        rigidBody.IsOnPlatform = false;
+        rigidBody.isOnPlatform = false;
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(pos, hitbox, platformPos, platformHitbox)) {
                 resolvePlatformCollision(pos, vel, hitbox,
-                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.IsOnPlatform);
+                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.isOnPlatform);
             }
         }
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
             if (aabb_overlap_world(pos, hitbox, platformPos, platformHitbox)) {
                 resolveOneWayPlatformCollision(pos, vel, hitbox,
-                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.IsOnPlatform);
+                    platformPos, platformHitbox, originalPos, platformVel, rigidBody.isOnPlatform);
             }
         }
     }

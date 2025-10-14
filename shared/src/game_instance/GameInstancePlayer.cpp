@@ -9,6 +9,7 @@
 #include "../ecs/systems/FrequencyUtils.hpp"
 #include "../entities/player/CreatePlayer.hpp"
 #include <iostream>
+#include "components/componentutils/VectorUtils.hpp"
 
 void GameInstancePlayer::addPlayer(Registry& registry, uint32_t playerId, const std::string& username,
                                    std::vector<Entity>& newEntities)
@@ -48,7 +49,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
 
     auto& velocity = registry.get<Velocity>(playerEntity);
     auto& dash = registry.get<Dash>(playerEntity);
-    auto& rigidBody = registry.get<RigidBody>(playerEntity);
+    auto& rb = registry.get<RigidBody>(playerEntity);
 
     if (!dash.isDashing) {
         velocity.dx = 0.0f;
@@ -57,16 +58,17 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
 
     const float speed = 250.0f;
     bool hasRealInputs = false;
+    float accel = rb.isOnPlatform ? rb.groundAccel : rb.airAccel;
 
     for (const auto& [input, isPressed] : inputs) {
         if (!isPressed)
             continue;
-
         hasRealInputs = true;
+
         switch (input) {
         case GameInput::UP:
             if (!dash.isDashing) {
-                if (rigidBody.IsOnPlatform) {
+                if (rb.isOnPlatform) {
                     velocity.dy = -V0;
                 }
                 dash.direction.y = -1;
@@ -79,13 +81,15 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
             break;
         case GameInput::LEFT:
             if (!dash.isDashing) {
-                velocity.dx = -speed;
+                //velocity.dx = -speed; //useless ???
+                rb.acceleration.x = speed * -accel;
                 dash.direction.x = -1;
             }
             break;
         case GameInput::RIGHT:
             if (!dash.isDashing) {
-                velocity.dx = speed;
+                //velocity.dx = speed;
+                rb.acceleration.x = speed * accel;
                 dash.direction.x = 1;
             }
             break;
@@ -98,6 +102,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
             if (!dash.isDashing && FrequencyUtils::shouldTrigger(dash.cooldown)) {
                 dash.isDashing = true;
                 dash.remaining = dash.duration;
+                rb.active = false;
                 if (dash.direction.x == 0 && dash.direction.y == 0)
                     dash.direction.y = -1;
             }

@@ -9,7 +9,7 @@
 #include "components/Velocity.hpp"
 #include "components/Tags.hpp"
 #include "Config.hpp"
-#include "RigidBody.hpp"
+#include "components/RigidBody.hpp"
 #include <iostream>
 
 void handlePlayerInputs(InputManager& _inputs, Registry& registry)
@@ -23,7 +23,7 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
         velocity.dx = 0.0f;
 
         if (_inputs.isUp()) {
-            if (rigidBody.IsOnPlatform) {
+            if (rigidBody.isOnPlatform) {
                 velocity.dy = -V0;
             }
         }
@@ -34,7 +34,7 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
             velocity.dx = speed;
         }
 
-        if (_inputs.isDown() && !rigidBody.IsOnPlatform && velocity.dy > 0) {
+        if (_inputs.isDown() && !rigidBody.isOnPlatform && velocity.dy > 0) {
             velocity.dy += 300.0f;
         }
     }

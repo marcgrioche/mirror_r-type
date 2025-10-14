@@ -2,11 +2,10 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** GravitySystem
+** HealthSystem
 */
 
-#include "GravitySystem.hpp"
-#include "components/Tags.hpp"
+#include "HealthSystem.hpp"
 #include "components/Health.hpp"
 #include <vector>
 
