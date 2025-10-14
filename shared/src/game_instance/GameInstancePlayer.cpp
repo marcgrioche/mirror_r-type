@@ -52,11 +52,10 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
     auto& rb = registry.get<RigidBody>(playerEntity);
 
     if (!dash.isDashing) {
-        velocity.v.x = 0.0f;
+        rb.acceleration = { 0.0f, 0.0f };
         dash.direction = { 0.0f, 0.0f };
     }
 
-    const float speed = 250.0f;
     bool hasRealInputs = false;
     float accel = rb.isOnPlatform ? rb.groundAccel : rb.airAccel;
 
@@ -81,15 +80,13 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
             break;
         case GameInput::LEFT:
             if (!dash.isDashing) {
-                //velocity.v.x = -speed; //useless ???
-                rb.acceleration.x = speed * -accel;
+                rb.acceleration.x = -accel;
                 dash.direction.x = -1;
             }
             break;
         case GameInput::RIGHT:
             if (!dash.isDashing) {
-                //velocity.v.x = speed;
-                rb.acceleration.x = speed * accel;
+                rb.acceleration.x = accel;
                 dash.direction.x = 1;
             }
             break;

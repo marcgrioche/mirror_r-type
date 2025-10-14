@@ -11,35 +11,39 @@
 #include "Config.hpp"
 #include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
+#include "components/Tags.hpp"
 
 void rigidBodySystem(Registry& registry, float deltaTime)
 {
     auto view = registry.view<RigidBody, Velocity>();
 
-    for (auto&& [rb, vel] : view) {
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        auto [entity, rb, vel] = it.entity_and_components();
         if (!rb.active) {
             continue;
         }
+        
+        vel.v += rb.acceleration * deltaTime;
 
-        float friction = rb.isOnPlatform ? rb.groundFriction : rb.airFriction;
-
-        vel.v = rb.acceleration * deltaTime;
-        vel.v = vel.v * friction * deltaTime;
+        if (rb.isOnPlatform) {
+            vel.v.x *= pow(rb.groundFriction, deltaTime);
+            
+            if (registry.has<PlayerTag>(entity)) {
+                if (std::abs(rb.acceleration.x) < 1.0f) {
+                    vel.v.x = 0.0f;
+                }
+            }
+        } else {
+            vel.v.x *= pow(rb.airFriction, deltaTime);
+        }
 
         vel.v.x = std::clamp(vel.v.x, -rb.maxSpeed, rb.maxSpeed);
 
         if (!rb.isOnPlatform) {
-            vel.v.y += rb.gravity * deltaTime;
+            vel.v.y += rb.gravity;
             vel.v.y = std::min(vel.v.y, rb.maxFallSpeed);
+        } else {
+            vel.v += rb.groundSpeed;
         }
-        // if (vel.v.y < 0.f) {
-        //     vel.v.y += GRAVITY_UP * deltaTime;
-        // } else {
-        //     vel.v.y += GRAVITY_DOWN * deltaTime;
-        // }
-
-        // if (vel.v.y > MAX_FALL) {
-        //     vel.v.y = MAX_FALL;
-        // }
     }
 }

@@ -10,6 +10,7 @@
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "components/RigidBody.hpp"
 
 /**
  * @brief Main collision detection and resolution system
@@ -31,7 +32,7 @@ void collisionSystem(Registry& registry, float deltaTime);
  */
 void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel, bool& isPlayerOnPlatform);
+    const Position& originalPos, const Velocity& platformVel, RigidBody &rb);
 
 /**
  * @brief Resolves collision between player and one-way platform (can jump through from below)
@@ -46,4 +47,4 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
  */
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel, bool& isPlayerOnPlatform);
+    const Position& originalPos, const Velocity& platformVel, RigidBody &rb);

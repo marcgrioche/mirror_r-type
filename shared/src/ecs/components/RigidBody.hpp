@@ -16,14 +16,15 @@
 
 struct RigidBody {
     bool active = true; //can be disabled for special behaviors
-    float weight = 1;
-    float groundAccel = 12000.f;
-    float airAccel = 4000.f;
-    float groundFriction = 0.95f;
-    float airFriction = 0.85f;
+    float weight = 1.f;
+    float groundAccel = 10000.f;
+    float airAccel = 2000.f;
+    float groundFriction = 0.001f;
+    float airFriction = 0.3f;
     float maxSpeed = 300.f; //mainly to limit input based speed ?
-    float maxFallSpeed = 1000.f;
-    float gravity = 3000.f;
+    float maxFallSpeed = 1500.f;
+    float gravity = 100.f;
     bool isOnPlatform = false;
+    Vector2 groundSpeed;
     Vector2 acceleration;
 };
