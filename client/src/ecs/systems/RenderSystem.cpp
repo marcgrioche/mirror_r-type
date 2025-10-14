@@ -42,8 +42,8 @@ void renderSystem(Registry& registry)
         SDL_Texture* texture = resourceManager.getTexture(sprite.texture_id);
 
         SDL_Rect dstRect = {
-            static_cast<int>(pos.x + sprite.offset_x),
-            static_cast<int>(pos.y + sprite.offset_y),
+            static_cast<int>(pos.v.x + sprite.offset_x),
+            static_cast<int>(pos.v.y + sprite.offset_y),
             static_cast<int>(sprite.dstRect.w * sprite.scale_x),
             static_cast<int>(sprite.dstRect.h * sprite.scale_y)
         };
@@ -102,8 +102,8 @@ void renderSystem(Registry& registry)
         Hitbox& hitbox = registry.get<Hitbox>(e);
         Position& pos = registry.get<Position>(e);
         SDL_Rect rect = {
-            static_cast<int>(pos.x + hitbox.offset_x),
-            static_cast<int>(pos.y + hitbox.offset_y),
+            static_cast<int>(pos.v.x + hitbox.offset_x),
+            static_cast<int>(pos.v.y + hitbox.offset_y),
             static_cast<int>(hitbox.width),
             static_cast<int>(hitbox.height)
         };
@@ -146,8 +146,8 @@ void playerPseudoRenderSystem(Registry& registry, SDL_Renderer* renderer)
             SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
             if (textTexture) {
                 SDL_Rect dstRect;
-                dstRect.x = static_cast<int>(pos.x);
-                dstRect.y = static_cast<int>(pos.y) - textSurface->h - 4.f; // Render above the entity
+                dstRect.x = static_cast<int>(pos.v.x);
+                dstRect.y = static_cast<int>(pos.v.y) - textSurface->h - 4.f; // Render above the entity
                 dstRect.w = textSurface->w;
                 dstRect.h = textSurface->h;
                 SDL_RenderCopy(renderer, textTexture, nullptr, &dstRect);

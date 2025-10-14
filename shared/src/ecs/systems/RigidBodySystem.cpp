@@ -23,23 +23,23 @@ void rigidBodySystem(Registry& registry, float deltaTime)
 
         float friction = rb.isOnPlatform ? rb.groundFriction : rb.airFriction;
 
-        vel = rb.acceleration * deltaTime;
-        vel *= friction * deltaTime;
+        vel.v = rb.acceleration * deltaTime;
+        vel.v = vel.v * friction * deltaTime;
 
-        vel.x = std::clamp(rb.velocity.x, -rb.maxSpeed, rb.maxSpeed);
+        vel.v.x = std::clamp(vel.v.x, -rb.maxSpeed, rb.maxSpeed);
 
         if (!rb.isOnPlatform) {
-            rb.velocity.y *= rb.gravity * deltaTime;
-            rb.velocity.y = std::min(rb.velocity.y, rb.maxFallSpeed);
+            vel.v.y += rb.gravity * deltaTime;
+            vel.v.y = std::min(vel.v.y, rb.maxFallSpeed);
         }
-        // if (vel.dy < 0.f) {
-        //     vel.dy += GRAVITY_UP * deltaTime;
+        // if (vel.v.y < 0.f) {
+        //     vel.v.y += GRAVITY_UP * deltaTime;
         // } else {
-        //     vel.dy += GRAVITY_DOWN * deltaTime;
+        //     vel.v.y += GRAVITY_DOWN * deltaTime;
         // }
 
-        // if (vel.dy > MAX_FALL) {
-        //     vel.dy = MAX_FALL;
+        // if (vel.v.y > MAX_FALL) {
+        //     vel.v.y = MAX_FALL;
         // }
     }
 }

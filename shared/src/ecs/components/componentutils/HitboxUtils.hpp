@@ -23,13 +23,13 @@
 inline bool aabb_overlap_world(const Position& pa, const Hitbox& ha,
     const Position& pb, const Hitbox& hb)
 {
-    float axmin = pa.x + ha.offset_x;
-    float aymin = pa.y + ha.offset_y;
+    float axmin = pa.v.x + ha.offset_x;
+    float aymin = pa.v.y + ha.offset_y;
     float axmax = axmin + ha.width;
     float aymax = aymin + ha.height;
 
-    float bxmin = pb.x + hb.offset_x;
-    float bymin = pb.y + hb.offset_y;
+    float bxmin = pb.v.x + hb.offset_x;
+    float bymin = pb.v.y + hb.offset_y;
     float bxmax = bxmin + hb.width;
     float bymax = bymin + hb.height;
 

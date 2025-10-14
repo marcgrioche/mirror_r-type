@@ -21,16 +21,16 @@ void dashSystem(Registry& registry, float deltaTime)
         if (dash.isDashing) {
             dash.remaining -= deltaTime;
 
-            velocity.dx = dash.dashSpeed * dash.direction.x;
-            velocity.dy = dash.dashSpeed * dash.direction.y;
+            velocity.v.x = dash.dashSpeed * dash.direction.x;
+            velocity.v.y = dash.dashSpeed * dash.direction.y;
 
             if (dash.remaining <= 0.0f) {
                 rigidBody.active = true; //reactivate rigid body
                 dash.isDashing = false;
                 dash.remaining = 0.0f;
                 FrequencyUtils::reset(dash.cooldown);
-                velocity.dx = 0.0f;
-                velocity.dy = 0.0f;
+                velocity.v.x = 0.0f;
+                velocity.v.y = 0.0f;
             }
         }
     }

@@ -31,7 +31,7 @@ void textBoxInputSystem(Registry& registry, const SDL_Event& event)
             Hitbox& hitbox = registry.get<Hitbox>(e);
 
             // Test point-in-rect
-            bool clicked = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
+            bool clicked = (mx >= pos.v.x && mx <= pos.v.x + hitbox.width && my >= pos.v.y && my <= pos.v.y + hitbox.height);
 
             if (clicked && input.isActive) {
                 input.isFocused = true;

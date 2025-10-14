@@ -75,7 +75,7 @@ void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuratio
                 float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
                 _newEntitiesThisTick.push_back(factories::createPowerUp(
                     registry,
-                    Position { pos.x, pos.y },
+                    Position { pos.v.x, pos.v.y },
                     Velocity { -10.0f, 0.0f },
                     Hitbox { POWERUP_WIDTH, POWERUP_HEIGHT },
                     Lifetime { POWERUP_LIFETIME },

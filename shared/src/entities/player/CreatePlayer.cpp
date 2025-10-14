@@ -50,7 +50,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
 {
     Entity player = registry.create_entity();
     registry.add<Position>(player, position);
-    registry.add<PreviousPosition>(player, PreviousPosition { position.x, position.y });
+    registry.add<PreviousPosition>(player, PreviousPosition { position.v.x, position.v.y });
     registry.add<Velocity>(player, Velocity { 0.0f, 0.0f });
     registry.add<Health>(player, health);
     registry.add<Hitbox>(player, hitbox);
@@ -72,7 +72,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
 {
     Entity player = registry.create_entity();
     registry.add<Position>(player, position);
-    registry.add<PreviousPosition>(player, PreviousPosition { position.x, position.y });
+    registry.add<PreviousPosition>(player, PreviousPosition { position.v.x, position.v.y });
     registry.add<Velocity>(player, Velocity { 0.0f, 0.0f });
     registry.add<Health>(player, health);
     registry.add<Hitbox>(player, hitbox);

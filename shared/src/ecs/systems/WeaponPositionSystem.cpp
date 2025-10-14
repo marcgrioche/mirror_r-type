@@ -17,8 +17,8 @@ void weaponPositionSystem(Registry& registry)
     for (auto [w, parent, position] : view) {
         if (registry.has<Position>(parent.parent)) {
             auto& parentPosition = registry.get<Position>(parent.parent);
-            position.x = parentPosition.x;
-            position.y = parentPosition.y;
+            position.v.x = parentPosition.v.x;
+            position.v.y = parentPosition.v.y;
         }
     }
 }

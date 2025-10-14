@@ -34,8 +34,8 @@ void drawButton(GraphicsManager& gfx, Registry& registry, Entity entity)
     }
 
     SDL_Rect buttonRect = {
-        static_cast<int>(pos.x + hitbox.offset_x),
-        static_cast<int>(pos.y + hitbox.offset_y),
+        static_cast<int>(pos.v.x + hitbox.offset_x),
+        static_cast<int>(pos.v.y + hitbox.offset_y),
         static_cast<int>(hitbox.width),
         static_cast<int>(hitbox.height)
     };

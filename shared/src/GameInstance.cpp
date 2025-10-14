@@ -86,7 +86,7 @@ void GameInstance::updateTick()
     for (const auto& [playerId, entity] : _player.getPlayerEntities()) {
         if (_core.getRegistry().has<Velocity>(entity)) {
             const auto& vel = _core.getRegistry().get<Velocity>(entity);
-            if (vel.dx != 0.0f || vel.dy != 0.0f) {
+            if (vel.v.x != 0.0f || vel.v.y != 0.0f) {
                 _core.markStateChanged();
                 break;
             }

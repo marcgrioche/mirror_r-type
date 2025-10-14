@@ -59,12 +59,12 @@ bool handlePlayerAttack(
         // If the weapon has a ProjectileType, add this entity type in the registry
         if (registry.has<ProjectileType>(weaponIt.entity())) {
             const Entity tpl = registry.get<ProjectileType>(weaponIt.entity()).entity;
-            const Position spawnPos { playerPos.x + registry.get<Hitbox>(playerEntity).width / 2, playerPos.y + registry.get<Hitbox>(playerEntity).height / 2 - registry.get<Hitbox>(tpl).height / 2 };
+            const Position spawnPos { playerPos.v.x + registry.get<Hitbox>(playerEntity).width / 2, playerPos.v.y + registry.get<Hitbox>(playerEntity).height / 2 - registry.get<Hitbox>(tpl).height / 2 };
             const Parent spawnParent { weaponIt.entity() };
 
             Entity spawned;
             if (registry.has<ProjectileTag>(tpl)) {
-                Velocity vel = registry.has<Velocity>(tpl) ? Velocity { registry.get<Velocity>(tpl).dx, registry.get<Velocity>(tpl).dy } : Velocity { 300.0f, 0.0f };
+                Velocity vel = registry.has<Velocity>(tpl) ? Velocity { registry.get<Velocity>(tpl).v.x, registry.get<Velocity>(tpl).v.y } : Velocity {{ 300.0f, 0.0f }};
                 Hitbox hit = registry.has<Hitbox>(tpl) ? registry.get<Hitbox>(tpl) : Hitbox { 32.0f, 32.0f, 0.0f, 0.0f };
                 Damage projDmg = registry.has<Damage>(tpl) ? registry.get<Damage>(tpl) : Damage { damage.value };
                 Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 5.0f };
@@ -150,12 +150,12 @@ bool handleEnemyAttacks(
             const Entity tpl = registry.get<ProjectileType>(weaponEntity).entity;
             const Hitbox& ownerHit = registry.get<Hitbox>(owner);
             const Hitbox& projHit = registry.get<Hitbox>(tpl);
-            Position spawnPos { enemyPos.x, enemyPos.y + ownerHit.height / 2 - projHit.height / 2 };
+            Position spawnPos { enemyPos.v.x, enemyPos.v.y + ownerHit.height / 2 - projHit.height / 2 };
 
             if (registry.has<BossTag>(owner)) {
                 int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height * 2));
                 int offset = maxOffset > 0 ? rand() % maxOffset : 0;
-                spawnPos.y = enemyPos.y + offset;
+                spawnPos.v.y = enemyPos.v.y + offset;
             }
             const Parent spawnParent { weaponEntity };
 

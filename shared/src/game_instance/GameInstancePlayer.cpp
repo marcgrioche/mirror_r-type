@@ -52,7 +52,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
     auto& rb = registry.get<RigidBody>(playerEntity);
 
     if (!dash.isDashing) {
-        velocity.dx = 0.0f;
+        velocity.v.x = 0.0f;
         dash.direction = { 0.0f, 0.0f };
     }
 
@@ -69,7 +69,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
         case GameInput::UP:
             if (!dash.isDashing) {
                 if (rb.isOnPlatform) {
-                    velocity.dy = -V0;
+                    velocity.v.y = -V0;
                 }
                 dash.direction.y = -1;
             }
@@ -81,14 +81,14 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
             break;
         case GameInput::LEFT:
             if (!dash.isDashing) {
-                //velocity.dx = -speed; //useless ???
+                //velocity.v.x = -speed; //useless ???
                 rb.acceleration.x = speed * -accel;
                 dash.direction.x = -1;
             }
             break;
         case GameInput::RIGHT:
             if (!dash.isDashing) {
-                //velocity.dx = speed;
+                //velocity.v.x = speed;
                 rb.acceleration.x = speed * accel;
                 dash.direction.x = 1;
             }

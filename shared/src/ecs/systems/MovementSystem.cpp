@@ -23,7 +23,7 @@ int movementPlatform(Registry& registry, float /*deltaTime*/)
 
     auto view = registry.view<Position, PlatformTag, Dead, Hitbox>();
     for (auto&& [pos, tag, dead, hitbox] : view) {
-        if (!dead.dead && (pos.x + hitbox.width) < 0.0f) {
+        if (!dead.dead && (pos.v.x + hitbox.width) < 0.0f) {
             dead.dead = true;
             ++outPlatformCounter;
         }
@@ -36,8 +36,8 @@ int movementSystem(Registry& registry, float deltaTime)
     // store previous positions for entities that need it
     auto prevPosView = registry.view<Position, PreviousPosition>();
     for (auto&& [pos, prevPos] : prevPosView) {
-        prevPos.x = pos.x;
-        prevPos.y = pos.y;
+        prevPos.v.x = pos.v.x;
+        prevPos.v.y = pos.v.y;
     }
 
     auto view = registry.view<Position, Velocity>();
@@ -51,8 +51,8 @@ int movementSystem(Registry& registry, float deltaTime)
             }
         }
 
-        pos.x += vel.dx * deltaTime;
-        pos.y += vel.dy * deltaTime;
+        pos.v.x += vel.v.x * deltaTime;
+        pos.v.y += vel.v.y * deltaTime;
     }
 
     int outPlatforms = movementPlatform(registry, deltaTime);

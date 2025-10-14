@@ -74,8 +74,8 @@ void drawTextBox(GraphicsManager& gfx, Registry& registry, Entity entity)
 
     // Position et taille de rendu
     SDL_Rect destRect = {
-        static_cast<int>(pos.x),
-        static_cast<int>(pos.y),
+        static_cast<int>(pos.v.x),
+        static_cast<int>(pos.v.y),
         textSurface->w,
         textSurface->h
     };

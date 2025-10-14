@@ -18,8 +18,8 @@ void boundarySystem(Registry& registry)
     auto view = registry.view<Position, Hitbox, Health, Dead>();
 
     for (auto&& [pos, hitbox, health, dead] : view) {
-        float X = pos.x + hitbox.offset_x + hitbox.width;
-        float Y = pos.y + hitbox.offset_y + hitbox.height;
+        float X = pos.v.x + hitbox.offset_x + hitbox.width;
+        float Y = pos.v.y + hitbox.offset_y + hitbox.height;
 
         if (Y > SCREEN_HEIGHT + 200.0f || X < -200.0f || X > SCREEN_WIDTH + 200.0f) {
             health.hp = 0;

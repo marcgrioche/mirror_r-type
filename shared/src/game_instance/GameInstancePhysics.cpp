@@ -16,8 +16,8 @@ void GameInstancePhysics::updatePreviousPositions(Registry& registry)
 {
     auto prevPosView = registry.view<Position, PreviousPosition>();
     for (auto&& [pos, prevPos] : prevPosView) {
-        prevPos.x = pos.x;
-        prevPos.y = pos.y;
+        prevPos.v.x = pos.v.x;
+        prevPos.v.y = pos.v.y;
     }
 }
 

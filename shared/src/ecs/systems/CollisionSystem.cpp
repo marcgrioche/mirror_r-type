@@ -26,7 +26,7 @@ void collisionSystem(Registry& registry, float deltaTime)
     auto oneWayPlatformView = registry.view<BottomPassPlatform, Position, Hitbox, Velocity>();
 
     for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : bodiesView) {
-        Position originalPos = { prevPos.x, prevPos.y };
+        Position originalPos = { prevPos.v.x, prevPos.v.y };
         rigidBody.isOnPlatform = false;
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
@@ -50,14 +50,14 @@ void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
     (void)originalPos;
-    float bodyLeft = pos.x + hitbox.offset_x;
+    float bodyLeft = pos.v.x + hitbox.offset_x;
     float bodyRight = bodyLeft + hitbox.width;
-    float bodyTop = pos.y + hitbox.offset_y;
+    float bodyTop = pos.v.y + hitbox.offset_y;
     float bodyBottom = bodyTop + hitbox.height;
 
-    float platformLeft = platformPos.x + platformHitbox.offset_x;
+    float platformLeft = platformPos.v.x + platformHitbox.offset_x;
     float platformRight = platformLeft + platformHitbox.width;
-    float platformTop = platformPos.y + platformHitbox.offset_y;
+    float platformTop = platformPos.v.y + platformHitbox.offset_y;
     float platformBottom = platformTop + platformHitbox.height;
 
     float overlapLeft = bodyRight - platformLeft;
@@ -71,25 +71,25 @@ void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox
 
     if (minOverlapX < minOverlapY) {
         if (overlapLeft < overlapRight) {
-            pos.x = platformLeft - (hitbox.offset_x + hitbox.width);
+            pos.v.x = platformLeft - (hitbox.offset_x + hitbox.width);
         } else {
-            pos.x = platformRight - hitbox.offset_x;
+            pos.v.x = platformRight - hitbox.offset_x;
         }
-        vel.dx = platformVel.dx;
+        vel.v.x = platformVel.v.x;
         std::cout << "Horizontal collision resolved!" << std::endl;
     } else {
         if (overlapTop < overlapBottom) {
-            pos.y = platformTop - (hitbox.offset_y + hitbox.height);
-            if (vel.dy >= 0) {
-                vel.dy = 0.0f;
-                float inputVel = vel.dx;
-                vel.dx = 2 * platformVel.dx + inputVel;
+            pos.v.y = platformTop - (hitbox.offset_y + hitbox.height);
+            if (vel.v.y >= 0) {
+                vel.v.y = 0.0f;
+                float inputVel = vel.v.x;
+                vel.v.x = 2 * platformVel.v.x + inputVel;
                 isPlayerOnPlatform = true;
             }
         } else {
-            pos.y = platformBottom - hitbox.offset_y;
-            if (vel.dy < 0) {
-                vel.dy = 0.0f;
+            pos.v.y = platformBottom - hitbox.offset_y;
+            if (vel.v.y < 0) {
+                vel.v.y = 0.0f;
                 std::cout << "Player hit ceiling!" << std::endl;
             }
         }
@@ -100,19 +100,19 @@ void resolveOneWayPlatformCollision(Position& pos, Velocity& vel, const Hitbox& 
     const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, bool &isPlayerOnPlatform)
 {
-    if (vel.dy <= 0) {
+    if (vel.v.y <= 0) {
         return; // Player is not falling, ignore collision
     }
 
     // Check if body was above the platform in the previous frame
-    float originalBodyBottom = originalPos.y + hitbox.offset_y + hitbox.height;
-    float platformTop = platformPos.y + platformHitbox.offset_y;
+    float originalBodyBottom = originalPos.v.y + hitbox.offset_y + hitbox.height;
+    float platformTop = platformPos.v.y + platformHitbox.offset_y;
 
     if (originalBodyBottom <= platformTop + 5.0f) {
-        pos.y = platformTop - (hitbox.offset_y + hitbox.height);
-        vel.dy = 0.0f;
-        float inputVel = vel.dx;
-        vel.dx = 2 * platformVel.dx + inputVel;
+        pos.v.y = platformTop - (hitbox.offset_y + hitbox.height);
+        vel.v.y = 0.0f;
+        float inputVel = vel.v.x;
+        vel.v.x = 2 * platformVel.v.x + inputVel;
         isPlayerOnPlatform = true;
     }
 }

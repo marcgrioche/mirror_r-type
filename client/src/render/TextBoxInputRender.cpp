@@ -26,8 +26,8 @@ void drawTextBoxInput(GraphicsManager& gfx, Registry& registry, Entity entity)
 
     // 1. Dessine le fond et la bordure de la TextBox
     SDL_Rect inputRect = {
-        static_cast<int>(pos.x + hitbox.offset_x),
-        static_cast<int>(pos.y + hitbox.offset_y),
+        static_cast<int>(pos.v.x + hitbox.offset_x),
+        static_cast<int>(pos.v.y + hitbox.offset_y),
         static_cast<int>(hitbox.width),
         static_cast<int>(hitbox.height)
     };

@@ -173,7 +173,7 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
     {
         auto view = registry.view<Position, PlatformTag>();
         for (auto&& [pos, tag] : view) {
-            placed.push_back({ pos.x, pos.y });
+            placed.push_back({ pos.v.x, pos.v.y });
         }
     }
 

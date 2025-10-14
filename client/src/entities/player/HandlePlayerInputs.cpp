@@ -20,22 +20,22 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
 
         const float speed = 250.0f;
 
-        velocity.dx = 0.0f;
+        velocity.v.x = 0.0f;
 
         if (_inputs.isUp()) {
             if (rigidBody.isOnPlatform) {
-                velocity.dy = -V0;
+                velocity.v.y = -V0;
             }
         }
         if (_inputs.isLeft()) {
-            velocity.dx = -speed;
+            velocity.v.x = -speed;
         }
         if (_inputs.isRight()) {
-            velocity.dx = speed;
+            velocity.v.x = speed;
         }
 
-        if (_inputs.isDown() && !rigidBody.isOnPlatform && velocity.dy > 0) {
-            velocity.dy += 300.0f;
+        if (_inputs.isDown() && !rigidBody.isOnPlatform && velocity.v.y > 0) {
+            velocity.v.y += 300.0f;
         }
     }
 }

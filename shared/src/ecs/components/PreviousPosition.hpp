@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include "Vector2.hpp"
+
 /**
  * @brief Component storing the position from the previous frame for collision detection
- * @param x Previous X-coordinate position
- * @param y Previous Y-coordinate position
+ * @param v Vector2 containing previous x and y coordinates
  */
 struct PreviousPosition {
-    float x = 0.0f;
-    float y = 0.0f;
+    Vector2 v;
 };

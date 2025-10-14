@@ -22,8 +22,8 @@ void drawProjectil(GraphicsManager& gfx, Registry& registry, Entity entity)
     SDL_Color bgColor = { 255, 255, 255, 255 };
 
     SDL_Rect ProjectileTag = {
-        static_cast<int>(pos.x + hitbox.offset_x),
-        static_cast<int>(pos.y + hitbox.offset_y),
+        static_cast<int>(pos.v.x + hitbox.offset_x),
+        static_cast<int>(pos.v.y + hitbox.offset_y),
         static_cast<int>(hitbox.width),
         static_cast<int>(hitbox.height)
     };

@@ -23,8 +23,8 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
 
         if (registry.has<Position>(entity)) {
             const auto& pos = registry.get<Position>(entity);
-            msg.write(pos.x);
-            msg.write(pos.y);
+            msg.write(pos.v.x);
+            msg.write(pos.v.y);
         } else {
             msg.write(0.0f);
             msg.write(0.0f);
@@ -89,8 +89,8 @@ Message GameInstanceSerialization::serializeEntityBatch(
 
         if (registry.has<Position>(entity)) {
             auto& pos = registry.get<Position>(entity);
-            msg.write(pos.x);
-            msg.write(pos.y);
+            msg.write(pos.v.x);
+            msg.write(pos.v.y);
         } else {
             continue; // Skip entities without position
         }
@@ -121,8 +121,8 @@ Message GameInstanceSerialization::serializeEntityBatch(
         } else if (entityType == 1) { // Projectile
             if (registry.has<Velocity>(entity)) {
                 auto& vel = registry.get<Velocity>(entity);
-                msg.write(vel.dx);
-                msg.write(vel.dy);
+                msg.write(vel.v.x);
+                msg.write(vel.v.y);
             }
 
             if (registry.has<Damage>(entity)) {
@@ -164,8 +164,8 @@ Message GameInstanceSerialization::serializeEntityBatch(
         } else if (entityType == 3) { // Enemy
             if (registry.has<Velocity>(entity)) {
                 auto& vel = registry.get<Velocity>(entity);
-                msg.write(vel.dx);
-                msg.write(vel.dy);
+                msg.write(vel.v.x);
+                msg.write(vel.v.y);
             }
 
             if (registry.has<Health>(entity)) {
