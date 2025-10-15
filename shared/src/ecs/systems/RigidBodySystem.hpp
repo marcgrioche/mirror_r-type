@@ -7,6 +7,8 @@
 
 #pragma once
 #include "Registry.hpp"
+#include "components/RigidBody.hpp"
+#include "components/Velocity.hpp"
 
 /**
  * @brief System that applies gravitational acceleration to entities with RigidBody components
@@ -16,3 +18,9 @@
  */
 
 void rigidBodySystem(Registry& registry, float deltaTime);
+
+void changeRigidBodyComponentProperties(
+    RigidBody& t_rigidBody,
+    Velocity& t_velocity,
+    float t_deltaTime,
+    bool t_isPlayer);
