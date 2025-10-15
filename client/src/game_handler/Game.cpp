@@ -6,6 +6,8 @@
 */
 
 #include "Game.hpp"
+#include "../../shared/include/ComponentMapper.hpp"
+#include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "ButtonSystem.hpp"
 #include "Config.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
@@ -33,6 +35,9 @@ Game::~Game()
 
 bool Game::initialize()
 {
+    initializeEntityMetadataRegistration();
+    initializeComponentMappings();
+
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
