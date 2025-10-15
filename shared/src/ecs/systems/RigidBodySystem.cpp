@@ -11,7 +11,9 @@
 #include "Config.hpp"
 #include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
+#include <cmath>
 #include "components/Tags.hpp"
+#include <cmath>
 
 void rigidBodySystem(Registry& registry, float deltaTime)
 {
