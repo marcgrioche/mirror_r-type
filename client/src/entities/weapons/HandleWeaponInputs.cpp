@@ -29,8 +29,8 @@ void handleWeaponInputs(InputManager& _inputs, Registry& registry)
                     const Position& parentPosition = registry.get<Position>(parent.parent);
                     factories::createProjectile(
                         registry,
-                        Position{parentPosition.x, parentPosition.y},
-                        Velocity{500.0f, 0.0f},
+                        Position{{parentPosition.v.x, parentPosition.v.y}},
+                        Velocity{{500.0f, 0.0f}},
                         Damage{damage.value},
                         Hitbox{50.0f, 50.0f, 0.0f, 0.0f},
                         Parent{weaponEntity},

@@ -12,7 +12,7 @@
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
-#include "ecs/systems/GravitySystem.hpp"
+#include "ecs/systems/RigidBodySystem.hpp"
 #include "ecs/systems/HealthSystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
@@ -57,7 +57,7 @@ void Game::updateLocalGameTick()
 {
     handlePlayerInputs(_inputs, _registry);
     handleWeaponInputs(_inputs, _registry);
-    gravitySystem(_registry, TICK_DURATION);
+    rigidBodySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
     projectileSystem(_registry, TICK_DURATION);
     collisionSystem(_registry, TICK_DURATION);

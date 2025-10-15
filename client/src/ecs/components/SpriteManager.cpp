@@ -151,7 +151,7 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
     // Calculate rotation based on velocity direction
     if (registry.has<Velocity>(entity)) {
         Velocity& velocity = registry.get<Velocity>(entity);
-        sprite.rotation = atan2(velocity.dy, velocity.dx) * 180.0f / M_PI + 180.0f;
+        sprite.rotation = atan2(velocity.v.y, velocity.v.x) * 180.0f / M_PI + 180.0f;
     }
 
     registry.add<Sprite>(entity, sprite);

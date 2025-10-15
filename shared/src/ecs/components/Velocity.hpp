@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include "Vector2.hpp"
+
 /**
  * @brief Component representing movement velocity in 2D space
- * @param dx Velocity in the x-direction (pixels per second)
- * @param dy Velocity in the y-direction (pixels per second)
+ * @param v Vector2 containing velocity in x and y directions (pixels per second)
  */
 struct Velocity {
-    float dx, dy;
+    Vector2 v;
 };

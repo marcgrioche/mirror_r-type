@@ -151,8 +151,8 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
 
     if (registry.has<Velocity>(enemy)) {
         auto& velocity = registry.get<Velocity>(enemy);
-        velocity.dx = velX;
-        velocity.dy = velY;
+        velocity.v.x = velX;
+        velocity.v.y = velY;
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
@@ -253,8 +253,8 @@ void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, f
 {
     if (registry.has<Position>(entity)) {
         auto& position = registry.get<Position>(entity);
-        position.x = posX;
-        position.y = posY;
+        position.v.x = posX;
+        position.v.y = posY;
     }
 
     if (registry.has<Sprite>(entity)) {

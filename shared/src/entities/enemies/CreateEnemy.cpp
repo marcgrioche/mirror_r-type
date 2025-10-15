@@ -39,7 +39,7 @@ Entity createEnemy(Registry& registry, const Position& position, const Health& h
 {
     Entity enemy = registry.create_entity();
     registry.add<Position>(enemy, position);
-    registry.add<PreviousPosition>(enemy, PreviousPosition { position.x, position.y });
+    registry.add<PreviousPosition>(enemy, PreviousPosition { position.v.x, position.v.y });
     registry.add<Velocity>(enemy, velocity);
     registry.add<Health>(enemy, health);
     registry.add<Hitbox>(enemy, hitbox);

@@ -73,6 +73,47 @@ public:
      */
     bool isInitialized() const;
 
+    /**
+     * @brief Gets the actual window dimensions
+     * @param width Output parameter for window width
+     * @param height Output parameter for window height
+     */
+    void getWindowSize(int& width, int& height) const;
+
+    /**
+     * @brief Toggles fullscreen mode on/off
+     * @param fullscreen True to enable fullscreen desktop mode, false for windowed
+     */
+    void setFullscreen(bool fullscreen);
+
+    /**
+     * @brief Gets the logical resolution (game coordinates)
+     * @param width Output parameter for logical width
+     * @param height Output parameter for logical height
+     */
+    void getLogicalSize(int& width, int& height) const;
+
+    /**
+     * @brief Gets the render resolution (internal rendering quality)
+     * @param width Output parameter for render width
+     * @param height Output parameter for render height
+     */
+    void getRenderSize(int& width, int& height) const;
+
+    /**
+     * @brief Changes the window size dynamically
+     * @param width New window width
+     * @param height New window height
+     */
+    void setWindowSize(int width, int height);
+
+    /**
+     * @brief Changes the render resolution dynamically
+     * @param width New render width
+     * @param height New render height
+     */
+    void setRenderSize(int width, int height);
+
 private:
     GraphicsManager() = default;
     ~GraphicsManager() = default;
@@ -80,7 +121,18 @@ private:
     GraphicsManager(const GraphicsManager&) = delete;
     GraphicsManager& operator=(const GraphicsManager&) = delete;
 
+    void applyScalingOptions();
+    void createRenderTarget();
+    void destroyRenderTarget();
+
     SDL_Window* m_window = nullptr;
     SDL_Renderer* m_renderer = nullptr;
+    SDL_Texture* m_renderTarget = nullptr;
     bool m_initialized = false;
+    bool m_useRenderTarget = false;
+    
+    int m_logicalWidth = 0;
+    int m_logicalHeight = 0;
+    int m_renderWidth = 0;
+    int m_renderHeight = 0;
 };

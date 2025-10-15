@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include "Vector2.hpp"
+
 /**
  * @brief Component representing 2D position coordinates in the game world
- * @param x X-coordinate position
- * @param y Y-coordinate position
+ * @param v Vector2 containing x and y coordinates
  */
 struct Position {
-    float x, y;
+    Vector2 v;
 };

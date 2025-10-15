@@ -11,24 +11,24 @@
 #include "Dash.hpp"
 #include "FrequencyUtils.hpp"
 #include <iostream>
+#include "components/RigidBody.hpp"
 
 void dashSystem(Registry& registry, float deltaTime)
 {
-    auto view = registry.view<Dash, Velocity>();
+    auto view = registry.view<Dash, Velocity, RigidBody>();
 
-    for (auto [dash, velocity] : view) {
+    for (auto [dash, velocity, rigidBody] : view) {
         if (dash.isDashing) {
             dash.remaining -= deltaTime;
 
-            velocity.dx = dash.dashSpeed * dash.direction.x;
-            velocity.dy = dash.dashSpeed * dash.direction.y;
+            velocity.v.x = dash.dashSpeed * dash.direction.x;
+            velocity.v.y = dash.dashSpeed * dash.direction.y;
 
             if (dash.remaining <= 0.0f) {
+                rigidBody.active = true; //reactivate rigid body
                 dash.isDashing = false;
                 dash.remaining = 0.0f;
                 FrequencyUtils::reset(dash.cooldown);
-                velocity.dx = 0.0f;
-                velocity.dy = 0.0f;
             }
         }
     }

@@ -46,7 +46,7 @@ void buttonSystem(Registry& registry)
         Position& pos = registry.get<Position>(e);
         Hitbox& hitbox = registry.get<Hitbox>(e);
 
-        const bool hovered = (mx >= pos.x && mx <= pos.x + hitbox.width && my >= pos.y && my <= pos.y + hitbox.height);
+        const bool hovered = (mx >= pos.v.x && mx <= pos.v.x + hitbox.width && my >= pos.v.y && my <= pos.v.y + hitbox.height);
         button.is_hovered = hovered && button.interactable;
 
         if (button.interactable && hovered && justPressed && !clickConsumedForThisPress) {

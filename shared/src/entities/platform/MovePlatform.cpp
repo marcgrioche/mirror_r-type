@@ -16,7 +16,7 @@ void movePlatform(Registry& registry)
     const float speed = 30.0f;
 
     for (auto [tag, velocity] : view) {
-        velocity.dx =  0.0f;
-        velocity.dx = -speed;
+        velocity.v.x =  0.0f;
+        velocity.v.x = -speed;
     }
 }
