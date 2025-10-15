@@ -30,7 +30,6 @@ Entity createProjectile(Registry& registry,
     registry.emplace<Parent>(projectile, parent);
     registry.emplace<Lifetime>(projectile, lifetime);
     registry.emplace<ProjectileTag>(projectile);
-    registry.emplace<FunctionMotion>(projectile, getFunctionMotionSineAbsolute(position));
     return projectile;
 }
 
@@ -42,7 +41,7 @@ Entity createProjectileTemplate(
 {
     // This entity is a blueprint: no Position/Lifetime/Parent so systems ignore it
     Entity tpl = registry.create_entity();
-    registry.emplace<Velocity>(tpl, Velocity{0, 0});
+    registry.emplace<Velocity>(tpl, velocity);
     registry.emplace<Damage>(tpl, damage);
     registry.emplace<Hitbox>(tpl, hitbox);
     registry.emplace<ProjectileTag>(tpl);

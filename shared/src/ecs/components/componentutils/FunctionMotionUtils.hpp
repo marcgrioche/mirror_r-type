@@ -13,6 +13,7 @@ FunctionMotion getFunctionMotionSineAbsolute(Position origin, float vx = 300.f, 
 {
     FunctionMotion fm = {
         .function = [vx, frequency, amplitude](float t, float dt) {
+            (void)dt;
             float x = vx * t;
             float y = std::sin(t * frequency * 2.f * M_PI) * amplitude;
             return Vector2{x, y};
