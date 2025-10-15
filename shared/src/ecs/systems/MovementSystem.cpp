@@ -7,13 +7,11 @@
 
 #include "MovementSystem.hpp"
 #include "../../include/Config.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/PreviousPosition.hpp"
+#include "components/Dead.hpp"
 #include "components/Health.hpp"
 #include "components/Hitbox.hpp"
-#include "components/Dead.hpp"
 #include "components/Tags.hpp"
+#include "components/Velocity.hpp"
 #include <array>
 #include <random>
 
@@ -31,28 +29,41 @@ int movementPlatform(Registry& registry, float /*deltaTime*/)
     return outPlatformCounter;
 }
 
+void resetEntityPosition(const Position& t_position, PreviousPosition& t_previousPosition)
+{
+    t_previousPosition.v.x = t_position.v.x;
+    t_previousPosition.v.y = t_position.v.y;
+}
+
+void changeMovementComponentProperties(Registry& t_registry, const Entity& t_entity, const float t_deltaTime)
+{
+    auto& position = t_registry.get<Position>(t_entity);
+    auto& velocity = t_registry.get<Velocity>(t_entity);
+
+    if (t_registry.has<PlayerTag>(t_entity) && t_registry.has<Health>(t_entity)) {
+        const auto& health = t_registry.get<Health>(t_entity);
+        if (health.hp <= 0) {
+            return;
+        }
+    }
+
+    position.v.x += velocity.v.x * t_deltaTime;
+    position.v.y += velocity.v.y * t_deltaTime;
+}
+
 int movementSystem(Registry& registry, float deltaTime)
 {
     // store previous positions for entities that need it
     auto prevPosView = registry.view<Position, PreviousPosition>();
     for (auto&& [pos, prevPos] : prevPosView) {
-        prevPos.v.x = pos.v.x;
-        prevPos.v.y = pos.v.y;
+        resetEntityPosition(pos, prevPos);
     }
 
     auto view = registry.view<Position, Velocity>();
     for (auto it = view.begin(); it != view.end(); ++it) {
         auto [entity, pos, vel] = it.entity_and_components();
 
-        if (registry.has<PlayerTag>(entity) && registry.has<Health>(entity)) {
-            const auto& health = registry.get<Health>(entity);
-            if (health.hp <= 0) {
-                continue;
-            }
-        }
-
-        pos.v.x += vel.v.x * deltaTime;
-        pos.v.y += vel.v.y * deltaTime;
+        changeMovementComponentProperties(registry, entity, deltaTime);
     }
 
     int outPlatforms = movementPlatform(registry, deltaTime);
