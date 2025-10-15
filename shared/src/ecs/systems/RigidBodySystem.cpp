@@ -43,7 +43,7 @@ void rigidBodySystem(Registry& registry, float deltaTime)
 
         if (!rb.isOnGround) {
             vel.v.y += rb.gravity;
-            vel.v.y = std::min(vel.v.y, rb.maxFallSpeed);
+            vel.v.y = (std::min)(vel.v.y, rb.maxFallSpeed);
         } else {
             vel.v += rb.groundSpeed;
         }

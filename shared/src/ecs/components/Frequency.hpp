@@ -14,7 +14,7 @@
  */
 struct Frequency {
     double frequency = 1.0; /**< Time interval in seconds between event occurrences */
-    std::chrono::high_resolution_clock::time_point lastTime = std::chrono::high_resolution_clock::time_point::min(); /**< Timestamp of last event execution */
+    std::chrono::high_resolution_clock::time_point lastTime = (std::chrono::high_resolution_clock::time_point::min)(); /**< Timestamp of last event execution */
 
     Frequency() = default;
     /**
