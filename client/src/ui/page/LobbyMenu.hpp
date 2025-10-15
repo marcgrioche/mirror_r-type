@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 9:48:07 PM 2025 jojo
-** Last update Thu Oct 8 2:33:05 PM 2025 jojo
+** Last update Tue Oct 13 3:14:49 PM 2025 jojo
 */
 
 #pragma once
@@ -37,7 +37,7 @@ public:
      * @brief Shows the lobby menu by creating and displaying its UI elements
      * @param registry The ECS registry to create entities in
      */
-    void show(Registry& registry);
+    void show(Registry& registry, int lobbyId);
 
     /**
      * @brief Shows the lobby menu after a game has ended
@@ -104,12 +104,13 @@ private:
     Entity m_connectButtonEntity;
     Entity m_connectTextBoxEntity;
     Entity m_returnButtonEntity;
+    Entity m_textBoxLobbyEntity;
     bool m_visible = false;
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;
     bool m_isReturningFromGame = false;
 
-    void createEntities(Registry& registry);
+    void createEntities(Registry& registry, int lobbyId);
     void destroyEntities(Registry& registry);
     void setupEventHandlers();
 };

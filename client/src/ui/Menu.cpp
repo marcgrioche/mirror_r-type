@@ -27,7 +27,7 @@ void Menu::activate(Registry& _registry, Page page)
         m_joinPage.show(_registry);
         break;
     case Page::LOBBY:
-        m_lobbyPage.show(_registry);
+        m_lobbyPage.show(_registry, 0);
         break;
     case Page::WIN:
         m_endPage.show(_registry, true);
@@ -81,11 +81,11 @@ void Menu::showJoinPage(Registry& registry)
     m_joinPage.show(registry);
 }
 
-void Menu::showLobbyPage(Registry& registry)
+void Menu::showLobbyPage(Registry& registry, int lobbyId)
 {
     hideAllPages(registry);
     m_currentPage = Page::LOBBY;
-    m_lobbyPage.show(registry);
+    m_lobbyPage.show(registry, lobbyId);
 }
 
 void Menu::showLobbyPageAfterGame(Registry& registry)

@@ -5,13 +5,13 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 9:48:35 PM 2025 jojo
-** Last update Thu Oct 8 1:24:54 PM 2025 jojo
+** Last update Tue Oct 13 3:20:26 PM 2025 jojo
 */
 
 #include "LobbyMenu.hpp"
+#include "Config.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
-#include "Config.hpp"
 #include <iostream>
 
 LobbyMenu::LobbyMenu()
@@ -21,10 +21,10 @@ LobbyMenu::LobbyMenu()
 
 LobbyMenu::~LobbyMenu() = default;
 
-void LobbyMenu::show(Registry& registry)
+void LobbyMenu::show(Registry& registry, int lobbyId)
 {
     if (!m_visible) {
-        createEntities(registry);
+        createEntities(registry, lobbyId);
         m_visible = true;
         clearRequests();
         m_isReturningFromGame = false;
@@ -34,7 +34,7 @@ void LobbyMenu::show(Registry& registry)
 void LobbyMenu::showAfterGameEnd(Registry& registry)
 {
     if (!m_visible) {
-        createEntities(registry);
+        createEntities(registry, 0);
         m_visible = true;
         clearRequests();
         m_isReturningFromGame = true;
@@ -51,7 +51,7 @@ void LobbyMenu::hide(Registry& registry)
     }
 }
 
-void LobbyMenu::createEntities(Registry& registry)
+void LobbyMenu::createEntities(Registry& registry, int lobbyId)
 {
     // TextBoxInput pour le code de connexion
     // m_textBoxEntity = factories::createTextBoxInput(registry,
@@ -66,6 +66,9 @@ void LobbyMenu::createEntities(Registry& registry)
 
     m_connectTextBoxEntity = factories::createTextBox(registry,
         "READY", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+
+    m_textBoxLobbyEntity = factories::createTextBox(registry,
+        std::to_string(lobbyId), 320.0f, 220.0f, 16, { 255, 255, 255, 255 });
 }
 
 void LobbyMenu::destroyEntities(Registry& registry)
@@ -74,6 +77,7 @@ void LobbyMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_connectButtonEntity);
     registry.kill_entity(m_returnButtonEntity);
     registry.kill_entity(m_connectTextBoxEntity);
+    registry.kill_entity(m_textBoxLobbyEntity);
 }
 
 void LobbyMenu::setupEventHandlers()
@@ -137,6 +141,7 @@ void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
     drawButton(gfx, registry, m_connectButtonEntity);
     drawTextBox(gfx, registry, m_connectTextBoxEntity);
     drawButton(gfx, registry, m_returnButtonEntity);
+    drawTextBox(gfx, registry, m_textBoxLobbyEntity);
 }
 
 bool LobbyMenu::hasRequest() const
