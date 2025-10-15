@@ -34,7 +34,7 @@ Entity createPlayer(Registry& registry)
     registry.emplace<Dead>(player);
     registry.emplace<Dash>(player, Dash {});
     registry.emplace<PowerUp>(player);
-    registry.emplace<PlayerTag>(player);
+    registry.emplace<PlayerTag>(player, PlayerTag { 0 });
     registry.emplace<RigidBody>(player);
     // registry.emplace<Sprite>(player, 0, 50, 50);
     Entity projectile = factories::createProjectileTemplate(
@@ -68,7 +68,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     return player;
 }
 
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox)
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox, const uint32_t playerId)
 {
     Entity player = registry.create_entity();
     registry.add<Position>(player, position);
@@ -78,7 +78,7 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
     registry.add<Hitbox>(player, hitbox);
     registry.emplace<Dead>(player);
     registry.add<Dash>(player, Dash {});
-    registry.add<PlayerTag>(player, PlayerTag {});
+    registry.add<PlayerTag>(player, PlayerTag { playerId });
     registry.add<TextBox>(player, textbox);
     registry.emplace<PowerUp>(player);
     registry.emplace<RigidBody>(player);
