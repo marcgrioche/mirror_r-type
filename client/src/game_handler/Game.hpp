@@ -251,6 +251,7 @@ private:
     void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers);
     void updateSingleEntity(const Message& msg, Registry& registry);
     Entity findEntityByServerId(Registry& registry, uint32_t serverId);
+    Entity findEntityByClientId(Registry& registry, uint32_t clientId);
     void updateEntityState(Registry& registry, Entity entity, float posX, float posY, uint32_t health);
     void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY);
     void updateEntityHealth(Registry& registry, Entity entity, uint32_t health);
