@@ -33,7 +33,8 @@ Game::~Game()
 
 bool Game::initialize()
 {
-    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", SCREEN_WIDTH, SCREEN_HEIGHT)) {
+    // Initialize with window size (physical window), not game resolution
+    if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
         return false;
     }
