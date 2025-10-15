@@ -242,6 +242,19 @@ Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
     return Entity { 0, 0 };
 }
 
+Entity Game::findEntityByClientId(Registry& registry, const uint32_t clientId)
+{
+    auto view = registry.view<PlayerTag>();
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        Entity entity = it.entity();
+        const auto& playerTag = registry.get<PlayerTag>(entity);
+        if (playerTag.playerId == clientId) {
+            return entity;
+        }
+    }
+    return Entity { 0, 0 };
+}
+
 void Game::updateEntityState(Registry& registry, Entity entity,
     float posX, float posY, uint32_t health)
 {
