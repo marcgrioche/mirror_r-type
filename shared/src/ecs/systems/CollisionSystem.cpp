@@ -6,12 +6,12 @@
 */
 
 #include "CollisionSystem.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
-#include "components/PreviousPosition.hpp"
 #include "components/Platform.hpp"
+#include "components/Position.hpp"
+#include "components/PreviousPosition.hpp"
 #include "components/Tags.hpp"
+#include "components/Velocity.hpp"
 #include "components/componentutils/HitboxUtils.hpp"
 #include <algorithm>
 #include <iostream>
@@ -41,12 +41,14 @@ void collisionSystem(Registry& registry, float deltaTime)
                     platformPos, platformHitbox, originalPos, platformVel, rigidBody);
             }
         }
+
+        checkGroundContact(pos, hitbox, rigidBody, platformView, oneWayPlatformView);
     }
 }
 
 void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel, RigidBody &rb)
+    const Position& originalPos, const Velocity& platformVel, RigidBody& rb)
 {
     (void)originalPos;
     float bodyLeft = pos.v.x + hitbox.offset_x;
@@ -95,7 +97,7 @@ void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox
 
 void resolveOneWayPlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
-    const Position& originalPos, const Velocity& platformVel, RigidBody &rb)
+    const Position& originalPos, const Velocity& platformVel, RigidBody& rb)
 {
     if (vel.v.y <= 0) {
         return; // Player is not falling, ignore collision
@@ -110,5 +112,41 @@ void resolveOneWayPlatformCollision(Position& pos, Velocity& vel, const Hitbox& 
         vel.v.y = 0.0f;
         rb.isOnGround = true;
         rb.groundSpeed = platformVel.v;
+    }
+}
+
+void checkGroundContact(const Position& pos, const Hitbox& hitbox, RigidBody& rb,
+    const auto& platformView, const auto& oneWayPlatformView)
+{
+    if (rb.isOnGround) {
+        return;
+    }
+
+    float bodyLeft = pos.v.x + hitbox.offset_x;
+    float bodyRight = bodyLeft + hitbox.width;
+    float bodyBottom = pos.v.y + hitbox.offset_y + hitbox.height;
+
+    for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
+        float platformLeft = platformPos.v.x + platformHitbox.offset_x;
+        float platformRight = platformLeft + platformHitbox.width;
+        float platformTop = platformPos.v.y + platformHitbox.offset_y;
+
+        if (bodyBottom >= platformTop - 1.0f && bodyBottom <= platformTop + 1.0f && bodyRight > platformLeft && bodyLeft < platformRight) {
+            rb.isOnGround = true;
+            rb.groundSpeed = platformVel.v;
+            return;
+        }
+    }
+
+    for (auto&& [p, platformPos, platformHitbox, platformVel] : oneWayPlatformView) {
+        float platformLeft = platformPos.v.x + platformHitbox.offset_x;
+        float platformRight = platformLeft + platformHitbox.width;
+        float platformTop = platformPos.v.y + platformHitbox.offset_y;
+
+        if (bodyBottom >= platformTop - 1.0f && bodyBottom <= platformTop + 1.0f && bodyRight > platformLeft && bodyLeft < platformRight) {
+            rb.isOnGround = true;
+            rb.groundSpeed = platformVel.v;
+            return;
+        }
     }
 }
