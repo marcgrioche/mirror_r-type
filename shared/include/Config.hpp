@@ -6,10 +6,7 @@
 */
 
 #pragma once
-
-// Screen dimensions
-constexpr int SCREEN_WIDTH = 1920;
-constexpr int SCREEN_HEIGHT = 1080;
+#include "DisplayPresets.hpp"
 
 // Jump and gravity constants
 constexpr float JUMP_HEIGHT = 200.0f; // pixels
