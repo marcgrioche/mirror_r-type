@@ -67,8 +67,8 @@ void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox
     float overlapBottom = platformBottom - bodyTop;
 
     // plus l'overlap est petit, plus ça veut dire que ça "vient" de toucher
-    float minOverlapX = std::min(overlapLeft, overlapRight);
-    float minOverlapY = std::min(overlapTop, overlapBottom);
+    float minOverlapX = (std::min)(overlapLeft, overlapRight);
+    float minOverlapY = (std::min)(overlapTop, overlapBottom);
 
     if (minOverlapX < minOverlapY) {
         if (overlapLeft < overlapRight) {
