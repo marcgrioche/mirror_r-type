@@ -25,7 +25,7 @@ void rigidBodySystem(Registry& registry, float deltaTime)
         
         vel.v += rb.acceleration * deltaTime;
 
-        if (rb.isOnPlatform) {
+        if (rb.isOnGround) {
             vel.v.x *= pow(rb.groundFriction, deltaTime);
             
             if (registry.has<PlayerTag>(entity)) {
@@ -39,7 +39,7 @@ void rigidBodySystem(Registry& registry, float deltaTime)
 
         vel.v.x = std::clamp(vel.v.x, -rb.maxSpeed, rb.maxSpeed);
 
-        if (!rb.isOnPlatform) {
+        if (!rb.isOnGround) {
             vel.v.y += rb.gravity;
             vel.v.y = std::min(vel.v.y, rb.maxFallSpeed);
         } else {

@@ -26,7 +26,7 @@ void collisionSystem(Registry& registry, float deltaTime)
 
     for (auto&& [pos, vel, hitbox, prevPos, rigidBody] : bodiesView) {
         Position originalPos = { prevPos.v.x, prevPos.v.y };
-        rigidBody.isOnPlatform = false;
+        rigidBody.isOnGround = false;
 
         for (auto&& [p, platformPos, platformHitbox, platformVel] : platformView) {
             if (aabb_overlap_world(pos, hitbox, platformPos, platformHitbox)) {
@@ -80,7 +80,7 @@ void resolvePlatformCollision(Position& pos, Velocity& vel, const Hitbox& hitbox
             pos.v.y = platformTop - (hitbox.offset_y + hitbox.height);
             if (vel.v.y >= 0) {
                 vel.v.y = 0.0f;
-                rb.isOnPlatform = true;
+                rb.isOnGround = true;
                 rb.groundSpeed = platformVel.v;
             }
         } else {
@@ -108,7 +108,7 @@ void resolveOneWayPlatformCollision(Position& pos, Velocity& vel, const Hitbox& 
     if (originalBodyBottom <= platformTop + 5.0f) {
         pos.v.y = platformTop - (hitbox.offset_y + hitbox.height);
         vel.v.y = 0.0f;
-        rb.isOnPlatform = true;
+        rb.isOnGround = true;
         rb.groundSpeed = platformVel.v;
     }
 }

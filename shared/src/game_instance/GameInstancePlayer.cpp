@@ -57,7 +57,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
     }
 
     bool hasRealInputs = false;
-    float accel = rb.isOnPlatform ? rb.groundAccel : rb.airAccel;
+    float accel = rb.isOnGround ? rb.groundAccel : rb.airAccel;
 
     for (const auto& [input, isPressed] : inputs) {
         if (!isPressed)
@@ -67,7 +67,7 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
         switch (input) {
         case GameInput::UP:
             if (!dash.isDashing) {
-                if (rb.isOnPlatform) {
+                if (rb.isOnGround) {
                     velocity.v.y = -V0;
                 }
                 dash.direction.y = -1;

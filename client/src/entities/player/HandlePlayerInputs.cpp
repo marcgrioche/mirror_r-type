@@ -23,7 +23,7 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
         velocity.v.x = 0.0f;
 
         if (_inputs.isUp()) {
-            if (rigidBody.isOnPlatform) {
+            if (rigidBody.isOnGround) {
                 velocity.v.y = -V0;
             }
         }
@@ -34,7 +34,7 @@ void handlePlayerInputs(InputManager& _inputs, Registry& registry)
             velocity.v.x = speed;
         }
 
-        if (_inputs.isDown() && !rigidBody.isOnPlatform && velocity.v.y > 0) {
+        if (_inputs.isDown() && !rigidBody.isOnGround && velocity.v.y > 0) {
             velocity.v.y += 300.0f;
         }
     }

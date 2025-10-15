@@ -11,7 +11,7 @@
 /**
  * @brief Component representing physics properties for entities affected by gravity
  * @param weight Mass/weight of the entity affecting gravity response
- * @param isOnPlatform True if the entity is currently standing on a platform
+ * @param isOnGround True if the entity is currently standing on a platform
  */
 
 struct RigidBody {
@@ -24,7 +24,7 @@ struct RigidBody {
     float maxSpeed = 300.f; //mainly to limit input based speed ?
     float maxFallSpeed = 1500.f;
     float gravity = 100.f;
-    bool isOnPlatform = false;
+    bool isOnGround = false;
     Vector2 groundSpeed;
     Vector2 acceleration;
 };
