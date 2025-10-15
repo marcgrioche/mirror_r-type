@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include "components/Components.hpp"
 #include "components/Hitbox.hpp"
 #include "ecs/Registry.hpp"
 #include <algorithm>
