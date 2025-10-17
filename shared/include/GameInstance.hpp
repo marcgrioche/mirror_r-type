@@ -1,13 +1,13 @@
 #pragma once
 
-#include "game_instance/GameInstanceCore.hpp"
-#include "game_instance/GameInstancePlayer.hpp"
-#include "game_instance/GameInstanceEntities.hpp"
-#include "game_instance/GameInstancePhysics.hpp"
-#include "game_instance/GameInstanceConditions.hpp"
-#include "game_instance/GameInstanceSerialization.hpp"
 #include "GameInputs.hpp"
 #include "Message.hpp"
+#include "game_instance/GameInstanceConditions.hpp"
+#include "game_instance/GameInstanceCore.hpp"
+#include "game_instance/GameInstanceEntities.hpp"
+#include "game_instance/GameInstancePhysics.hpp"
+#include "game_instance/GameInstancePlayer.hpp"
+#include "game_instance/GameInstanceSerialization.hpp"
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -15,7 +15,7 @@
 
 /**
  * @brief Main game instance orchestrating all game subsystems
- * 
+ *
  * This class delegates responsibilities to specialized managers:
  * - Core: State and lifecycle management
  * - Player: Player management and input processing
@@ -154,6 +154,7 @@ private:
     GameInstanceCore _core;
     GameInstancePlayer _player;
     GameInstanceEntities _entities;
+    std::chrono::duration<float> _accumulatedTime { 0.0f };
 
     void updateTick();
 };

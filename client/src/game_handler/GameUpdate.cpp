@@ -12,15 +12,18 @@
 #include "ButtonSystem.hpp"
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
-#include "ecs/systems/RigidBodySystem.hpp"
 #include "ecs/systems/HealthSystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
+#include "ecs/systems/RigidBodySystem.hpp"
 #include "entities/player/HandlePlayerInputs.hpp"
 #include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
 #include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
+
+#include "DashSystem.hpp"
+#include "game_instance/PlayerInputProcessor.hpp"
 
 void Game::update(float deltaTime)
 {
@@ -43,6 +46,45 @@ void Game::updateGameTick()
     buttonSystem(_registry);
 }
 
+void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
+{
+    const auto clientId = m_clientNetwork->getPlayerId();
+    const auto playerEntity = findEntityByClientId(_registry, clientId);
+
+    std::vector<Entity> newEntities = {};
+    PlayerInputProcessor::processInput(
+        _registry,
+        playerEntity,
+        m_clientNetwork->getCurrentTick(),
+        inputs,
+        newEntities,
+        100,
+        true);
+}
+
+void Game::updatePlayerSprite(Registry& registry, const Entity entity, const float posX, const float posY)
+{
+    if (registry.has<Sprite>(entity)) {
+        auto& sprite = registry.get<Sprite>(entity);
+        sprite.dstRect.x = static_cast<int>(posX);
+        sprite.dstRect.y = static_cast<int>(posY);
+    }
+}
+
+void Game::updateSystemsComponents()
+{
+    const auto playerEntity = findEntityByClientId(_registry, 100);
+    if (playerEntity.id == 0 && playerEntity.version == 0)
+        return;
+    auto& dash = _registry.get<Dash>(playerEntity);
+    auto& velocity = _registry.get<Velocity>(playerEntity);
+    auto& rigidBody = _registry.get<RigidBody>(playerEntity);
+
+    changeDashComponentProperties(dash, velocity, rigidBody, TICK_DURATION);
+    changeRigidBodyComponentProperties(rigidBody, velocity, TICK_DURATION, true);
+    GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
+}
+
 void Game::updateNetworkGameTick()
 {
     movementSystem(_registry, TICK_DURATION);
@@ -50,7 +92,10 @@ void Game::updateNetworkGameTick()
     auto currentInputs = getCurrentInputs();
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
+    m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
     m_clientNetwork->incrementTick();
+    processLocalInputs(currentInputs);
+    updateSystemsComponents();
 }
 
 void Game::updateLocalGameTick()

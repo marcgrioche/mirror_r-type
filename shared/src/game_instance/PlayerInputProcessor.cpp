@@ -14,7 +14,8 @@ bool processInput(
     uint32_t tick,
     const std::vector<std::pair<GameInput, bool>>& inputs,
     std::vector<Entity>& newEntities,
-    uint32_t playerId)
+    uint32_t playerId,
+    bool isClient)
 {
     (void)tick;
 
@@ -66,6 +67,8 @@ bool processInput(
             }
             break;
         case GameInput::ATTACK:
+            if (isClient)
+                continue;
             if (WeaponSystem::handlePlayerAttack(registry, playerEntity, playerId, newEntities)) {
                 // Attack processed
             }

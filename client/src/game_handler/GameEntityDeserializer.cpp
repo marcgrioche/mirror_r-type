@@ -80,8 +80,16 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         TextBox { username, 12 },
         serverPlayerId);
 
+    // Entity entity2 = factories::createPlayer(registry,
+    //     Position { posX, posY },
+    //     Health { static_cast<int>(healthValue) },
+    //     Hitbox { width, height, offsetX, offsetY },
+    //     TextBox { username, 12 },
+    //     100);
+
     registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
     SpriteManager::addPlayerSprite(registry, entity, posX, posY, 1.5f);
+    // SpriteManager::addPlayerSprite(registry, entity2, posX, posY, 1.5f);
 }
 
 void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
@@ -203,18 +211,18 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     (void)tick;
     uint8_t numPlayers = msg.readU8();
 
-    updateNonPredictedEntities(msg, registry, numPlayers);
+    updateNonPredictedEntities(msg, registry, numPlayers, tick);
 }
 
 void Game::updateNonPredictedEntities(const Message& msg, Registry& registry,
-    uint8_t numPlayers)
+    uint8_t numPlayers, uint32_t tick)
 {
     for (uint8_t i = 0; i < numPlayers; ++i) {
-        updateSingleEntity(msg, registry);
+        updateSingleEntity(msg, registry, tick);
     }
 }
 
-void Game::updateSingleEntity(const Message& msg, Registry& registry)
+void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t tick)
 {
     uint32_t entityId = msg.readU32();
     float posX = msg.readFloat();
@@ -226,7 +234,7 @@ void Game::updateSingleEntity(const Message& msg, Registry& registry)
         return;
     }
 
-    updateEntityState(registry, entity, posX, posY, health);
+    updateEntityState(registry, entity, posX, posY, health, tick);
 }
 
 Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
@@ -256,25 +264,47 @@ Entity Game::findEntityByClientId(Registry& registry, const uint32_t clientId)
 }
 
 void Game::updateEntityState(Registry& registry, Entity entity,
-    float posX, float posY, uint32_t health)
+    float posX, float posY, uint32_t health, const uint32_t serverTick)
 {
-    updateEntityPosition(registry, entity, posX, posY);
+    updateEntityPosition(registry, entity, posX, posY, serverTick);
     updateEntityHealth(registry, entity, health);
 }
 
-void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, float posY)
+void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, float posY,
+    const uint32_t serverTick)
 {
+    auto playerEntity = findEntityByClientId(registry, m_clientNetwork->getPlayerId());
+    // auto playerTag = registry.get<PlayerTag>(entity);
+
+    if (playerEntity == entity) {
+        if (registry.has<Position>(playerEntity)) {
+            auto& position = registry.get<Position>(playerEntity);
+            position.v.x = posX;
+            position.v.y = posY;
+        }
+
+        // Step 2: Reconciliation
+        // Remove all confirmed inputs
+        m_inputHistory.removeUpToTick(serverTick);
+
+        // Step 3: Replay remaining inputs for prediction
+        // for (const auto& frame : m_inputHistory.getHistory()) {
+        //     auto actions = frame.actions;
+        //     // Apply each frame's actions to the player as you do in your normal per-tick logic
+        //     processLocalInputs(actions);
+        // }
+
+        // Optionally: update sprite position with interpolation (for smoothing)
+        updatePlayerSprite(registry, entity, posX, posY);
+        return;
+    }
     if (registry.has<Position>(entity)) {
         auto& position = registry.get<Position>(entity);
         position.v.x = posX;
         position.v.y = posY;
     }
 
-    if (registry.has<Sprite>(entity)) {
-        auto& sprite = registry.get<Sprite>(entity);
-        sprite.dstRect.x = static_cast<int>(posX);
-        sprite.dstRect.y = static_cast<int>(posY);
-    }
+    updatePlayerSprite(registry, entity, posX, posY);
 }
 
 void Game::updateEntityHealth(Registry& registry, Entity entity, uint32_t health)

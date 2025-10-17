@@ -1,9 +1,9 @@
 #include "../include/GameInstance.hpp"
+#include "../include/game_instance/GameInstanceConditions.hpp"
 #include "../include/game_instance/GameInstanceCore.hpp"
-#include "../include/game_instance/GameInstancePlayer.hpp"
 #include "../include/game_instance/GameInstanceEntities.hpp"
 #include "../include/game_instance/GameInstancePhysics.hpp"
-#include "../include/game_instance/GameInstanceConditions.hpp"
+#include "../include/game_instance/GameInstancePlayer.hpp"
 #include "../include/game_instance/GameInstanceSerialization.hpp"
 #include "ecs/components/Velocity.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
@@ -33,16 +33,15 @@ void GameInstance::update()
         return;
 
     auto currentTime = std::chrono::steady_clock::now();
-    auto deltaTime = currentTime - _core.getLastTickTime();
-    auto tickDuration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<float>(TICK_DURATION));
+    float deltaTime = std::chrono::duration<float>(currentTime - _core.getLastTickTime()).count();
+    // std::cout << "Delta time: " << deltaTime << std::endl;
+    _core.setLastTickTime(currentTime);
 
-    while (deltaTime >= tickDuration) {
+    _accumulatedTime += std::chrono::duration<float>(deltaTime);
+    while (_accumulatedTime.count() >= TICK_DURATION) {
         updateTick();
-        deltaTime -= tickDuration;
+        _accumulatedTime -= std::chrono::duration<float>(TICK_DURATION);
     }
-
-    _core.setLastTickTime(currentTime - deltaTime);
 }
 
 void GameInstance::updateTick()
@@ -119,8 +118,7 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
     return GameInstanceSerialization::serializeGameState(
         _core.getRegistry(),
         _core.getCurrentTick(),
-        _player.getPlayerEntities()
-    );
+        _player.getPlayerEntities());
 }
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
@@ -134,8 +132,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         _core.getRegistry(),
         entity,
         _player.getPlayerEntities(),
-        _player.getUsernames()
-    );
+        _player.getUsernames());
 }
 
 Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
@@ -144,8 +141,7 @@ Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
         _core.getRegistry(),
         entities,
         _player.getPlayerEntities(),
-        _player.getUsernames()
-    );
+        _player.getUsernames());
 }
 
 std::vector<Entity> GameInstance::getAndClearNewEntities()
