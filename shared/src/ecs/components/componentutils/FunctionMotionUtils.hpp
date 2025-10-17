@@ -10,6 +10,10 @@
 #include "Position.hpp"
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 FunctionMotion getFunctionMotionSineAbsolute(Position origin, float vx = 300.f, float frequency = 3.f, float amplitude = 100.f)
 {
     FunctionMotion fm = {
