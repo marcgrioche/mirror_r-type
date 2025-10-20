@@ -110,6 +110,21 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
         }
         return;
     }
+    uint8_t lobbyState = msg.readU8();
+    const uint32_t ownerId = msg.readU32();
+    const uint8_t numPlayers = msg.readU8();
+
+    (void)lobbyState;
+    m_lobbyOwnerId = ownerId;
+    if (numPlayers != 0) {
+        m_lobbyPlayers.clear();
+    }
+    for (uint8_t i = 0; i < numPlayers; i++) {
+        uint32_t playerId = msg.readU32();
+        const uint8_t playerUsernameLen = msg.readU8();
+        const std::string username = msg.readString(playerUsernameLen);
+        m_lobbyPlayers[playerId] = username;
+    }
 
     std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
 
@@ -164,6 +179,7 @@ void Game::handleKickPlayerNotice(const Client::NetworkEvent& event)
     const uint32_t playerId = msg.readU32();
     // REMOVE PLAYER Entity and remove it from the vector in the m_clientNetwork
     std::cout << "Removing player " << playerId << " from " << lobbyId << std::endl;
+    m_lobbyPlayers.erase(playerId);
 }
 
 void Game::processLocalGameUpdates()

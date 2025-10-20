@@ -113,6 +113,12 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - **Payload**:
   - uint32: Lobby ID (0 = not in lobby or operation failed)
   - uint8: Lobby state (0=WAITING, 1=RUNNING, 2=FINISHED)
+  - uint32: Owner Player ID
+  - uint8: Number of players (N)
+  - For i in 0..N-1:
+    - uint32: Player ID
+    - uint8: Username length (L)
+    - bytes[L]: Username (UTF-8)
 
 ### KICK_PLAYER
 - **Direction**: Client → Server
