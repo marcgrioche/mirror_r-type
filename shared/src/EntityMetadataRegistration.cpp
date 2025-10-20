@@ -69,6 +69,7 @@ void initializeEntityMetadataRegistration()
         EntityType::PLATFORM,
         "Platform",
         { { "position", PropertyType::VEC2_FLOAT, true },
+            { "velocity", PropertyType::VEC2_FLOAT, true },
             { "hitbox", PropertyType::VEC4_FLOAT, true } },
         createPlatformFromData });
     factory.registerFactory(EntityType::PLATFORM, createPlatformFromData);
@@ -143,8 +144,9 @@ Entity createProjectileFromData(class Registry& registry, const class EntityData
 Entity createPlatformFromData(class Registry& registry, const class EntityData& data)
 {
     Vector2 position = data.get<Vector2>("position");
+    Vector2 velocity = data.get<Vector2>("velocity");
 
-    return factories::createOneWayPlatform(registry, position.x, position.y);
+    return factories::createOneWayPlatform(registry, position.x, position.y, velocity.x, velocity.y);
 }
 
 Entity createEnemyFromData(class Registry& registry, const class EntityData& data)

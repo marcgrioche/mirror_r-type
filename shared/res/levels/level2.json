@@ -1,0 +1,14 @@
+{
+  "platform": {
+    "layers": 8,
+    "topMargin": 80.0,
+    "bottomMargin": 100.0,
+    "sameLevelEpsilon": 28.0,
+    "minDistXSame": 200.0,
+    "crossDistX": 180.0,
+    "maxDiffY": 110.0,
+    "reachableX": 270.0,
+    "velocityX": -30.0,
+    "velocityY": 0.0
+  }
+}
