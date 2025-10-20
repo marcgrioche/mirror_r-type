@@ -12,6 +12,7 @@
 #include "components/Hitbox.hpp"
 #include "components/Tags.hpp"
 #include "components/Velocity.hpp"
+#include "systems/FunctionMotionSystem.hpp"
 #include <array>
 #include <random>
 
@@ -58,6 +59,8 @@ int movementSystem(Registry& registry, float deltaTime)
     for (auto&& [pos, prevPos] : prevPosView) {
         resetEntityPosition(pos, prevPos);
     }
+
+    functionMotionSystem(registry, deltaTime);
 
     auto view = registry.view<Position, Velocity>();
     for (auto it = view.begin(); it != view.end(); ++it) {

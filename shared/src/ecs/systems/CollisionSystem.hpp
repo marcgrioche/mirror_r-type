@@ -48,14 +48,3 @@ void resolvePlatformCollision(Position& playerPos, Velocity& playerVel, const Hi
 void resolveOneWayPlatformCollision(Position& playerPos, Velocity& playerVel, const Hitbox& playerHitbox,
     const Position& platformPos, const Hitbox& platformHitbox,
     const Position& originalPos, const Velocity& platformVel, RigidBody& rb);
-
-/**
- * @brief Checks if an entity is standing on a platform even without collision overlap
- * @param pos Entity's position component
- * @param hitbox Entity's hitbox component
- * @param rb Entity's rigid body component (modified to set isOnGround)
- * @param platformView View of regular platforms
- * @param oneWayPlatformView View of one-way platforms
- */
-void checkGroundContact(const Position& pos, const Hitbox& hitbox, RigidBody& rb,
-    const auto& platformView, const auto& oneWayPlatformView);

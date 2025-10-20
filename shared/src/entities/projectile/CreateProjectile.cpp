@@ -10,6 +10,8 @@
 
 #include "CreateProjectile.hpp"
 #include "components/Tags.hpp"
+#include "FunctionMotion.hpp"
+#include "componentutils/FunctionMotionUtils.hpp"
 
 namespace factories {
 Entity createProjectile(Registry& registry,
