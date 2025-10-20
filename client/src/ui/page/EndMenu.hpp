@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 8 1:33:59 PM 2025 jojo
-** Last update Thu Oct 8 2:32:55 PM 2025 jojo
+** Last update Thu Oct 15 11:07:09 PM 2025 jojo
 */
 
 #pragma once
@@ -96,6 +96,7 @@ private:
     Entity m_textBoxStateEntity;
     Entity m_textBoxReturnEntity;
     Entity m_returnButtonEntity;
+    Entity m_backgroundEntity;
     bool m_visible = false;
     bool m_returnRequested = false;
     std::string m_state = "WIN";

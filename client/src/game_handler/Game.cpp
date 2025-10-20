@@ -12,6 +12,7 @@
 #include "ecs/components/ParallaxState.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "systems/EyeSystem.hpp"
 #include <SDL.h>
 #include <iostream>
 
@@ -75,6 +76,26 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
 
+    // LOAD UI
+    if (!resourceManager.loadTexture(renderer, "MenuBackground", "client/res/sprites/UI/Background/menuBackground.png")) {
+        std::cout << "Warning: Failed to load MenuBackground texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "ButtonMouth", "client/res/sprites/UI/tools/buttonAsset.png")) {
+        std::cout << "Warning: Failed to load buttonMouth texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "ButtonEye", "client/res/sprites/UI/tools/buttonParamAsset.png")) {
+        std::cout << "Warning: Failed to load buttonEye texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "zoneText", "client/res/sprites/UI/tools/textBoxAsset.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "eyeOutline", "client/res/sprites/UI/tools/eyeOutline.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil", "client/res/sprites/UI/tools/eyePupil.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
     _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
 
     _timer.start();
@@ -167,6 +188,7 @@ void Game::runMenuLoop()
     // Traite les événements du nouveau système de menu
     processMenuEvents(); // Utilise la version adaptée
 
+    eyeSystem(_registry, 0);
     // Met à jour et rendu du menu
     m_menu.update(_registry, _timer.getDeltaTime()); // Passe registry et deltaTime
     buttonSystem(_registry);

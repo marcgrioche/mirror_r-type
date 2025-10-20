@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 1 11:02:34 AM 2025 jojo
-** Last update Thu Oct 8 2:32:52 PM 2025 jojo
+** Last update Tue Oct 20 3:43:37 PM 2025 jojo
 */
 
 #pragma once
@@ -27,6 +27,7 @@ namespace factories {
  */
 Entity createTextBox(Registry& registry, const std::string& text,
     float x, float y, int fontSize = 16,
-    Color color = { 255, 255, 255, 255 }, ::TextBox::Alignment alignement = ::TextBox::Alignment::LEFT);
+    Color color = { 255, 255, 255, 255 }, ::TextBox::Alignment alignement = ::TextBox::Alignment::LEFT,
+    const std::string& textureId = "", float xS = 0, float yS = 0, float wS = 0, float hS = 0);
 
 } // namespace Factory

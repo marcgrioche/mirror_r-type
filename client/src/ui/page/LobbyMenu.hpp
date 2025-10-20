@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 9:48:07 PM 2025 jojo
-** Last update Tue Oct 13 3:14:49 PM 2025 jojo
+** Last update Thu Oct 15 11:07:35 PM 2025 jojo
 */
 
 #pragma once
@@ -105,6 +105,7 @@ private:
     Entity m_connectTextBoxEntity;
     Entity m_returnButtonEntity;
     Entity m_textBoxLobbyEntity;
+    Entity m_backgroundEntity;
     bool m_visible = false;
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;
