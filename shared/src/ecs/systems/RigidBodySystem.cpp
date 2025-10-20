@@ -25,18 +25,18 @@ void changeRigidBodyComponentProperties(
     t_velocity.v += t_rigidBody.acceleration * t_deltaTime;
 
     if (t_rigidBody.isOnGround) {
-        t_velocity.v.x *= std::pow(t_rigidBody.groundFriction, t_deltaTime);
+        t_velocity.v.x *= (std::pow)(t_rigidBody.groundFriction, t_deltaTime);
 
         if (t_isPlayer) {
-            if (std::abs(t_rigidBody.acceleration.x) < 1.0f) {
+            if ((std::abs)(t_rigidBody.acceleration.x) < 1.0f) {
                 t_velocity.v.x = 0.0f;
             }
         }
     } else {
-        t_velocity.v.x *= std::pow(t_rigidBody.airFriction, t_deltaTime);
+        t_velocity.v.x *= (std::pow)(t_rigidBody.airFriction, t_deltaTime);
     }
 
-    t_velocity.v.x = std::clamp(t_velocity.v.x, -t_rigidBody.maxSpeed, t_rigidBody.maxSpeed);
+    t_velocity.v.x = (std::clamp)(t_velocity.v.x, -t_rigidBody.maxSpeed, t_rigidBody.maxSpeed);
 
     // if (!t_rigidBody.isOnGround) {
     //     t_velocity.v.y += t_rigidBody.gravity;
