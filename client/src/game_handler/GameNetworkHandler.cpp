@@ -46,6 +46,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::USERNAME_ACK:
         handleUsername(event);
         break;
+    case MessageType::KICK_NOTICE:
+        handleKickPlayerNotice(event);
+        break;
     default:
         break;
     }
@@ -147,6 +150,20 @@ void Game::handleUsername(const Client::NetworkEvent& event)
         const auto state = std::get<bool>(event.payload);
         std::cout << "Username creation state: " << state << std::endl;
     }
+}
+
+void Game::handleKickPlayerNotice(const Client::NetworkEvent& event)
+{
+    if (!std::holds_alternative<Message>(event.payload)) {
+        return;
+    }
+    const Message& raw = std::get<Message>(event.payload);
+    Message msg = raw;
+    msg.resetReadPosition();
+    const uint32_t lobbyId = msg.readU32();
+    const uint32_t playerId = msg.readU32();
+    // REMOVE PLAYER Entity and remove it from the vector in the m_clientNetwork
+    std::cout << "Removing player " << playerId << " from " << lobbyId << std::endl;
 }
 
 void Game::processLocalGameUpdates()
