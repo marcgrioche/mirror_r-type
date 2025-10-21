@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Wed Oct 21 1:22:37 AM 2025 jojo
+** Last update Wed Oct 21 3:24:25 PM 2025 jojo
 */
 
 #include "ConnectionMenu.hpp"
@@ -62,7 +62,7 @@ void ConnectionMenu::createEntities(Registry& registry)
     m_connectTextBoxEntity = factories::createTextBox(registry, "CONNECT",
         WINDOW_WIDTH / 2 - 120, WINDOW_HEIGHT / 2 + 180, 50, { 255, 00, 00, 00 }, TextBox::Alignment::CENTER);
 
-    bg.reload(registry, 50);
+    bg.reload(registry, 75, { m_connectButtonEntity, m_textBoxSpriteEntity });
 }
 
 void ConnectionMenu::destroyEntities(Registry& registry)

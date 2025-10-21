@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:59:23 PM 2025 jojo
-** Last update Wed Oct 21 2:59:00 PM 2025 jojo
+** Last update Wed Oct 21 3:28:56 PM 2025 jojo
 */
 
 #include "ui/page/HomeMenu.hpp"
@@ -66,7 +66,7 @@ void HomeMenu::createEntities(Registry& registry)
     m_textBoxParamEntity = factories::createTextBox(registry,
         "PARAMETER", SCREEN_WIDTH / 2 - 120 - 600, SCREEN_HEIGHT / 2 - 25, 40, { 255, 0, 0, 0 });
 
-    m_backgroundMenu.reload(registry, 50);
+    m_backgroundMenu.reload(registry, 75, { m_joinButtonEntity, m_createButtonEntity, m_paramButtonEntity });
 }
 
 void HomeMenu::destroyEntities(Registry& registry)

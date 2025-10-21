@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 21 1:07:22 AM 2025 jojo
-** Last update Wed Oct 21 3:07:10 PM 2025 jojo
+** Last update Wed Oct 21 3:29:54 PM 2025 jojo
 */
 
 #include "BackgroundMenu.hpp"
@@ -24,7 +24,6 @@
 
 BackgroundMenu::BackgroundMenu()
 {
-    m_background = { 0 };
 }
 
 BackgroundMenu::~BackgroundMenu()
@@ -134,7 +133,7 @@ void BackgroundMenu::reload(Registry& registry, int eyeCount, const std::vector<
             bool overlap = false;
             for (auto& r : placed) {
                 if (rectsOverlap(x, y, static_cast<float>(w), static_cast<float>(h),
-                        r.x, r.y, r.w, r.h, std::max(4.0f, std::min(w, h) * 0.15f))) {
+                        r.x, r.y, r.w, r.h, std::max(4.0f, std::min(w, h) * 0.09f))) {
                     overlap = true;
                     break;
                 }
