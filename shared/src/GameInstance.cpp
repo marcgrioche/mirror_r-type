@@ -38,16 +38,15 @@ void GameInstance::update()
         return;
 
     auto currentTime = std::chrono::steady_clock::now();
-    auto deltaTime = currentTime - _core.getLastTickTime();
-    auto tickDuration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<float>(TICK_DURATION));
+    float deltaTime = std::chrono::duration<float>(currentTime - _core.getLastTickTime()).count();
+    // std::cout << "Delta time server: " << deltaTime << std::endl;
+    _core.setLastTickTime(currentTime);
 
-    while (deltaTime >= tickDuration) {
+    _accumulatedTime += std::chrono::duration<float>(deltaTime);
+    while (_accumulatedTime.count() >= TICK_DURATION) {
         updateTick();
-        deltaTime -= tickDuration;
+        _accumulatedTime -= std::chrono::duration<float>(TICK_DURATION);
     }
-
-    _core.setLastTickTime(currentTime - deltaTime);
 }
 
 void GameInstance::updateTick()

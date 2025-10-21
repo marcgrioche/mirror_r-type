@@ -30,6 +30,8 @@
 
 #include <string>
 
+#include "prediction/InputHistory.hpp"
+
 class Game {
     /**
      * @brief Enumeration of possible game states
@@ -225,15 +227,21 @@ private:
     void logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, float posY);
 
     // Game state updates
-    void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers);
-    void updateSingleEntity(const Message& msg, Registry& registry);
+    void updateNonPredictedEntities(const Message& msg, Registry& registry, uint8_t numPlayers, uint32_t tick);
+    void updateSingleEntity(const Message& msg, Registry& registry, uint32_t tick);
     Entity findEntityByServerId(Registry& registry, uint32_t serverId);
-    void updateEntityState(Registry& registry, Entity entity, float posX, float posY, uint32_t health);
-    void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY);
+    Entity findEntityByClientId(Registry& registry, uint32_t clientId);
+    void updateEntityState(Registry& registry, Entity entity, float posX, float posY, uint32_t health,
+        uint32_t serverTick);
+    void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY,
+        uint32_t serverTick);
     void updateEntityHealth(Registry& registry, Entity entity, uint32_t health);
 
     // Input handling
     std::vector<std::pair<GameInput, bool>> getCurrentInputs();
+    void processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs);
+    void updateSystemsComponents();
+    void updatePlayerSprite(Registry& registry, Entity entity, float posX, float posY);
 
     // Entity cleanup
     void clearGameEntities();
@@ -253,6 +261,7 @@ private:
     bool m_connected = false;
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
+    InputHistory m_inputHistory;
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;

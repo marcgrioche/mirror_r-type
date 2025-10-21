@@ -156,6 +156,7 @@ private:
     GameInstancePlayer _player;
     GameInstanceEntities _entities;
     Level _level;
+    std::chrono::duration<float> _accumulatedTime { 0.0f };
 
     void updateTick();
 };

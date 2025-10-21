@@ -7,6 +7,8 @@
 
 #pragma once
 #include "Registry.hpp"
+#include "components/Position.hpp"
+#include "components/PreviousPosition.hpp"
 
 /**
  * @brief System that updates entity positions based on their velocity components
@@ -16,3 +18,6 @@
  * @return Number of entities that were moved during this update
  */
 int movementSystem(Registry& registry, float deltaTime);
+
+void resetEntityPosition(const Position& t_position, PreviousPosition& t_previousPosition);
+void changeMovementComponentProperties(Registry& t_registry, const Entity& t_entity, float t_deltaTime);

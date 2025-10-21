@@ -39,7 +39,8 @@ Entity createPlayer(Registry& registry, const Position& position, const Health& 
  * @param health The health component for the player
  * @param hitbox The hitbox component for collision detection
  * @param textbox The textbox component for player name display
+ * @param playerId The player id
  * @return The created player entity
  */
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox);
+Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox, uint32_t playerId);
 }
