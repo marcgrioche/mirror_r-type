@@ -8,6 +8,10 @@
 #pragma once
 #include <chrono>
 
+#ifdef min
+#undef min
+#endif
+
 /**
  * @brief Component that manages frequency-based timing for events and cooldowns
  * Tracks when events should occur based on time intervals and maintains last execution time

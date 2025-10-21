@@ -10,6 +10,10 @@
 #include <chrono>
 #include <iostream>
 
+#ifdef min
+#undef min
+#endif
+
 namespace FrequencyUtils {
 
 /**
