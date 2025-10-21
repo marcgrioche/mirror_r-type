@@ -28,5 +28,4 @@ public:
 
 private:
     std::vector<std::string> m_arguments;
-    int m_argc;
 };

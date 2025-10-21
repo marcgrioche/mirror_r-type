@@ -1,9 +1,9 @@
 #include "../include/GameInstance.hpp"
+#include "../include/game_instance/GameInstanceConditions.hpp"
 #include "../include/game_instance/GameInstanceCore.hpp"
-#include "../include/game_instance/GameInstancePlayer.hpp"
 #include "../include/game_instance/GameInstanceEntities.hpp"
 #include "../include/game_instance/GameInstancePhysics.hpp"
-#include "../include/game_instance/GameInstanceConditions.hpp"
+#include "../include/game_instance/GameInstancePlayer.hpp"
 #include "../include/game_instance/GameInstanceSerialization.hpp"
 #include "ecs/components/Velocity.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
@@ -13,6 +13,7 @@ GameInstance::GameInstance(uint32_t lobbyId)
     : _core(lobbyId)
     , _player()
     , _entities()
+    , _level()
 {
 }
 
@@ -21,6 +22,10 @@ void GameInstance::initialize()
     _core.setLost(false);
     _core.setWon(false);
     std::cout << "Initializing game instance for lobby " << _core.getLobbyId() << std::endl;
+
+    _level.loadFromJson("shared/res/levels/level1.json");
+    _entities.setLevel(&_level);
+
     _entities.initializeLevel(_core.getRegistry());
     _core.setLastTickTime(std::chrono::steady_clock::now());
     _core.setRunning(true);
@@ -119,8 +124,7 @@ std::vector<uint8_t> GameInstance::serializeGameState() const
     return GameInstanceSerialization::serializeGameState(
         _core.getRegistry(),
         _core.getCurrentTick(),
-        _player.getPlayerEntities()
-    );
+        _player.getPlayerEntities());
 }
 
 void GameInstance::deserializeGameState(const std::vector<uint8_t>& data)
@@ -134,8 +138,7 @@ Message GameInstance::serializeEntitySpawn(Entity entity)
         _core.getRegistry(),
         entity,
         _player.getPlayerEntities(),
-        _player.getUsernames()
-    );
+        _player.getUsernames());
 }
 
 Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
@@ -144,8 +147,7 @@ Message GameInstance::serializeEntityBatch(const std::vector<Entity>& entities)
         _core.getRegistry(),
         entities,
         _player.getPlayerEntities(),
-        _player.getUsernames()
-    );
+        _player.getUsernames());
 }
 
 std::vector<Entity> GameInstance::getAndClearNewEntities()

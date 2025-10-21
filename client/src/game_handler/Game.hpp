@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include "../../../shared/include/EntityData.hpp"
+#include "../../../shared/include/EntityFactory.hpp"
+#include "../../../shared/include/EntityType.hpp"
 #include "../../../shared/include/GameInstance.hpp"
 #include "../../../shared/include/Message.hpp"
 #include "../network/RTypeClient.hpp"
@@ -15,6 +18,7 @@
 #include "GameTimer.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/components/Sprite.hpp"
+#include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
@@ -216,6 +220,7 @@ private:
 
     // Entity creation helpers
     void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY);
+    void attachSpriteToEntity(Registry& registry, Entity entity, EntityType type, const EntityData& data);
     void logUnknownEntityType(uint8_t entityType);
     void logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, float posY);
 

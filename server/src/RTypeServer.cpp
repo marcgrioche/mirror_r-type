@@ -1,4 +1,6 @@
 #include "RTypeServer.hpp"
+#include "../../shared/include/ComponentMapper.hpp"
+#include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "IpEncoding.hpp"
 #include <atomic>
 #include <chrono>
@@ -36,6 +38,9 @@ RTypeServer::RTypeServer(uint16_t port)
     : _port(port)
     , _nextPlayerId(1)
 {
+    initializeEntityMetadataRegistration();
+    initializeComponentMappings();
+
     _socket = std::make_unique<UdpSocket>(_port);
     _lobbyManager.setServer(this);
     registerHandlers();

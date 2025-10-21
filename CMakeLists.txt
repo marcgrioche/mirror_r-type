@@ -22,6 +22,15 @@ endif()
 
 include(${CPM_DOWNLOAD_LOCATION})
 
+CPMAddPackage(
+    NAME nlohmann_json
+    GITHUB_REPOSITORY nlohmann/json
+    GIT_TAG v3.11.3
+    OPTIONS
+        "JSON_BuildTests OFF"
+        "JSON_Install OFF"
+)
+
 file(GLOB_RECURSE SERVER_SOURCES src/*.cpp ../shared/src/*.cpp)
 include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 
