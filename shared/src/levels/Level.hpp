@@ -35,6 +35,8 @@ private:
     int _enemyHealth = 20;
     float _enemyWidth = 40.0f;
     float _enemyHeight = 40.0f;
+    float _enemyProjectileSpeed = -300.0f;
+    int _enemyProjectileDamage = 10;
 
     // Boss parameters
     int _bossHealth = 200;
@@ -42,6 +44,8 @@ private:
     float _bossHeight = 100.0f;
     float _bossShootFrequency = 2.0f;
     float _bossSpawnEnemyFrequency = 5.0f;
+    float _bossProjectileSpeed = -300.0f;
+    int _bossProjectileDamage = 10;
 
 public:
     /**
@@ -77,9 +81,13 @@ public:
     int getEnemyHealth() const { return _enemyHealth; }
     float getEnemyWidth() const { return _enemyWidth; }
     float getEnemyHeight() const { return _enemyHeight; }
+    float getEnemyProjectileSpeed() const { return _enemyProjectileSpeed; }
+    int getEnemyProjectileDamage() const { return _enemyProjectileDamage; }
     int getBossHealth() const { return _bossHealth; }
     float getBossWidth() const { return _bossWidth; }
     float getBossHeight() const { return _bossHeight; }
     float getBossShootFrequency() const { return _bossShootFrequency; }
     float getBossSpawnEnemyFrequency() const { return _bossSpawnEnemyFrequency; }
+    float getBossProjectileSpeed() const { return _bossProjectileSpeed; }
+    int getBossProjectileDamage() const { return _bossProjectileDamage; }
 };

@@ -16,7 +16,9 @@
     "velocityY": 0.0,
     "health": 15,
     "width": 35.0,
-    "height": 35.0
+    "height": 35.0,
+    "projectileSpeed": -350.0,
+    "projectileDamage": 15
   },
   "boss": {
     "health": 300,

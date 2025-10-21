@@ -16,13 +16,17 @@
     "velocityY": 0.0,
     "health": 20,
     "width": 200.0,
-    "height": 200.0
+    "height": 200.0,
+    "projectileSpeed": -300.0,
+    "projectileDamage": 10
   },
   "boss": {
     "health": 200,
     "width": 400.0,
-    "height": 400.0,
+    "height": 800.0,
     "shootFrequency": 0.5,
-    "spawnEnemyFrequency": 5.0
+    "spawnEnemyFrequency": 5.0,
+    "projectileSpeed": -600.0,
+    "projectileDamage": 10
   }
 }
