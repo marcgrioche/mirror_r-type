@@ -22,4 +22,15 @@ void RTypeServer::handleJoinLobby(const Message& msg, PeerInfo& peerInfo)
     response.write(success ? lobbyId : static_cast<uint32_t>(0));
 
     sendToClient(msg.player_id, response);
+
+    if (success) {
+        // Add peer to peer list for this lobby
+        auto it = _clients.find(msg.player_id);
+        if (it != _clients.end()) {
+            _peerLists[lobbyId].push_back(it->second);
+        }
+
+        // Send updated peer list to all players in the lobby
+        sendPeerListToLobby(lobbyId);
+    }
 }

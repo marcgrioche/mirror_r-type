@@ -13,6 +13,10 @@ if(WIN32)
     target_link_libraries(r-type_server PRIVATE ws2_32)
 endif()
 
+target_link_libraries(r-type_server PRIVATE
+    GameNetworkingSockets::GameNetworkingSockets
+)
+
 set_target_properties(r-type_server PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON

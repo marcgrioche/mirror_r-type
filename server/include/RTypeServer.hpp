@@ -56,6 +56,7 @@ private:
     LobbyManager _lobbyManager;
     uint32_t _nextPlayerId;
     std::unordered_map<uint32_t, std::string> _usernames;
+    std::unordered_map<uint32_t, std::vector<PeerInfo>> _peerLists; // lobbyId to list of peers for P2P
 
     static void handleSignal(int);
 
@@ -73,6 +74,7 @@ private:
 
     // utility methods
     bool addUsername(uint32_t playerId, const std::string& username);
+    void sendPeerListToLobby(uint32_t lobbyId);
 
     /**
      * Register all protocol message handlers in the handler map.

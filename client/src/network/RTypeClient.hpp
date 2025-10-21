@@ -9,6 +9,7 @@
 #include "../../../shared/include/GameInputs.hpp"
 #include "NetworkEventQueue.hpp"
 #include "managers/InputManager.hpp"
+#include <steam/steamnetworkingsockets.h>
 
 namespace Client {
 class RTypeClient : public RTypeNetwork {
@@ -170,6 +171,12 @@ public:
      */
     uint32_t getPlayerId() const { return m_playerId; }
 
+    // P2P methods
+    void handleP2PConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pInfo);
+
+public:
+    static RTypeClient* instance; // For callbacks
+
 private:
     void registerHandlers() override;
     uint16_t m_port;
@@ -184,6 +191,19 @@ private:
     NetworkEventQueue& m_eventsQueue;
     std::unordered_map<GameAction, bool> m_previousInputStates;
 
+    // P2P connection management
+    std::unordered_map<uint32_t, PeerInfo> m_p2pPeers; // peer_id to peer info
+    std::unordered_map<uint32_t, HSteamNetConnection> m_p2pConnections; // peer_id to connection handle
+    std::unordered_map<uint32_t, bool> m_p2pConnected; // peer_id to connection status
+    ISteamNetworkingSockets* m_networking; // GNS interface for P2P
+
+    // P2P methods
+    void establishP2PConnection(uint32_t peerId, const PeerInfo& peerInfo);
+    bool isP2PAvailable(uint32_t peerId) const;
+    void sendViaP2P(uint32_t peerId, const Message& msg);
+    void sendViaServer(const Message& msg);
+    bool isGameCriticalMessage(MessageType type) const;
+
     // server responses handlers
     void handleConnectionAccepted(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleLobbyCreation(const Message& t_msg, PeerInfo& t_peerInfo);
@@ -195,5 +215,6 @@ private:
     void handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleUsernameRequestState(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handlePeerList(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

@@ -3,8 +3,8 @@
 #ifndef RTYPENETWORK_HPP
 #define RTYPENETWORK_HPP
 
+#include "GameNetworkingSocket.hpp"
 #include "Message.hpp"
-#include "UdpSocket.hpp"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -67,7 +67,7 @@ public:
     void sendTo(const std::string& ip, uint16_t port, const Message& msg);
 
 protected:
-    std::unique_ptr<UdpSocket> _socket;
+    std::unique_ptr<GameNetworkingSocket> _socket;
     std::queue<QueuedMessage> _outgoingQueue;
     std::atomic<bool> _running { true };
 

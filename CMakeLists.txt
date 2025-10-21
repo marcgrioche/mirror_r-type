@@ -22,6 +22,44 @@ endif()
 
 include(${CPM_DOWNLOAD_LOCATION})
 
+# Build protobuf first
+CPMAddPackage(
+    NAME protobuf
+    VERSION 3.21.12
+    GITHUB_REPOSITORY protocolbuffers/protobuf
+    OPTIONS
+        "protobuf_BUILD_TESTS OFF"
+        "protobuf_BUILD_EXAMPLES OFF"
+        "protobuf_WITH_ZLIB OFF"
+)
+
+# Set protobuf variables for GameNetworkingSockets to find
+if(protobuf_ADDED)
+    set(Protobuf_INCLUDE_DIR "${protobuf_SOURCE_DIR}/src" CACHE PATH "Protobuf include directory")
+    set(Protobuf_INCLUDE_DIRS "${protobuf_SOURCE_DIR}/src" CACHE PATH "Protobuf include directories")
+    set(Protobuf_LIBRARIES protobuf::libprotobuf CACHE STRING "Protobuf libraries")
+    set(Protobuf_LIBRARY protobuf::libprotobuf CACHE STRING "Protobuf library")
+    set(Protobuf_PROTOC_EXECUTABLE $<TARGET_FILE:protobuf::protoc> CACHE FILEPATH "Protobuf compiler")
+    set(Protobuf_FOUND TRUE CACHE BOOL "Protobuf found")
+    set(PROTOBUF_FOUND TRUE CACHE BOOL "Protobuf found")
+    
+    # Make these variables available globally
+    set(Protobuf_INCLUDE_DIR "${protobuf_SOURCE_DIR}/src")
+    set(Protobuf_LIBRARIES protobuf::libprotobuf)
+endif()
+
+# Now build GameNetworkingSockets with the protobuf we just built
+CPMAddPackage(
+    NAME GameNetworkingSockets
+    GITHUB_REPOSITORY ValveSoftware/GameNetworkingSockets
+    GIT_TAG v1.4.1
+    OPTIONS
+        "BUILD_SHARED_LIBS OFF"
+        "BUILD_STATIC_LIBS ON"
+        "USE_STEAMWEBRTC OFF"
+        "Protobuf_USE_STATIC_LIBS ON"
+)
+
 file(GLOB_RECURSE SERVER_SOURCES src/*.cpp ../shared/src/*.cpp)
 include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 

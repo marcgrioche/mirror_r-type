@@ -45,7 +45,8 @@ enum class MessageType : uint8_t {
     ROLLBACK = 107,
     GAME_END_WIN = 108,
     GAME_END_LOSE = 109,
-    USERNAME_ACK = 110
+    USERNAME_ACK = 110,
+    PEER_LIST = 111
 };
 
 class Message {
@@ -201,7 +202,7 @@ public:
     /**
      * @brief Resets the read position to the beginning of the payload
      */
-    void resetReadPosition() { readPos = 0; }
+    void resetReadPosition() const { readPos = 0; }
 
     /**
      * @brief Checks if there are enough bytes remaining to read the specified amount

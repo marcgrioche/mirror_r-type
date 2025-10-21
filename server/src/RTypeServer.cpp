@@ -36,7 +36,7 @@ RTypeServer::RTypeServer(uint16_t port)
     : _port(port)
     , _nextPlayerId(1)
 {
-    _socket = std::make_unique<UdpSocket>(_port);
+    _socket = std::make_unique<GameNetworkingSocket>(_port);
     _lobbyManager.setServer(this);
     registerHandlers();
 }
@@ -87,7 +87,10 @@ void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 {
     auto it = _clients.find(playerId);
     if (it != _clients.end()) {
+        std::cout << "[SERVER] Sending message type " << static_cast<int>(msg.getType()) << " to client " << playerId << std::endl;
         queueMessage(msg, it->second);
+    } else {
+        std::cout << "[SERVER] Failed to send message to unknown client " << playerId << std::endl;
     }
 }
 
@@ -141,4 +144,24 @@ bool RTypeServer::addUsername(uint32_t playerId, const std::string& username)
     }
     _usernames[playerId] = realUsername;
     return true;
+}
+
+void RTypeServer::sendPeerListToLobby(uint32_t lobbyId)
+{
+    auto it = _peerLists.find(lobbyId);
+    if (it == _peerLists.end())
+        return;
+
+    const auto& peers = it->second;
+
+    Message peerListMsg(MessageType::PEER_LIST);
+    peerListMsg.write(static_cast<uint8_t>(peers.size())); // number of peers
+
+    for (const auto& peer : peers) {
+        peerListMsg.write(peer.peer_id);
+        peerListMsg.write(peer.ip_address);
+        peerListMsg.write(peer.port);
+    }
+
+    broadcastToLobby(lobbyId, peerListMsg);
 }

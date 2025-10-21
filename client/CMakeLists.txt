@@ -102,6 +102,7 @@ target_link_libraries(r-type_client PRIVATE
     SDL2_image::SDL2_image
     SDL2_ttf::SDL2_ttf
     SDL2_mixer::SDL2_mixer
+    GameNetworkingSockets::GameNetworkingSockets
 )
 
 if(WIN32)
