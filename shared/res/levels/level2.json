@@ -10,5 +10,19 @@
     "reachableX": 270.0,
     "velocityX": -30.0,
     "velocityY": 0.0
+  },
+  "enemy": {
+    "velocityX": -60.0,
+    "velocityY": 0.0,
+    "health": 15,
+    "width": 35.0,
+    "height": 35.0
+  },
+  "boss": {
+    "health": 300,
+    "width": 120.0,
+    "height": 120.0,
+    "shootFrequency": 1.5,
+    "spawnEnemyFrequency": 3.0
   }
 }

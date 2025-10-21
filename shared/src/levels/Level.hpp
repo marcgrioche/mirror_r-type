@@ -29,6 +29,20 @@ private:
     float _platformVelocityX = -30.0f;
     float _platformVelocityY = 0.0f;
 
+    // Enemy parameters
+    float _enemyVelocityX = -80.0f;
+    float _enemyVelocityY = 0.0f;
+    int _enemyHealth = 20;
+    float _enemyWidth = 40.0f;
+    float _enemyHeight = 40.0f;
+
+    // Boss parameters
+    int _bossHealth = 200;
+    float _bossWidth = 100.0f;
+    float _bossHeight = 100.0f;
+    float _bossShootFrequency = 2.0f;
+    float _bossSpawnEnemyFrequency = 5.0f;
+
 public:
     /**
      * @brief Constructs a Level instance
@@ -57,4 +71,15 @@ public:
     float getPlatformReachableX() const { return _platformReachableX; }
     float getPlatformVelocityX() const { return _platformVelocityX; }
     float getPlatformVelocityY() const { return _platformVelocityY; }
+    // --- Getters for new parameters ---
+    float getEnemyVelocityX() const { return _enemyVelocityX; }
+    float getEnemyVelocityY() const { return _enemyVelocityY; }
+    int getEnemyHealth() const { return _enemyHealth; }
+    float getEnemyWidth() const { return _enemyWidth; }
+    float getEnemyHeight() const { return _enemyHeight; }
+    int getBossHealth() const { return _bossHealth; }
+    float getBossWidth() const { return _bossWidth; }
+    float getBossHeight() const { return _bossHeight; }
+    float getBossShootFrequency() const { return _bossShootFrequency; }
+    float getBossSpawnEnemyFrequency() const { return _bossSpawnEnemyFrequency; }
 };

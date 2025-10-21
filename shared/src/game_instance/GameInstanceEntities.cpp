@@ -23,10 +23,7 @@ void GameInstanceEntities::initializeLevel(Registry& registry)
     // Create Boss
     _newEntitiesThisTick.push_back(factories::createBoss(
         registry,
-        Position { SCREEN_WIDTH - BOSS_WIDTH, 0.0f },
-        Health { BOSS_HEALTH },
-        Hitbox { BOSS_WIDTH, BOSS_HEIGHT },
-        Velocity { 0.0f, 0.0f }));
+        _currentLevel));
 }
 
 void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuration)

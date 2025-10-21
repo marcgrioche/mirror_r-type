@@ -42,6 +42,22 @@ void Level::loadFromJson(const std::string& filepath)
             _platformVelocityX = platform.value("velocityX", _platformVelocityX);
             _platformVelocityY = platform.value("velocityY", _platformVelocityY);
         }
+        if (config.contains("enemy")) {
+            auto& enemy = config["enemy"];
+            _enemyVelocityX = enemy.value("velocityX", _enemyVelocityX);
+            _enemyVelocityY = enemy.value("velocityY", _enemyVelocityY);
+            _enemyHealth = enemy.value("health", _enemyHealth);
+            _enemyWidth = enemy.value("width", _enemyWidth);
+            _enemyHeight = enemy.value("height", _enemyHeight);
+        }
+        if (config.contains("boss")) {
+            auto& boss = config["boss"];
+            _bossHealth = boss.value("health", _bossHealth);
+            _bossWidth = boss.value("width", _bossWidth);
+            _bossHeight = boss.value("height", _bossHeight);
+            _bossShootFrequency = boss.value("shootFrequency", _bossShootFrequency);
+            _bossSpawnEnemyFrequency = boss.value("spawnEnemyFrequency", _bossSpawnEnemyFrequency);
+        }
     } catch (const std::exception& e) {
         std::cerr << "Error loading level configuration: " << e.what() << std::endl;
     }
