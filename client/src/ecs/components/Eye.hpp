@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Oct 20 8:29:45 PM 2025 jojo
-** Last update Tue Oct 20 8:29:47 PM 2025 jojo
+** Last update Wed Oct 21 3:07:30 PM 2025 jojo
 */
 
 #pragma once
@@ -16,8 +16,8 @@
  * and parameters for pupil movement.
  */
 struct Eye {
-    Entity outlineEntity { 0 };
-    Entity pupilEntity { 0 };
+    Entity outlineEntity;
+    Entity pupilEntity;
     // center offset inside the eye local box (usually width/2, height/2)
     float center_offset_x = 0.0f;
     float center_offset_y = 0.0f;

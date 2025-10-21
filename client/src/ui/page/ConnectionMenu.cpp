@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Wed Oct 21 12:35:03 AM 2025 jojo
+** Last update Wed Oct 21 1:22:37 AM 2025 jojo
 */
 
 #include "ConnectionMenu.hpp"
@@ -62,10 +62,7 @@ void ConnectionMenu::createEntities(Registry& registry)
     m_connectTextBoxEntity = factories::createTextBox(registry, "CONNECT",
         WINDOW_WIDTH / 2 - 120, WINDOW_HEIGHT / 2 + 180, 50, { 255, 00, 00, 00 }, TextBox::Alignment::CENTER);
 
-    // background entity test
-    m_backgroundEntity = factories::createSprite(registry, "MenuBackground", 0, 0, 1920, 1080, 1920, 1080);
-
-    m_eyetest = factories::createEye(registry, "eyeOutline", "eyePupil", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 200, 200, 500, 500, 200, 200, 16.0f);
+    bg.reload(registry, 50);
 }
 
 void ConnectionMenu::destroyEntities(Registry& registry)
@@ -73,9 +70,9 @@ void ConnectionMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
     registry.kill_entity(m_connectTextBoxEntity);
-    registry.kill_entity(m_backgroundEntity);
     registry.kill_entity(m_textBoxSpriteEntity);
-    registry.kill_entity(m_eyetest);
+
+    bg.destroy(registry);
 }
 
 void ConnectionMenu::setupEventHandlers()
@@ -125,15 +122,13 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_SetRenderDrawColor(renderer, 100, 120, 150, 255);
     SDL_RenderDrawRect(renderer, &menuBox);
 
-    drawSprite(gfx, registry, m_backgroundEntity);
+    bg.draw(gfx, registry);
     // Rendu des composants
     drawSprite(gfx, registry, m_textBoxSpriteEntity);
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
 
     drawButton(gfx, registry, m_connectButtonEntity);
     drawTextBox(gfx, registry, m_connectTextBoxEntity);
-
-    drawEye(gfx, registry, m_eyetest);
 }
 
 std::string ConnectionMenu::getConnectionCode(Registry& registry) const

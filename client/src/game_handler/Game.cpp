@@ -96,6 +96,20 @@ bool Game::initialize()
     if (!resourceManager.loadTexture(renderer, "eyePupil", "client/res/sprites/UI/tools/eyePupil.png")) {
         std::cout << "Warning: Failed to load zoneText texture" << std::endl;
     }
+    if (!resourceManager.loadTexture(renderer, "eyeOutline2", "client/res/sprites/UI/tools/eyeOutline2.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil2", "client/res/sprites/UI/tools/eyePupil2.png")) {
+        std::cout << "Warning: Failed to load eyepupil2 texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "eyeOutline3", "client/res/sprites/UI/tools/eyeOutline3.png")) {
+        std::cout << "Warning: Failed to load eyeoutline3 texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil3", "client/res/sprites/UI/tools/eyePupil3.png")) {
+        std::cout << "Warning: Failed to load eyepupil3 texture" << std::endl;
+    }
+
     _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
 
     _timer.start();

@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:59:23 PM 2025 jojo
-** Last update Tue Oct 20 7:27:22 PM 2025 jojo
+** Last update Wed Oct 21 2:59:00 PM 2025 jojo
 */
 
 #include "ui/page/HomeMenu.hpp"
@@ -66,7 +66,7 @@ void HomeMenu::createEntities(Registry& registry)
     m_textBoxParamEntity = factories::createTextBox(registry,
         "PARAMETER", SCREEN_WIDTH / 2 - 120 - 600, SCREEN_HEIGHT / 2 - 25, 40, { 255, 0, 0, 0 });
 
-    m_backgroundEntity = factories::createSprite(registry, "MenuBackground", 0, 0, 1920, 1080, 1920, 1080);
+    m_backgroundMenu.reload(registry, 50);
 }
 
 void HomeMenu::destroyEntities(Registry& registry)
@@ -81,7 +81,7 @@ void HomeMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxJoinEntity);
     registry.kill_entity(m_textBoxParamEntity);
 
-    registry.kill_entity(m_backgroundEntity);
+    m_backgroundMenu.destroy(registry);
 }
 
 void HomeMenu::setupEventHandlers()
@@ -132,7 +132,7 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_RenderFillRect(renderer, &fullBg);
 
     // Rendu des composants
-    drawSprite(gfx, registry, m_backgroundEntity);
+    m_backgroundMenu.draw(gfx, registry);
 
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
 

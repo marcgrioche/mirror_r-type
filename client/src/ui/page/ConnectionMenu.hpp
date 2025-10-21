@@ -5,10 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:24:22 PM 2025 jojo
-** Last update Tue Oct 20 8:50:48 PM 2025 jojo
+** Last update Wed Oct 21 1:10:12 AM 2025 jojo
 */
 
 #pragma once
+#include "../BackgroundMenu.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
 #include "managers/EventManager.hpp"
@@ -100,10 +101,9 @@ private:
     Entity m_textBoxEntity;
     Entity m_connectButtonEntity;
     Entity m_connectTextBoxEntity;
-    Entity m_backgroundEntity;
     Entity m_textBoxSpriteEntity;
 
-    Entity m_eyetest;
+    BackgroundMenu bg;
 
     bool m_visible = false;
     bool m_connectionRequested = false;
