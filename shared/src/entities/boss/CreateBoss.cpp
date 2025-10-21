@@ -23,7 +23,7 @@ Entity createBoss(Registry& registry, const Level* level)
     registry.emplace<Position>(boss, posX, posY);
     registry.emplace<PreviousPosition>(boss, posX, posY);
     registry.emplace<Velocity>(boss, velocityX, velocityY);
-    registry.emplace<Health>(boss, bossHealth);
+    registry.emplace<Health>(boss, static_cast<int>(bossHealth));
     registry.emplace<Hitbox>(boss, width, height, 0.0f, 0.0f);
     registry.emplace<Dead>(boss);
     registry.emplace<EnemyTag>(boss);
@@ -37,7 +37,7 @@ Entity createBoss(Registry& registry, const Level* level)
     Entity projectile = factories::createProjectileTemplate(
         registry,
         Velocity { bossProjectileSpeed, PROJECTILE_VELOCITY_Y },
-        Damage { bossProjectileDamage },
+        Damage { static_cast<float>(bossProjectileDamage) },
         Hitbox { bossProjectileWidth, bossProjectileHeight });
     Entity shootWeapon = createWeapon(registry, Parent { boss }, projectile);
     if (registry.has<Frequency>(shootWeapon)) {

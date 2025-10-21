@@ -116,7 +116,6 @@ private:
     Entity m_textBoxCreateEntity;
     Entity m_textBoxJoinEntity;
     Entity m_textBoxParamEntity;
-    Entity m_ParamButtonEntity;
     bool m_visible = false;
     bool m_joinRequested = false;
     bool m_createRequested = false;

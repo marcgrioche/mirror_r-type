@@ -61,7 +61,7 @@ struct EntityProperty {
 /**
  * @brief Forward declaration for EntityData
  */
-struct EntityData;
+class EntityData;
 
 /**
  * @brief Metadata for an entity type, including serialization info and factory
