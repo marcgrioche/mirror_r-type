@@ -16,6 +16,7 @@
 #include "components/Tags.hpp"
 #include <array>
 #include <random>
+#include "systems/FunctionMotionSystem.hpp"
 
 int movementPlatform(Registry& registry, float /*deltaTime*/)
 {
@@ -39,6 +40,8 @@ int movementSystem(Registry& registry, float deltaTime)
         prevPos.v.x = pos.v.x;
         prevPos.v.y = pos.v.y;
     }
+
+    functionMotionSystem(registry, deltaTime);
 
     auto view = registry.view<Position, Velocity>();
     for (auto it = view.begin(); it != view.end(); ++it) {

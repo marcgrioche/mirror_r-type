@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Sep 29 1:26:02 PM 2025 jojo
-** Last update Wed Oct 7 3:13:55 PM 2025 jojo
+** Last update Fri Oct 16 1:41:56 AM 2025 jojo
 */
 
 #include "ButtonSystem.hpp"
@@ -13,6 +13,7 @@
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
+#include "components/Sprite.hpp"
 #include <SDL2/SDL.h>
 #include <algorithm>
 
@@ -46,8 +47,20 @@ void buttonSystem(Registry& registry)
         Position& pos = registry.get<Position>(e);
         Hitbox& hitbox = registry.get<Hitbox>(e);
 
-        const bool hovered = (mx >= pos.v.x && mx <= pos.v.x + hitbox.width && my >= pos.v.y && my <= pos.v.y + hitbox.height);
+        int hx = static_cast<int>(pos.v.x + hitbox.offset_x);
+        int hy = static_cast<int>(pos.v.y + hitbox.offset_y);
+        int hw = static_cast<int>(hitbox.width);
+        int hh = static_cast<int>(hitbox.height);
+
+        const bool hovered = (mx >= hx && mx <= hx + hw && my >= hy && my <= hy + hh);
         button.is_hovered = hovered && button.interactable;
+        if (registry.has<Sprite>(e)) {
+            Sprite& sprite = registry.get<Sprite>(e);
+            if (button.is_hovered)
+                sprite.current_frame = 1;
+            else
+                sprite.current_frame = 0;
+        }
 
         if (button.interactable && hovered && justPressed && !clickConsumedForThisPress) {
             button.was_pressed = true;

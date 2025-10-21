@@ -55,7 +55,7 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
 
     const int LAYER_COUNT = level ? level->getPlatformLayers() : 8;
     const float availableSpan = (MAX_Y - MIN_Y);
-    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
+    const float targetSpacing = (std::min)(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
     const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
     const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f; // centre les layers dans la fenêtre jouable
     std::vector<float> layers(LAYER_COUNT);
@@ -159,7 +159,7 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
     // Même logique de layers que dans generateRandomPlatforms
     const int LAYER_COUNT = level ? level->getPlatformLayers() : 8;
     const float availableSpan = (MAX_Y - MIN_Y);
-    const float targetSpacing = std::min(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
+    const float targetSpacing = (std::min)(availableSpan / (LAYER_COUNT - 1), MAX_DIFF_Y - 5.f); // petite marge sécurité
     const float usedSpan = targetSpacing * (LAYER_COUNT - 1);
     const float verticalOffset = MIN_Y + (availableSpan - usedSpan) * 0.5f; // centre les layers dans la fenêtre jouable
     std::vector<float> layers(LAYER_COUNT);

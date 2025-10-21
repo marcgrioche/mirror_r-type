@@ -26,7 +26,7 @@ inline bool shouldTrigger(const Frequency& freq)
     auto now = std::chrono::high_resolution_clock::now();
 
     // If lastTime is min, it means we want immediate trigger
-    if (freq.lastTime == std::chrono::high_resolution_clock::time_point::min()) {
+    if (freq.lastTime == (std::chrono::high_resolution_clock::time_point::min)()) {
         return true;
     }
     auto elapsed = std::chrono::duration_cast<std::chrono::duration<double>>(now - freq.lastTime);
@@ -63,6 +63,6 @@ inline bool triggerAndReset(Frequency& freq)
  */
 inline void makeReady(Frequency& freq)
 {
-    freq.lastTime = std::chrono::high_resolution_clock::time_point::min();
+    freq.lastTime = (std::chrono::high_resolution_clock::time_point::min)();
 }
 }

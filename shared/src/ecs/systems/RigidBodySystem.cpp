@@ -41,11 +41,9 @@ void rigidBodySystem(Registry& registry, float deltaTime)
 
         vel.v.x = std::clamp(vel.v.x, -rb.maxSpeed, rb.maxSpeed);
 
-        if (!rb.isOnGround) {
-            vel.v.y += rb.gravity;
-            vel.v.y = std::min(vel.v.y, rb.maxFallSpeed);
-        } else {
+        vel.v.y += rb.gravity;
+        vel.v.y = (std::min)(vel.v.y, rb.maxFallSpeed);
+        if (rb.isOnGround)
             vel.v += rb.groundSpeed;
-        }
     }
 }

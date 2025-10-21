@@ -121,7 +121,7 @@ public:
      * @brief Shows the lobby page
      * @param registry The ECS registry to use for entity management
      */
-    void showLobbyPage(Registry& registry);
+    void showLobbyPage(Registry& registry, int lobbyId);
 
     /**
      * @brief Shows the lobby page after a game has ended

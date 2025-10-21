@@ -7,16 +7,6 @@ ProgramArguments::ProgramArguments(const int argc, char** argv)
         m_arguments.emplace_back(argv[i]);
 }
 
-bool ProgramArguments::isLocalMode() const
-{
-    for (const auto& arg : m_arguments) {
-        if (arg == "--local") {
-            return true;
-        }
-    }
-    return false;
-}
-
 uint16_t ProgramArguments::getPort() const
 {
     for (size_t i = 0; i + 1 < m_arguments.size(); ++i) {

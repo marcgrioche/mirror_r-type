@@ -41,7 +41,7 @@ void collisionPlayerPowerUpSystem(Registry& registry, float)
                 if (powerUpData.type == PowerUpType::HEAL) {
                     if (registry.has<Health>(plE)) {
                         auto& health = registry.get<Health>(plE);
-                        health.hp = std::min(health.hp + 20, 100);
+                        health.hp = (std::min)(health.hp + 20, 100);
                         std::cout << "Player healed! Health: " << health.hp << std::endl;
                     }
                 } else if (powerUpData.type == PowerUpType::DAMAGE_BOOST) {
