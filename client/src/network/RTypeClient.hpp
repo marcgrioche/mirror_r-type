@@ -175,6 +175,12 @@ public:
      */
     uint32_t getPlayerId() const { return m_playerId; }
 
+    /**
+     * @brief Gets the ping time
+     * @return The ping time in milliseconds
+     */
+    uint64_t getPingTimestamp() const { return m_ping; }
+
 private:
     void registerHandlers() override;
     uint16_t m_port;
