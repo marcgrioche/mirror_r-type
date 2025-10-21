@@ -32,11 +32,13 @@ Entity createBoss(Registry& registry, const Level* level)
     // Weapon for shooting projectiles
     float bossProjectileSpeed = level ? level->getBossProjectileSpeed() : PROJECTILE_VELOCITY_X;
     int bossProjectileDamage = level ? level->getBossProjectileDamage() : PROJECTILE_DAMAGE;
+    float bossProjectileWidth = level ? level->getBossProjectileWidth() : PROJECTILE_WIDTH;
+    float bossProjectileHeight = level ? level->getBossProjectileHeight() : PROJECTILE_HEIGHT;
     Entity projectile = factories::createProjectileTemplate(
         registry,
         Velocity { bossProjectileSpeed, PROJECTILE_VELOCITY_Y },
         Damage { bossProjectileDamage },
-        Hitbox { PROJECTILE_WIDTH, PROJECTILE_HEIGHT });
+        Hitbox { bossProjectileWidth, bossProjectileHeight });
     Entity shootWeapon = createWeapon(registry, Parent { boss }, projectile);
     if (registry.has<Frequency>(shootWeapon)) {
         auto& freq = registry.get<Frequency>(shootWeapon);

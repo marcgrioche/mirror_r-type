@@ -28,11 +28,13 @@ Entity createEnemy(Registry& registry, const Level* level)
 
     float projectileSpeed = level ? level->getEnemyProjectileSpeed() : PROJECTILE_VELOCITY_X;
     int projectileDamage = level ? level->getEnemyProjectileDamage() : PROJECTILE_DAMAGE;
+    float projectileWidth = level ? level->getEnemyProjectileWidth() : PROJECTILE_WIDTH;
+    float projectileHeight = level ? level->getEnemyProjectileHeight() : PROJECTILE_HEIGHT;
     Entity projectile = factories::createProjectileTemplate(
         registry,
         Velocity { projectileSpeed, PROJECTILE_VELOCITY_Y },
         Damage { projectileDamage },
-        Hitbox { PROJECTILE_WIDTH, PROJECTILE_HEIGHT });
+        Hitbox { projectileWidth, projectileHeight });
     Entity weapon = createWeapon(registry, Parent { enemy }, projectile);
     if (registry.has<Frequency>(weapon)) {
         auto& freq = registry.get<Frequency>(weapon);

@@ -18,15 +18,19 @@
     "width": 200.0,
     "height": 200.0,
     "projectileSpeed": -300.0,
-    "projectileDamage": 10
+    "projectileDamage": 10,
+    "projectileWidth": 32.0,
+    "projectileHeight": 32.0
   },
   "boss": {
     "health": 200,
     "width": 400.0,
     "height": 800.0,
-    "shootFrequency": 0.5,
+    "shootFrequency": 5,
     "spawnEnemyFrequency": 5.0,
-    "projectileSpeed": -600.0,
-    "projectileDamage": 10
+    "projectileSpeed": -500.0,
+    "projectileDamage": 300,
+    "projectileWidth": 70.0,
+    "projectileHeight": 70.0
   }
 }
