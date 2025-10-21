@@ -52,6 +52,8 @@ void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
     const auto clientId = m_clientNetwork->getPlayerId();
     const auto playerEntity = findEntityByClientId(_registry, clientId);
 
+    if (inputs.empty())
+        return;
     std::vector<Entity> newEntities = {};
     PlayerInputProcessor::processInput(
         _registry,
@@ -95,6 +97,8 @@ void Game::updateNetworkGameTick()
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
     m_clientNetwork->incrementTick();
+    if (m_clientNetwork->getCurrentTick() % 100 == 0)
+        m_clientNetwork->pingRequest();
     processLocalInputs(currentInputs);
     GameInstancePhysics::updatePreviousPositions(_registry);
     updateSystemsComponents();
@@ -104,7 +108,7 @@ void Game::updateNetworkGameTick()
         updatePlayerSprite(_registry, playerEntity, pos.v.x, pos.v.y);
     }
     spriteAnimationSystem(_registry, TICK_DURATION);
-    GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
+    collisionSystem(_registry, TICK_DURATION);
 }
 
 void Game::updateLocalGameTick()
