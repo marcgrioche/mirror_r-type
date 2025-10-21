@@ -14,14 +14,13 @@
 #include "managers/ResourceManager.hpp"
 #include <SDL.h>
 #include <iostream>
+#include "systems/RenderSystem.hpp"
 
-Game::Game(bool isLocalMode, uint16_t clientPort)
+Game::Game(uint16_t clientPort)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
-    , m_localGameInstance(nullptr)
     , _isRunning(false)
-    , m_isLocalMode(isLocalMode)
     , m_clientPort(clientPort)
 {
 }
@@ -82,27 +81,8 @@ bool Game::initialize()
     _accumulatedTime = 0.0f;
     _isRunning = true;
 
-    initializeGameMode();
+    initializeMenuMode();
     return true;
-}
-
-void Game::initializeGameMode()
-{
-    if (m_isLocalMode) {
-        initializeLocalMode();
-    } else {
-        initializeMenuMode();
-    }
-}
-
-void Game::initializeLocalMode()
-{
-    m_localGameInstance = std::make_unique<GameInstance>(0);
-    m_localGameInstance->initialize();
-    m_localGameInstance->addPlayer(1, "");
-
-    _state = GameState::PLAYING;
-    std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
 }
 
 void Game::initializeMenuMode()
@@ -121,7 +101,7 @@ void Game::run()
     SDL_Event event;
 
     while (_isRunning) {
-        processGameMode();
+        processNetworkEvents();
 
         float deltaTime = _timer.getDeltaTime();
         handleInputEvents(event);
@@ -140,15 +120,6 @@ void Game::run()
     }
 
     std::cout << "Game loop ended." << std::endl;
-}
-
-void Game::processGameMode()
-{
-    if (m_isLocalMode) {
-        processLocalGameUpdates();
-    } else {
-        processNetworkEvents();
-    }
 }
 
 void Game::handleInputEvents(SDL_Event& event)
@@ -188,7 +159,7 @@ void Game::runMenuLoop()
 void Game::runGameLoop(float deltaTime)
 {
     update(deltaTime);
-    render();
+    renderSystem(_registry);
     SDL_Delay(16);
 }
 
