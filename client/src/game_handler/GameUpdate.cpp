@@ -16,8 +16,6 @@
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "ecs/systems/RigidBodySystem.hpp"
-#include "entities/player/HandlePlayerInputs.hpp"
-#include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
 #include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
@@ -31,20 +29,10 @@ void Game::update(float deltaTime)
 
     // std::cout << "Delta time client: " << deltaTime << std::endl;
     while (_accumulatedTime >= TICK_DURATION) {
-        updateGameTick();
+        updateNetworkGameTick();
+        buttonSystem(_registry);
         _accumulatedTime -= TICK_DURATION;
     }
-}
-
-void Game::updateGameTick()
-{
-    if (!m_isLocalMode) {
-        updateNetworkGameTick();
-    } else {
-        updateLocalGameTick();
-    }
-
-    buttonSystem(_registry);
 }
 
 void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
@@ -109,26 +97,6 @@ void Game::updateNetworkGameTick()
     }
     spriteAnimationSystem(_registry, TICK_DURATION);
     collisionSystem(_registry, TICK_DURATION);
-}
-
-void Game::updateLocalGameTick()
-{
-    handlePlayerInputs(_inputs, _registry);
-    handleWeaponInputs(_inputs, _registry);
-    rigidBodySystem(_registry, TICK_DURATION);
-    movementSystem(_registry, TICK_DURATION);
-    projectileSystem(_registry, TICK_DURATION);
-    collisionSystem(_registry, TICK_DURATION);
-    collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
-    powerUpEffectSystem(_registry, TICK_DURATION);
-    healthSystem(_registry);
-    powerUpSystem(_registry, TICK_DURATION);
-    spriteAnimationSystem(_registry, TICK_DURATION);
-}
-
-void Game::render()
-{
-    renderSystem(_registry);
 }
 
 void Game::startGameplay()

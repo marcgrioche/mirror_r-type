@@ -5,14 +5,17 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Thu Oct 8 1:18:14 PM 2025 jojo
+** Last update Thu Oct 15 11:13:45 PM 2025 jojo
 */
 
 #include "ui/page/JoinMenu.hpp"
+#include "Config.hpp"
+#include "components/Sprite.hpp"
+#include "components/SpriteFactory.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
-#include "Config.hpp"
+#include "render/SpriteRender.hpp"
 #include <iostream>
 
 JoinMenu::JoinMenu()
@@ -54,6 +57,19 @@ void JoinMenu::createEntities(Registry& registry)
 
     m_textBoxConnectEntity = factories::createTextBox(registry,
         "CONNECT", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+
+    Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
+        0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
+
+    bg.dstRect = { 0, 0, SCREEN_WIDTH, SCREEN_WIDTH };
+    if (bg.frame_width > 0 && bg.frame_height > 0) {
+        bg.scale_x = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
+        bg.scale_y = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
+    }
+
+    m_backgroundEntity = registry.create_entity();
+    registry.emplace<Position>(m_backgroundEntity, 0.0f, 0.0f);
+    registry.add<Sprite>(m_backgroundEntity, bg);
 }
 
 void JoinMenu::destroyEntities(Registry& registry)
@@ -62,6 +78,7 @@ void JoinMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_connectButtonEntity);
     registry.kill_entity(m_textBoxConnectEntity);
     registry.kill_entity(m_returnButtonEntity);
+    registry.kill_entity(m_backgroundEntity);
 }
 
 void JoinMenu::setupEventHandlers()
@@ -117,6 +134,7 @@ void JoinMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_RenderDrawRect(renderer, &menuBox);
 
     // Rendu des composants
+    drawSprite(gfx, registry, m_backgroundEntity);
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
     drawButton(gfx, registry, m_connectButtonEntity);
     drawTextBox(gfx, registry, m_textBoxConnectEntity);

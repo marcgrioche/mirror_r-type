@@ -14,14 +14,11 @@ int main(int argc, char* argv[])
 {
     try {
         const ProgramArguments args(argc, argv);
-        const bool isLocalMode = args.isLocalMode();
         const uint16_t clientPort = args.getPort();
 
-        if (isLocalMode)
-            std::cout << "Starting in local mode" << std::endl;
         std::cout << "Using client port: " << clientPort << std::endl;
 
-        Game game(isLocalMode, clientPort);
+        Game game(clientPort);
 
         if (!game.initialize()) {
             std::cerr << "Failed to initialize game!" << std::endl;

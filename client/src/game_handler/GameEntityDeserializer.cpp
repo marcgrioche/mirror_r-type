@@ -5,6 +5,11 @@
 ** Game Entity Deserializer - Handles entity creation from network messages
 */
 
+#include "../../shared/include/EntityData.hpp"
+#include "../../shared/include/EntityFactory.hpp"
+#include "../../shared/include/EntityMetadataRegistration.hpp"
+#include "../../shared/include/EntitySerializer.hpp"
+#include "../../shared/include/EntityType.hpp"
 #include "Game.hpp"
 #include "ecs/components/Damage.hpp"
 #include "ecs/components/Health.hpp"
@@ -17,11 +22,6 @@
 #include "ecs/components/SpriteFactory.hpp"
 #include "ecs/components/SpriteManager.hpp"
 #include "ecs/components/Velocity.hpp"
-#include "entities/enemies/CreateEnemy.hpp"
-#include "entities/platform/CreatePlatform.hpp"
-#include "entities/player/CreatePlayer.hpp"
-#include "entities/powerUp/CreatePowerUp.hpp"
-#include "entities/projectile/CreateProjectile.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -32,30 +32,16 @@ void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
 
     for (uint8_t i = 0; i < entityCount; ++i) {
         uint32_t entityId = msg.readU32();
-        uint8_t entityType = msg.readU8();
-        float posX = msg.readFloat();
-        float posY = msg.readFloat();
+        uint8_t entityTypeRaw = msg.readU8();
+        EntityType type = static_cast<EntityType>(entityTypeRaw);
 
-        switch (entityType) {
-        case 0:
-            createPlayerFromMessage(msg, registry, entityId, posX, posY);
-            break;
-        case 1:
-            createProjectileFromMessage(msg, registry, entityId, posX, posY);
-            break;
-        case 2:
-            createPlatformFromMessage(msg, registry, entityId, posX, posY);
-            break;
-        case 3:
-            createEnemyFromMessage(msg, registry, entityId, posX, posY);
-            break;
-        case 4:
-            createPowerUpFromMessage(msg, registry, entityId, posX, posY);
-            break;
-        default:
-            logUnknownEntityType(entityType);
-            break;
-        }
+        EntityData data = EntitySerializer::deserializeEntityData(const_cast<Message&>(msg), type);
+
+        Entity entity = EntityFactory::getInstance().create(registry, data);
+
+        registry.add<ServerEntityId>(entity, ServerEntityId { entityId });
+
+        attachSpriteToEntity(registry, entity, type, data);
     }
 }
 
@@ -193,6 +179,36 @@ void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
         effectDuration);
 
     registry.add<ServerEntityId>(powerUp, ServerEntityId { entityId });
+}
+
+void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType type, const EntityData& data)
+{
+    Vector2 position = data.get<Vector2>("position");
+
+    switch (type) {
+    case EntityType::PLAYER:
+        SpriteManager::addPlayerSprite(registry, entity, position.x, position.y, 1.5f);
+        break;
+    case EntityType::PROJECTILE:
+        SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, 1.5f);
+        break;
+    case EntityType::PLATFORM:
+        SpriteManager::addPlatformSprite(registry, entity, position.x, position.y);
+        break;
+    case EntityType::ENEMY:
+        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 2.0f);
+        break;
+    case EntityType::POWERUP:
+        // PowerUp sprite attachment - could be based on powerup type
+        break;
+    case EntityType::BOSS:
+        // Boss sprite attachment - could be different from enemy
+        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 3.0f);
+        break;
+    default:
+        std::cout << "Unknown entity type for sprite attachment: " << static_cast<int>(type) << std::endl;
+        break;
+    }
 }
 
 void Game::logUnknownEntityType(uint8_t entityType)

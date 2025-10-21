@@ -5,14 +5,21 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 5:46:09 PM 2025 jojo
-** Last update Thu Oct 8 12:45:52 PM 2025 jojo
+** Last update Wed Oct 21 3:24:25 PM 2025 jojo
 */
 
-#include "ui/page/ConnectionMenu.hpp"
+#include "ConnectionMenu.hpp"
+#include "Config.hpp"
+#include "components/Sprite.hpp"
+#include "components/SpriteFactory.hpp"
+#include "entities/Sprite/CreateAnimateSprite.hpp"
 #include "entities/button/CreateButton.hpp"
+#include "entities/eyes/CreateEye.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
-#include "Config.hpp"
+#include "managers/ResourceManager.hpp"
+#include "render/EyeRender.hpp"
+#include "render/SpriteRender.hpp"
 #include <iostream>
 
 ConnectionMenu::ConnectionMenu()
@@ -43,14 +50,19 @@ void ConnectionMenu::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
     m_textBoxEntity = factories::createTextBoxInput(registry,
-        "Enter connection code...", 300.0f, 250.0f, 16, { 0, 0, 0, 255 });
+        "Enter connection code...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 300, 30, { 255, 0, 0, 0 });
+
+    m_textBoxSpriteEntity = factories::createSprite(registry, "zoneText",
+        WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 500, 400, 400, 500, 500);
 
     // Bouton Connect
     m_connectButtonEntity = factories::createButton(registry,
-        320.0f, 320.0f, 160.0f, 50.0f, "connect_to_server", true);
+        WINDOW_WIDTH / 2 - 250, WINDOW_HEIGHT / 2 - 50, 380.0f, 120.0f, "connect_to_server", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     m_connectTextBoxEntity = factories::createTextBox(registry, "CONNECT",
-        320.0f, 340.0f, 16, { 255, 0, 0, 0 }, TextBox::Alignment::CENTER);
+        WINDOW_WIDTH / 2 - 120, WINDOW_HEIGHT / 2 + 180, 50, { 255, 00, 00, 00 }, TextBox::Alignment::CENTER);
+
+    bg.reload(registry, 75, { m_connectButtonEntity, m_textBoxSpriteEntity });
 }
 
 void ConnectionMenu::destroyEntities(Registry& registry)
@@ -58,6 +70,9 @@ void ConnectionMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
     registry.kill_entity(m_connectTextBoxEntity);
+    registry.kill_entity(m_textBoxSpriteEntity);
+
+    bg.destroy(registry);
 }
 
 void ConnectionMenu::setupEventHandlers()
@@ -107,8 +122,11 @@ void ConnectionMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_SetRenderDrawColor(renderer, 100, 120, 150, 255);
     SDL_RenderDrawRect(renderer, &menuBox);
 
+    bg.draw(gfx, registry);
     // Rendu des composants
+    drawSprite(gfx, registry, m_textBoxSpriteEntity);
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
+
     drawButton(gfx, registry, m_connectButtonEntity);
     drawTextBox(gfx, registry, m_connectTextBoxEntity);
 }

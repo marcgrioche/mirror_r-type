@@ -2,20 +2,9 @@
 #include <stdexcept>
 
 ProgramArguments::ProgramArguments(const int argc, char** argv)
-    : m_argc(argc)
 {
     for (int i = 1; i < argc; ++i)
         m_arguments.emplace_back(argv[i]);
-}
-
-bool ProgramArguments::isLocalMode() const
-{
-    for (const auto& arg : m_arguments) {
-        if (arg == "--local") {
-            return true;
-        }
-    }
-    return false;
 }
 
 uint16_t ProgramArguments::getPort() const

@@ -1,33 +1,29 @@
 #include "../../include/game_instance/GameInstanceEntities.hpp"
 #include "../../include/Config.hpp"
-#include "../ecs/components/Lifetime.hpp"
 #include "../ecs/components/Dead.hpp"
-#include "../ecs/components/Position.hpp"
-#include "../ecs/components/Velocity.hpp"
-#include "../ecs/components/Hitbox.hpp"
 #include "../ecs/components/Health.hpp"
-#include "../ecs/components/Tags.hpp"
+#include "../ecs/components/Hitbox.hpp"
+#include "../ecs/components/Lifetime.hpp"
+#include "../ecs/components/Position.hpp"
 #include "../ecs/components/PowerUp.hpp"
-#include "../entities/platform/CreatePlatform.hpp"
+#include "../ecs/components/Tags.hpp"
+#include "../ecs/components/Velocity.hpp"
 #include "../entities/boss/CreateBoss.hpp"
+#include "../entities/platform/CreatePlatform.hpp"
 #include "../entities/powerUp/CreatePowerUp.hpp"
-#include <unordered_set>
 #include <algorithm>
 #include <cstdlib>
+#include <unordered_set>
 
 void GameInstanceEntities::initializeLevel(Registry& registry)
 {
-    auto platformList = factories::generateRandomPlatforms(registry, 22);
+    auto platformList = factories::generateRandomPlatforms(registry, 22, _currentLevel);
     _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformList.begin(), platformList.end());
-    
+
     // Create Boss
     _newEntitiesThisTick.push_back(factories::createBoss(
-        registry, 
-        Position { SCREEN_WIDTH - BOSS_WIDTH, 0.0f }, 
-        Health { BOSS_HEALTH }, 
-        Hitbox { BOSS_WIDTH, BOSS_HEIGHT }, 
-        Velocity { 0.0f, 0.0f }
-    ));
+        registry,
+        _currentLevel));
 }
 
 void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuration)
@@ -67,7 +63,7 @@ void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuratio
             if (already.insert(e.id).second) {
                 _killedEntitiesThisTick.push_back(e.id);
             }
-            
+
             // Drop power-ups from enemies
             if (registry.has<EnemyTag>(e) && registry.has<Position>(e)) {
                 Position& pos = registry.get<Position>(e);
@@ -80,8 +76,7 @@ void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuratio
                     Hitbox { POWERUP_WIDTH, POWERUP_HEIGHT },
                     Lifetime { POWERUP_LIFETIME },
                     type,
-                    effectDuration
-                ));
+                    effectDuration));
             }
             registry.kill_entity(e);
         }
@@ -89,15 +84,15 @@ void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuratio
 
     // 4) Remove from newly spawned list if they died the same tick
     if (!_newEntitiesThisTick.empty()) {
-        _newEntitiesThisTick.erase(std::remove_if(_newEntitiesThisTick.begin(), _newEntitiesThisTick.end(), 
-            [&](Entity const& cand) {
-                for (auto const& k : killedThisTick) {
-                    if (cand == k)
-                        return true;
-                }
-                return false;
-            }
-        ), _newEntitiesThisTick.end());
+        _newEntitiesThisTick.erase(std::remove_if(_newEntitiesThisTick.begin(), _newEntitiesThisTick.end(),
+                                       [&](Entity const& cand) {
+                                           for (auto const& k : killedThisTick) {
+                                               if (cand == k)
+                                                   return true;
+                                           }
+                                           return false;
+                                       }),
+            _newEntitiesThisTick.end());
     }
 }
 
@@ -120,7 +115,7 @@ void GameInstanceEntities::spawnRandomPowerUps(Registry& registry, int count)
     for (int i = 0; i < count; ++i) {
         float x = static_cast<float>(rand() % SCREEN_WIDTH + 100);
         float y = static_cast<float>(rand() % 300 + 200);
-        
+
         PowerUpType type = (rand() % 2 == 0) ? PowerUpType::HEAL : PowerUpType::DAMAGE_BOOST;
         float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
 
@@ -131,8 +126,7 @@ void GameInstanceEntities::spawnRandomPowerUps(Registry& registry, int count)
             Hitbox { 20.0f, 20.0f, 0.0f, 0.0f },
             Lifetime { 30.0f },
             type,
-            effectDuration
-        );
+            effectDuration);
         _newEntitiesThisTick.push_back(powerUp);
     }
 }
@@ -140,7 +134,7 @@ void GameInstanceEntities::spawnRandomPowerUps(Registry& registry, int count)
 void GameInstanceEntities::generatePlatforms(Registry& registry, int count)
 {
     for (int i = 0; i < count; ++i) {
-        auto platformTmp = factories::reGenerateRandomPlatforms(registry, 1);
+        auto platformTmp = factories::reGenerateRandomPlatforms(registry, 1, _currentLevel);
         _newEntitiesThisTick.insert(_newEntitiesThisTick.end(), platformTmp.begin(), platformTmp.end());
     }
 }

@@ -5,14 +5,19 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:59:23 PM 2025 jojo
-** Last update Sat Oct 10 4:17:20 PM 2025 jojo
+** Last update Wed Oct 21 3:28:56 PM 2025 jojo
 */
 
 #include "ui/page/HomeMenu.hpp"
 #include "Config.hpp"
+#include "components/Sprite.hpp"
+#include "components/SpriteFactory.hpp"
+#include "entities/Sprite/CreateAnimateSprite.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
+#include "render/SpriteRender.hpp"
+
 #include <iostream>
 
 HomeMenu::HomeMenu()
@@ -46,20 +51,22 @@ void HomeMenu::createEntities(Registry& registry)
         "Enter your username...", 300.0f, 200.0f, 18, { 255, 255, 255, 255 });
 
     m_joinButtonEntity = factories::createButton(registry,
-        250.0f, 280.0f, 120.0f, 50.0f, "home_join", true);
+        SCREEN_WIDTH / 2 - 250 + 600, SCREEN_HEIGHT / 2 - 250, 380.0f, 120.0f, "home_join", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     m_createButtonEntity = factories::createButton(registry,
-        250.0f, 350.0f, 120.0f, 50.0f, "home_create", true);
+        SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 250, 380.0f, 120.0f, "home_create", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     m_paramButtonEntity = factories::createButton(registry,
-        250.0f, 420.0f, 120.0f, 50.0f, "home_param", true);
+        SCREEN_WIDTH / 2 - 250 - 600, SCREEN_HEIGHT / 2 - 250, 380.0f, 120.0f, "home_param", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     m_textBoxJoinEntity = factories::createTextBox(registry,
-        "JOIN LOBBY", 250.0f, 280.0f, 16, { 255, 0, 0, 0 });
+        "JOIN LOBBY", SCREEN_WIDTH / 2 - 120 + 600, SCREEN_HEIGHT / 2 - 25, 40, { 255, 0, 0, 0 });
     m_textBoxCreateEntity = factories::createTextBox(registry,
-        "CREATE LOBBY", 250.0f, 350.0f, 16, { 255, 0, 0, 0 });
+        "CREATE LOBBY", SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2 - 25, 40, { 255, 0, 0, 0 });
     m_textBoxParamEntity = factories::createTextBox(registry,
-        "PARAMETER", 250.0f, 420.0f, 16, { 255, 0, 0, 0 });
+        "PARAMETER", SCREEN_WIDTH / 2 - 120 - 600, SCREEN_HEIGHT / 2 - 25, 40, { 255, 0, 0, 0 });
+
+    m_backgroundMenu.reload(registry, 75, { m_joinButtonEntity, m_createButtonEntity, m_paramButtonEntity });
 }
 
 void HomeMenu::destroyEntities(Registry& registry)
@@ -73,6 +80,8 @@ void HomeMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxCreateEntity);
     registry.kill_entity(m_textBoxJoinEntity);
     registry.kill_entity(m_textBoxParamEntity);
+
+    m_backgroundMenu.destroy(registry);
 }
 
 void HomeMenu::setupEventHandlers()
@@ -123,6 +132,8 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
     SDL_RenderFillRect(renderer, &fullBg);
 
     // Rendu des composants
+    m_backgroundMenu.draw(gfx, registry);
+
     drawTextBoxInput(gfx, registry, m_textBoxEntity);
 
     drawButton(gfx, registry, m_joinButtonEntity);

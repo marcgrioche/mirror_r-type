@@ -25,6 +25,8 @@
 #include "components/Velocity.hpp"
 #include <iostream>
 
+class Level;
+
 namespace factories {
 /**
  * @brief Creates a boss entity with default properties at the right edge of the screen
@@ -32,6 +34,7 @@ namespace factories {
  * @return The created boss entity
  */
 Entity createBoss(Registry& registry);
+Entity createBoss(Registry& registry, const Level* level);
 
 /**
  * @brief Creates a boss entity with custom properties

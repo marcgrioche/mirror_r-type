@@ -64,10 +64,10 @@ bool handlePlayerAttack(
 
             Entity spawned;
             if (registry.has<ProjectileTag>(tpl)) {
-                Velocity vel = registry.has<Velocity>(tpl) ? Velocity { registry.get<Velocity>(tpl).v.x, registry.get<Velocity>(tpl).v.y } : Velocity {{ 300.0f, 0.0f }};
+                Velocity vel = registry.has<Velocity>(tpl) ? Velocity { registry.get<Velocity>(tpl).v.x, registry.get<Velocity>(tpl).v.y } : Velocity { { 300.0f, 0.0f } };
                 Hitbox hit = registry.has<Hitbox>(tpl) ? registry.get<Hitbox>(tpl) : Hitbox { 32.0f, 32.0f, 0.0f, 0.0f };
                 Damage projDmg = registry.has<Damage>(tpl) ? registry.get<Damage>(tpl) : Damage { damage.value };
-                Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 5.0f };
+                Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 30.0f };
                 spawned = factories::createProjectile(registry, spawnPos, vel, projDmg, hit, spawnParent, life);
             } else if (registry.has<EnemyTag>(tpl)) {
                 Health hp = registry.has<Health>(tpl) ? registry.get<Health>(tpl) : Health { 10 };
@@ -83,7 +83,7 @@ bool handlePlayerAttack(
                     Damage { damage.value },
                     Hitbox { 32.0f, 32.0f, 0.0f, 0.0f },
                     spawnParent,
-                    Lifetime { 5.0f });
+                    Lifetime { 30.0f });
             }
 
             newEntitiesThisTick.push_back(spawned);
@@ -164,7 +164,7 @@ bool handleEnemyAttacks(
                 Velocity vel = registry.has<Velocity>(tpl) ? registry.get<Velocity>(tpl) : Velocity { -300.0f, 0.0f };
                 Hitbox hit = registry.has<Hitbox>(tpl) ? registry.get<Hitbox>(tpl) : Hitbox { 32.0f, 32.0f, 0.0f, 0.0f };
                 Damage projDmg = registry.has<Damage>(tpl) ? registry.get<Damage>(tpl) : Damage { damage.value };
-                Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 5.0f };
+                Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 30.0f };
                 spawned = factories::createProjectile(registry, spawnPos, vel, projDmg, hit, spawnParent, life);
             } else if (registry.has<EnemyTag>(tpl)) {
                 Health hp = registry.has<Health>(tpl) ? registry.get<Health>(tpl) : Health { 10 };
@@ -180,7 +180,7 @@ bool handleEnemyAttacks(
                     Damage { damage.value },
                     Hitbox { 32.0f, 32.0f, 0.0f, 0.0f },
                     spawnParent,
-                    Lifetime { 5.0f });
+                    Lifetime { 30.0f });
             }
 
             newEntitiesThisTick.push_back(spawned);

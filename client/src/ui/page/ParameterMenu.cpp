@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Fri Oct 10 3:47:00 PM 2025 jojo
-** Last update Mon Oct 12 11:16:50 AM 2025 jojo
+** Last update Tue Oct 13 3:24:36 PM 2025 jojo
 */
 
 #include "ParameterMenu.hpp"
@@ -56,11 +56,11 @@ void ParameterMenu::createEntities(Registry& registry)
 
     // auto-shoot toggle button
     m_autoShootButtonEntity = factories::createButton(registry, 120.0f, 450.0f, 100.0f, 40.0f, "auto_shoot_toggle", true);
-    m_autoShootTextEntity = factories::createTextBox(registry, m_autoShoot ? "AUTO ON" : "AUTO OFF", 170.0f, 465.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::CENTER);
+    m_autoShootTextEntity = factories::createTextBox(registry, m_autoShoot ? "AUTO ON" : "AUTO OFF", 170.0f, 465.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
 
     // return button
     m_returnButtonEntity = factories::createButton(registry, 320.0f, 520.0f, 160.0f, 50.0f, "return_to_home", true);
-    m_returnTextEntity = factories::createTextBox(registry, "RETURN", 360.0f, 535.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::CENTER);
+    m_returnTextEntity = factories::createTextBox(registry, "RETURN", 360.0f, 535.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
 }
 
 void ParameterMenu::destroyEntities(Registry& registry)
@@ -77,23 +77,11 @@ void ParameterMenu::destroyEntities(Registry& registry)
     }
     m_keyTextEntities.clear();
 
-    if (m_returnTextEntity.id != 0) {
-        registry.kill_entity(m_returnTextEntity);
-        m_returnTextEntity = { 0, 0 };
-    }
-    if (m_autoShootTextEntity.id != 0) {
-        registry.kill_entity(m_autoShootTextEntity);
-        m_autoShootTextEntity = { 0, 0 };
-    }
-    if (m_autoShootButtonEntity.id != 0) {
-        registry.kill_entity(m_autoShootButtonEntity);
-        m_autoShootButtonEntity = { 0, 0 };
-    }
+    registry.kill_entity(m_returnTextEntity);
+    registry.kill_entity(m_returnButtonEntity);
 
-    if (m_returnButtonEntity.id != 0) {
-        registry.kill_entity(m_returnButtonEntity);
-        m_returnButtonEntity = { 0, 0 };
-    }
+    registry.kill_entity(m_autoShootTextEntity);
+    registry.kill_entity(m_autoShootButtonEntity);
 }
 
 void ParameterMenu::setupEventHandlers()
@@ -153,9 +141,9 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
                 m_bindings[m_selectedIndex].second.clear();
                 m_bindings[m_selectedIndex].second.push_back(storedCode);
                 saveBindings();
-                auto btnName = (mouseBtn == SDL_BUTTON_LEFT) ? "Mouse Left" : (mouseBtn == SDL_BUTTON_RIGHT) ? "Mouse Right"
-                    : (mouseBtn == SDL_BUTTON_MIDDLE)                                                        ? "Mouse Middle"
-                                                                                                             : ("Mouse Button " + std::to_string(mouseBtn)).c_str();
+                std::string btnName = (mouseBtn == SDL_BUTTON_LEFT) ? "Mouse Left" : (mouseBtn == SDL_BUTTON_RIGHT) ? "Mouse Right"
+                    : (mouseBtn == SDL_BUTTON_MIDDLE)                                                               ? "Mouse Middle"
+                                                                                                                    : "Mouse Button " + std::to_string(mouseBtn);
                 std::cout << "Rebound " << m_bindings[m_selectedIndex].first
                           << " to " << btnName << " (" << storedCode << ")\n";
             }
@@ -211,6 +199,7 @@ void ParameterMenu::handleEvent(Registry& registry, const SDL_Event& event)
     // TODO make a function
     if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         int mx = event.button.x;
+        (void)mx;
         int my = event.button.y;
         int top = 120;
         int lineH = 36;
@@ -394,9 +383,9 @@ std::string ParameterMenu::keysToString(const std::vector<int>& keys) const
         int code = keys[i];
         if (code < 0) { // mouse button encoding (negative)
             int mb = -code;
-            const char* name = (mb == SDL_BUTTON_LEFT) ? "Mouse Left" : (mb == SDL_BUTTON_RIGHT) ? "Mouse Right"
+            std::string name = (mb == SDL_BUTTON_LEFT) ? "Mouse Left" : (mb == SDL_BUTTON_RIGHT) ? "Mouse Right"
                 : (mb == SDL_BUTTON_MIDDLE)                                                      ? "Mouse Middle"
-                                                                                                 : ("Mouse " + std::to_string(mb)).c_str();
+                                                                                                 : "Mouse " + std::to_string(mb);
             ss << name;
         } else {
             ss << SDL_GetKeyName(static_cast<SDL_Keycode>(code));
