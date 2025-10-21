@@ -116,6 +116,18 @@ public:
     bool isQuit() const { return isActionPressed(GameAction::QUIT); }
     const std::unordered_map<GameAction, bool>& getActions() const;
 
+    /**
+     * @brief Gets the current mouse X position
+     * @return The mouse X coordinate
+     */
+    Sint32 getMouseX() const { return mousex; }
+
+    /**
+     * @brief Gets the current mouse Y position
+     * @return The mouse Y coordinate
+     */
+    Sint32 getMouseY() const { return mousey; }
+
 private:
     InputManager() { setDefaultKeyBindings(); }
     ~InputManager() = default;
@@ -126,6 +138,8 @@ private:
     std::unordered_map<SDL_Keycode, GameAction> keyToAction;
     std::unordered_map<GameAction, bool> actionStates;
     std::unordered_map<GameAction, bool> previousActionStates;
+    Sint32 mousex = 0;
+    Sint32 mousey = 0;
 
     void updateActionState(GameAction action, bool isPressed);
 };

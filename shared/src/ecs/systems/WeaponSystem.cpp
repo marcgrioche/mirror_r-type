@@ -27,8 +27,10 @@ bool handlePlayerAttack(
     Registry& registry,
     Entity playerEntity,
     uint32_t playerId,
-    std::vector<Entity>& newEntitiesThisTick)
-{
+    std::vector<Entity>& newEntitiesThisTick,
+    float mouseX,
+    float mouseY)
+{   
     auto weaponView = registry.view<WeaponTag, Frequency, Parent, Damage>();
 
     for (auto weaponIt = weaponView.begin(); weaponIt != weaponView.end(); ++weaponIt) {

@@ -16,31 +16,20 @@
 namespace factories {
 
 /**
- * @brief Creates a default player entity with standard components
+ * @brief Creates a player entity with customizable components
  * @param registry The ECS registry to create the entity in
+ * @param username The player's username (defaults to empty string for TextBox display)
+ * @param position Initial position (defaults to 50, -500)
+ * @param health Health component (defaults to 100 HP)
+ * @param hitbox Hitbox component (defaults to 32x32)
+ * @param playerId The player ID for the PlayerTag component (defaults to 0)
  * @return The created player entity
  */
-Entity createPlayer(Registry& registry);
-
-/**
- * @brief Creates a player entity with specified position, health, and hitbox
- * @param registry The ECS registry to create the entity in
- * @param position The initial position component for the player
- * @param health The health component for the player
- * @param hitbox The hitbox component for collision detection
- * @return The created player entity
- */
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox);
-
-/**
- * @brief Creates a player entity with position, health, hitbox, and textbox components
- * @param registry The ECS registry to create the entity in
- * @param position The initial position component for the player
- * @param health The health component for the player
- * @param hitbox The hitbox component for collision detection
- * @param textbox The textbox component for player name display
- * @param playerId The player id
- * @return The created player entity
- */
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox, uint32_t playerId);
+Entity createPlayer(
+    Registry& registry,
+    const std::string& username = "",
+    const Position& position = Position { 50.0f, -500.0f },
+    const Health& health = Health { 100 },
+    const Hitbox& hitbox = Hitbox { 32.0f, 32.0f, 0.0f, 0.0f },
+    uint32_t playerId = 0);
 }

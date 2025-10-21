@@ -81,8 +81,10 @@ void Game::updateNetworkGameTick()
     auto currentInputs = getCurrentInputs();
     const auto clientId = m_clientNetwork->getPlayerId();
     const auto playerEntity = findEntityByClientId(_registry, clientId);
+    float mouseX = static_cast<float>(_inputs.getMouseX());
+    float mouseY = static_cast<float>(_inputs.getMouseY());
 
-    m_clientNetwork->sendCurrentInputState(currentInputs);
+    m_clientNetwork->sendCurrentInputStateWithMouse(currentInputs, mouseX, mouseY);
     m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
     m_clientNetwork->incrementTick();
     if (m_clientNetwork->getCurrentTick() % 100 == 0)

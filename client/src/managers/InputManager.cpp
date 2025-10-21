@@ -62,6 +62,9 @@ void InputManager::handleSDLEvent(const SDL_Event& e)
                 updateActionState(it->second, false);
             }
         }
+    } else if (e.type == SDL_MOUSEMOTION) {
+        mousex = e.motion.x;
+        mousey = e.motion.y;
     }
 }
 

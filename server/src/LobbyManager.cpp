@@ -325,7 +325,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
         while (lobby->hasPendingInputs()) {
             PlayerInput input = lobby->dequeueInput();
-            bool hadRealInput = lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs);
+            bool hadRealInput = lobby->gameInstance->processPlayerInput(input.playerId, input.tick, input.inputs, input.mouseX, input.mouseY);
             if (hadRealInput) {
                 hadRealInputsThisTick = true;
             }

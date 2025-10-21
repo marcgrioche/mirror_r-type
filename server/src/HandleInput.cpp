@@ -47,6 +47,13 @@ void RTypeServer::handleInput(const Message& msg, PeerInfo& peerInfo)
         inputs.emplace_back(inputType, isPressed);
     }
 
-    PlayerInput playerInput { msg.player_id, clientTick, inputs };
+    float mouseX = 0.0f;
+    float mouseY = 0.0f;
+    if (msg.remainingBytes() >= 8) {  // 2 floats = 8 bytes
+        mouseX = msg.readFloat();
+        mouseY = msg.readFloat();
+    }
+
+    PlayerInput playerInput { msg.player_id, clientTick, inputs, mouseX, mouseY };
     const_cast<Lobby*>(lobby)->queueInput(playerInput);
 }

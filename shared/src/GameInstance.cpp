@@ -109,9 +109,9 @@ void GameInstance::removePlayer(uint32_t playerId)
     _player.removePlayer(_core.getRegistry(), playerId);
 }
 
-bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs)
+bool GameInstance::processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs, float mouseX, float mouseY)
 {
-    bool hasRealInputs = _player.processPlayerInput(_core.getRegistry(), playerId, tick, inputs, _entities.getNewEntitiesThisTick());
+    bool hasRealInputs = _player.processPlayerInput(_core.getRegistry(), playerId, tick, inputs, _entities.getNewEntitiesThisTick(), mouseX, mouseY);
     if (hasRealInputs) {
         _core.markStateChanged();
     }
