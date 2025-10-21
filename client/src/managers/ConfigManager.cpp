@@ -31,7 +31,6 @@ bool ConfigManager::loadKeyBindings()
     std::string configPath = getConfigFilePath();
 
     if (!std::filesystem::exists(configPath)) {
-        std::cout << "Config file not found, using defaults: " << configPath << std::endl;
         return false;
     }
 
@@ -67,6 +66,8 @@ bool ConfigManager::loadKeyBindings()
                 action = GameAction::MOVE_RIGHT;
             else if (actionStr == "shoot")
                 action = GameAction::SHOOT;
+            else if (actionStr == "dash")
+                action = GameAction::DASH;
             else if (actionStr == "quit")
                 action = GameAction::QUIT;
 
@@ -102,7 +103,6 @@ bool ConfigManager::loadKeyBindings()
     }
 
     file.close();
-    std::cout << "Loaded keybindings from: " << configPath << std::endl;
     return true;
 }
 
@@ -123,6 +123,7 @@ bool ConfigManager::saveKeyBindings()
 
     file << "# R-Type Keybindings Configuration" << std::endl;
     file << "# Format: action=keycode1,keycode2,..." << std::endl;
+    file << "# Mouse buttons: Left=1073741824, Right=1073741825" << std::endl;
     file << std::endl;
 
     for (const auto& binding : m_keyBindings) {
@@ -143,6 +144,9 @@ bool ConfigManager::saveKeyBindings()
         case GameAction::SHOOT:
             actionStr = "shoot";
             break;
+        case GameAction::DASH:
+            actionStr = "dash";
+            break;
         case GameAction::QUIT:
             actionStr = "quit";
             break;
@@ -162,7 +166,6 @@ bool ConfigManager::saveKeyBindings()
     file << "auto_shoot=" << (m_autoShoot ? "1" : "0") << std::endl;
 
     file.close();
-    std::cout << "Saved keybindings to: " << configPath << std::endl;
     return true;
 }
 
@@ -207,9 +210,9 @@ void ConfigManager::setDefaultKeyBindings()
     m_keyBindings[GameAction::MOVE_DOWN] = { SDLK_s };
     m_keyBindings[GameAction::MOVE_LEFT] = { SDLK_q };
     m_keyBindings[GameAction::MOVE_RIGHT] = { SDLK_d };
-    m_keyBindings[GameAction::SHOOT] = { SDLK_SPACE };
+    m_keyBindings[GameAction::SHOOT] = { MOUSE_LEFT_KEYCODE };
+    m_keyBindings[GameAction::DASH] = { SDLK_SPACE, MOUSE_RIGHT_KEYCODE };
     m_keyBindings[GameAction::QUIT] = { SDLK_ESCAPE };
-    m_keyBindings[GameAction::DASH] = { SDLK_LSHIFT };
 }
 
 bool ConfigManager::getAutoShoot() const

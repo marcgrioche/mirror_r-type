@@ -22,6 +22,9 @@ enum class GameAction {
     ACTION_COUNT
 };
 
+constexpr SDL_Keycode MOUSE_LEFT_KEYCODE = static_cast<SDL_Keycode>(0x40000000);
+constexpr SDL_Keycode MOUSE_RIGHT_KEYCODE = static_cast<SDL_Keycode>(0x40000001);
+
 class InputManager {
 public:
     /**
