@@ -34,7 +34,7 @@ void GameInstance::update()
 
     auto currentTime = std::chrono::steady_clock::now();
     float deltaTime = std::chrono::duration<float>(currentTime - _core.getLastTickTime()).count();
-    // std::cout << "Delta time: " << deltaTime << std::endl;
+    // std::cout << "Delta time server: " << deltaTime << std::endl;
     _core.setLastTickTime(currentTime);
 
     _accumulatedTime += std::chrono::duration<float>(deltaTime);

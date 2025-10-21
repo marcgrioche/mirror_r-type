@@ -79,6 +79,9 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
         Hitbox { width, height, offsetX, offsetY },
         TextBox { username, 12 },
         serverPlayerId);
+    if (serverPlayerId == m_clientNetwork->getPlayerId()) {
+        m_clientNetwork->resetTick();
+    }
 
     // Entity entity2 = factories::createPlayer(registry,
     //     Position { posX, posY },
@@ -279,6 +282,8 @@ void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, f
     if (playerEntity == entity) {
         if (registry.has<Position>(playerEntity)) {
             auto& position = registry.get<Position>(playerEntity);
+            // std::cout << "Server tick " << serverTick << " , POSX: " << posX << ", POSY: " << posY << std::endl;
+            // std::cout << "client tick " << m_clientNetwork->getCurrentTick() << " , POSX: " << position.v.x << ", POSY: " << position.v.y << std::endl;
             position.v.x = posX;
             position.v.y = posY;
         }
@@ -295,7 +300,7 @@ void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, f
         // }
 
         // Optionally: update sprite position with interpolation (for smoothing)
-        updatePlayerSprite(registry, entity, posX, posY);
+        // updatePlayerSprite(registry, entity, posX, posY);
         return;
     }
     if (registry.has<Position>(entity)) {

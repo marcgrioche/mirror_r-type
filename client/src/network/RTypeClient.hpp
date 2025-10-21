@@ -165,6 +165,11 @@ public:
     void incrementTick() { m_currentTick++; }
 
     /**
+     * @brief reset the current tick counter
+     */
+    void resetTick() { m_currentTick = 0; }
+
+    /**
      * @brief Gets the player's ID
      * @return The player's unique identifier
      */

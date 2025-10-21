@@ -29,6 +29,7 @@ void Game::update(float deltaTime)
 {
     _accumulatedTime += deltaTime;
 
+    // std::cout << "Delta time client: " << deltaTime << std::endl;
     while (_accumulatedTime >= TICK_DURATION) {
         updateGameTick();
         _accumulatedTime -= TICK_DURATION;
@@ -58,7 +59,7 @@ void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
         m_clientNetwork->getCurrentTick(),
         inputs,
         newEntities,
-        100,
+        clientId,
         true);
 }
 
@@ -73,7 +74,7 @@ void Game::updatePlayerSprite(Registry& registry, const Entity entity, const flo
 
 void Game::updateSystemsComponents()
 {
-    const auto playerEntity = findEntityByClientId(_registry, 100);
+    const auto playerEntity = findEntityByClientId(_registry, m_clientNetwork->getPlayerId());
     if (playerEntity.id == 0 && playerEntity.version == 0)
         return;
     auto& dash = _registry.get<Dash>(playerEntity);
@@ -82,20 +83,28 @@ void Game::updateSystemsComponents()
 
     changeDashComponentProperties(dash, velocity, rigidBody, TICK_DURATION);
     changeRigidBodyComponentProperties(rigidBody, velocity, TICK_DURATION, true);
-    GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
+    // GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
 }
 
 void Game::updateNetworkGameTick()
 {
-    movementSystem(_registry, TICK_DURATION);
-    spriteAnimationSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
+    const auto clientId = m_clientNetwork->getPlayerId();
+    const auto playerEntity = findEntityByClientId(_registry, clientId);
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
     m_clientNetwork->incrementTick();
     processLocalInputs(currentInputs);
+    GameInstancePhysics::updatePreviousPositions(_registry);
     updateSystemsComponents();
+    movementSystem(_registry, TICK_DURATION);
+    if (_registry.has<Position>(playerEntity)) {
+        const auto& pos = _registry.get<Position>(playerEntity);
+        updatePlayerSprite(_registry, playerEntity, pos.v.x, pos.v.y);
+    }
+    spriteAnimationSystem(_registry, TICK_DURATION);
+    GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
 }
 
 void Game::updateLocalGameTick()
