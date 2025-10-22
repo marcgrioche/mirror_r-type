@@ -12,6 +12,7 @@
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
 #include "components/Sprite.hpp"
+#include "components/SpriteUtils.hpp"
 #include "components/Tags.hpp"
 #include "components/TextBox.hpp"
 #include "managers/GraphicsManager.hpp"
@@ -41,24 +42,15 @@ void renderSystem(Registry& registry)
 
         SDL_Texture* texture = resourceManager.getTexture(sprite.texture_id);
 
-        SDL_Rect dstRect = {
-            static_cast<int>(pos.v.x + sprite.offset_x),
-            static_cast<int>(pos.v.y + sprite.offset_y),
-            static_cast<int>(sprite.dstRect.w * sprite.scale_x),
-            static_cast<int>(sprite.dstRect.h * sprite.scale_y)
-        };
-
-        if (dstRect.w == 0) {
-            dstRect.w = static_cast<int>(sprite.srcRect.w * sprite.scale_x);
-        }
-        if (dstRect.h == 0) {
-            dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale_y);
-        }
+        // Calculate source and destination rectangles using SpriteUtils
+        SDL_Rect srcRect = SpriteUtils::calculateSourceRect(sprite);
+        SDL_Rect dstRect = SpriteUtils::calculateDestRect(sprite, pos.v);
 
         if (texture) {
-            SDL_RenderCopyEx(renderer, texture, &sprite.srcRect, &dstRect,
+            SDL_RenderCopyEx(renderer, texture, &srcRect, &dstRect,
                 sprite.rotation, nullptr, SDL_FLIP_NONE);
         } else {
+            // Fallback rendering with colored rectangles
             if (registry.has<PlayerTag>(e)) {
                 graphics.setDrawColor(255, 0, 255, 255); // Magenta for players
             } else if (registry.has<PlatformTag>(e)) {

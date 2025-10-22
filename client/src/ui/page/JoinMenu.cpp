@@ -59,12 +59,11 @@ void JoinMenu::createEntities(Registry& registry)
         "CONNECT", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
 
     Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
-        0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
+        2480.0f, 2486.0f, 1.0f, 1.0f, 0.0f, 0.0f);
 
-    bg.dstRect = { 0, 0, SCREEN_WIDTH, SCREEN_WIDTH };
-    if (bg.frame_width > 0 && bg.frame_height > 0) {
-        bg.scale_x = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
-        bg.scale_y = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
+    if (bg.size.x > 0 && bg.size.y > 0) {
+        bg.scale.x = static_cast<float>(SCREEN_WIDTH) / bg.size.x;
+        bg.scale.y = static_cast<float>(SCREEN_WIDTH) / bg.size.x;
     }
 
     m_backgroundEntity = registry.create_entity();

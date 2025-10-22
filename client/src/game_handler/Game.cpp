@@ -48,71 +48,9 @@ bool Game::initialize()
     auto& resourceManager = ResourceManager::getInstance();
     SDL_Renderer* renderer = _graphics.getRenderer();
 
-    if (!resourceManager.loadTexture(renderer, "player_sprite.png", "client/res/sprites/player_sprite.png")) {
-        std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "eye_spritesheet.png", "client/res/sprites/eye_spritesheet.png")) {
-        std::cout << "Warning: Failed to load eye spritesheet texture - using fallback rectangles" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "WallOfFlesh.png", "client/res/sprites/WallOfFlesh.png")) {
-        std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "bydo_flying.png", "client/res/sprites/bydo_flying.png")) {
-        std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
-    }
-
-    // Load parallax background textures
-    if (!resourceManager.loadTexture(renderer, "TopLayer.png", "client/res/sprites/ParallaxBackground/TopLayer.png")) {
-        std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "Light.png", "client/res/sprites/ParallaxBackground/Light.png")) {
-        std::cout << "Warning: Failed to load Light texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", "client/res/sprites/ParallaxBackground/MiddleLayer.png")) {
-        std::cout << "Warning: Failed to load MiddleLayer texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "DownLayer.png", "client/res/sprites/ParallaxBackground/DownLayer.png")) {
-        std::cout << "Warning: Failed to load DownLayer texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "Sky.png", "client/res/sprites/ParallaxBackground/Sky.png")) {
-        std::cout << "Warning: Failed to load Sky texture" << std::endl;
-    }
-
-    // LOAD UI
-    if (!resourceManager.loadTexture(renderer, "MenuBackground", "client/res/sprites/UI/Background/menuBackground.png")) {
-        std::cout << "Warning: Failed to load MenuBackground texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "ButtonMouth", "client/res/sprites/UI/tools/buttonAsset.png")) {
-        std::cout << "Warning: Failed to load buttonMouth texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "ButtonEye", "client/res/sprites/UI/tools/buttonParamAsset.png")) {
-        std::cout << "Warning: Failed to load buttonEye texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "zoneText", "client/res/sprites/UI/tools/textBoxAsset.png")) {
-        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "eyeOutline", "client/res/sprites/UI/tools/eyeOutline.png")) {
-        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "eyePupil", "client/res/sprites/UI/tools/eyePupil.png")) {
-        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "eyeOutline2", "client/res/sprites/UI/tools/eyeOutline2.png")) {
-        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "eyePupil2", "client/res/sprites/UI/tools/eyePupil2.png")) {
-        std::cout << "Warning: Failed to load eyepupil2 texture" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "eyeOutline3", "client/res/sprites/UI/tools/eyeOutline3.png")) {
-        std::cout << "Warning: Failed to load eyeoutline3 texture" << std::endl;
-    }
-    if (!resourceManager.loadTexture(renderer, "eyePupil3", "client/res/sprites/UI/tools/eyePupil3.png")) {
-        std::cout << "Warning: Failed to load eyepupil3 texture" << std::endl;
+    // Load all textures from the sprite registry
+    if (!resourceManager.loadFromRegistry(renderer)) {
+        std::cout << "Warning: Some textures failed to load - using fallback rectangles where needed" << std::endl;
     }
 
     _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });

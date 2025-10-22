@@ -23,11 +23,27 @@ public:
     SDL_Texture* loadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path);
 
     /**
+     * @brief Retrieves a previously loaded texture by ID, loading it if not already cached
+     * @param renderer The SDL renderer to create the texture with (if loading)
+     * @param id The unique identifier of the texture
+     * @param path File path to the image file (if loading)
+     * @return Pointer to the SDL texture, or nullptr if loading fails
+     */
+    SDL_Texture* getOrLoadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path);
+
+    /**
      * @brief Retrieves a previously loaded texture by ID
      * @param id The unique identifier of the texture
      * @return Pointer to the SDL texture, or nullptr if not found
      */
     SDL_Texture* getTexture(const std::string& id) const;
+
+    /**
+     * @brief Loads all textures from the sprite registry
+     * @param renderer The SDL renderer to create textures with
+     * @return True if all textures loaded successfully, false otherwise
+     */
+    bool loadFromRegistry(SDL_Renderer* renderer);
 
     /**
      * @brief Loads a font at the specified size

@@ -33,9 +33,6 @@ Entity createButton(Registry& registry, float x, float y, float width, float hei
             0, 0 // offsetX, offsetY
         );
 
-        // Ensure the dstRect matches the button position/size
-        sprite.dstRect = { static_cast<int>(x), static_cast<int>(y), static_cast<int>(xS), static_cast<int>(yS) };
-
         registry.add<Sprite>(button, sprite);
         registry.emplace<Hitbox>(button, width, height, 70.0f, 200.0f);
     } else {

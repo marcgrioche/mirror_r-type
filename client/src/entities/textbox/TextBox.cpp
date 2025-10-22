@@ -38,9 +38,6 @@ Entity createTextBox(Registry& registry, const std::string& text,
             0, 0 // offsetX, offsetY
         );
 
-        // Ensure the dstRect matches the button position/size
-        sprite.dstRect = { static_cast<int>(x), static_cast<int>(y), static_cast<int>(xS), static_cast<int>(yS) };
-
         registry.add<Sprite>(textBox, sprite);
     }
 

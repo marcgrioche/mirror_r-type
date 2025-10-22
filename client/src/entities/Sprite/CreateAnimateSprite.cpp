@@ -29,9 +29,6 @@ Entity createSprite(Registry& registry, const std::string& textureId, float x, f
         offsetX, offsetY // offsets
     );
 
-    spr.dstRect = { static_cast<int>(x), static_cast<int>(y),
-        static_cast<int>(width), static_cast<int>(height) };
-
     registry.add<Sprite>(sprite, spr);
 
     return sprite;

@@ -13,12 +13,22 @@
 class SpriteFactory {
 public:
     /**
+     * @brief Creates a sprite from the sprite registry
+     * @param spriteKey Key name in the sprite registry (e.g., "player", "enemy_bydo")
+     * @param scaleX Horizontal scaling factor (default 1.0)
+     * @param scaleY Vertical scaling factor (default 1.0)
+     * @param offsetX X offset for sprite positioning (default 0)
+     * @param offsetY Y offset for sprite positioning (default 0)
+     * @return Configured Sprite object
+     */
+    static Sprite createFromRegistry(const std::string& spriteKey,
+        float scaleX = 1.0f, float scaleY = 1.0f, float offsetX = 0.0f, float offsetY = 0.0f);
+
+    /**
      * @brief Creates a static (non-animated) sprite
      * @param textureId Identifier for the texture resource
-     * @param x Source rectangle X position in texture
-     * @param y Source rectangle Y position in texture
-     * @param width Source rectangle width
-     * @param height Source rectangle height
+     * @param width Sprite width
+     * @param height Sprite height
      * @param scaleX Horizontal scaling factor
      * @param scaleY Vertical scaling factor
      * @param offsetX X offset for sprite positioning
@@ -26,8 +36,8 @@ public:
      * @return Configured Sprite object
      */
     static Sprite createStaticSprite(const std::string& textureId,
-        int x, int y, int width, int height,
-        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0);
+        float width, float height,
+        float scaleX = 1.0f, float scaleY = 1.0f, float offsetX = 0.0f, float offsetY = 0.0f);
 
     /**
      * @brief Creates an animated sprite with multiple frames
@@ -43,23 +53,7 @@ public:
      * @return Configured Sprite object
      */
     static Sprite createAnimatedSprite(const std::string& textureId,
-        int frameWidth, int frameHeight,
+        float frameWidth, float frameHeight,
         int totalFrames, float frameDuration = 0.1f,
-        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0);
-
-    /**
-     * @brief Creates a custom sprite with full control over source and destination rectangles
-     * @param textureId Identifier for the texture resource
-     * @param srcRect Source rectangle defining the area to render from texture
-     * @param dstRect Destination rectangle defining where to render on screen
-     * @param scale Overall scaling factor
-     * @param rotation Rotation angle in degrees
-     * @param offsetX X offset for sprite positioning
-     * @param offsetY Y offset for sprite positioning
-     * @return Configured Sprite object
-     */
-    static Sprite createCustomSprite(const std::string& textureId,
-        SDL_Rect srcRect, SDL_Rect dstRect,
-        float scale = 1.0f, float rotation = 0.0f,
-        int offsetX = 0, int offsetY = 0);
+        float scaleX = 1.0f, float scaleY = 1.0f, float offsetX = 0.0f, float offsetY = 0.0f);
 };

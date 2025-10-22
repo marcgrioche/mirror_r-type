@@ -24,13 +24,7 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
 
         if (sprite.elapsed_time >= sprite.frame_duration) {
             sprite.elapsed_time = 0.0f;
-
             sprite.current_frame = (sprite.current_frame + 1) % sprite.total_frames;
-
-            sprite.srcRect.x = sprite.current_frame * sprite.frame_width;
-            sprite.srcRect.y = 0;
-            sprite.srcRect.w = sprite.frame_width;
-            sprite.srcRect.h = sprite.frame_height;
         }
     }
 }

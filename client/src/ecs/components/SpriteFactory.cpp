@@ -6,78 +6,79 @@
 */
 
 #include "SpriteFactory.hpp"
+#include "SpriteRegistry.hpp"
+#include <iostream>
+
+Sprite SpriteFactory::createFromRegistry(const std::string& spriteKey,
+    float scaleX, float scaleY, float offsetX, float offsetY)
+{
+    const SpriteConfig* config = SpriteRegistry::get(spriteKey);
+
+    if (!config) {
+        std::cerr << "Warning: Sprite '" << spriteKey << "' not found in registry" << std::endl;
+        // Return a default sprite
+        Sprite sprite;
+        sprite.texture_id = spriteKey;
+        sprite.size = { 32.0f, 32.0f };
+        sprite.scale = { scaleX, scaleY };
+        sprite.offset = { offsetX, offsetY };
+        return sprite;
+    }
+
+    Sprite sprite;
+    sprite.texture_id = config->textureId;
+    sprite.scale = { scaleX, scaleY };
+    sprite.offset = { offsetX, offsetY };
+    sprite.rotation = 0.0f;
+
+    if (config->animated) {
+        sprite.size = { config->frameWidth, config->frameHeight };
+        sprite.total_frames = config->frames;
+        sprite.frame_duration = config->frameDuration;
+    } else {
+        sprite.size = { config->width, config->height };
+        sprite.total_frames = 1;
+    }
+
+    sprite.current_frame = 0;
+    sprite.elapsed_time = 0.0f;
+
+    return sprite;
+}
 
 Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
-    int x, int y, int width, int height,
-    float scaleX, float scaleY, int offsetX, int offsetY)
+    float width, float height,
+    float scaleX, float scaleY, float offsetX, float offsetY)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
-    sprite.srcRect = { x, y, width, height };
-    sprite.dstRect = { 0, 0, width, height };
-    sprite.offset_x = offsetX;
-    sprite.offset_y = offsetY;
-    sprite.scale = scaleX;
-    sprite.scale_x = scaleX;
-    sprite.scale_y = scaleY;
+    sprite.size = { width, height };
+    sprite.scale = { scaleX, scaleY };
+    sprite.offset = { offsetX, offsetY };
     sprite.rotation = 0.0f;
-
     sprite.total_frames = 1;
     sprite.current_frame = 0;
     sprite.frame_duration = 0.0f;
     sprite.elapsed_time = 0.0f;
-    sprite.frame_width = width;
-    sprite.frame_height = height;
 
     return sprite;
 }
 
 Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
-    int frameWidth, int frameHeight,
+    float frameWidth, float frameHeight,
     int totalFrames, float frameDuration,
-    float scaleX, float scaleY, int offsetX, int offsetY)
+    float scaleX, float scaleY, float offsetX, float offsetY)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
-    sprite.srcRect = { 0, 0, frameWidth, frameHeight };
-    sprite.dstRect = { 0, 0, frameWidth, frameHeight };
-    sprite.offset_x = offsetX;
-    sprite.offset_y = offsetY;
-    sprite.scale = scaleX;
-    sprite.scale_x = scaleX;
-    sprite.scale_y = scaleY; // Independent Y scaling
+    sprite.size = { frameWidth, frameHeight };
+    sprite.scale = { scaleX, scaleY };
+    sprite.offset = { offsetX, offsetY };
     sprite.rotation = 0.0f;
-
     sprite.total_frames = totalFrames;
     sprite.current_frame = 0;
     sprite.frame_duration = frameDuration;
     sprite.elapsed_time = 0.0f;
-    sprite.frame_width = frameWidth;
-    sprite.frame_height = frameHeight;
-
-    return sprite;
-}
-
-Sprite SpriteFactory::createCustomSprite(const std::string& textureId,
-    SDL_Rect srcRect, SDL_Rect dstRect,
-    float scale, float rotation,
-    int offsetX, int offsetY)
-{
-    Sprite sprite;
-    sprite.texture_id = textureId;
-    sprite.srcRect = srcRect;
-    sprite.dstRect = dstRect;
-    sprite.offset_x = offsetX;
-    sprite.offset_y = offsetY;
-    sprite.scale = scale;
-    sprite.rotation = rotation;
-
-    sprite.total_frames = 1;
-    sprite.current_frame = 0;
-    sprite.frame_duration = 0.0f;
-    sprite.elapsed_time = 0.0f;
-    sprite.frame_width = srcRect.w;
-    sprite.frame_height = srcRect.h;
 
     return sprite;
 }

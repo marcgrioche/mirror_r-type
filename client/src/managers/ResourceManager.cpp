@@ -1,4 +1,5 @@
 #include "ResourceManager.hpp"
+#include "SpriteRegistry.hpp"
 #include <iostream>
 
 ResourceManager& ResourceManager::getInstance()
@@ -16,10 +17,47 @@ SDL_Texture* ResourceManager::loadTexture(SDL_Renderer* renderer, const std::str
     return tex;
 }
 
+SDL_Texture* ResourceManager::getOrLoadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path)
+{
+    // Check if already loaded
+    auto it = textures.find(id);
+    if (it != textures.end()) {
+        return it->second;
+    }
+
+    // Load if not found
+    return loadTexture(renderer, id, path);
+}
+
 SDL_Texture* ResourceManager::getTexture(const std::string& id) const
 {
     auto it = textures.find(id);
     return (it != textures.end()) ? it->second : nullptr;
+}
+
+bool ResourceManager::loadFromRegistry(SDL_Renderer* renderer)
+{
+    const auto& sprites = SpriteRegistry::getAll();
+    int successCount = 0;
+    int failCount = 0;
+
+    for (const auto& [key, config] : sprites) {
+        SDL_Texture* texture = loadTexture(renderer, config.textureId, config.filePath);
+        if (texture) {
+            successCount++;
+        } else {
+            failCount++;
+            std::cerr << "Warning: Failed to load texture '" << key << "' from " << config.filePath << std::endl;
+        }
+    }
+
+    std::cout << "Loaded " << successCount << " textures from sprite registry";
+    if (failCount > 0) {
+        std::cout << " (" << failCount << " failed)";
+    }
+    std::cout << std::endl;
+
+    return failCount == 0;
 }
 
 void ResourceManager::unloadAll()

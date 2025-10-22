@@ -61,13 +61,7 @@ void eyeSystem(Registry& registry, float /*deltaTime*/)
             registry.emplace<Position>(eye.pupilEntity, px, py);
         }
 
-        // update sprite dstRect to match new top-left
-        if (registry.has<Sprite>(eye.pupilEntity)) {
-            Sprite& pspr = registry.get<Sprite>(eye.pupilEntity);
-            pspr.dstRect.x = static_cast<int>(std::round(px));
-            pspr.dstRect.y = static_cast<int>(std::round(py));
-            pspr.dstRect.w = eye.pupil_w;
-            pspr.dstRect.h = eye.pupil_h;
-        }
+        // Position is now used by render system, no need to update sprite dstRect
+        // Sprite size and scale are already set during creation
     }
 }

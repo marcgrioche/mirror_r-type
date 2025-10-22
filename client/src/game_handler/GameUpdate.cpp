@@ -55,11 +55,12 @@ void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
 
 void Game::updatePlayerSprite(Registry& registry, const Entity entity, const float posX, const float posY)
 {
-    if (registry.has<Sprite>(entity)) {
-        auto& sprite = registry.get<Sprite>(entity);
-        sprite.dstRect.x = static_cast<int>(posX);
-        sprite.dstRect.y = static_cast<int>(posY);
-    }
+    // Sprite position is now automatically handled by the render system using Position component
+    // This function is kept for API compatibility but no longer needs to do anything
+    (void)registry;
+    (void)entity;
+    (void)posX;
+    (void)posY;
 }
 
 void Game::updateSystemsComponents()
