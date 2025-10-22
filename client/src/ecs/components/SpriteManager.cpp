@@ -7,11 +7,14 @@
 
 #include "SpriteManager.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Parent.hpp"
 #include "components/Sprite.hpp"
 #include "components/SpriteFactory.hpp"
 #include "components/SpriteUtils.hpp"
+#include "components/Tags.hpp"
 #include "components/Velocity.hpp"
 #include <cmath>
+#include <iostream>
 
 void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
 {
@@ -85,23 +88,36 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
     (void)posY;
 
     if (!registry.has<Hitbox>(entity)) {
-        return; // Cannot add sprite without hitbox
+        return;
     }
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    // Create sprite from registry
-    Sprite sprite = SpriteFactory::createFromRegistry("projectile_eye");
+    bool isPlayerProjectile = false;
+    if (registry.has<Velocity>(entity)) {
+        const Velocity& velocity = registry.get<Velocity>(entity);
+        isPlayerProjectile = (velocity.v.x > 0);
+    }
 
-    // Calculate centered transform
+    Sprite sprite;
+    if (isPlayerProjectile) {
+        sprite = SpriteFactory::createFromRegistry("projectile_laser");
+    } else {
+        sprite = SpriteFactory::createFromRegistry("projectile_eye");
+    }
+
     SpriteTransform transform = SpriteUtils::calculateCenteredTransform(sprite.size, hitbox, sizeFactor);
     sprite.scale = transform.scale;
     sprite.offset = transform.offset;
 
-    // Calculate rotation based on velocity direction
     if (registry.has<Velocity>(entity)) {
         Velocity& velocity = registry.get<Velocity>(entity);
-        sprite.rotation = atan2(velocity.v.y, velocity.v.x) * 180.0f / M_PI + 180.0f;
+        float baseRotation = atan2(velocity.v.y, velocity.v.x) * 180.0f / M_PI;
+        if (isPlayerProjectile) {
+            sprite.rotation = baseRotation;
+        } else {
+            sprite.rotation = baseRotation + 180.0f;
+        }
     }
 
     registry.add<Sprite>(entity, sprite);
