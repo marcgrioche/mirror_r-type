@@ -15,10 +15,14 @@ int main(int argc, char* argv[])
     try {
         const ProgramArguments args(argc, argv);
         const uint16_t clientPort = args.getPort();
+        const std::string colorblindType = args.getColorblindType();
 
         std::cout << "Using client port: " << clientPort << std::endl;
+        if (!colorblindType.empty()) {
+            std::cout << "Colorblind filter: " << colorblindType << std::endl;
+        }
 
-        Game game(clientPort);
+        Game game(clientPort, colorblindType);
 
         if (!game.initialize()) {
             std::cerr << "Failed to initialize game!" << std::endl;

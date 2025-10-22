@@ -19,13 +19,14 @@
 #include <SDL.h>
 #include <iostream>
 
-Game::Game(uint16_t clientPort)
+Game::Game(uint16_t clientPort, std::string colorblindType)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
     , _isRunning(false)
     , m_clientPort(clientPort)
 {
+    _graphics.setColorblindMode(colorblindType);
 }
 
 Game::~Game()

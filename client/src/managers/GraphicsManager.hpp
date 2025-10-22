@@ -114,6 +114,12 @@ public:
      */
     void setRenderSize(int width, int height);
 
+    /**
+     * @brief Sets the colorblind filter type
+     * @param type The colorblind filter type ("protanopia", "deuteranopia", "tritanopia", or empty for no filter)
+     */
+    void setColorblindMode(std::string type);
+
 private:
     GraphicsManager() = default;
     ~GraphicsManager() = default;
@@ -124,13 +130,22 @@ private:
     void applyScalingOptions();
     void createRenderTarget();
     void destroyRenderTarget();
+    void applyHardwareColorblindFilter();
+    void createColorblindFilterTextures();
+    void destroyColorblindFilterTextures();
 
     SDL_Window* m_window = nullptr;
     SDL_Renderer* m_renderer = nullptr;
     SDL_Texture* m_renderTarget = nullptr;
+    SDL_Texture* m_colorblindFilterTexture = nullptr;
     bool m_initialized = false;
     bool m_useRenderTarget = false;
-    
+    std::string m_colorblindType;
+
+    struct ColorModulation {
+        Uint8 r, g, b;
+    } m_colorModulation = { 255, 255, 255 };
+
     int m_logicalWidth = 0;
     int m_logicalHeight = 0;
     int m_renderWidth = 0;
