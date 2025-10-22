@@ -270,6 +270,49 @@ std::vector<uint32_t> LobbyManager::getLobbyPlayers(uint32_t lobbyId) const
     return it->second->players;
 }
 
+std::unordered_map<uint32_t, std::string> LobbyManager::getLobbyPlayersUsernames(uint32_t lobbyId) const
+{
+    auto it = _lobbies.find(lobbyId);
+    if (it == _lobbies.end()) {
+        return {};
+    }
+    std::unordered_map<uint32_t, std::string> playersUsernames;
+    for (const auto playerId : it->second->players) {
+        if (it->second->_usernames.contains(playerId)) {
+            playersUsernames[playerId] = it->second->_usernames[playerId];
+        } else {
+            playersUsernames[playerId] = std::to_string(playerId);
+        }
+    }
+    return playersUsernames;
+}
+
+Message LobbyManager::initLobbyInfo(const uint32_t lobbyId)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    Message response(MessageType::LOBBY_INFO);
+
+    auto it = _lobbies.find(lobbyId);
+    if (it == _lobbies.end()) {
+        response.write(static_cast<uint32_t>(0));
+        response.write(static_cast<uint32_t>(0));
+        response.write(static_cast<uint8_t>(0));
+        return response;
+    }
+    // Write lobby ID
+    const auto playersUsernames = getLobbyPlayersUsernames(lobbyId);
+    response.write(lobbyId);
+    response.write(static_cast<uint8_t>(it->second->state));
+    response.write(it->second->creatorId);
+    response.write(static_cast<uint8_t>(it->second->players.size()));
+    for (const auto& pair : playersUsernames) {
+        response.write(pair.first);
+        response.write(pair.second);
+    }
+    return response;
+}
+
 void LobbyManager::runLobbyThread(Lobby* lobby)
 {
     // TODO: Refactor

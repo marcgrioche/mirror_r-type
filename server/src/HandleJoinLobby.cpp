@@ -14,12 +14,18 @@ void RTypeServer::handleJoinLobby(const Message& msg, PeerInfo& peerInfo)
 
     bool success = _lobbyManager.joinLobby(lobbyId, msg.player_id);
 
-    Message response(MessageType::LOBBY_INFO);
-    response.sequence_number = msg.sequence_number;
-    response.player_id = msg.player_id;
+    if (!success) {
+        Message response(MessageType::LOBBY_INFO);
+        response.sequence_number = msg.sequence_number;
+        response.player_id = msg.player_id;
 
-    // Write lobby ID (0 if join failed)
-    response.write(success ? lobbyId : static_cast<uint32_t>(0));
+        // Write lobby ID (0 if join failed)
+        response.write(static_cast<uint32_t>(0));
+        response.write(static_cast<uint32_t>(0));
+        response.write(static_cast<uint8_t>(0));
+        sendToClient(msg.player_id, response);
+    }
+    Message successResponse = _lobbyManager.initLobbyInfo(lobbyId);
 
-    sendToClient(msg.player_id, response);
+    broadcastToLobby(lobbyId, successResponse);
 }
