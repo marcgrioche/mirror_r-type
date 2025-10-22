@@ -22,3 +22,8 @@ Client/CMakeFiles/
 Server/CMakeFiles/
 .idea/
 
+# macOS
+.DS_Store
+**/.DS_Store
+
+

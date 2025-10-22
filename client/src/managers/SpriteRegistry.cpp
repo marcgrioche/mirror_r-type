@@ -43,6 +43,16 @@ const std::unordered_map<std::string, SpriteConfig> SpriteRegistry::sprites = {
         }
     },
     {
+        "weapon",
+        {
+            .textureId = "wp1.png",
+            .filePath = "client/res/sprites/weapons/wp1.png",
+            .animated = false,
+            .width = 66.0f,
+            .height = 22.0f
+        }
+    },
+    {
         "platform",
         {
             .textureId = "WallOfFlesh.png",

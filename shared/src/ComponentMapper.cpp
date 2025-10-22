@@ -15,6 +15,7 @@
 #include "../src/ecs/components/PowerUp.hpp"
 #include "../src/ecs/components/Tags.hpp"
 #include "../src/ecs/components/Velocity.hpp"
+#include "../src/ecs/components/WeaponRotation.hpp"
 #include <stdexcept>
 
 ComponentMapper& ComponentMapper::getInstance()
@@ -278,15 +279,31 @@ void initializeComponentMappings()
         [](Entity entity, const Registry& registry) -> PropertyValue {
             (void)entity;
             (void)registry;
-            // This would need access to the usernames map
-            // For now, return empty string - this will be handled specially
             return std::string("");
         },
         [](Entity entity, Registry& registry, const PropertyValue& value) {
             (void)entity;
             (void)registry;
             (void)value;
-            // Usernames are handled by the deserialization context
-            // Not stored as components
+        });
+
+    // Weapon rotation mapping
+    mapper.registerMapping(
+        "weapon_rotation",
+        [](Entity entity, const Registry& registry) -> PropertyValue {
+            if (!registry.has<WeaponRotation>(entity)) {
+                return 0.0f;
+            }
+            const auto& weaponRot = registry.get<WeaponRotation>(entity);
+            return weaponRot.angle;
+        },
+        [](Entity entity, Registry& registry, const PropertyValue& value) {
+            float angle = std::get<float>(value);
+            if (registry.has<WeaponRotation>(entity)) {
+                auto& weaponRot = registry.get<WeaponRotation>(entity);
+                weaponRot.angle = angle;
+            } else {
+                registry.add<WeaponRotation>(entity, WeaponRotation { angle });
+            }
         });
 }

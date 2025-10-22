@@ -106,3 +106,13 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
 
     registry.add<Sprite>(entity, sprite);
 }
+
+void SpriteManager::addWeaponSprite(Registry& registry, Entity entity, float sizeFactor)
+{
+    Sprite sprite = SpriteFactory::createFromRegistry("weapon");
+    
+    sprite.scale = { sizeFactor, sizeFactor };
+    sprite.offset = { 0.0f, 0.0f };
+
+    registry.add<Sprite>(entity, sprite);
+}

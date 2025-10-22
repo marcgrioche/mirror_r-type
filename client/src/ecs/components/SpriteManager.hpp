@@ -50,4 +50,7 @@ void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY
  * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
+
+void addWeaponSprite(Registry& registry, Entity entity, float sizeFactor = 1.0f);
+
 } // namespace SpriteManager

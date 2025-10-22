@@ -19,6 +19,7 @@
 #include "ecs/components/PowerUp.hpp"
 #include "ecs/components/TextBox.hpp"
 #include "ecs/components/Velocity.hpp"
+#include "ecs/components/WeaponRotation.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
@@ -47,7 +48,8 @@ void initializeEntityMetadataRegistration()
             { "health", PropertyType::INT, true },
             { "hitbox", PropertyType::VEC4_FLOAT, true },
             { "player_id", PropertyType::UINT32, true },
-            { "username", PropertyType::STRING, true } },
+            { "username", PropertyType::STRING, true },
+            { "weapon_rotation", PropertyType::FLOAT, false } },
         createPlayerFromData });
     factory.registerFactory(EntityType::PLAYER, createPlayerFromData);
 
