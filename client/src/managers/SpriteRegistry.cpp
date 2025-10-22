@@ -7,9 +7,7 @@
 
 #include "SpriteRegistry.hpp"
 
-// Hardcoded sprite configurations - all in one place!
 const std::unordered_map<std::string, SpriteConfig> SpriteRegistry::sprites = {
-    // Game Entities
     {
         "player",
         {
@@ -55,7 +53,6 @@ const std::unordered_map<std::string, SpriteConfig> SpriteRegistry::sprites = {
         }
     },
 
-    // Parallax Background
     {
         "parallax_top",
         {
@@ -97,7 +94,6 @@ const std::unordered_map<std::string, SpriteConfig> SpriteRegistry::sprites = {
         }
     },
 
-    // UI Elements
     {
         "menu_background",
         {

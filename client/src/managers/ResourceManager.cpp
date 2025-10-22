@@ -19,13 +19,11 @@ SDL_Texture* ResourceManager::loadTexture(SDL_Renderer* renderer, const std::str
 
 SDL_Texture* ResourceManager::getOrLoadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path)
 {
-    // Check if already loaded
     auto it = textures.find(id);
     if (it != textures.end()) {
         return it->second;
     }
 
-    // Load if not found
     return loadTexture(renderer, id, path);
 }
 

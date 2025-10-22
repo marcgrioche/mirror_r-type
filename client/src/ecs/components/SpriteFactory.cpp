@@ -16,7 +16,6 @@ Sprite SpriteFactory::createFromRegistry(const std::string& spriteKey,
 
     if (!config) {
         std::cerr << "Warning: Sprite '" << spriteKey << "' not found in registry" << std::endl;
-        // Return a default sprite
         Sprite sprite;
         sprite.texture_id = spriteKey;
         sprite.size = { 32.0f, 32.0f };
