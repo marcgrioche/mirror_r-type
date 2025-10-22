@@ -112,7 +112,13 @@ void SpriteManager::addWeaponSprite(Registry& registry, Entity entity, float siz
     Sprite sprite = SpriteFactory::createFromRegistry("weapon");
     
     sprite.scale = { sizeFactor, sizeFactor };
-    sprite.offset = { 0.0f, 0.0f };
+    
+    float weaponWidth = sprite.size.x * sizeFactor;
+    float weaponHeight = sprite.size.y * sizeFactor;
+    
+    sprite.offset = { -weaponWidth / 3.0f, -weaponHeight / 2.0f };
+    
+    sprite.rotationCenter = { weaponWidth / 3.0f, weaponHeight / 2.0f };
 
     registry.add<Sprite>(entity, sprite);
 }

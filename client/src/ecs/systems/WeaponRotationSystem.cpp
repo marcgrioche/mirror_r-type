@@ -28,10 +28,6 @@ void updateWeaponRotations(Registry& registry, float mouseX, float mouseY)
             continue;
         }
 
-        if (!registry.has<Sprite>(weaponEntity)) {
-            SpriteManager::addWeaponSprite(registry, weaponEntity, 0.5f);
-        }
-
         const Parent& parent = registry.get<Parent>(weaponEntity);
         Entity parentEntity = parent.parent;
 
@@ -39,21 +35,28 @@ void updateWeaponRotations(Registry& registry, float mouseX, float mouseY)
             continue;
         }
 
-        const Position& parentPos = registry.get<Position>(parentEntity);
-        
-        if (!registry.has<Position>(weaponEntity)) {
-            registry.add<Position>(weaponEntity, Position { parentPos.v.x, parentPos.v.y });
-        } else {
-            Position& weaponPos = registry.get<Position>(weaponEntity);
-            weaponPos.v.x = parentPos.v.x;
-            weaponPos.v.y = parentPos.v.y;
-        }
-
         if (!registry.has<PlayerTag>(parentEntity)) {
             continue;
         }
 
+        if (!registry.has<Sprite>(weaponEntity)) {
+            SpriteManager::addWeaponSprite(registry, weaponEntity, 1.2f);
+        }
+
+        const Position& parentPos = registry.get<Position>(parentEntity);
         const Hitbox& parentHitbox = registry.get<Hitbox>(parentEntity);
+        
+        float centerX = parentPos.v.x + parentHitbox.width / 2.0f;
+        float centerY = parentPos.v.y + parentHitbox.height / 2.0f;
+        
+        if (!registry.has<Position>(weaponEntity)) {
+            registry.add<Position>(weaponEntity, Position { centerX, centerY });
+        } else {
+            Position& weaponPos = registry.get<Position>(weaponEntity);
+            weaponPos.v.x = centerX;
+            weaponPos.v.y = centerY;
+        }
+
         Sprite& weaponSprite = registry.get<Sprite>(weaponEntity);
 
         float weaponCenterX = parentPos.v.x + parentHitbox.width / 2.0f;

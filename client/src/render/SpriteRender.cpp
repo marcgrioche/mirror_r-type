@@ -41,5 +41,13 @@ void drawSprite(GraphicsManager& gfx, Registry& registry, Entity sprite)
         return;
     }
 
-    SDL_RenderCopyEx(renderer, tex, &srcRect, &dstRect, spr.rotation, nullptr, SDL_FLIP_NONE);
+    SDL_Point* center = nullptr;
+    SDL_Point rotCenter;
+    if (spr.rotationCenter.x >= 0.0f && spr.rotationCenter.y >= 0.0f) {
+        rotCenter.x = static_cast<int>(spr.rotationCenter.x);
+        rotCenter.y = static_cast<int>(spr.rotationCenter.y);
+        center = &rotCenter;
+    }
+
+    SDL_RenderCopyEx(renderer, tex, &srcRect, &dstRect, spr.rotation, center, SDL_FLIP_NONE);
 }

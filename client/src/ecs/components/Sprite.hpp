@@ -27,15 +27,14 @@
  * @param elapsed_time Time elapsed since last frame change
  */
 struct Sprite {
-    std::string texture_id; // ID referencing a texture in a texture manager
+    std::string texture_id;
 
-    // Dimensions & Transform
-    Vector2 size;       // Width/height of sprite (or frame if animated)
-    Vector2 scale;      // Independent X/Y scaling
-    Vector2 offset;     // X/Y offset for positioning
-    float rotation = 0.0f; // Rotation in degrees
+    Vector2 size;
+    Vector2 scale;
+    Vector2 offset;
+    float rotation = 0.0f;
+    Vector2 rotationCenter = { -1.0f, -1.0f };
 
-    // Animation
     int total_frames = 1;
     int current_frame = 0;
     float frame_duration = 0.1f;
