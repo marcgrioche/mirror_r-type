@@ -78,7 +78,7 @@ bool handlePlayerAttack(
             Entity spawned;
             if (registry.has<ProjectileTag>(tpl)) {
                 // Get the base speed from the template velocity
-                float baseSpeed = 2000.0f;
+                float baseSpeed = 300.0f;
                 if (registry.has<Velocity>(tpl)) {
                     const Velocity& tplVel = registry.get<Velocity>(tpl);
                     baseSpeed = magnitude(tplVel.v);
