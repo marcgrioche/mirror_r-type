@@ -33,8 +33,7 @@ static void cleanupWinsock()
  */
 
 UdpSocket::UdpSocket(uint16_t port)
-    : _port(port)
-    , _socket(-1)
+    : _socket(-1)
     , _is_open(false)
 {
 #ifdef _WIN32

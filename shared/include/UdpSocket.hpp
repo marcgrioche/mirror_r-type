@@ -78,7 +78,6 @@ public:
     void close();
 
 private:
-    uint16_t _port;
     socket_t _socket;
     bool _is_open;
 };

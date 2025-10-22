@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** mirror_r-type
 ** File description:
-** Game Network Handler - Manages network events and local game updates
+** Game Network Handler - Manages network events
 */
 
 #include "Game.hpp"
@@ -180,32 +180,4 @@ void Game::handleKickPlayerNotice(const Client::NetworkEvent& event)
     // REMOVE PLAYER Entity and remove it from the vector in the m_clientNetwork
     std::cout << "Removing player " << playerId << " from " << lobbyId << std::endl;
     m_lobbyPlayers.erase(playerId);
-}
-
-void Game::processLocalGameUpdates()
-{
-    if (!m_localGameInstance) {
-        return;
-    }
-
-    m_localGameInstance->update();
-    processNewLocalEntities();
-}
-
-void Game::processNewLocalEntities()
-{
-    auto newEntities = m_localGameInstance->getAndClearNewEntities();
-
-    for (const auto& entity : newEntities) {
-        createLocalEntity(entity);
-    }
-}
-
-void Game::createLocalEntity(Entity entity)
-{
-    Message msg = m_localGameInstance->serializeEntitySpawn(entity);
-    if (msg.getPayload().empty()) {
-        return;
-    }
-    deserializeAndCreateEntity(msg, _registry);
 }

@@ -15,6 +15,7 @@ void RTypeClient::handleConnectionAccepted(const Message& t_msg, PeerInfo& t_pee
     if (m_serverInfo.ip_address != t_peerInfo.ip_address || m_serverInfo.port != t_peerInfo.port) {
         m_serverInfo = t_peerInfo;
     }
+    pingRequest();
 }
 
 void RTypeClient::pingRequest()

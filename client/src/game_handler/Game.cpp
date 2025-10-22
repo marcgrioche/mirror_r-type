@@ -6,22 +6,24 @@
 */
 
 #include "Game.hpp"
+#include "../../shared/include/ComponentMapper.hpp"
+#include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "ButtonSystem.hpp"
 #include "Config.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
 #include "ecs/components/ParallaxState.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "systems/EyeSystem.hpp"
+#include "systems/RenderSystem.hpp"
 #include <SDL.h>
 #include <iostream>
 
-Game::Game(bool isLocalMode, uint16_t clientPort)
+Game::Game(uint16_t clientPort)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
-    , m_localGameInstance(nullptr)
     , _isRunning(false)
-    , m_isLocalMode(isLocalMode)
     , m_clientPort(clientPort)
 {
 }
@@ -33,6 +35,9 @@ Game::~Game()
 
 bool Game::initialize()
 {
+    initializeEntityMetadataRegistration();
+    initializeComponentMappings();
+
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
         std::cerr << "Failed to initialize graphics!" << std::endl;
@@ -75,6 +80,40 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
 
+    // LOAD UI
+    if (!resourceManager.loadTexture(renderer, "MenuBackground", "client/res/sprites/UI/Background/menuBackground.png")) {
+        std::cout << "Warning: Failed to load MenuBackground texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "ButtonMouth", "client/res/sprites/UI/tools/buttonAsset.png")) {
+        std::cout << "Warning: Failed to load buttonMouth texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "ButtonEye", "client/res/sprites/UI/tools/buttonParamAsset.png")) {
+        std::cout << "Warning: Failed to load buttonEye texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "zoneText", "client/res/sprites/UI/tools/textBoxAsset.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "eyeOutline", "client/res/sprites/UI/tools/eyeOutline.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil", "client/res/sprites/UI/tools/eyePupil.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyeOutline2", "client/res/sprites/UI/tools/eyeOutline2.png")) {
+        std::cout << "Warning: Failed to load zoneText texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil2", "client/res/sprites/UI/tools/eyePupil2.png")) {
+        std::cout << "Warning: Failed to load eyepupil2 texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "eyeOutline3", "client/res/sprites/UI/tools/eyeOutline3.png")) {
+        std::cout << "Warning: Failed to load eyeoutline3 texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "eyePupil3", "client/res/sprites/UI/tools/eyePupil3.png")) {
+        std::cout << "Warning: Failed to load eyepupil3 texture" << std::endl;
+    }
+
     _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
 
     _timer.start();
@@ -82,27 +121,8 @@ bool Game::initialize()
     _accumulatedTime = 0.0f;
     _isRunning = true;
 
-    initializeGameMode();
+    initializeMenuMode();
     return true;
-}
-
-void Game::initializeGameMode()
-{
-    if (m_isLocalMode) {
-        initializeLocalMode();
-    } else {
-        initializeMenuMode();
-    }
-}
-
-void Game::initializeLocalMode()
-{
-    m_localGameInstance = std::make_unique<GameInstance>(0);
-    m_localGameInstance->initialize();
-    m_localGameInstance->addPlayer(1, "");
-
-    _state = GameState::PLAYING;
-    std::cout << "Local mode initialized - starting gameplay directly" << std::endl;
 }
 
 void Game::initializeMenuMode()
@@ -121,7 +141,7 @@ void Game::run()
     SDL_Event event;
 
     while (_isRunning) {
-        processGameMode();
+        processNetworkEvents();
 
         float deltaTime = _timer.getDeltaTime();
         handleInputEvents(event);
@@ -142,15 +162,6 @@ void Game::run()
     std::cout << "Game loop ended." << std::endl;
 }
 
-void Game::processGameMode()
-{
-    if (m_isLocalMode) {
-        processLocalGameUpdates();
-    } else {
-        processNetworkEvents();
-    }
-}
-
 void Game::handleInputEvents(SDL_Event& event)
 {
     _inputs.beginFrame();
@@ -167,6 +178,7 @@ void Game::runMenuLoop()
     // Traite les événements du nouveau système de menu
     processMenuEvents(); // Utilise la version adaptée
 
+    eyeSystem(_registry, 0);
     // Met à jour et rendu du menu
     m_menu.update(_registry, _timer.getDeltaTime()); // Passe registry et deltaTime
     buttonSystem(_registry);
@@ -188,7 +200,7 @@ void Game::runMenuLoop()
 void Game::runGameLoop(float deltaTime)
 {
     update(deltaTime);
-    render();
+    renderSystem(_registry);
     SDL_Delay(16);
 }
 

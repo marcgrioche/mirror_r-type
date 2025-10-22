@@ -5,10 +5,11 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 6:56:33 PM 2025 jojo
-** Last update Sat Oct 10 3:56:45 PM 2025 jojo
+** Last update Wed Oct 21 2:59:25 PM 2025 jojo
 */
 
 #pragma once
+#include "../BackgroundMenu.hpp"
 #include "Entity.hpp"
 #include "Registry.hpp"
 #include "managers/EventManager.hpp"
@@ -117,6 +118,8 @@ private:
     Entity m_textBoxJoinEntity;
     Entity m_textBoxParamEntity;
     Entity m_ParamButtonEntity;
+    BackgroundMenu m_backgroundMenu;
+
     bool m_visible = false;
     bool m_joinRequested = false;
     bool m_createRequested = false;

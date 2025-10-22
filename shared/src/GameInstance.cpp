@@ -13,6 +13,7 @@ GameInstance::GameInstance(uint32_t lobbyId)
     : _core(lobbyId)
     , _player()
     , _entities()
+    , _level()
 {
 }
 
@@ -21,6 +22,10 @@ void GameInstance::initialize()
     _core.setLost(false);
     _core.setWon(false);
     std::cout << "Initializing game instance for lobby " << _core.getLobbyId() << std::endl;
+
+    _level.loadFromJson("shared/res/levels/level1.json");
+    _entities.setLevel(&_level);
+
     _entities.initializeLevel(_core.getRegistry());
     _core.setLastTickTime(std::chrono::steady_clock::now());
     _core.setRunning(true);
@@ -34,7 +39,7 @@ void GameInstance::update()
 
     auto currentTime = std::chrono::steady_clock::now();
     float deltaTime = std::chrono::duration<float>(currentTime - _core.getLastTickTime()).count();
-    // std::cout << "Delta time: " << deltaTime << std::endl;
+    // std::cout << "Delta time server: " << deltaTime << std::endl;
     _core.setLastTickTime(currentTime);
 
     _accumulatedTime += std::chrono::duration<float>(deltaTime);

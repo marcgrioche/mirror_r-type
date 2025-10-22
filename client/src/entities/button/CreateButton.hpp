@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Sep 29 1:40:18 PM 2025 jojo
-** Last update Tue Sep 29 1:40:29 PM 2025 jojo
+** Last update Fri Oct 16 12:13:38 AM 2025 jojo
 */
 
 #pragma once
@@ -28,5 +28,6 @@ namespace factories {
  * @return The created entity
  */
 Entity createButton(Registry& registry, float x, float y, float width, float height,
-    const std::string& actionId, bool interactable = true);
+    const std::string& actionId, bool interactable = true,
+    const std::string& textureId = "", float xS = 0, float yS = 0, float wS = 0, float hS = 0);
 }

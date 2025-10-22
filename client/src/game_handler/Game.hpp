@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include "../../../shared/include/EntityData.hpp"
+#include "../../../shared/include/EntityFactory.hpp"
+#include "../../../shared/include/EntityType.hpp"
 #include "../../../shared/include/GameInstance.hpp"
 #include "../../../shared/include/Message.hpp"
 #include "../network/RTypeClient.hpp"
@@ -15,6 +18,7 @@
 #include "GameTimer.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/components/Sprite.hpp"
+#include "entities/enemies/CreateEnemy.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/projectile/CreateProjectile.hpp"
@@ -45,10 +49,9 @@ public:
 
     /**
      * @brief Constructs a Game instance
-     * @param isLocalMode Whether to run in local mode (no networking)
      * @param clientPort The port to use for client networking
      */
-    Game(bool isLocalMode = false, uint16_t clientPort = 2020);
+    Game(uint16_t clientPort = 2020);
 
     /**
      * @brief Destructor for Game
@@ -78,11 +81,6 @@ private:
      * @brief Initializes the game for networked multiplayer mode
      */
     void initializeGameMode();
-
-    /**
-     * @brief Initializes the game for local single-player mode
-     */
-    void initializeLocalMode();
 
     /**
      * @brief Initializes the menu system
@@ -121,7 +119,7 @@ private:
      */
     void sendDisconnectMessage();
 
-    // Core update and render
+    // Core update
 
     /**
      * @brief Updates the game state
@@ -130,31 +128,14 @@ private:
     void update(float deltaTime);
 
     /**
-     * @brief Renders the current game state
-     */
-    void render();
-
-    /**
      * @brief Starts the gameplay session
      */
     void startGameplay();
-
-    // Game tick updates
-
-    /**
-     * @brief Updates the game for the current tick
-     */
-    void updateGameTick();
 
     /**
      * @brief Updates the game tick for networked mode
      */
     void updateNetworkGameTick();
-
-    /**
-     * @brief Updates the game tick for local mode
-     */
-    void updateLocalGameTick();
 
     // Menu handling
 
@@ -229,11 +210,6 @@ private:
     void handleUsername(const Client::NetworkEvent& event);
     void handleKickPlayerNotice(const Client::NetworkEvent& event);
 
-    // Local game updates
-    void processLocalGameUpdates();
-    void processNewLocalEntities();
-    void createLocalEntity(Entity entity);
-
     // Entity deserialization
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
     void deserializeAndUpdateGameState(const Message& msg, Registry& registry);
@@ -247,6 +223,7 @@ private:
 
     // Entity creation helpers
     void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY);
+    void attachSpriteToEntity(Registry& registry, Entity entity, EntityType type, const EntityData& data);
     void logUnknownEntityType(uint8_t entityType);
     void logEntityCreation(uint32_t entityId, uint8_t entityType, float posX, float posY);
 
@@ -279,11 +256,9 @@ private:
     InputManager& _inputs;
     Client::NetworkEventQueue m_events;
     std::unique_ptr<Client::RTypeClient> m_clientNetwork;
-    std::unique_ptr<GameInstance> m_localGameInstance;
     std::thread m_networkThread;
 
     bool _isRunning;
-    bool m_isLocalMode;
     bool m_connected = false;
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;

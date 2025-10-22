@@ -16,8 +16,6 @@
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "ecs/systems/RigidBodySystem.hpp"
-#include "entities/player/HandlePlayerInputs.hpp"
-#include "entities/weapons/HandleWeaponInputs.hpp"
 #include "systems/RenderSystem.hpp"
 #include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
@@ -29,21 +27,12 @@ void Game::update(float deltaTime)
 {
     _accumulatedTime += deltaTime;
 
+    // std::cout << "Delta time client: " << deltaTime << std::endl;
     while (_accumulatedTime >= TICK_DURATION) {
-        updateGameTick();
+        updateNetworkGameTick();
+        buttonSystem(_registry);
         _accumulatedTime -= TICK_DURATION;
     }
-}
-
-void Game::updateGameTick()
-{
-    if (!m_isLocalMode) {
-        updateNetworkGameTick();
-    } else {
-        updateLocalGameTick();
-    }
-
-    buttonSystem(_registry);
 }
 
 void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
@@ -51,6 +40,8 @@ void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
     const auto clientId = m_clientNetwork->getPlayerId();
     const auto playerEntity = findEntityByClientId(_registry, clientId);
 
+    if (inputs.empty())
+        return;
     std::vector<Entity> newEntities = {};
     PlayerInputProcessor::processInput(
         _registry,
@@ -58,7 +49,7 @@ void Game::processLocalInputs(std::vector<std::pair<GameInput, bool>>& inputs)
         m_clientNetwork->getCurrentTick(),
         inputs,
         newEntities,
-        100,
+        clientId,
         true);
 }
 
@@ -73,7 +64,7 @@ void Game::updatePlayerSprite(Registry& registry, const Entity entity, const flo
 
 void Game::updateSystemsComponents()
 {
-    const auto playerEntity = findEntityByClientId(_registry, 100);
+    const auto playerEntity = findEntityByClientId(_registry, m_clientNetwork->getPlayerId());
     if (playerEntity.id == 0 && playerEntity.version == 0)
         return;
     auto& dash = _registry.get<Dash>(playerEntity);
@@ -82,40 +73,30 @@ void Game::updateSystemsComponents()
 
     changeDashComponentProperties(dash, velocity, rigidBody, TICK_DURATION);
     changeRigidBodyComponentProperties(rigidBody, velocity, TICK_DURATION, true);
-    GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
+    // GameInstancePhysics::checkCollisions(_registry, TICK_DURATION);
 }
 
 void Game::updateNetworkGameTick()
 {
-    movementSystem(_registry, TICK_DURATION);
-    spriteAnimationSystem(_registry, TICK_DURATION);
     auto currentInputs = getCurrentInputs();
+    const auto clientId = m_clientNetwork->getPlayerId();
+    const auto playerEntity = findEntityByClientId(_registry, clientId);
 
     m_clientNetwork->sendCurrentInputState(currentInputs);
     m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
     m_clientNetwork->incrementTick();
+    if (m_clientNetwork->getCurrentTick() % 100 == 0)
+        m_clientNetwork->pingRequest();
     processLocalInputs(currentInputs);
+    GameInstancePhysics::updatePreviousPositions(_registry);
     updateSystemsComponents();
-}
-
-void Game::updateLocalGameTick()
-{
-    handlePlayerInputs(_inputs, _registry);
-    handleWeaponInputs(_inputs, _registry);
-    rigidBodySystem(_registry, TICK_DURATION);
     movementSystem(_registry, TICK_DURATION);
-    projectileSystem(_registry, TICK_DURATION);
-    collisionSystem(_registry, TICK_DURATION);
-    collisionPlayerPowerUpSystem(_registry, TICK_DURATION);
-    powerUpEffectSystem(_registry, TICK_DURATION);
-    healthSystem(_registry);
-    powerUpSystem(_registry, TICK_DURATION);
+    if (_registry.has<Position>(playerEntity)) {
+        const auto& pos = _registry.get<Position>(playerEntity);
+        updatePlayerSprite(_registry, playerEntity, pos.v.x, pos.v.y);
+    }
     spriteAnimationSystem(_registry, TICK_DURATION);
-}
-
-void Game::render()
-{
-    renderSystem(_registry);
+    collisionSystem(_registry, TICK_DURATION);
 }
 
 void Game::startGameplay()

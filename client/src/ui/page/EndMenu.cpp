@@ -5,14 +5,17 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 8 1:41:51 PM 2025 jojo
-** Last update Thu Oct 8 2:15:49 PM 2025 jojo
+** Last update Thu Oct 15 11:12:42 PM 2025 jojo
 */
 
 #include "EndMenu.hpp"
+#include "Config.hpp"
+#include "components/Sprite.hpp"
+#include "components/SpriteFactory.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
-#include "Config.hpp"
+#include "render/SpriteRender.hpp"
 #include <iostream>
 
 EndMenuPage::EndMenuPage()
@@ -57,6 +60,19 @@ void EndMenuPage::createEntities(Registry& registry)
 
     m_textBoxReturnEntity = factories::createTextBox(registry,
         "RETURN", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+
+    Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
+        0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
+
+    bg.dstRect = { 0, 0, SCREEN_WIDTH, SCREEN_WIDTH };
+    if (bg.frame_width > 0 && bg.frame_height > 0) {
+        bg.scale_x = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
+        bg.scale_y = static_cast<float>(SCREEN_WIDTH) / bg.frame_width;
+    }
+
+    m_backgroundEntity = registry.create_entity();
+    registry.emplace<Position>(m_backgroundEntity, 0.0f, 0.0f);
+    registry.add<Sprite>(m_backgroundEntity, bg);
 }
 
 void EndMenuPage::destroyEntities(Registry& registry)
@@ -64,6 +80,7 @@ void EndMenuPage::destroyEntities(Registry& registry)
     registry.kill_entity(m_textBoxStateEntity);
     registry.kill_entity(m_textBoxReturnEntity);
     registry.kill_entity(m_returnButtonEntity);
+    registry.kill_entity(m_backgroundEntity);
 }
 
 void EndMenuPage::setupEventHandlers()
@@ -114,6 +131,7 @@ void EndMenuPage::render(GraphicsManager& gfx, Registry& registry)
     SDL_RenderDrawRect(renderer, &menuBox);
 
     // Rendu des composants
+    drawSprite(gfx, registry, m_backgroundEntity);
     drawTextBox(gfx, registry, m_textBoxStateEntity);
     drawButton(gfx, registry, m_returnButtonEntity);
     drawTextBox(gfx, registry, m_textBoxReturnEntity);

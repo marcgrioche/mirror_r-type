@@ -21,12 +21,6 @@ public:
     ~ProgramArguments() = default;
 
     /**
-     * @brief Checks if the program is running in local mode
-     * @return True if local mode is enabled, false otherwise
-     */
-    bool isLocalMode() const;
-
-    /**
      * @brief Gets the port number from command line arguments
      * @return The port number
      */
@@ -34,5 +28,4 @@ public:
 
 private:
     std::vector<std::string> m_arguments;
-    int m_argc;
 };

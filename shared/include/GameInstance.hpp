@@ -8,6 +8,7 @@
 #include "game_instance/GameInstancePhysics.hpp"
 #include "game_instance/GameInstancePlayer.hpp"
 #include "game_instance/GameInstanceSerialization.hpp"
+#include "levels/Level.hpp"
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -154,6 +155,7 @@ private:
     GameInstanceCore _core;
     GameInstancePlayer _player;
     GameInstanceEntities _entities;
+    Level _level;
     std::chrono::duration<float> _accumulatedTime { 0.0f };
 
     void updateTick();

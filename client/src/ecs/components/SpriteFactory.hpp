@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include "ResourceManager.hpp"
 #include "Sprite.hpp"
 #include <string>
 

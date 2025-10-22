@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../../src/ecs/Registry.hpp"
 #include "../../src/ecs/Entity.hpp"
+#include "../../src/ecs/Registry.hpp"
+#include "../../src/levels/Level.hpp"
 #include <chrono>
 #include <cstdint>
 #include <vector>
@@ -15,6 +16,12 @@ public:
      * @brief Constructs entity manager
      */
     GameInstanceEntities() = default;
+
+    /**
+     * @brief Sets the current level configuration
+     * @param level The level configuration to use
+     */
+    void setLevel(const Level* level) { _currentLevel = level; }
 
     /**
      * @brief Initializes the level with entities
@@ -79,4 +86,5 @@ private:
     int _platformsToAdd = 0;
     std::chrono::steady_clock::time_point _lastPowerUpSpawnTime;
     static constexpr float POWER_UP_SPAWN_INTERVAL = 30.0f;
+    const Level* _currentLevel = nullptr;
 };

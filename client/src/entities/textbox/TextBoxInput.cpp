@@ -5,12 +5,14 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 7 2:31:26 PM 2025 jojo
-** Last update Thu Oct 8 2:36:46 PM 2025 jojo
+** Last update Tue Oct 20 7:00:19 PM 2025 jojo
 */
 
 #include "TextBoxInput.hpp"
 #include "Hitbox.hpp"
 #include "Position.hpp"
+#include "components/Sprite.hpp"
+#include "components/SpriteFactory.hpp"
 #include "components/TextBox.hpp"
 #include "components/TextBoxInput.hpp"
 
@@ -27,11 +29,11 @@ Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
     // Hitbox pour détection clic (estimation basée sur taille)
     float estimatedWidth = fontSize * 15; // largeur fixe raisonnable
     float estimatedHeight = fontSize * 1.5f;
-    registry.emplace<Hitbox>(inputBox, estimatedWidth, estimatedHeight, 0.0f, 0.0f);
+    // registry.emplace<Hitbox>(inputBox, estimatedWidth, estimatedHeight, 0.0f, 0.0f);
 
     // TextBox pour l'affichage
     registry.emplace<TextBox>(inputBox, placeholder, fontSize, color,
-        "client/res/fonts/OpenSans-Medium.ttf", true, TextBox::Alignment::LEFT);
+        "client/res/fonts/OpenSans-Medium.ttf", true, TextBox::Alignment::CENTER);
 
     // Component input
     registry.emplace<TextBoxInput>(
@@ -40,13 +42,14 @@ Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
         placeholder,
         false,
         true,
-        static_cast<size_t>(100),
+        static_cast<size_t>(20),
         static_cast<size_t>(0),
         0.0f,
         true,
         color,
-        color
-    );
+        color);
+
+    registry.emplace<Hitbox>(inputBox, estimatedWidth, estimatedHeight, 0.0f, 0.0f);
 
     return inputBox;
 }

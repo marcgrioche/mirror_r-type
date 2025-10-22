@@ -165,10 +165,21 @@ public:
     void incrementTick() { m_currentTick++; }
 
     /**
+     * @brief reset the current tick counter
+     */
+    void resetTick() { m_currentTick = 0; }
+
+    /**
      * @brief Gets the player's ID
      * @return The player's unique identifier
      */
     uint32_t getPlayerId() const { return m_playerId; }
+
+    /**
+     * @brief Gets the ping time
+     * @return The ping time in milliseconds
+     */
+    uint64_t getPingTimestamp() const { return m_ping; }
 
     /**
      * @brief Kicks a player from a lobby
