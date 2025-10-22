@@ -16,7 +16,7 @@ void GameInstancePlayer::addPlayer(Registry& registry, uint32_t playerId, const 
     std::vector<Entity>& newEntities)
 {
     std::cout << "Adding player " << playerId << " to game instance with username: " << username << std::endl;
-    Entity playerEntity = factories::createPlayer(registry);
+    Entity playerEntity = factories::createPlayer(registry, username);
     _playerEntities[playerId] = playerEntity;
     newEntities.push_back(playerEntity);
     _usernames[playerEntity.id] = username;
@@ -33,8 +33,9 @@ void GameInstancePlayer::removePlayer(Registry& registry, uint32_t playerId)
 }
 
 bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerId, uint32_t tick,
-    const std::vector<std::pair<GameInput, bool>>& inputs,
-    std::vector<Entity>& newEntities)
+                                            const std::vector<std::pair<GameInput, bool>>& inputs,
+                                            std::vector<Entity>& newEntities,
+                                            float mouseX, float mouseY)
 {
     auto it = _playerEntities.find(playerId);
     if (it == _playerEntities.end())
@@ -42,14 +43,17 @@ bool GameInstancePlayer::processPlayerInput(Registry& registry, uint32_t playerI
 
     Entity playerEntity = it->second;
 
-    // Pass resolved arguments to the new function
+    // Pass to the refactored function including mouse coordinates
     return PlayerInputProcessor::processInput(
         registry,
         playerEntity,
         tick,
         inputs,
         newEntities,
-        playerId);
+        playerId,
+        false,
+        mouseX,
+        mouseY);
 }
 
 uint32_t GameInstancePlayer::findPlayerIdByEntity(const Entity& entity) const

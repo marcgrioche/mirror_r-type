@@ -21,6 +21,8 @@ struct PlayerInput {
     uint32_t playerId;
     uint32_t tick;
     std::vector<std::pair<GameInput, bool>> inputs;
+    float mouseX = 0.0f;
+    float mouseY = 0.0f;
 };
 
 struct Lobby {
