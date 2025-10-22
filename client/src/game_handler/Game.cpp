@@ -64,19 +64,19 @@ bool Game::initialize()
     }
 
     // Load parallax background textures
-    if (!resourceManager.loadTexture(renderer, "TopLayer.png", "client/res/sprites/ParallaxBackground/TopLayer.png")) {
+    if (!resourceManager.loadTexture(renderer, "TopLayer.png", "client/res/sprites/Heads_Boss/ParallaxBackground/TopLayer.png")) {
         std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "Light.png", "client/res/sprites/ParallaxBackground/Light.png")) {
+    if (!resourceManager.loadTexture(renderer, "Light.png", "client/res/sprites/Heads_Boss/ParallaxBackground/Light.png")) {
         std::cout << "Warning: Failed to load Light texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", "client/res/sprites/ParallaxBackground/MiddleLayer.png")) {
+    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", "client/res/sprites/Heads_Boss/ParallaxBackground/MiddleLayer.png")) {
         std::cout << "Warning: Failed to load MiddleLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "DownLayer.png", "client/res/sprites/ParallaxBackground/DownLayer.png")) {
+    if (!resourceManager.loadTexture(renderer, "DownLayer.png", "client/res/sprites/Heads_Boss/ParallaxBackground/DownLayer.png")) {
         std::cout << "Warning: Failed to load DownLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "Sky.png", "client/res/sprites/ParallaxBackground/Sky.png")) {
+    if (!resourceManager.loadTexture(renderer, "Sky.png", "client/res/sprites/Heads_Boss/ParallaxBackground/Sky.png")) {
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
 
