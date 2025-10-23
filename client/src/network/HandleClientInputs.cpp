@@ -84,3 +84,25 @@ void RTypeClient::sendCurrentInputState(const std::vector<std::pair<GameInput, b
 
     sendMessage(msg);
 }
+
+void RTypeClient::sendCurrentInputStateWithMouse(const std::vector<std::pair<GameInput, bool>>& inputs, float mouseX, float mouseY)
+{
+    if (inputs.empty() || !m_isConnected) {
+        return;
+    }
+
+    Message msg(MessageType::INPUT);
+    msg.write(static_cast<uint32_t>(getCurrentTick()));
+    msg.write(static_cast<uint8_t>(inputs.size()));
+
+    for (const auto& [input, state] : inputs) {
+        msg.write(static_cast<uint8_t>(input));
+        msg.write(static_cast<uint8_t>(state ? 1 : 0));
+    }
+
+    // Append mouse coordinates at the end
+    msg.write(mouseX);
+    msg.write(mouseY);
+
+    sendMessage(msg);
+}

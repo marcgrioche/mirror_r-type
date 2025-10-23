@@ -24,24 +24,27 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 
 ## 3. Message Types
 
-| Name          | Value | Direction         | Description                       |
-|---------------|-------|-------------------|-----------------------------------|
-| CONNECT       | 1     | Client → Server   | Request connection                |
-| INPUT         | 2     | Client → Server   | Player input                      |
-| PING          | 3     | Client → Server   | Keepalive                         |
-| DISCONNECT    | 4     | Client → Server   | Disconnect request                |
-| CREATE_LOBBY  | 5     | Client → Server   | Create a new game lobby           |
-| JOIN_LOBBY    | 6     | Client → Server   | Join an existing lobby            |
-| START_GAME    | 7     | Client → Server   | Start game in lobby               |
-| LOBBY_STATE   | 8     | Client → Server   | Request lobby information         |
-| SET_USERNAME  | 9     | Client → Server   | Set or update player username     |
-| CONNECT_ACK   | 101   | Server → Client   | Connection accepted               |
-| GAME_STATE    | 102   | Server → Client   | Game state update                 |
-| PONG          | 103   | Server → Client   | Keepalive response                |
-| LOBBY_INFO    | 104   | Server → Client   | Lobby creation/join info          |
-| SPAWN_ENTITY  | 105   | Server → Client   | Spawn game entity                 |
-| ROLLBACK      | 106   | Server → Client   | Rollback game state               |
-| USERNAME_ACK  | 107   | Server → Client   | Username set/updated confirmation |
+| Name         | Value | Direction         | Description                               |
+|--------------|-------|-------------------|-------------------------------------------|
+| CONNECT      | 1     | Client → Server   | Request connection                        |
+| INPUT        | 2     | Client → Server   | Player input                              |
+| PING         | 3     | Client → Server   | Keepalive                                 |
+| DISCONNECT   | 4     | Client → Server   | Disconnect request                        |
+| CREATE_LOBBY | 5     | Client → Server   | Create a new game lobby                   |
+| JOIN_LOBBY   | 6     | Client → Server   | Join an existing lobby                    |
+| START_GAME   | 7     | Client → Server   | Start game in lobby                       |
+| LOBBY_STATE  | 8     | Client → Server   | Request lobby information                 |
+| SET_USERNAME | 9     | Client → Server   | Set or update player username             |
+| KICK_PLAYER  | 10    | Client → Server   | Player: kick player from lobby            |
+| CONNECT_ACK  | 101   | Server → Client   | Connection accepted                       |
+| GAME_STATE   | 102   | Server → Client   | Game state update                         |
+| PONG         | 103   | Server → Client   | Keepalive response                        |
+| LOBBY_INFO   | 104   | Server → Client   | Lobby creation/join info                  |
+| SPAWN_ENTITY | 105   | Server → Client   | Spawn game entity                         |
+| ROLLBACK     | 106   | Server → Client   | Rollback game state                       |
+| USERNAME_ACK | 107   | Server → Client   | Username set/updated confirmation         |
+| KICK_ACK     | 108   | Server → Client   | Acknowledge kick request                  |
+| KICK_NOTICE  | 109   | Server → Client   | Notification sent to players in the lobby |
 
 ## 4. Encoding Rules
 
@@ -110,6 +113,20 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - **Payload**:
   - uint32: Lobby ID (0 = not in lobby or operation failed)
   - uint8: Lobby state (0=WAITING, 1=RUNNING, 2=FINISHED)
+  - uint32: Owner Player ID
+  - uint8: Number of players (N)
+  - For i in 0..N-1:
+    - uint32: Player ID
+    - uint8: Username length (L)
+    - bytes[L]: Username (UTF-8)
+
+### KICK_PLAYER
+- **Direction**: Client → Server
+- **When to use**: Sent by the lobby owner to request removal of a player.
+- **Payload**:
+  - uint32: Lobby ID
+  - uint32: Target Player ID (the player to remove)
+- **Response**: server MUST send KICK_ACK in response.
 
 ### SPAWN_ENTITY
 - **Direction**: Server → Client
@@ -160,6 +177,24 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - **Direction**: Server → Client
 - **Payload**:
   - uint8: State of the request (0 = rejected, 1 = accepted)
+
+### KICK_ACK
+- **Direction**: Server → Client (owner/requester)
+- **When to use**: Acknowledge the KICK_PLAYER request and indicate success or failure.
+- **Payload**:
+  - uint32: Lobby ID
+  - uint32: Target Player ID
+  - uint8: Status (0 = failure, 1 = success)
+- Notes:
+  - On success, server also sends KICK_NOTICE to all players in the lobby.
+
+### KICK_NOTICE
+- **Direction**: Server → Client (kicked player)
+- **When to use**: Notify the players including the kicked player they were removed.
+- **Payload**:
+  - uint32: Lobby ID
+  - uint32: Kicked Player ID
+  - uint32: Requester Player ID (the owner who issued the kick)
 
 
 ## 8. Example Packet (CONNECT)

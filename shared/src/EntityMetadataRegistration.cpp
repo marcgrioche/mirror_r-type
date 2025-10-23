@@ -117,11 +117,13 @@ Entity createPlayerFromData(Registry& registry, const EntityData& data)
     std::string username = data.get<std::string>("username");
     auto player_id = data.get<uint32_t>("player_id");
 
-    return factories::createPlayer(registry,
+    return factories::createPlayer(
+        registry,
+        username,
         Position { position.x, position.y },
         Health { health },
         Hitbox { hitbox[0], hitbox[1], hitbox[2], hitbox[3] },
-        TextBox { username, 12 }, player_id);
+        player_id);
 }
 
 Entity createProjectileFromData(class Registry& registry, const class EntityData& data)

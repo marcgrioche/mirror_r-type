@@ -13,6 +13,8 @@ bool processInput(
     const std::vector<std::pair<GameInput, bool>>& inputs,
     std::vector<Entity>& newEntities,
     uint32_t playerId,
-    bool isClient = false);
+    bool isClient = false,
+    float mouseX = 0.0f,
+    float mouseY = 0.0f);
 
 }

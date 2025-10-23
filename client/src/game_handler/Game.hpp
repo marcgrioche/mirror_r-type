@@ -209,6 +209,7 @@ private:
     void handleGameEndWin();
     void handleGameEndLose();
     void handleUsername(const Client::NetworkEvent& event);
+    void handleKickPlayerNotice(const Client::NetworkEvent& event);
 
     // Entity deserialization
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
@@ -263,6 +264,8 @@ private:
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
     InputHistory m_inputHistory;
+    uint32_t m_lobbyOwnerId = 0;
+    std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;

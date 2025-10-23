@@ -18,6 +18,7 @@
 #include "components/ProjectileType.hpp"
 #include "components/Tags.hpp"
 #include "components/Velocity.hpp"
+#include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -27,8 +28,10 @@ bool handlePlayerAttack(
     Registry& registry,
     Entity playerEntity,
     uint32_t playerId,
-    std::vector<Entity>& newEntitiesThisTick)
-{
+    std::vector<Entity>& newEntitiesThisTick,
+    float mouseX,
+    float mouseY)
+{   
     auto weaponView = registry.view<WeaponTag, Frequency, Parent, Damage>();
 
     for (auto weaponIt = weaponView.begin(); weaponIt != weaponView.end(); ++weaponIt) {
@@ -56,15 +59,32 @@ bool handlePlayerAttack(
             return false;
         }
         const Position& playerPos = registry.get<Position>(playerEntity);
+        const Hitbox& playerHitbox = registry.get<Hitbox>(playerEntity);
+        
+        Vector2 playerCenter = {
+            playerPos.v.x + playerHitbox.width / 2,
+            playerPos.v.y + playerHitbox.height / 2
+        };
+        
+        Vector2 mousePos = { mouseX, mouseY };
+        Vector2 shootDirection = direction(playerCenter, mousePos);
+        
         // If the weapon has a ProjectileType, add this entity type in the registry
         if (registry.has<ProjectileType>(weaponIt.entity())) {
             const Entity tpl = registry.get<ProjectileType>(weaponIt.entity()).entity;
-            const Position spawnPos { playerPos.v.x + registry.get<Hitbox>(playerEntity).width / 2, playerPos.v.y + registry.get<Hitbox>(playerEntity).height / 2 - registry.get<Hitbox>(tpl).height / 2 };
+            const Position spawnPos { playerPos.v.x + playerHitbox.width / 2, playerPos.v.y + playerHitbox.height / 2 - registry.get<Hitbox>(tpl).height / 2 };
             const Parent spawnParent { weaponIt.entity() };
 
             Entity spawned;
             if (registry.has<ProjectileTag>(tpl)) {
-                Velocity vel = registry.has<Velocity>(tpl) ? Velocity { registry.get<Velocity>(tpl).v.x, registry.get<Velocity>(tpl).v.y } : Velocity { { 300.0f, 0.0f } };
+                // Get the base speed from the template velocity
+                float baseSpeed = 300.0f;
+                if (registry.has<Velocity>(tpl)) {
+                    const Velocity& tplVel = registry.get<Velocity>(tpl);
+                    baseSpeed = magnitude(tplVel.v);
+                }
+                
+                Velocity vel = { shootDirection * baseSpeed };
                 Hitbox hit = registry.has<Hitbox>(tpl) ? registry.get<Hitbox>(tpl) : Hitbox { 32.0f, 32.0f, 0.0f, 0.0f };
                 Damage projDmg = registry.has<Damage>(tpl) ? registry.get<Damage>(tpl) : Damage { damage.value };
                 Lifetime life = registry.has<Lifetime>(tpl) ? registry.get<Lifetime>(tpl) : Lifetime { 30.0f };
@@ -76,10 +96,11 @@ bool handlePlayerAttack(
                 spawned = factories::createEnemy(registry, spawnPos, hp, hit, vel);
                 registry.emplace<Parent>(spawned, spawnParent);
             } else {
+                Velocity vel = { shootDirection * 300.0f };
                 spawned = factories::createProjectile(
                     registry,
                     spawnPos,
-                    Velocity { 300.0f, 0.0f },
+                    vel,
                     Damage { damage.value },
                     Hitbox { 32.0f, 32.0f, 0.0f, 0.0f },
                     spawnParent,

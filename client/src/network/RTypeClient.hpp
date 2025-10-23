@@ -154,6 +154,14 @@ public:
     void sendCurrentInputState(const std::vector<std::pair<GameInput, bool>>& inputs);
 
     /**
+     * @brief Sends the current input state with mouse position to the server
+     * @param inputs Vector of input pairs (GameInput, isPressed)
+     * @param mouseX Mouse X coordinate
+     * @param mouseY Mouse Y coordinate
+     */
+    void sendCurrentInputStateWithMouse(const std::vector<std::pair<GameInput, bool>>& inputs, float mouseX, float mouseY);
+
+    /**
      * @brief Gets the current game tick
      * @return The current tick number
      */
@@ -181,6 +189,12 @@ public:
      */
     uint64_t getPingTimestamp() const { return m_ping; }
 
+    /**
+     * @brief Kicks a player from a lobby
+     * @param t_playerId the id of the player to kick
+     */
+    void kickPlayerFromLobby(uint32_t t_playerId);
+
 private:
     void registerHandlers() override;
     uint16_t m_port;
@@ -206,5 +220,7 @@ private:
     void handleGameEndWin(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleGameEndLose(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleUsernameRequestState(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleKickPlayerAck(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleKickPlayerNotice(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

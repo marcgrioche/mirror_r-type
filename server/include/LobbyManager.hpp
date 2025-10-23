@@ -21,6 +21,8 @@ struct PlayerInput {
     uint32_t playerId;
     uint32_t tick;
     std::vector<std::pair<GameInput, bool>> inputs;
+    float mouseX = 0.0f;
+    float mouseY = 0.0f;
 };
 
 struct Lobby {
@@ -124,6 +126,20 @@ public:
      * @return List of player IDs in the lobby
      */
     std::vector<uint32_t> getLobbyPlayers(uint32_t lobbyId) const;
+
+    /**
+     * @brief Gets the players in a lobby (thread-safe)
+     * @param lobbyId ID of the lobby
+     * @return List of player IDs and their corresponding username in the lobby
+     */
+    std::unordered_map<uint32_t, std::string> getLobbyPlayersUsernames(uint32_t lobbyId) const;
+
+    /**
+     * @brief Initialises the lobby information
+     * @param lobbyId the lobby id to get the information
+     * @return message layout with the lobby information
+     */
+    Message initLobbyInfo(uint32_t lobbyId);
 
     /**
      * @brief Adds a username for a player

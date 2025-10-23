@@ -21,13 +21,17 @@ namespace WeaponSystem {
  * @param playerEntity The player entity attempting to shoot
  * @param playerId The player's network ID for projectile ownership tracking
  * @param newEntitiesThisTick Vector to track newly created entities for network synchronization
+ * @param mouseX Mouse X coordinate for aiming (optional, default 0)
+ * @param mouseY Mouse Y coordinate for aiming (optional, default 0)
  * @return true if a projectile was created, false otherwise
  */
 bool handlePlayerAttack(
     Registry& registry,
     Entity playerEntity,
     uint32_t playerId,
-    std::vector<Entity>& newEntitiesThisTick);
+    std::vector<Entity>& newEntitiesThisTick,
+    float mouseX = 0.0f,
+    float mouseY = 0.0f);
 
 /**
  * Handle automatic enemy weapon attacks.

@@ -9,12 +9,7 @@ void RTypeServer::handleCreateLobby(const Message& msg, PeerInfo& peerInfo)
 
     uint32_t lobbyId = _lobbyManager.createLobby(msg.player_id);
 
-    Message response(MessageType::LOBBY_INFO);
-    response.sequence_number = msg.sequence_number;
-    response.player_id = msg.player_id;
-
-    // Write lobby ID
-    response.write(lobbyId);
+    Message response = _lobbyManager.initLobbyInfo(lobbyId);
 
     sendToClient(msg.player_id, response);
 }

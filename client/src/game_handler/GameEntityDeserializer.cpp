@@ -59,12 +59,14 @@ void Game::createPlayerFromMessage(const Message& msg, Registry& registry,
     // Extract the actual username
     std::string username = msg.readString(usernameLength);
 
-    Entity entity = factories::createPlayer(registry,
+    Entity entity = factories::createPlayer(
+        registry,
+        username,
         Position { posX, posY },
         Health { static_cast<int>(healthValue) },
         Hitbox { width, height, offsetX, offsetY },
-        TextBox { username, 12 },
         serverPlayerId);
+
     if (serverPlayerId == m_clientNetwork->getPlayerId()) {
         m_clientNetwork->resetTick();
     }
