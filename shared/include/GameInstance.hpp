@@ -33,8 +33,9 @@ public:
     /**
      * @brief Constructs a GameInstance for the specified lobby
      * @param lobbyId The ID of the lobby this game instance belongs to
+     * @param level The level number to load
      */
-    explicit GameInstance(uint32_t lobbyId);
+    explicit GameInstance(uint32_t lobbyId, int level);
 
     /**
      * @brief Destroys the GameInstance
@@ -161,6 +162,7 @@ private:
     GameInstancePlayer _player;
     GameInstanceEntities _entities;
     Level _level;
+    int _levelNumber;
     std::chrono::duration<float> _accumulatedTime { 0.0f };
 
     void updateTick();

@@ -23,7 +23,7 @@
     "projectileHeight": 32.0
   },
   "boss": {
-    "health": 200,
+    "health": 20,
     "width": 400.0,
     "height": 800.0,
     "shootFrequency": 5,

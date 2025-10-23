@@ -9,11 +9,12 @@
 #include "ecs/systems/WeaponSystem.hpp"
 #include <iostream>
 
-GameInstance::GameInstance(uint32_t lobbyId)
+GameInstance::GameInstance(uint32_t lobbyId, int level)
     : _core(lobbyId)
     , _player()
     , _entities()
     , _level()
+    , _levelNumber(level)
 {
 }
 
@@ -21,9 +22,10 @@ void GameInstance::initialize()
 {
     _core.setLost(false);
     _core.setWon(false);
-    std::cout << "Initializing game instance for lobby " << _core.getLobbyId() << std::endl;
+    std::cout << "Initializing game instance for lobby " << _core.getLobbyId() << " with level " << _levelNumber << std::endl;
 
-    _level.loadFromJson("shared/res/levels/level2.json");
+    std::string levelPath = "shared/res/levels/level" + std::to_string(_levelNumber) + ".json";
+    _level.loadFromJson(levelPath);
     _entities.setLevel(&_level);
 
     _entities.initializeLevel(_core.getRegistry());
