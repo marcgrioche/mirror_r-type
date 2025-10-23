@@ -41,8 +41,10 @@ public:
      * @brief Activates the menu system and shows the specified page
      * @param registry The ECS registry to use for entity management
      * @param page The initial page to display (default: HOME)
+     * @param currentLevel The player's current level (used for WIN/LOSE pages)
+     * @param maxLevel The maximum available level (used for WIN/LOSE pages)
      */
-    void activate(Registry& registry, Page page = Page::HOME);
+    void activate(Registry& registry, Page page = Page::HOME, uint32_t currentLevel = 1, uint32_t maxLevel = 1);
 
     /**
      * @brief Deactivates the menu system and hides all pages
@@ -108,26 +110,35 @@ public:
     /**
      * @brief Shows the victory page
      * @param registry The ECS registry to use for entity management
+     * @param currentLevel The player's current level after winning
+     * @param maxLevel The maximum available level
      */
-    void showWinPage(Registry& registry);
+    void showWinPage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Shows the defeat page
      * @param registry The ECS registry to use for entity management
+     * @param currentLevel The player's current level after losing
+     * @param maxLevel The maximum available level
      */
-    void showLosePage(Registry& registry);
+    void showLosePage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Shows the lobby page
      * @param registry The ECS registry to use for entity management
+     * @param lobbyId The lobby ID to display
+     * @param currentLevel The player's current level
+     * @param maxLevel The maximum available level
      */
-    void showLobbyPage(Registry& registry, int lobbyId);
+    void showLobbyPage(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Shows the lobby page after a game has ended
      * @param registry The ECS registry to use for entity management
+     * @param currentLevel The player's current level
+     * @param maxLevel The maximum available level
      */
-    void showLobbyPageAfterGame(Registry& registry);
+    void showLobbyPageAfterGame(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     // Récupération des données saisies
 
@@ -208,6 +219,8 @@ public:
 private:
     bool m_active = false;
     Page m_currentPage = Page::HOME;
+    uint32_t m_currentLevel = 1;
+    uint32_t m_maxLevel = 1;
 
     // Pages modulaires
     HomeMenu m_homePage;

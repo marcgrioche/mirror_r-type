@@ -135,18 +135,17 @@ void Game::handleGameEndWin()
 {
     std::cout << "Game ended - You won!" << std::endl;
     m_currentLevel++;
-    if (m_currentLevel >= m_maxLevel) {
+    if (m_currentLevel > m_maxLevel) {
         m_currentLevel = 1;
     }
-    printf("DEBUG - Current Level: %u / Max Level: %u\n", m_currentLevel, m_maxLevel);
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
-        m_menu.showWinPage(_registry);
+        m_menu.showWinPage(_registry, m_currentLevel, m_maxLevel);
     } else {
         // Réactive le menu pour afficher la page Win
         _state = GameState::MENU;
-        m_menu.activate(_registry, Menu::Page::WIN);
+        m_menu.activate(_registry, Menu::Page::WIN, m_currentLevel, m_maxLevel);
     }
 }
 
@@ -157,11 +156,11 @@ void Game::handleGameEndLose()
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
-        m_menu.showLosePage(_registry);
+        m_menu.showLosePage(_registry, m_currentLevel, m_maxLevel);
     } else {
         // Réactive le menu pour afficher la page Lose
         _state = GameState::MENU;
-        m_menu.activate(_registry, Menu::Page::LOSE);
+        m_menu.activate(_registry, Menu::Page::LOSE, m_currentLevel, m_maxLevel);
     }
 }
 
