@@ -7,6 +7,7 @@
 #include "UdpSocket.hpp"
 #include <atomic>
 #include <functional>
+#include <map>
 #include <memory>
 #include <queue>
 #include <unordered_map>
@@ -15,7 +16,13 @@ struct PeerInfo {
     uint32_t peer_id;
     std::string ip_address;
     uint16_t port;
-    // Add more fields as needed
+
+    bool operator<(const PeerInfo& other) const
+    {
+        if (ip_address != other.ip_address)
+            return ip_address < other.ip_address;
+        return port < other.port;
+    }
 };
 
 struct QueuedMessage {
