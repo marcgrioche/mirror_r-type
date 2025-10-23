@@ -14,6 +14,19 @@ public:
     static ResourceManager& getInstance();
 
     /**
+     * @brief Initializes the resource manager with the base path
+     * Should be called after SDL initialization
+     */
+    void initialize();
+
+    /**
+     * @brief Gets the full path for an asset relative to the executable
+     * @param relativePath Path relative to the res/ directory
+     * @return Full path to the asset
+     */
+    std::string getAssetPath(const std::string& relativePath) const;
+
+    /**
      * @brief Loads a texture from file and stores it with the given ID
      * @param renderer The SDL renderer to create the texture with
      * @param id Unique identifier for the texture
@@ -53,6 +66,7 @@ private:
     ~ResourceManager();
 
     std::unordered_map<std::string, SDL_Texture*> textures;
+    std::string basePath_;
     std::string defaultFontPath = "client/res/fonts/OpenSans-Medium.ttf";
     std::unordered_map<int, TTF_Font*> fonts;
 };

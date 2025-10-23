@@ -15,6 +15,7 @@
 #include "components/SpriteFactory.hpp"
 #include "components/TextBox.hpp"
 #include "components/TextBoxInput.hpp"
+#include "managers/ResourceManager.hpp"
 
 namespace factories {
 
@@ -33,7 +34,7 @@ Entity createTextBoxInput(Registry& registry, const std::string& placeholder,
 
     // TextBox pour l'affichage
     registry.emplace<TextBox>(inputBox, placeholder, fontSize, color,
-        "client/res/fonts/OpenSans-Medium.ttf", true, TextBox::Alignment::CENTER);
+        ResourceManager::getInstance().getAssetPath("fonts/OpenSans-Medium.ttf"), true, TextBox::Alignment::CENTER);
 
     // Component input
     registry.emplace<TextBoxInput>(

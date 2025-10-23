@@ -114,6 +114,7 @@ if(WIN32)
 
     set_target_properties(r-type_client PROPERTIES
         WIN32_EXECUTABLE TRUE
+        ICON "${CMAKE_CURRENT_SOURCE_DIR}/res/icon.ico"
     )
 
     add_custom_command(TARGET r-type_client POST_BUILD
@@ -130,7 +131,31 @@ if(WIN32)
         $<TARGET_FILE:SDL2_mixer::SDL2_mixer>
         $<TARGET_FILE_DIR:r-type_client>
     )
+elseif(UNIX AND NOT APPLE)
+    # Generate .desktop file for Linux desktop environments
+    set(DESKTOP_FILE "${CMAKE_BINARY_DIR}/r-type_client.desktop")
+    set(ICON_FILE "${CMAKE_BINARY_DIR}/icon.png")
+
+    add_custom_command(TARGET r-type_client POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/res/icon.png"
+        "${ICON_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "[Desktop Entry]" > "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Name=R-Type Client" >> "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Exec=$<TARGET_FILE:r-type_client>" >> "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Icon=${ICON_FILE}" >> "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Type=Application" >> "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Categories=Game;" >> "${DESKTOP_FILE}"
+        COMMAND ${CMAKE_COMMAND} -E echo "Comment=R-Type ECS SDL2 Game Client" >> "${DESKTOP_FILE}"
+    )
 endif()
+
+# Copy all assets to build directory for self-contained executable
+add_custom_command(TARGET r-type_client POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/res"
+    "${CMAKE_BINARY_DIR}/res"
+)
 
 set_target_properties(r-type_client PROPERTIES
     CXX_STANDARD 20
