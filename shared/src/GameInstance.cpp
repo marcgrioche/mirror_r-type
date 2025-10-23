@@ -23,7 +23,7 @@ void GameInstance::initialize()
     _core.setWon(false);
     std::cout << "Initializing game instance for lobby " << _core.getLobbyId() << std::endl;
 
-    _level.loadFromJson("shared/res/levels/level1.json");
+    _level.loadFromJson("shared/res/levels/level2.json");
     _entities.setLevel(&_level);
 
     _entities.initializeLevel(_core.getRegistry());

@@ -79,6 +79,18 @@ public:
      */
     void setAutoShoot(bool enabled);
 
+    /**
+     * @brief Gets the colorblind filter type
+     * @return The colorblind filter type ("protanopia", "deuteranopia", "tritanopia", or empty string for no filter)
+     */
+    std::string getColorblindType() const;
+
+    /**
+     * @brief Sets the colorblind filter type
+     * @param type The colorblind filter type ("protanopia", "deuteranopia", "tritanopia", or empty string for no filter)
+     */
+    void setColorblindType(const std::string& type);
+
 private:
     ConfigManager();
     ~ConfigManager() = default;
@@ -91,5 +103,6 @@ private:
 
     std::unordered_map<GameAction, std::vector<SDL_Keycode>> m_keyBindings;
     bool m_autoShoot = false;
+    std::string m_colorblindType;
     const std::string m_configFileName = "keybindings.ini";
 };

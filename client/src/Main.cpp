@@ -7,6 +7,7 @@
 
 #include "ProgramArguments.hpp"
 #include "game_handler/Game.hpp"
+#include "managers/ConfigManager.hpp"
 #include <iostream>
 #include <string>
 
@@ -15,7 +16,11 @@ int main(int argc, char* argv[])
     try {
         const ProgramArguments args(argc, argv);
         const uint16_t clientPort = args.getPort();
-        const std::string colorblindType = args.getColorblindType();
+        std::string colorblindType = args.getColorblindType();
+
+        if (colorblindType.empty()) {
+            colorblindType = ConfigManager::getInstance().getColorblindType();
+        }
 
         std::cout << "Using client port: " << clientPort << std::endl;
         if (!colorblindType.empty()) {

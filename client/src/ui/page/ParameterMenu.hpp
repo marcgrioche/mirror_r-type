@@ -70,5 +70,8 @@ private:
     Entity m_returnTextEntity { 0, 0 };
     Entity m_autoShootButtonEntity { 0, 0 };
     Entity m_autoShootTextEntity { 0, 0 };
+    Entity m_colorblindButtonEntity { 0, 0 };
+    Entity m_colorblindTextEntity { 0, 0 };
     bool m_autoShoot = false;
+    std::string m_colorblindType;
 };
