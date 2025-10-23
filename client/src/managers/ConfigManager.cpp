@@ -206,7 +206,15 @@ void ConfigManager::resetToDefaults()
 
 std::string ConfigManager::getConfigFilePath() const
 {
-    return "res/config/" + m_configFileName;
+    char* basePath = SDL_GetBasePath();
+    if (basePath) {
+        std::string path = std::string(basePath) + "res/config/" + m_configFileName;
+        SDL_free(basePath);
+        return path;
+    } else {
+        std::cerr << "Warning: Could not get base path for config, using relative path" << std::endl;
+        return "res/config/" + m_configFileName;
+    }
 }
 
 void ConfigManager::setDefaultKeyBindings()

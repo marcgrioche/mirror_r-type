@@ -68,6 +68,12 @@ public:
     void resetToDefaults();
 
     /**
+     * @brief Gets the config file path
+     * @return The path to the config file
+     */
+    std::string getConfigFilePath() const;
+
+    /**
      * @brief Gets the auto-shoot setting
      * @return True if auto-shoot is enabled, false otherwise
      */
@@ -98,7 +104,6 @@ private:
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
 
-    std::string getConfigFilePath() const;
     void setDefaultKeyBindings();
 
     std::unordered_map<GameAction, std::vector<SDL_Keycode>> m_keyBindings;
