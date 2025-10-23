@@ -44,6 +44,10 @@ RTypeServer::RTypeServer(uint16_t port)
     _socket = std::make_unique<UdpSocket>(_port);
     _lobbyManager.setServer(this);
     registerHandlers();
+    _db = std::make_unique<SqlDB::DB>("rtype.db");
+    if (_db) {
+        _db->init();
+    }
 }
 
 void RTypeServer::start()

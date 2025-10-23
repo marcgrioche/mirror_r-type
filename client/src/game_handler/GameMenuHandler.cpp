@@ -23,7 +23,7 @@ void Game::handleMenuConnectRequest()
     m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
     m_clientNetwork->connectToServerRequest();
 
-    m_menu.showHomePage(_registry);
+    m_menu.showLoginPage(_registry);
     std::cout << "Connected to server " << ip << ":" << port << std::endl;
 }
 
@@ -116,7 +116,7 @@ void Game::processMenuEvents()
 
 void Game::onConnectionSuccess()
 {
-    m_menu.showHomePage(_registry);
+    m_menu.showLoginPage(_registry);
 }
 
 void Game::onLobbyJoined(uint32_t lobbyId)

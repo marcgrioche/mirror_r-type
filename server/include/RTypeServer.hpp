@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DB.hpp"
 #include "LobbyManager.hpp"
 #include "RTypeNetwork.hpp"
 #include <cstdint>
@@ -56,6 +57,7 @@ private:
     LobbyManager _lobbyManager;
     uint32_t _nextPlayerId;
     std::unordered_map<uint32_t, std::string> _usernames;
+    std::unique_ptr<SqlDB::DB> _db;
 
     static void handleSignal(int);
 

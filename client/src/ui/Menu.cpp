@@ -74,6 +74,13 @@ void Menu::showConnectionPage(Registry& registry)
     m_connectionPage.show(registry);
 }
 
+void Menu::showLoginPage(Registry& registry)
+{
+    hideAllPages(registry);
+    m_currentPage = Page::LOGIN;
+    m_loginPage.show(registry);
+}
+
 void Menu::showJoinPage(Registry& registry)
 {
     hideAllPages(registry);
@@ -137,6 +144,9 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
     case Page::CONNECTION:
         m_connectionPage.handleEvent(registry, e);
         break;
+    case Page::LOGIN:
+        m_loginPage.handleEvent(registry, e);
+        break;
     case Page::JOIN_LOBBY:
         m_joinPage.handleEvent(registry, e);
         break;
@@ -169,6 +179,9 @@ void Menu::update(Registry& registry, float deltaTime)
         break;
     case Page::CONNECTION:
         m_connectionPage.update(registry, deltaTime);
+        break;
+    case Page::LOGIN:
+        m_loginPage.update(registry, deltaTime);
         break;
     case Page::JOIN_LOBBY:
         m_joinPage.update(registry, deltaTime);
@@ -203,6 +216,9 @@ void Menu::processPageTransitions(Registry& registry)
 
     case Page::CONNECTION:
         // Transition gérée par le système principal via hasConnectionRequest()
+        break;
+    case Page::LOGIN:
+        showLoginPage(registry);
         break;
     case Page::LOBBY:
         if (m_lobbyPage.hasReturnRequest()) {
@@ -253,6 +269,9 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
         break;
     case Page::CONNECTION:
         m_connectionPage.render(gfx, registry);
+        break;
+    case Page::LOGIN:
+        m_loginPage.render(gfx, registry);
         break;
     case Page::JOIN_LOBBY:
         m_joinPage.render(gfx, registry);
