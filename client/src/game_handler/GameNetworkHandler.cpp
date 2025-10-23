@@ -134,6 +134,11 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 void Game::handleGameEndWin()
 {
     std::cout << "Game ended - You won!" << std::endl;
+    m_currentLevel++;
+    if (m_currentLevel >= m_maxLevel) {
+        m_currentLevel = 1;
+    }
+    printf("DEBUG - Current Level: %u / Max Level: %u\n", m_currentLevel, m_maxLevel);
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
@@ -148,6 +153,7 @@ void Game::handleGameEndWin()
 void Game::handleGameEndLose()
 {
     std::cout << "Game ended - You lost!" << std::endl;
+    m_currentLevel = 1;
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {

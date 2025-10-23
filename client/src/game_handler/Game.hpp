@@ -248,6 +248,9 @@ private:
     // Entity cleanup
     void clearGameEntities();
 
+    // Level management
+    uint32_t determineMaxLevel();
+
     Menu m_menu;
 
     Registry _registry;
@@ -266,6 +269,8 @@ private:
     InputHistory m_inputHistory;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
+    uint32_t m_currentLevel = 1;
+    uint32_t m_maxLevel = 1;
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
