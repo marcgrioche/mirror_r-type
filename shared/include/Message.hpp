@@ -184,6 +184,15 @@ public:
     static Message deserialize(const std::vector<uint8_t>& data);
 
     /**
+     * @brief Deserializes a message from a buffer at a specific offset
+     * @param data The buffer containing message data
+     * @param offset The offset to start reading from
+     * @param bytesConsumed Output parameter for bytes consumed during deserialization
+     * @return The deserialized Message object
+     */
+    static Message deserializeFromOffset(const std::vector<uint8_t>& data, size_t offset, size_t& bytesConsumed);
+
+    /**
      * @brief Gets the message type
      * @return The message type identifier
      */

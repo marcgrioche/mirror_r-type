@@ -46,12 +46,20 @@ void RTypeNetwork::processIncomingMessages()
 
         ssize_t received = _socket->receive(data, sender_ip, sender_port);
         if (received > 0) {
-            try {
-                Message msg = Message::deserialize(data);
-                handleReceive(msg, sender_ip, sender_port);
-                messagesProcessed++;
-            } catch (const std::exception& e) {
-                std::cerr << "Error deserializing message: " << e.what() << std::endl;
+            size_t offset = 0;
+
+            while (offset < data.size() && messagesProcessed < MAX_MESSAGES_PER_CALL) {
+                try {
+                    size_t bytesConsumed = 0;
+                    Message msg = Message::deserializeFromOffset(data, offset, bytesConsumed);
+                    handleReceive(msg, sender_ip, sender_port);
+
+                    offset += bytesConsumed;
+                    messagesProcessed++;
+                } catch (const std::exception& e) {
+                    std::cerr << "Error deserializing message at offset " << offset << ": " << e.what() << std::endl;
+                    break;
+                }
             }
         } else {
             break;
@@ -72,12 +80,36 @@ void RTypeNetwork::queueMessage(const Message& msg, const PeerInfo& peerInfo)
 void RTypeNetwork::processOutgoingMessages()
 {
     if (_socket && _socket->pollForWrite(0)) {
+        std::map<PeerInfo, std::vector<Message>> peerMessages;
+
         while (!_outgoingQueue.empty()) {
             QueuedMessage qmsg = _outgoingQueue.front();
             _outgoingQueue.pop();
+            peerMessages[qmsg.peerInfo].push_back(qmsg.msg);
+        }
 
-            std::vector<uint8_t> data = qmsg.msg.serialize();
-            _socket->send(data, qmsg.peerInfo.ip_address, qmsg.peerInfo.port);
+        for (const auto& [peer, messages] : peerMessages) {
+            const size_t MAX_UDP_SIZE = 1400;
+            std::vector<uint8_t> batchBuffer;
+            size_t currentBatchSize = 0;
+
+            for (const auto& msg : messages) {
+                std::vector<uint8_t> serializedMsg = msg.serialize();
+
+                if (currentBatchSize + serializedMsg.size() > MAX_UDP_SIZE && !batchBuffer.empty()) {
+                    _socket->send(batchBuffer, peer.ip_address, peer.port);
+
+                    batchBuffer.clear();
+                    currentBatchSize = 0;
+                }
+
+                batchBuffer.insert(batchBuffer.end(), serializedMsg.begin(), serializedMsg.end());
+                currentBatchSize += serializedMsg.size();
+            }
+
+            if (!batchBuffer.empty()) {
+                _socket->send(batchBuffer, peer.ip_address, peer.port);
+            }
         }
     }
 }
