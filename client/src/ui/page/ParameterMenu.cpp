@@ -299,44 +299,29 @@ void ParameterMenu::loadBindings()
             continue;
         std::string key = line.substr(0, pos);
         std::string vals = line.substr(pos + 1);
-        // parse csv of ints
-        std::vector<int> codes;
-        std::istringstream ss(vals);
-        std::string token;
-        while (std::getline(ss, token, ',')) {
+        key.erase(key.find_last_not_of(" \t") + 1);
+        key.erase(0, key.find_first_not_of(" \t"));
+        vals.erase(vals.find_last_not_of(" \t") + 1);
+        vals.erase(0, vals.find_first_not_of(" \t"));
+        if (key == "auto_shoot") {
             try {
-                int v = std::stoi(token);
-                codes.push_back(v);
+                m_autoShoot = (std::stoi(vals) != 0);
             } catch (...) {
+                m_autoShoot = false;
             }
-        }
-        if (!key.empty())
-            m_bindings.emplace_back(key, codes);
-    }
-
-    std::ifstream ifs_auto(m_iniPath);
-    if (ifs_auto.is_open()) {
-        std::string line;
-        while (std::getline(ifs_auto, line)) {
-            if (line.empty() || line[0] == '#')
-                continue;
-            auto pos = line.find('=');
-            if (pos != std::string::npos) {
-                std::string key = line.substr(0, pos);
-                std::string val = line.substr(pos + 1);
-                key.erase(key.find_last_not_of(" \t") + 1);
-                key.erase(0, key.find_first_not_of(" \t"));
-                val.erase(val.find_last_not_of(" \t") + 1);
-                val.erase(0, val.find_first_not_of(" \t"));
-                if (key == "auto_shoot") {
-                    try {
-                        m_autoShoot = (std::stoi(val) != 0);
-                    } catch (...) {
-                        m_autoShoot = false;
-                    }
-                    break;
+        } else if (!key.empty()) {
+            // parse csv of ints
+            std::vector<int> codes;
+            std::istringstream ss(vals);
+            std::string token;
+            while (std::getline(ss, token, ',')) {
+                try {
+                    int v = std::stoi(token);
+                    codes.push_back(v);
+                } catch (...) {
                 }
             }
+            m_bindings.emplace_back(key, codes);
         }
     }
 }
