@@ -16,7 +16,7 @@ Entity createBoss(Registry& registry, const Level* level)
     float height = level ? level->getBossHeight() : BOSS_HEIGHT;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
-    float posX = level ? SCREEN_WIDTH - width : SCREEN_WIDTH - BOSS_WIDTH;
+    float posX = level ? SCREEN_WIDTH - width / 4 : SCREEN_WIDTH - BOSS_WIDTH;
     float posY = 0.0f;
 
     Entity boss = registry.create_entity();

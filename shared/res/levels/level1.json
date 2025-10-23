@@ -1,6 +1,6 @@
 {
   "platform": {
-    "layers": 2,
+    "layers": 1,
     "topMargin": 30.0,
     "bottomMargin": 100.0,
     "sameLevelEpsilon": 28.0,
@@ -8,7 +8,7 @@
     "crossDistX": 180.0,
     "maxDiffY": 250.0,
     "reachableX": 200.0,
-    "velocityX": -100.0,
+    "velocityX": -10.0,
     "velocityY": 0.0
   },
   "enemy": {

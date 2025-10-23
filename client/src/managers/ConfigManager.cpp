@@ -78,6 +78,12 @@ bool ConfigManager::loadKeyBindings()
                 } catch (const std::exception&) {
                     std::cerr << "Invalid value for auto_shoot: " << keyStr << std::endl;
                 }
+            } else if (actionStr == "colorblind_type") {
+                if (keyStr == "protanopia" || keyStr == "deuteranopia" || keyStr == "tritanopia" || keyStr.empty()) {
+                    m_colorblindType = keyStr;
+                } else {
+                    std::cerr << "Invalid value for colorblind_type: " << keyStr << std::endl;
+                }
             } else if (action != GameAction::ACTION_COUNT) {
                 std::vector<SDL_Keycode> keys;
                 std::istringstream keyStream(keyStr);
@@ -164,6 +170,7 @@ bool ConfigManager::saveKeyBindings()
     }
 
     file << "auto_shoot=" << (m_autoShoot ? "1" : "0") << std::endl;
+    file << "colorblind_type=" << m_colorblindType << std::endl;
 
     file.close();
     return true;
@@ -199,7 +206,7 @@ void ConfigManager::resetToDefaults()
 
 std::string ConfigManager::getConfigFilePath() const
 {
-    return "client/res/config/" + m_configFileName;
+    return "res/config/" + m_configFileName;
 }
 
 void ConfigManager::setDefaultKeyBindings()
@@ -223,4 +230,16 @@ bool ConfigManager::getAutoShoot() const
 void ConfigManager::setAutoShoot(bool enabled)
 {
     m_autoShoot = enabled;
+}
+
+std::string ConfigManager::getColorblindType() const
+{
+    return m_colorblindType;
+}
+
+void ConfigManager::setColorblindType(const std::string& type)
+{
+    if (type == "protanopia" || type == "deuteranopia" || type == "tritanopia" || type.empty()) {
+        m_colorblindType = type;
+    }
 }

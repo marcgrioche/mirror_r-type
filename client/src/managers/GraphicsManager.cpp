@@ -7,7 +7,9 @@
 
 #include "GraphicsManager.hpp"
 #include "Config.hpp"
+#include <algorithm>
 #include <iostream>
+#include <vector>
 
 GraphicsManager& GraphicsManager::getInstance()
 {
@@ -34,16 +36,16 @@ bool GraphicsManager::initialize(const char* title, int width, int height)
     }
 
     Uint32 windowFlags = SDL_WINDOW_SHOWN;
-    
+
     switch (DISPLAY_MODE) {
-        case DisplayMode::FULLSCREEN_DESKTOP:
-            windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-            break;
-        case DisplayMode::FULLSCREEN_EXCLUSIVE:
-            windowFlags |= SDL_WINDOW_FULLSCREEN;
-            break;
-        case DisplayMode::WINDOWED:
-            break;
+    case DisplayMode::FULLSCREEN_DESKTOP:
+        windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        break;
+    case DisplayMode::FULLSCREEN_EXCLUSIVE:
+        windowFlags |= SDL_WINDOW_FULLSCREEN;
+        break;
+    case DisplayMode::WINDOWED:
+        break;
     }
 
     if (DISPLAY_MODE == DisplayMode::WINDOWED) {
@@ -78,23 +80,24 @@ bool GraphicsManager::initialize(const char* title, int width, int height)
     m_renderWidth = RENDER_WIDTH;
     m_renderHeight = RENDER_HEIGHT;
 
-    m_useRenderTarget = (m_renderWidth != m_logicalWidth || m_renderHeight != m_logicalHeight);
-    
+    m_useRenderTarget = (m_renderWidth != m_logicalWidth || m_renderHeight != m_logicalHeight || !m_colorblindType.empty());
+
     if (m_useRenderTarget) {
         createRenderTarget();
     }
-    
+
     SDL_RenderSetLogicalSize(m_renderer, m_logicalWidth, m_logicalHeight);
     applyScalingOptions();
 
     m_initialized = true;
-    
+
     return true;
 }
 
 void GraphicsManager::cleanup()
 {
     if (m_initialized) {
+        destroyColorblindFilterTextures();
         destroyRenderTarget();
         if (m_renderer) {
             SDL_DestroyRenderer(m_renderer);
@@ -125,36 +128,44 @@ SDL_Window* GraphicsManager::getWindow() const
 
 void GraphicsManager::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
-    if (!m_renderer) return;
-    
+    if (!m_renderer)
+        return;
+
     if (m_useRenderTarget && m_renderTarget) {
         SDL_SetRenderTarget(m_renderer, m_renderTarget);
     }
-    
+
     SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
     SDL_RenderClear(m_renderer);
 }
 
 void GraphicsManager::present()
 {
-    if (!m_renderer) return;
-    
+    if (!m_renderer)
+        return;
+
     if (m_useRenderTarget && m_renderTarget) {
         SDL_SetRenderTarget(m_renderer, nullptr);
-        SDL_RenderCopy(m_renderer, m_renderTarget, nullptr, nullptr);
+
+        if (!m_colorblindType.empty()) {
+            applyHardwareColorblindFilter();
+        } else {
+            SDL_RenderCopy(m_renderer, m_renderTarget, nullptr, nullptr);
+        }
     }
-    
+
     SDL_RenderPresent(m_renderer);
 }
 
 void GraphicsManager::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
-    if (!m_renderer) return;
-    
+    if (!m_renderer)
+        return;
+
     if (m_useRenderTarget && m_renderTarget) {
         SDL_SetRenderTarget(m_renderer, m_renderTarget);
     }
-    
+
     SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
 }
 
@@ -203,18 +214,19 @@ void GraphicsManager::setWindowSize(int width, int height)
 
 void GraphicsManager::setRenderSize(int width, int height)
 {
-    if (!m_renderer) return;
-    
+    if (!m_renderer)
+        return;
+
     bool needsRenderTarget = (width != m_logicalWidth || height != m_logicalHeight);
-    
+
     if (needsRenderTarget != m_useRenderTarget) {
         destroyRenderTarget();
         m_useRenderTarget = needsRenderTarget;
     }
-    
+
     m_renderWidth = width;
     m_renderHeight = height;
-    
+
     if (m_useRenderTarget) {
         destroyRenderTarget();
         createRenderTarget();
@@ -223,7 +235,8 @@ void GraphicsManager::setRenderSize(int width, int height)
 
 void GraphicsManager::applyScalingOptions()
 {
-    if (!m_renderer) return;
+    if (!m_renderer)
+        return;
 
     if (INTEGER_SCALING) {
         SDL_RenderSetIntegerScale(m_renderer, SDL_TRUE);
@@ -234,16 +247,16 @@ void GraphicsManager::applyScalingOptions()
 
 void GraphicsManager::createRenderTarget()
 {
-    if (!m_renderer) return;
-    
+    if (!m_renderer)
+        return;
+
     m_renderTarget = SDL_CreateTexture(
         m_renderer,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
         m_renderWidth,
-        m_renderHeight
-    );
-    
+        m_renderHeight);
+
     if (!m_renderTarget) {
         std::cerr << "Failed to create render target: " << SDL_GetError() << std::endl;
         m_useRenderTarget = false;
@@ -255,5 +268,63 @@ void GraphicsManager::destroyRenderTarget()
     if (m_renderTarget) {
         SDL_DestroyTexture(m_renderTarget);
         m_renderTarget = nullptr;
+    }
+}
+
+void GraphicsManager::setColorblindMode(std::string type)
+{
+    m_colorblindType = type;
+
+    if (type == "protanopia") {
+        // Red-blind: reduce red channel, emphasize green
+        m_colorModulation = { 145, 200, 255 }; // ~57% red, ~78% green, full blue
+    } else if (type == "deuteranopia") {
+        // Green-blind: reduce green channel, emphasize red
+        m_colorModulation = { 200, 180, 255 }; // ~78% red, ~70% green, full blue
+    } else if (type == "tritanopia") {
+        // Blue-blind: reduce blue channel, emphasize yellow tones
+        m_colorModulation = { 255, 220, 134 }; // full red, ~86% green, ~52% blue
+    } else {
+        // No filter - full color
+        m_colorModulation = { 255, 255, 255 };
+    }
+
+    if (!type.empty()) {
+        if (!m_renderTarget) {
+            createRenderTarget();
+        }
+        if (m_renderTarget) {
+            m_useRenderTarget = true;
+        }
+    } else {
+        m_useRenderTarget = (m_renderWidth != m_logicalWidth || m_renderHeight != m_logicalHeight);
+        if (!m_useRenderTarget) {
+            destroyRenderTarget();
+        }
+    }
+}
+
+void GraphicsManager::applyHardwareColorblindFilter()
+{
+    if (!m_renderTarget || m_colorblindType.empty()) {
+        SDL_RenderCopy(m_renderer, m_renderTarget, nullptr, nullptr);
+        return;
+    }
+
+    SDL_SetTextureColorMod(m_renderTarget, m_colorModulation.r, m_colorModulation.g, m_colorModulation.b);
+    SDL_RenderCopy(m_renderer, m_renderTarget, nullptr, nullptr);
+
+    SDL_SetTextureColorMod(m_renderTarget, 255, 255, 255);
+}
+
+void GraphicsManager::createColorblindFilterTextures()
+{
+}
+
+void GraphicsManager::destroyColorblindFilterTextures()
+{
+    if (m_colorblindFilterTexture) {
+        SDL_DestroyTexture(m_colorblindFilterTexture);
+        m_colorblindFilterTexture = nullptr;
     }
 }

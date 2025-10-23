@@ -81,6 +81,41 @@ void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX
     registry.add<Sprite>(entity, sprite);
 }
 
+void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+{
+    (void)posX;
+    (void)posY;
+
+    if (!registry.has<Hitbox>(entity)) {
+        return;
+    }
+
+    Hitbox& hitbox = registry.get<Hitbox>(entity);
+
+    const int FRAME_WIDTH = 512;
+    const int FRAME_HEIGHT = 512;
+    const int TOTAL_FRAMES = 8;
+    const float FRAME_DURATION = 0.17f;
+
+    float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
+    float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
+
+    float rendered_width = FRAME_WIDTH * scale_x;
+    float rendered_height = FRAME_HEIGHT * scale_y;
+    float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
+    float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+
+    Sprite sprite = SpriteFactory::createAnimatedSprite(
+        "heads_monster_idle.png",
+        FRAME_WIDTH, FRAME_HEIGHT,
+        TOTAL_FRAMES, FRAME_DURATION,
+        scale_x, scale_y,
+        offset_x, offset_y
+    );
+
+    registry.add<Sprite>(entity, sprite);
+}
+
 void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
 {
     (void)posX; // Unused parameter, kept for API compatibility
