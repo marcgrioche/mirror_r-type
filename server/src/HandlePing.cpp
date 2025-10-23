@@ -11,7 +11,7 @@
 void RTypeServer::handlePing(const Message& msg, PeerInfo& peerInfo)
 {
     (void)peerInfo; // Unused parameter
-    std::cout << "Received PING from player " << msg.player_id << std::endl;
+    // std::cout << "Received PING from player " << msg.player_id << std::endl;
     Message pongMsg(MessageType::PONG, msg.sequence_number, msg.player_id);
     sendToClient(msg.player_id, pongMsg);
 }

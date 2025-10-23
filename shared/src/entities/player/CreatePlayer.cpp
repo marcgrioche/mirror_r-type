@@ -23,70 +23,33 @@
 #include "components/Tags.hpp"
 
 namespace factories {
-Entity createPlayer(Registry& registry)
+
+Entity createPlayer(
+    Registry& registry,
+    const std::string& username,
+    const Position& position,
+    const Health& health,
+    const Hitbox& hitbox,
+    uint32_t playerId)
 {
     Entity player = registry.create_entity();
-    registry.emplace<Position>(player, 50.0f, -500.0f);
-    registry.emplace<PreviousPosition>(player, 50.0f, 480.0f);
+    registry.emplace<Position>(player, position.v.x, position.v.y);
+    registry.emplace<PreviousPosition>(player, position.v.x, position.v.y);
     registry.emplace<Velocity>(player, 0.0f, 0.0f);
-    registry.emplace<Health>(player, 100);
-    registry.emplace<Hitbox>(player, 32.0f, 32.0f, 0.0f, 0.0f);
+    registry.emplace<Health>(player, health.hp);
+    registry.emplace<Hitbox>(player, hitbox.width, hitbox.height, hitbox.offset_x, hitbox.offset_y);
     registry.emplace<Dead>(player);
     registry.emplace<Dash>(player, Dash {});
     registry.emplace<PowerUp>(player);
-    registry.emplace<PlayerTag>(player);
+    registry.emplace<PlayerTag>(player, PlayerTag { playerId });
     registry.emplace<RigidBody>(player);
-    // registry.emplace<Sprite>(player, 0, 50, 50);
-    Entity projectile = factories::createProjectileTemplate(
-        registry,
-        Velocity { -PROJECTILE_VELOCITY_X, PROJECTILE_VELOCITY_Y },
-        Damage { PROJECTILE_DAMAGE },
-        Hitbox { PROJECTILE_WIDTH, PROJECTILE_HEIGHT });
-    createWeapon(registry, Parent { player }, projectile);
-    return player;
-}
+    registry.emplace<TextBox>(player, username, 12);
 
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox)
-{
-    Entity player = registry.create_entity();
-    registry.add<Position>(player, position);
-    registry.add<PreviousPosition>(player, PreviousPosition { position.v.x, position.v.y });
-    registry.add<Velocity>(player, Velocity { 0.0f, 0.0f });
-    registry.add<Health>(player, health);
-    registry.add<Hitbox>(player, hitbox);
-    registry.emplace<Dead>(player);
-    registry.add<Dash>(player, Dash {});
-    registry.add<PlayerTag>(player, PlayerTag {});
-    registry.emplace<PowerUp>(player);
-    registry.emplace<RigidBody>(player);
     Entity projectile = factories::createProjectileTemplate(
         registry,
-        Velocity { -PROJECTILE_VELOCITY_X, PROJECTILE_VELOCITY_Y },
-        Damage { PROJECTILE_DAMAGE },
-        Hitbox { PROJECTILE_WIDTH, PROJECTILE_HEIGHT });
-    createWeapon(registry, Parent { player }, projectile);
-    return player;
-}
-
-Entity createPlayer(Registry& registry, const Position& position, const Health& health, const Hitbox& hitbox, const TextBox& textbox)
-{
-    Entity player = registry.create_entity();
-    registry.add<Position>(player, position);
-    registry.add<PreviousPosition>(player, PreviousPosition { position.v.x, position.v.y });
-    registry.add<Velocity>(player, Velocity { 0.0f, 0.0f });
-    registry.add<Health>(player, health);
-    registry.add<Hitbox>(player, hitbox);
-    registry.emplace<Dead>(player);
-    registry.add<Dash>(player, Dash {});
-    registry.add<PlayerTag>(player, PlayerTag {});
-    registry.add<TextBox>(player, textbox);
-    registry.emplace<PowerUp>(player);
-    registry.emplace<RigidBody>(player);
-    Entity projectile = factories::createProjectileTemplate(
-        registry,
-        Velocity { -PROJECTILE_VELOCITY_X, PROJECTILE_VELOCITY_Y },
-        Damage { PROJECTILE_DAMAGE },
-        Hitbox { PROJECTILE_WIDTH, PROJECTILE_HEIGHT });
+        Velocity { 1000, 0 },
+        Damage { 5 },
+        Hitbox { 25, 25 });
     createWeapon(registry, Parent { player }, projectile);
     return player;
 }

@@ -109,18 +109,21 @@ void initializeEntityMetadataRegistration()
     factory.registerFactory(EntityType::BOSS, createBossFromData);
 }
 
-Entity createPlayerFromData(class Registry& registry, const class EntityData& data)
+Entity createPlayerFromData(Registry& registry, const EntityData& data)
 {
     Vector2 position = data.get<Vector2>("position");
     int health = data.get<int>("health");
     std::array<float, 4> hitbox = data.get<std::array<float, 4>>("hitbox");
     std::string username = data.get<std::string>("username");
+    auto player_id = data.get<uint32_t>("player_id");
 
-    return factories::createPlayer(registry,
+    return factories::createPlayer(
+        registry,
+        username,
         Position { position.x, position.y },
         Health { health },
         Hitbox { hitbox[0], hitbox[1], hitbox[2], hitbox[3] },
-        TextBox { username, 12 });
+        player_id);
 }
 
 Entity createProjectileFromData(class Registry& registry, const class EntityData& data)

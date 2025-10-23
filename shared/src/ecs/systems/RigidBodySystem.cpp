@@ -6,14 +6,49 @@
 */
 
 #include "RigidBodySystem.hpp"
-#include "components/RigidBody.hpp"
-#include "components/Velocity.hpp"
 #include "Config.hpp"
+#include "components/Tags.hpp"
 #include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
 #include <cmath>
-#include "components/Tags.hpp"
-#include <cmath>
+
+void changeRigidBodyComponentProperties(
+    RigidBody& t_rigidBody,
+    Velocity& t_velocity,
+    const float t_deltaTime,
+    const bool t_isPlayer)
+{
+    if (!t_rigidBody.active) {
+        return;
+    }
+
+    t_velocity.v += t_rigidBody.acceleration * t_deltaTime;
+
+    if (t_rigidBody.isOnGround) {
+        t_velocity.v.x *= (std::pow)(t_rigidBody.groundFriction, t_deltaTime);
+
+        if (t_isPlayer) {
+            if ((std::abs)(t_rigidBody.acceleration.x) < 1.0f) {
+                t_velocity.v.x = 0.0f;
+            }
+        }
+    } else {
+        t_velocity.v.x *= (std::pow)(t_rigidBody.airFriction, t_deltaTime);
+    }
+
+    t_velocity.v.x = (std::clamp)(t_velocity.v.x, -t_rigidBody.maxSpeed, t_rigidBody.maxSpeed);
+
+    // if (!t_rigidBody.isOnGround) {
+    //     t_velocity.v.y += t_rigidBody.gravity;
+    //     t_velocity.v.y = (std::min)(t_velocity.v.y, t_rigidBody.maxFallSpeed);
+    // } else {
+    //     t_velocity.v += t_rigidBody.groundSpeed;
+    // }
+    t_velocity.v.y += t_rigidBody.gravity;
+    t_velocity.v.y = (std::min)(t_velocity.v.y, t_rigidBody.maxFallSpeed);
+    if (t_rigidBody.isOnGround)
+        t_velocity.v += t_rigidBody.groundSpeed;
+}
 
 void rigidBodySystem(Registry& registry, float deltaTime)
 {
@@ -21,29 +56,10 @@ void rigidBodySystem(Registry& registry, float deltaTime)
 
     for (auto it = view.begin(); it != view.end(); ++it) {
         auto [entity, rb, vel] = it.entity_and_components();
-        if (!rb.active) {
-            continue;
+        bool isPlayer = false;
+        if (registry.has<PlayerTag>(entity)) {
+            isPlayer = true;
         }
-        
-        vel.v += rb.acceleration * deltaTime;
-
-        if (rb.isOnGround) {
-            vel.v.x *= pow(rb.groundFriction, deltaTime);
-            
-            if (registry.has<PlayerTag>(entity)) {
-                if (std::abs(rb.acceleration.x) < 1.0f) {
-                    vel.v.x = 0.0f;
-                }
-            }
-        } else {
-            vel.v.x *= pow(rb.airFriction, deltaTime);
-        }
-
-        vel.v.x = std::clamp(vel.v.x, -rb.maxSpeed, rb.maxSpeed);
-
-        vel.v.y += rb.gravity;
-        vel.v.y = (std::min)(vel.v.y, rb.maxFallSpeed);
-        if (rb.isOnGround)
-            vel.v += rb.groundSpeed;
+        changeRigidBodyComponentProperties(rb, vel, deltaTime, isPlayer);
     }
 }

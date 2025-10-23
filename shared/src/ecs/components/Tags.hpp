@@ -8,9 +8,12 @@
 #pragma once
 
 /**
- * @brief Empty tag component identifying player-controlled entities
+ * @brief Tag component identifying player-controlled entities
+ * @param playerId representing the player Id on the server
  */
-struct PlayerTag { };
+struct PlayerTag {
+    uint32_t playerId;
+};
 
 /**
  * @brief Empty tag component identifying enemy entities

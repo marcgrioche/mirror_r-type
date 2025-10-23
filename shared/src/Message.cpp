@@ -40,9 +40,9 @@ Message::Message(const Message& other)
     : sequence_number(other.sequence_number)
     , player_id(other.player_id)
     , version(other.version)
+    , readPos(0)
     , type(other.type)
     , payload(other.payload)
-    , readPos(0)
 {
 }
 

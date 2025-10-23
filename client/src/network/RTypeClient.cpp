@@ -212,4 +212,10 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::USERNAME_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleUsernameRequestState(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::KICK_ACK] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleKickPlayerAck(t_msg, t_peerInfo);
+    };
+    _handlers[MessageType::KICK_NOTICE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleKickPlayerNotice(t_msg, t_peerInfo);
+    };
 }

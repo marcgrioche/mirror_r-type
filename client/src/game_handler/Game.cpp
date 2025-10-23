@@ -12,6 +12,7 @@
 #include "Config.hpp"
 #include "IpEncoding.hpp" // Ajoute cet include pour decodeIp
 #include "ecs/components/ParallaxState.hpp"
+#include "managers/ConfigManager.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
 #include "systems/EyeSystem.hpp"
@@ -206,11 +207,14 @@ void Game::runGameLoop(float deltaTime)
 
 void Game::cleanup()
 {
+    // Save key bindings before cleanup
+    ConfigManager& config = ConfigManager::getInstance();
+    config.saveKeyBindings();
+    
     if (_isRunning) {
         SDL_StopTextInput();
         _graphics.cleanup();
         _isRunning = false;
-        std::cout << "Game cleanup completed." << std::endl;
     }
 
     cleanupNetwork();

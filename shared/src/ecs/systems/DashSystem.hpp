@@ -7,6 +7,9 @@
 
 #pragma once
 #include "Registry.hpp"
+#include "components/Dash.hpp"
+#include "components/RigidBody.hpp"
+#include "components/Velocity.hpp"
 
 /**
  * @brief System that manages player dash abilities and cooldowns
@@ -15,3 +18,9 @@
  * @param deltaTime Time elapsed since the last frame in seconds
  */
 void dashSystem(Registry& registry, float deltaTime);
+
+void changeDashComponentProperties(
+    Dash& t_dash,
+    Velocity& t_velocity,
+    RigidBody& t_rigidBody,
+    float t_deltaTime);
