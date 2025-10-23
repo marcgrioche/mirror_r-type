@@ -20,13 +20,14 @@
 #include <SDL.h>
 #include <iostream>
 
-Game::Game(uint16_t clientPort)
+Game::Game(uint16_t clientPort, std::string colorblindType)
     : _graphics(GraphicsManager::getInstance())
     , _inputs(InputManager::getInstance())
     , m_clientNetwork(nullptr)
     , _isRunning(false)
     , m_clientPort(clientPort)
 {
+    _graphics.setColorblindMode(colorblindType);
 }
 
 Game::~Game()
@@ -115,8 +116,6 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load eyepupil3 texture" << std::endl;
     }
 
-    _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
-
     _timer.start();
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;
@@ -200,6 +199,15 @@ void Game::runMenuLoop()
 
 void Game::runGameLoop(float deltaTime)
 {
+    bool hasParallax = false;
+    for (auto [entity] : _registry.view<ParallaxState>()) {
+        hasParallax = true;
+        break;
+    }
+    if (!hasParallax) {
+        _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
+    }
+
     update(deltaTime);
     renderSystem(_registry);
     SDL_Delay(16);

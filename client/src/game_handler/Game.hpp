@@ -50,8 +50,9 @@ public:
     /**
      * @brief Constructs a Game instance
      * @param clientPort The port to use for client networking
+     * @param colorblindType The colorblind filter type ("protanopia", "deuteranopia", "tritanopia", or empty for no filter)
      */
-    Game(uint16_t clientPort = 2020);
+    Game(uint16_t clientPort = 2020, std::string colorblindType = "");
 
     /**
      * @brief Destructor for Game
