@@ -24,8 +24,8 @@
   },
   "boss": {
     "health": 200,
-    "width": 400.0,
-    "height": 800.0,
+    "width": 1080.0,
+    "height": 1080.0,
     "shootFrequency": 5,
     "spawnEnemyFrequency": 5.0,
     "projectileSpeed": -500.0,
