@@ -7,6 +7,25 @@ ResourceManager& ResourceManager::getInstance()
     return instance;
 }
 
+void ResourceManager::initialize()
+{
+    char* basePath = SDL_GetBasePath();
+    if (basePath) {
+        basePath_ = basePath;
+        SDL_free(basePath);
+        defaultFontPath = basePath_ + "res/fonts/OpenSans-Medium.ttf";
+    } else {
+        std::cerr << "Warning: Could not get base path, using relative paths" << std::endl;
+        basePath_ = "";
+        defaultFontPath = "res/fonts/OpenSans-Medium.ttf";
+    }
+}
+
+std::string ResourceManager::getAssetPath(const std::string& relativePath) const
+{
+    return basePath_ + "res/" + relativePath;
+}
+
 SDL_Texture* ResourceManager::loadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path)
 {
     SDL_Texture* tex = IMG_LoadTexture(renderer, path.c_str());

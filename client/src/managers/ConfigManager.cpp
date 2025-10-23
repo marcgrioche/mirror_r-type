@@ -206,7 +206,7 @@ void ConfigManager::resetToDefaults()
 
 std::string ConfigManager::getConfigFilePath() const
 {
-    return "client/res/config/" + m_configFileName;
+    return "res/config/" + m_configFileName;
 }
 
 void ConfigManager::setDefaultKeyBindings()
