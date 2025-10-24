@@ -156,6 +156,14 @@ public:
     void sendCurrentInputState(const std::vector<std::pair<GameInput, bool>>& inputs);
 
     /**
+     * @brief Sends the current input state with mouse position to the server
+     * @param inputs Vector of input pairs (GameInput, isPressed)
+     * @param mouseX Mouse X coordinate
+     * @param mouseY Mouse Y coordinate
+     */
+    void sendCurrentInputStateWithMouse(const std::vector<std::pair<GameInput, bool>>& inputs, float mouseX, float mouseY);
+
+    /**
      * @brief Gets the current game tick
      * @return The current tick number
      */

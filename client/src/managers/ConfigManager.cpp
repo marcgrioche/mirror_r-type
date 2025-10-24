@@ -31,7 +31,6 @@ bool ConfigManager::loadKeyBindings()
     std::string configPath = getConfigFilePath();
 
     if (!std::filesystem::exists(configPath)) {
-        std::cout << "Config file not found, using defaults: " << configPath << std::endl;
         return false;
     }
 
@@ -67,6 +66,8 @@ bool ConfigManager::loadKeyBindings()
                 action = GameAction::MOVE_RIGHT;
             else if (actionStr == "shoot")
                 action = GameAction::SHOOT;
+            else if (actionStr == "dash")
+                action = GameAction::DASH;
             else if (actionStr == "quit")
                 action = GameAction::QUIT;
 
@@ -76,6 +77,12 @@ bool ConfigManager::loadKeyBindings()
                     m_autoShoot = (value != 0);
                 } catch (const std::exception&) {
                     std::cerr << "Invalid value for auto_shoot: " << keyStr << std::endl;
+                }
+            } else if (actionStr == "colorblind_type") {
+                if (keyStr == "protanopia" || keyStr == "deuteranopia" || keyStr == "tritanopia" || keyStr.empty()) {
+                    m_colorblindType = keyStr;
+                } else {
+                    std::cerr << "Invalid value for colorblind_type: " << keyStr << std::endl;
                 }
             } else if (action != GameAction::ACTION_COUNT) {
                 std::vector<SDL_Keycode> keys;
@@ -102,7 +109,6 @@ bool ConfigManager::loadKeyBindings()
     }
 
     file.close();
-    std::cout << "Loaded keybindings from: " << configPath << std::endl;
     return true;
 }
 
@@ -123,6 +129,7 @@ bool ConfigManager::saveKeyBindings()
 
     file << "# R-Type Keybindings Configuration" << std::endl;
     file << "# Format: action=keycode1,keycode2,..." << std::endl;
+    file << "# Mouse buttons: Left=1073741824, Right=1073741825" << std::endl;
     file << std::endl;
 
     for (const auto& binding : m_keyBindings) {
@@ -143,6 +150,9 @@ bool ConfigManager::saveKeyBindings()
         case GameAction::SHOOT:
             actionStr = "shoot";
             break;
+        case GameAction::DASH:
+            actionStr = "dash";
+            break;
         case GameAction::QUIT:
             actionStr = "quit";
             break;
@@ -160,9 +170,9 @@ bool ConfigManager::saveKeyBindings()
     }
 
     file << "auto_shoot=" << (m_autoShoot ? "1" : "0") << std::endl;
+    file << "colorblind_type=" << m_colorblindType << std::endl;
 
     file.close();
-    std::cout << "Saved keybindings to: " << configPath << std::endl;
     return true;
 }
 
@@ -196,7 +206,7 @@ void ConfigManager::resetToDefaults()
 
 std::string ConfigManager::getConfigFilePath() const
 {
-    return "client/res/config/" + m_configFileName;
+    return "res/config/" + m_configFileName;
 }
 
 void ConfigManager::setDefaultKeyBindings()
@@ -207,9 +217,9 @@ void ConfigManager::setDefaultKeyBindings()
     m_keyBindings[GameAction::MOVE_DOWN] = { SDLK_s };
     m_keyBindings[GameAction::MOVE_LEFT] = { SDLK_q };
     m_keyBindings[GameAction::MOVE_RIGHT] = { SDLK_d };
-    m_keyBindings[GameAction::SHOOT] = { SDLK_SPACE };
+    m_keyBindings[GameAction::SHOOT] = { MOUSE_LEFT_KEYCODE };
+    m_keyBindings[GameAction::DASH] = { SDLK_SPACE, MOUSE_RIGHT_KEYCODE };
     m_keyBindings[GameAction::QUIT] = { SDLK_ESCAPE };
-    m_keyBindings[GameAction::DASH] = { SDLK_LSHIFT };
 }
 
 bool ConfigManager::getAutoShoot() const
@@ -220,4 +230,16 @@ bool ConfigManager::getAutoShoot() const
 void ConfigManager::setAutoShoot(bool enabled)
 {
     m_autoShoot = enabled;
+}
+
+std::string ConfigManager::getColorblindType() const
+{
+    return m_colorblindType;
+}
+
+void ConfigManager::setColorblindType(const std::string& type)
+{
+    if (type == "protanopia" || type == "deuteranopia" || type == "tritanopia" || type.empty()) {
+        m_colorblindType = type;
+    }
 }

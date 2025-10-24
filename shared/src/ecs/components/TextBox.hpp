@@ -20,7 +20,7 @@ struct TextBox {
     std::string text; /**< The text content to display */
     int fontSize = 16; /**< Font size in pixels */
     Color color = { 255, 255, 255, 255 }; /**< Text color (default: white) */
-    std::string fontPath = "client/res/fonts/OpenSans-Medium.ttf"; /**< Path to the font file */
+    std::string fontPath = "res/fonts/OpenSans-Medium.ttf"; /**< Path to the font file */
     bool visible = true; /**< Whether the text is visible */
     enum class Alignment { LEFT,
         CENTER,

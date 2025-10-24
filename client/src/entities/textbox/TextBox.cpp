@@ -13,6 +13,7 @@
 #include "TextBox.hpp"
 #include "components/Sprite.hpp"
 #include "components/SpriteFactory.hpp"
+#include "managers/ResourceManager.hpp"
 
 namespace factories {
 
@@ -24,7 +25,7 @@ Entity createTextBox(Registry& registry, const std::string& text,
 
     registry.emplace<Position>(textBox, x, y);
     registry.emplace<TextBox>(textBox, text, fontSize, color,
-        "client/res/fonts/metali1.ttf", true,
+        ResourceManager::getInstance().getAssetPath("fonts/metali1.ttf"), true,
         alignement);
 
     if (!textureId.empty()) {

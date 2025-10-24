@@ -15,7 +15,9 @@ bool processInput(
     const std::vector<std::pair<GameInput, bool>>& inputs,
     std::vector<Entity>& newEntities,
     uint32_t playerId,
-    bool isClient)
+    bool isClient,
+    float mouseX,
+    float mouseY)
 {
     (void)tick;
 
@@ -69,8 +71,9 @@ bool processInput(
         case GameInput::ATTACK:
             if (isClient)
                 continue;
-            if (WeaponSystem::handlePlayerAttack(registry, playerEntity, playerId, newEntities)) {
-                // Attack processed
+            // Pass mouse coordinates to weapon system for aiming
+            if (WeaponSystem::handlePlayerAttack(registry, playerEntity, playerId, newEntities, mouseX, mouseY)) {
+                // Attack processed with mouse aiming
             }
             break;
         case GameInput::DASH:

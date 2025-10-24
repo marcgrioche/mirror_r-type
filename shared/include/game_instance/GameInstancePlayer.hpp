@@ -43,11 +43,14 @@ public:
      * @param tick The tick number (unused currently)
      * @param inputs Vector of input pairs
      * @param newEntities List to add new entities to
+     * @param mouseX Mouse X coordinate (optional, default 0)
+     * @param mouseY Mouse Y coordinate (optional, default 0)
      * @return True if valid input was processed
      */
     bool processPlayerInput(Registry& registry, uint32_t playerId, uint32_t tick,
                            const std::vector<std::pair<GameInput, bool>>& inputs,
-                           std::vector<Entity>& newEntities);
+                           std::vector<Entity>& newEntities,
+                           float mouseX = 0.0f, float mouseY = 0.0f);
 
     /**
      * @brief Finds a player ID by their entity

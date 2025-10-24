@@ -26,6 +26,13 @@ public:
      */
     uint16_t getPort() const;
 
+    /**
+     * @brief Gets the colorblind filter type
+     * @return The colorblind filter type ("protanopia", "deuteranopia", "tritanopia", or empty string for no filter)
+     */
+    std::string getColorblindType() const;
+
 private:
     std::vector<std::string> m_arguments;
+    std::string m_colorblindType;
 };

@@ -93,8 +93,13 @@ public:
 
     /**
      * @brief Processes input from a player
+     * @param playerId The player's unique ID
+     * @param tick The tick number
+     * @param inputs Vector of input pairs
+     * @param mouseX Mouse X coordinate (optional, default 0)
+     * @param mouseY Mouse Y coordinate (optional, default 0)
      */
-    bool processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs);
+    bool processPlayerInput(uint32_t playerId, uint32_t tick, const std::vector<std::pair<GameInput, bool>>& inputs, float mouseX = 0.0f, float mouseY = 0.0f);
 
     /**
      * @brief Serializes the current game state

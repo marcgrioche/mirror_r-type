@@ -7,6 +7,7 @@
 
 #include "InputManager.hpp"
 #include "ConfigManager.hpp"
+#include <iostream>
 
 InputManager& InputManager::getInstance()
 {
@@ -41,6 +42,29 @@ void InputManager::handleSDLEvent(const SDL_Event& e)
         if (it != keyToAction.end()) {
             updateActionState(it->second, false);
         }
+    } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+        SDL_Keycode mouseKey = (e.button.button == SDL_BUTTON_LEFT) ? MOUSE_LEFT_KEYCODE 
+                              : (e.button.button == SDL_BUTTON_RIGHT) ? MOUSE_RIGHT_KEYCODE 
+                              : static_cast<SDL_Keycode>(0);
+        if (mouseKey != 0) {
+            auto it = keyToAction.find(mouseKey);
+            if (it != keyToAction.end()) {
+                updateActionState(it->second, true);
+            }
+        }
+    } else if (e.type == SDL_MOUSEBUTTONUP) {
+        SDL_Keycode mouseKey = (e.button.button == SDL_BUTTON_LEFT) ? MOUSE_LEFT_KEYCODE 
+                              : (e.button.button == SDL_BUTTON_RIGHT) ? MOUSE_RIGHT_KEYCODE 
+                              : static_cast<SDL_Keycode>(0);
+        if (mouseKey != 0) {
+            auto it = keyToAction.find(mouseKey);
+            if (it != keyToAction.end()) {
+                updateActionState(it->second, false);
+            }
+        }
+    } else if (e.type == SDL_MOUSEMOTION) {
+        mousex = e.motion.x;
+        mousey = e.motion.y;
     }
 }
 
@@ -102,11 +126,6 @@ void InputManager::setDefaultKeyBindings()
     bindKeysForAction(GameAction::SHOOT, config.getKeysForAction(GameAction::SHOOT));
     bindKeysForAction(GameAction::QUIT, config.getKeysForAction(GameAction::QUIT));
     bindKeysForAction(GameAction::DASH, config.getKeysForAction(GameAction::DASH));
-
-    bindKey(SDLK_UP, GameAction::MOVE_UP);
-    bindKey(SDLK_DOWN, GameAction::MOVE_DOWN);
-    bindKey(SDLK_LEFT, GameAction::MOVE_LEFT);
-    bindKey(SDLK_RIGHT, GameAction::MOVE_RIGHT);
 }
 
 void InputManager::updateActionState(GameAction action, bool isPressed)
