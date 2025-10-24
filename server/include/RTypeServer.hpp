@@ -72,6 +72,7 @@ private:
     void handleLobbyState(const Message& msg, PeerInfo& peerInfo);
     void handleUsername(const Message& msg, PeerInfo& peerInfo);
     void handleKickPlayer(const Message& msg, PeerInfo& peerInfo);
+    void handleAuthRequest(const Message& msg, PeerInfo& peerInfo);
     void removePlayerAndNotifyLobby(const Message& msg, const Lobby* t_lobby, uint32_t playerId);
     // ...other handlers per message type
 
