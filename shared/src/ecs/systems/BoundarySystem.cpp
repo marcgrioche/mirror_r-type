@@ -17,7 +17,14 @@ void boundarySystem(Registry& registry)
 {
     auto view = registry.view<Position, Hitbox, Health, Dead>();
 
-    for (auto&& [pos, hitbox, health, dead] : view) {
+    for (auto it = view.begin(); it != view.end(); ++it) {
+        auto [pos, hitbox, health, dead] = *it;
+        Entity entity = it.entity();
+
+        if (registry.has<BossTag>(entity)) {
+            continue;
+        }
+
         float X = pos.v.x + hitbox.offset_x + hitbox.width;
         float Y = pos.v.y + hitbox.offset_y + hitbox.height;
 
