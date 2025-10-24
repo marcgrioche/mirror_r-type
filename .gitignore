@@ -24,3 +24,4 @@ Server/CMakeFiles/
 
 rtype.db-shm
 rtype.db-wal
+*.ini
