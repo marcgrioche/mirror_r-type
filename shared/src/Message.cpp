@@ -213,6 +213,38 @@ Message Message::deserialize(const std::vector<uint8_t>& data)
     return Message(type, payload, seq, pid, version);
 }
 
+Message Message::deserializeFromOffset(const std::vector<uint8_t>& data, size_t offset, size_t& bytesConsumed)
+{
+    if (data.size() < offset + 10) {
+        throw std::runtime_error("Message too short");
+    }
+
+    MessageType type = static_cast<MessageType>(data[offset]);
+    uint8_t version = data[offset + 1];
+
+    uint16_t seq;
+    std::memcpy(&seq, &data[offset + 2], sizeof(seq));
+    seq = byteSwap16(seq);
+
+    uint32_t pid;
+    std::memcpy(&pid, &data[offset + 4], sizeof(pid));
+    pid = byteSwap32(pid);
+
+    uint16_t length;
+    std::memcpy(&length, &data[offset + 8], sizeof(length));
+    length = byteSwap16(length);
+
+    size_t totalMessageSize = static_cast<size_t>(length) + 10;
+    if (data.size() < offset + totalMessageSize) {
+        throw std::runtime_error("Invalid message length or incomplete message in buffer");
+    }
+
+    std::vector<uint8_t> payload(data.begin() + offset + 10, data.begin() + offset + totalMessageSize);
+    bytesConsumed = totalMessageSize;
+
+    return Message(type, payload, seq, pid, version);
+}
+
 uint16_t Message::byteSwap16(uint16_t value)
 {
     return (value << 8) | (value >> 8);
