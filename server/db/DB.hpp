@@ -22,6 +22,8 @@ public:
     // Create a safe backup into the given file path using sqlite3_backup API.
     bool backup_to_file(const std::string& t_backupPath);
 
+    bool isUserRegistered(const std::string& t_username);
+
 private:
     std::string m_dbPath;
     sqlite3* m_db = nullptr;

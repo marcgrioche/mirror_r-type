@@ -145,6 +145,14 @@ std::optional<std::pair<int64_t, std::string>> DB::get_player_hash(const std::st
     return std::nullopt;
 }
 
+bool DB::isUserRegistered(const std::string& t_username)
+{
+    if (get_player_hash(t_username)) {
+        return true;
+    }
+    return false;
+}
+
 std::optional<int64_t> DB::registerPlayer(const std::string& t_username, const std::string& t_password)
 {
     // Hash password afterward
