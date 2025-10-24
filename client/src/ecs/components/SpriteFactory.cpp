@@ -23,7 +23,8 @@ Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
     sprite.rotation = 0.0f;
 
     sprite.total_frames = 1;
-    sprite.current_frame = 0;
+    sprite.current_frameX = 0;
+    sprite.current_frameY = 0;
     sprite.frame_duration = 0.0f;
     sprite.elapsed_time = 0.0f;
     sprite.frame_width = width;
@@ -49,7 +50,8 @@ Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     sprite.rotation = 0.0f;
 
     sprite.total_frames = totalFrames;
-    sprite.current_frame = 0;
+    sprite.current_frameX = 0;
+    sprite.current_frameY = 0;
     sprite.frame_duration = frameDuration;
     sprite.elapsed_time = 0.0f;
     sprite.frame_width = frameWidth;
@@ -73,7 +75,8 @@ Sprite SpriteFactory::createCustomSprite(const std::string& textureId,
     sprite.rotation = rotation;
 
     sprite.total_frames = 1;
-    sprite.current_frame = 0;
+    sprite.current_frameX = 0;
+    sprite.current_frameY = 0;
     sprite.frame_duration = 0.0f;
     sprite.elapsed_time = 0.0f;
     sprite.frame_width = srcRect.w;

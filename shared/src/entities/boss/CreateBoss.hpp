@@ -17,6 +17,7 @@
 #include "Registry.hpp"
 #include "components/Dead.hpp"
 #include "components/Health.hpp"
+#include "components/MaxHealth.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Lifetime.hpp"
 #include "components/Position.hpp"

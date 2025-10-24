@@ -67,6 +67,10 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", "client/res/sprites/Heads_Boss/heads_monster_attack.png")) {
+        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
+    }
+
     if (!resourceManager.loadTexture(renderer, "bydo_flying.png", resourceManager.getAssetPath("sprites/bydo_flying.png"))) {
         std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
     }

@@ -26,6 +26,8 @@ Entity createBoss(Registry& registry, const Level* level)
     registry.emplace<PreviousPosition>(boss, posX, posY);
     registry.emplace<Velocity>(boss, velocityX, velocityY);
     registry.emplace<Health>(boss, static_cast<int>(bossHealth));
+    registry.emplace<MaxHealth>(boss, static_cast<int>(bossHealth));
+    registry.emplace<IsAttacking>(boss, false);
     registry.emplace<Hitbox>(boss, width, height, 0.0f, 0.0f);
     registry.emplace<Dead>(boss);
     registry.emplace<EnemyTag>(boss);
