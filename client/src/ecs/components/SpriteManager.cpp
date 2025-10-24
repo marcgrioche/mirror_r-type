@@ -92,10 +92,10 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    const int FRAME_WIDTH = 512;
-    const int FRAME_HEIGHT = 512;
-    const int TOTAL_FRAMES = 8;
-    const float FRAME_DURATION = 0.17f;
+    const int FRAME_WIDTH = level ? level->getFrameWidth() : 512;
+    const int FRAME_HEIGHT = level ? level->getFrameHeight() : 512;
+    const int TOTAL_FRAMES = level ? level->getFrameNumber() : 3;
+    const float FRAME_DURATION = level ? level->getFrameDuration() : 0.15;
 
     float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;

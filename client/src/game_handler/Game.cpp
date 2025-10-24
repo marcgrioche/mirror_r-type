@@ -63,7 +63,7 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
     }
 
-    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", "client/res/sprites/Heads_Boss/heads_monster_idle.png")) {
+    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", "client/res/sprites/Heads_Boss/heads_monster_all_idle.png")) {
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 

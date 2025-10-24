@@ -204,7 +204,7 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         // TODO: PowerUp sprite attachment
         break;
     case EntityType::BOSS:
-        SpriteManager::addBossSprite(registry, entity, position.x, position.y, 1.25f);
+        SpriteManager::addBossSprite(registry, entity, position.x, position.y, level ? level->getSizeFactor() : 1.0);
         break;
     default:
         std::cout << "Unknown entity type for sprite attachment: " << static_cast<int>(type) << std::endl;
