@@ -21,4 +21,4 @@ CMakeFiles/
 Client/CMakeFiles/
 Server/CMakeFiles/
 .idea/
-
+*.ini

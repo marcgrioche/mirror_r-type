@@ -155,7 +155,7 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
-    SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
+    // SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
@@ -201,11 +201,10 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 2.0f);
         break;
     case EntityType::POWERUP:
-        // PowerUp sprite attachment - could be based on powerup type
+        // TODO: PowerUp sprite attachment
         break;
     case EntityType::BOSS:
-        // Boss sprite attachment - could be different from enemy
-        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 3.0f);
+        SpriteManager::addBossSprite(registry, entity, position.x, position.y, 1.25f);
         break;
     default:
         std::cout << "Unknown entity type for sprite attachment: " << static_cast<int>(type) << std::endl;
