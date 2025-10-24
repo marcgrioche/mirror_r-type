@@ -4,6 +4,10 @@
 
 class AMenu {
 public:
+    enum class Input {
+        USERNAME,
+        PASSWORD,
+    };
     AMenu() = default;
     virtual ~AMenu() = default;
 
@@ -16,6 +20,9 @@ public:
     virtual void render(GraphicsManager& gfx, Registry& registry) = 0;
     virtual void setupEventHandlers() = 0;
     virtual void resetOtherOptions() = 0;
+    virtual void clearRequests() = 0;
+    virtual bool hasRequest() const = 0;
+    virtual std::string getInputData(Registry& registry, Input input) = 0;
     bool isVisible() const;
 
 protected:

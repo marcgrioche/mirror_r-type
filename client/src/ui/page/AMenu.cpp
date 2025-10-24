@@ -16,7 +16,7 @@ void AMenu::hide(Registry& registry)
     if (m_visible) {
         destroyEntities(registry);
         m_visible = false;
-        resetOtherOptions();
+        // resetOtherOptions();
     }
 }
 

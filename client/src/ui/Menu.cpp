@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include "page/AMenu.hpp"
+
 Menu::Menu()
     = default;
 Menu::~Menu() = default;
@@ -53,6 +55,7 @@ void Menu::hideAllPages(Registry& registry)
 {
     m_homePage.hide(registry);
     m_connectionPage.hide(registry);
+    m_loginPage.hide(registry);
     m_joinPage.hide(registry);
     // Hide all other pages to avoid leaving stale UI/entities around
     m_lobbyPage.hide(registry);
@@ -218,7 +221,6 @@ void Menu::processPageTransitions(Registry& registry)
         // Transition gérée par le système principal via hasConnectionRequest()
         break;
     case Page::LOGIN:
-        showLoginPage(registry);
         break;
     case Page::LOBBY:
         if (m_lobbyPage.hasReturnRequest()) {
@@ -311,10 +313,23 @@ std::string Menu::getUserPseudo(Registry& registry) const
     return m_homePage.getPseudo(registry);
 }
 
+std::string Menu::getInput(Registry& registry, AMenu::Input inputType)
+{
+    if (inputType == AMenu::Input::USERNAME || inputType == AMenu::Input::PASSWORD) {
+        return m_loginPage.getInputData(registry, inputType);
+    }
+    return "";
+}
+
 // Vérification des demandes utilisateur
 bool Menu::hasConnectionRequest() const
 {
     return m_connectionPage.hasConnectionRequest();
+}
+
+bool Menu::hasLoginRequest() const
+{
+    return m_loginPage.hasRequest();
 }
 
 bool Menu::hasJoinRequest() const
@@ -339,4 +354,5 @@ void Menu::clearAllRequests()
     m_homePage.clearRequests();
     m_lobbyPage.clearRequests();
     m_parameterPage.clearRequests();
+    m_loginPage.clearRequests();
 }

@@ -197,6 +197,8 @@ private:
      */
     void handleMenuStartRequest();
 
+    void handleMenuLoginRequest();
+
     // Network event handling
     void processNetworkEvents();
     void handleNetworkEvent(const Client::NetworkEvent& event);
@@ -209,6 +211,7 @@ private:
     void handleGameEndLose();
     void handleUsername(const Client::NetworkEvent& event);
     void handleKickPlayerNotice(const Client::NetworkEvent& event);
+    void handleAuthResponse(const Client::NetworkEvent& event);
 
     // Entity deserialization
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
@@ -265,6 +268,7 @@ private:
     InputHistory m_inputHistory;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
+    std::string m_pseudo = "";
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
@@ -276,4 +280,5 @@ private:
     void onLobbyJoined(uint32_t lobbyId);
     void onLobbyCreated(uint32_t lobbyId);
     void onGameStarted();
+    void onLoginSuccess();
 };

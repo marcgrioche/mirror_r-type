@@ -9,6 +9,10 @@ public:
 
     void render(GraphicsManager& gfx, Registry& registry) override;
     void resetOtherOptions() override { m_loginRequested = false; };
+    void clearRequests() override;
+    bool hasRequest() const override;
+    std::string getInputText(Registry& registry, const std::string& inputRef);
+    std::string getInputData(Registry& registry, Input input) override;
 
 private:
     // Entity m_usernameTextBoxEntity;

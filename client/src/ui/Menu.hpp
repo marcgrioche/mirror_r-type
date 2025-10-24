@@ -149,6 +149,8 @@ public:
      */
     std::string getJoinCode(Registry& registry) const;
 
+    std::string getInput(Registry& registry, AMenu::Input inputType);
+
     /**
      * @brief Gets the username entered by the user
      * @param registry The ECS registry to use for entity management
@@ -163,6 +165,8 @@ public:
      * @return True if connection request is pending, false otherwise
      */
     bool hasConnectionRequest() const;
+
+    bool hasLoginRequest() const;
 
     /**
      * @brief Checks if the user has requested to join a lobby

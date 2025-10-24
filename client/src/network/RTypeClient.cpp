@@ -218,4 +218,7 @@ void RTypeClient::registerHandlers()
     _handlers[MessageType::KICK_NOTICE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
         handleKickPlayerNotice(t_msg, t_peerInfo);
     };
+    _handlers[MessageType::AUTH_RESPONSE] = [this](const Message& t_msg, PeerInfo& t_peerInfo) {
+        handleAuthenticationResponse(t_msg, t_peerInfo);
+    };
 }

@@ -19,7 +19,7 @@ void LoginMenu::createEntities(Registry& registry)
     m_entities["username_input"] = factories::createTextBoxInput(registry,
         "Enter your username...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 300, 30, { 255, 0, 0, 0 });
     m_entities["password_input"] = factories::createTextBoxInput(registry,
-        "Enter your password...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 300, 30, { 255, 0, 0, 0 });
+        "Enter your password...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 100, 30, { 255, 0, 0, 0 });
 
     // Button login
     m_entities["login_button"] = factories::createButton(registry,
@@ -27,7 +27,7 @@ void LoginMenu::createEntities(Registry& registry)
     m_entities["login_textbox"] = factories::createTextBox(registry, "LOGIN",
         WINDOW_WIDTH / 2 - 120, WINDOW_HEIGHT / 2 + 180, 50, { 255, 00, 00, 00 }, TextBox::Alignment::CENTER);
 
-    m_bg.reload(registry, 55, { m_entities["login_button"] });
+    m_bg.reload(registry, 75, { m_entities["login_button"] });
 }
 
 void LoginMenu::setupEventHandlers()
@@ -39,6 +39,40 @@ void LoginMenu::setupEventHandlers()
             m_loginRequested = true;
         }
     });
+}
+
+void LoginMenu::clearRequests()
+{
+    m_loginRequested = false;
+}
+
+bool LoginMenu::hasRequest() const
+{
+    return m_loginRequested;
+}
+
+std::string LoginMenu::getInputText(Registry& registry, const std::string& inputRef)
+{
+    if (!registry.has<TextBoxInput>(m_entities[inputRef])) {
+        return "";
+    }
+    const auto& inputField = registry.get<TextBoxInput>(m_entities[inputRef]);
+    return inputField.inputText;
+}
+
+std::string LoginMenu::getInputData(Registry& registry, Input input)
+{
+    if (!m_visible) {
+        return "";
+    }
+    switch (input) {
+    case Input::USERNAME:
+        return getInputText(registry, "username_input");
+    case Input::PASSWORD:
+        return getInputText(registry, "password_input");
+    default:
+        return "";
+    }
 }
 
 void LoginMenu::render(GraphicsManager& gfx, Registry& registry)
