@@ -16,27 +16,18 @@ CPMAddPackage(
 
 add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
 
-if (TARGET sqlite::sqlite3)
-    message(STATUS "Using sqlite target: sqlite::sqlite3")
-    target_link_libraries(r-type_server PRIVATE sqlite::sqlite3)
-elseif (TARGET sqlite3)
-    message(STATUS "Using sqlite target: sqlite3")
-    add_library(sqlite::sqlite3 ALIAS sqlite3)
-    target_link_libraries(r-type_server PRIVATE sqlite::sqlite3)
-elseif (TARGET sqlite)
-    message(STATUS "Using sqlite target: sqlite")
-    add_library(sqlite::sqlite3 ALIAS sqlite)
-    target_link_libraries(r-type_server PRIVATE sqlite::sqlite3)
+CPMAddPackage(
+        NAME sqlite
+        GITHUB_REPOSITORY sqlite/sqlite
+        GIT_TAG version-3.42.1
+)
+
+if (sqlite_ADDED)
+    message(STATUS "Using sqlite3 from CPM (sqlite package)")
+    target_link_libraries(r-type_server PRIVATE sqlite3)
 else()
-    # Try system package via FindSQLite3 or pkg-config
-    find_package(SQLite3 QUIET)
-    if (TARGET SQLite::SQLite3)
-        message(STATUS "Using system SQLite: SQLite::SQLite3")
-        target_link_libraries(r-type_server PRIVATE SQLite::SQLite3)
-    else()
-        # Last resort: fail with a helpful message
-        message(FATAL_ERROR "SQLite package not available. Install sqlite3 development package or adjust CPM tag/FetchContent fallback.")
-    endif()
+    find_package(SQLite3 REQUIRED)
+    target_link_libraries(r-type_server PRIVATE SQLite::SQLite3)
 endif()
 
 if(WIN32)

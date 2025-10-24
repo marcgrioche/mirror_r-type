@@ -7,6 +7,7 @@ void RTypeServer::handleAuthRequest(const Message& msg, PeerInfo& peerInfo)
     std::string username = msg.readString(usernameLength);
     const uint8_t passwordLength = msg.readU8();
     std::string password = msg.readString(passwordLength);
+    uint32_t playerId = msg.player_id;
 
     Message response(MessageType::AUTH_RESPONSE, msg.sequence_number, msg.player_id);
 
@@ -14,6 +15,7 @@ void RTypeServer::handleAuthRequest(const Message& msg, PeerInfo& peerInfo)
     if (_db->isUserRegistered(username)) {
         auto id = _db->authenticate(username, password);
         if (id != std::nullopt) {
+            playerId = id.value();
             _clients.erase(static_cast<uint32_t>(msg.player_id));
             _clients[static_cast<uint32_t>(id.value())] = peerInfo;
             _usernames[static_cast<uint32_t>(id.value())] = username;
@@ -25,6 +27,7 @@ void RTypeServer::handleAuthRequest(const Message& msg, PeerInfo& peerInfo)
     } else {
         auto newId = _db->registerPlayer(username, password);
         if (newId != std::nullopt) {
+            playerId = newId.value();
             _clients.erase(static_cast<uint32_t>(msg.player_id));
             _clients[static_cast<uint32_t>(newId.value())] = peerInfo;
             _usernames[static_cast<uint32_t>(newId.value())] = username;
@@ -34,5 +37,5 @@ void RTypeServer::handleAuthRequest(const Message& msg, PeerInfo& peerInfo)
             response.write("Database not available!");
         }
     }
-    sendToClient(response.player_id, response);
+    sendToClient(playerId, response);
 }
