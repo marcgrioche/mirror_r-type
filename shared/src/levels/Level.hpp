@@ -50,6 +50,17 @@ private:
     int _bossProjectileDamage = 10;
     float _bossProjectileWidth = 32.0f;
     float _bossProjectileHeight = 32.0f;
+    int _bossHealthStatesNumber = 3;
+    std::string _bossIdlePath = "";
+    std::vector<std::string> _bossAttackPaths = {};
+    std::string _bossProjectilePath = "";
+    int _bossFrameWidth = 512;
+    int _bossFrameHeight = 512;
+    int _bossFramesNb = 8;
+    float _bossFrameDuration = 0.17f;
+    float _bossSizeFactor = 1.25f;
+    float _bossPosXFactor = 0.75f;
+    float _bossPosYFactor = 0.0f;
 
 public:
     /**
@@ -98,4 +109,15 @@ public:
     float getEnemyProjectileHeight() const { return _enemyProjectileHeight; }
     float getBossProjectileWidth() const { return _bossProjectileWidth; }
     float getBossProjectileHeight() const { return _bossProjectileHeight; }
+    int getBossHealthStatesNumber() const { return _bossHealthStatesNumber; }
+    const std::string& getBossIdlePath() const { return _bossIdlePath; }
+    const std::vector<std::string>& getBossAttackPaths() const { return _bossAttackPaths; }
+    const std::string& getBossProjectilePath() const { return _bossProjectilePath; }
+    int getBossFrameWidth() const { return _bossFrameWidth; }
+    int getBossFrameHeight() const { return _bossFrameHeight; }
+    int getBossFramesNb() const { return _bossFramesNb; }
+    float getBossFrameDuration() const { return _bossFrameDuration; }
+    float getBossSizeFactor() const { return _bossSizeFactor; }
+    float getBossPosXFactor() const { return _bossPosXFactor; }
+    float getBossPosYFactor() const { return _bossPosYFactor; }
 };

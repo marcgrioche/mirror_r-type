@@ -138,6 +138,11 @@ void Game::handleGameEndWin()
     if (m_currentLevel > m_maxLevel) {
         m_currentLevel = 1;
     }
+
+    // Load next level data
+    std::string levelPath = "shared/res/levels/level" + std::to_string(m_currentLevel) + ".json";
+    m_currentLevelData.loadFromJson(levelPath);
+
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
@@ -153,6 +158,11 @@ void Game::handleGameEndLose()
 {
     std::cout << "Game ended - You lost!" << std::endl;
     m_currentLevel = 1;
+
+    // Reload level 1 data
+    std::string levelPath = "shared/res/levels/level1.json";
+    m_currentLevelData.loadFromJson(levelPath);
+
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {

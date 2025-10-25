@@ -23,14 +23,25 @@
     "projectileHeight": 40.0
   },
   "boss": {
+    "health_states_number": 3,
+    "idle_path": "bydo_flying.png",
+    "attack_path": ["bydo_flying.png"],
+    "projectile_path": "boss_projectile.png",
+    "frame_width": 79,
+    "frame_height": 69,
+    "frames_nb": 4,
+    "frame_duration": 0.15,
+    "size_factor": 5.0,
+    "posX_factor": 0.75,
+    "posY_factor": 0.0,
     "health": 300,
     "width": 300.0,
     "height": 700.0,
     "shootFrequency": 0.5,
     "spawnEnemyFrequency": 3.0,
     "projectileSpeed": -800.0,
+    "projectileDamage": 400,
     "projectileWidth": 100.0,
     "projectileHeight": 100.0
-
   }
 }

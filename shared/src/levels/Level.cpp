@@ -65,6 +65,22 @@ void Level::loadFromJson(const std::string& filepath)
             _bossProjectileDamage = boss.value("projectileDamage", _bossProjectileDamage);
             _bossProjectileWidth = boss.value("projectileWidth", _bossProjectileWidth);
             _bossProjectileHeight = boss.value("projectileHeight", _bossProjectileHeight);
+            _bossHealthStatesNumber = boss.value("health_states_number", _bossHealthStatesNumber);
+            _bossIdlePath = boss.value("idle_path", _bossIdlePath);
+            if (boss.contains("attack_path") && boss["attack_path"].is_array()) {
+                _bossAttackPaths.clear();
+                for (const auto& path : boss["attack_path"]) {
+                    _bossAttackPaths.push_back(path);
+                }
+            }
+            _bossProjectilePath = boss.value("projectile_path", _bossProjectilePath);
+            _bossFrameWidth = boss.value("frame_width", _bossFrameWidth);
+            _bossFrameHeight = boss.value("frame_height", _bossFrameHeight);
+            _bossFramesNb = boss.value("frames_nb", _bossFramesNb);
+            _bossFrameDuration = boss.value("frame_duration", _bossFrameDuration);
+            _bossSizeFactor = boss.value("size_factor", _bossSizeFactor);
+            _bossPosXFactor = boss.value("posX_factor", _bossPosXFactor);
+            _bossPosYFactor = boss.value("posY_factor", _bossPosYFactor);
         }
     } catch (const std::exception& e) {
         std::cerr << "Error loading level configuration: " << e.what() << std::endl;

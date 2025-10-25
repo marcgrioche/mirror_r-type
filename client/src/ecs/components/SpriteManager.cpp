@@ -81,7 +81,7 @@ void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX
     registry.add<Sprite>(entity, sprite);
 }
 
-void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor, const Level* level)
 {
     (void)posX;
     (void)posY;
@@ -92,10 +92,11 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    const int FRAME_WIDTH = level ? level->getFrameWidth() : 512;
-    const int FRAME_HEIGHT = level ? level->getFrameHeight() : 512;
-    const int TOTAL_FRAMES = level ? level->getFrameNumber() : 3;
-    const float FRAME_DURATION = level ? level->getFrameDuration() : 0.15;
+    const int FRAME_WIDTH = level ? level->getBossFrameWidth() : 512;
+    const int FRAME_HEIGHT = level ? level->getBossFrameHeight() : 512;
+    const int TOTAL_FRAMES = level ? level->getBossFramesNb() : 3;
+    const float FRAME_DURATION = level ? level->getBossFrameDuration() : 0.15;
+    const std::string texture_id = level ? level->getBossIdlePath() : "heads_monster_idle.png";
 
     float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
@@ -106,12 +107,11 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createAnimatedSprite(
-        "heads_monster_idle.png",
+        texture_id,
         FRAME_WIDTH, FRAME_HEIGHT,
         TOTAL_FRAMES, FRAME_DURATION,
         scale_x, scale_y,
-        offset_x, offset_y
-    );
+        offset_x, offset_y);
 
     registry.add<Sprite>(entity, sprite);
 }

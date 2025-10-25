@@ -63,11 +63,11 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
     }
 
-    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", "client/res/sprites/Heads_Boss/heads_monster_all_idle.png")) {
+    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_all_idle.png"))) {
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 
-    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", "client/res/sprites/Heads_Boss/heads_monster_attack.png")) {
+    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
         std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
     }
 
@@ -132,6 +132,10 @@ bool Game::initialize()
     _isRunning = true;
 
     m_maxLevel = determineMaxLevel();
+
+    // Preload level 1 data
+    std::string level1Path = "shared/res/levels/level1.json";
+    m_currentLevelData.loadFromJson(level1Path);
 
     initializeMenuMode();
     return true;
