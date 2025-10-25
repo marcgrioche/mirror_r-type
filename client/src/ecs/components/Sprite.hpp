@@ -42,9 +42,11 @@ struct Sprite {
     float scale_y = 1.0f; // Independent Y scaling for exact hitbox matching
     float rotation = 0.0f; // in degrees
     int total_frames = 1; // for animated sprites
-    int current_frame = 0;
+    int current_frameX = 0;
+    int current_frameY = 0;
     float frame_duration = 0.1f;
     float elapsed_time = 0.0f;
     int frame_width = 0;
     int frame_height = 0;
+    int nb_state = 0;
 };

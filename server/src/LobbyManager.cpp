@@ -2,6 +2,7 @@
 #include "../../shared/include/Message.hpp"
 #include "RTypeServer.hpp"
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 
 Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
@@ -9,6 +10,7 @@ Lobby::Lobby(uint32_t lobbyId, uint32_t creator)
     , creatorId(creator)
     , state(LobbyState::WAITING)
     , maxPlayers(4)
+    , currentLevel(1)
     , gameInstance(nullptr)
     , threadRunning(false)
 {
@@ -137,7 +139,7 @@ bool LobbyManager::startGame(uint32_t lobbyId, uint32_t playerId)
         return false;
     }
 
-    lobby->gameInstance = std::make_unique<GameInstance>(lobbyId);
+    lobby->gameInstance = std::make_unique<GameInstance>(lobbyId, lobby->currentLevel);
     lobby->gameInstance->initialize();
 
     for (uint32_t player : lobby->players) {
@@ -278,7 +280,7 @@ std::unordered_map<uint32_t, std::string> LobbyManager::getLobbyPlayersUsernames
     }
     std::unordered_map<uint32_t, std::string> playersUsernames;
     for (const auto playerId : it->second->players) {
-        if (it->second->_usernames.contains(playerId)) {
+        if (it->second->_usernames.find(playerId) != it->second->_usernames.end()) {
             playersUsernames[playerId] = it->second->_usernames[playerId];
         } else {
             playersUsernames[playerId] = std::to_string(playerId);
@@ -335,6 +337,12 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
         if (lobby->gameInstance->hasWon()) {
             std::cout << "Game won in lobby " << lobby->id << std::endl;
+            lobby->currentLevel++;
+            std::string nextLevelPath = "shared/res/levels/level" + std::to_string(lobby->currentLevel) + ".json";
+            std::ifstream checkFile(nextLevelPath);
+            if (!checkFile.is_open()) {
+                lobby->currentLevel = 1;
+            }
             Message endMsg(MessageType::GAME_END_WIN);
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;
@@ -344,6 +352,7 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
             break;
         } else if (lobby->gameInstance->hasLost()) {
             std::cout << "Game lost in lobby " << lobby->id << std::endl;
+            lobby->currentLevel = 1;
             Message endMsg(MessageType::GAME_END_LOSE);
             _server->broadcastToLobby(lobby->id, endMsg);
             lobby->state = LobbyState::WAITING;

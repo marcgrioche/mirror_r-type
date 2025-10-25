@@ -36,14 +36,19 @@ public:
     /**
      * @brief Shows the lobby menu by creating and displaying its UI elements
      * @param registry The ECS registry to create entities in
+     * @param lobbyId The lobby ID to display
+     * @param currentLevel The player's current level
+     * @param maxLevel The maximum available level
      */
-    void show(Registry& registry, int lobbyId);
+    void show(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Shows the lobby menu after a game has ended
      * @param registry The ECS registry to create entities in
+     * @param currentLevel The player's current level
+     * @param maxLevel The maximum available level
      */
-    void showAfterGameEnd(Registry& registry);
+    void showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Hides the lobby menu by destroying its UI elements
@@ -80,6 +85,12 @@ public:
      */
     void handleEvent(Registry& registry, const SDL_Event& event);
 
+    /**
+     * @brief Renders the dungeon map showing level progression
+     * @param renderer The SDL renderer to use for drawing
+     */
+    void renderDungeonMap(SDL_Renderer* renderer);
+
     // Vérifie si l'utilisateur a cliqué "Connect"
 
     /**
@@ -110,6 +121,8 @@ private:
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;
     bool m_isReturningFromGame = false;
+    uint32_t m_currentLevel = 1;
+    uint32_t m_maxLevel = 1;
 
     void createEntities(Registry& registry, int lobbyId);
     void destroyEntities(Registry& registry);

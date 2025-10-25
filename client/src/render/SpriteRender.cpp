@@ -31,7 +31,7 @@ void drawSprite(GraphicsManager& gfx, Registry& registry, Entity sprite)
 
     // If animated, compute the correct frame X offset
     if (spr.total_frames > 1) {
-        int frame = spr.current_frame;
+        int frame = spr.current_frameX;
         if (frame < 0)
             frame = 0;
         if (frame >= spr.total_frames)

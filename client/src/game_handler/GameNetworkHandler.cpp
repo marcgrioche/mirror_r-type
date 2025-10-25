@@ -134,28 +134,43 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 void Game::handleGameEndWin()
 {
     std::cout << "Game ended - You won!" << std::endl;
+    m_currentLevel++;
+    if (m_currentLevel > m_maxLevel) {
+        m_currentLevel = 1;
+    }
+
+    // Load next level data
+    std::string levelPath = "shared/res/levels/level" + std::to_string(m_currentLevel) + ".json";
+    m_currentLevelData.loadFromJson(levelPath);
+
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
-        m_menu.showWinPage(_registry);
+        m_menu.showWinPage(_registry, m_currentLevel, m_maxLevel);
     } else {
         // Réactive le menu pour afficher la page Win
         _state = GameState::MENU;
-        m_menu.activate(_registry, Menu::Page::WIN);
+        m_menu.activate(_registry, Menu::Page::WIN, m_currentLevel, m_maxLevel);
     }
 }
 
 void Game::handleGameEndLose()
 {
     std::cout << "Game ended - You lost!" << std::endl;
+    m_currentLevel = 1;
+
+    // Reload level 1 data
+    std::string levelPath = "shared/res/levels/level1.json";
+    m_currentLevelData.loadFromJson(levelPath);
+
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
-        m_menu.showLosePage(_registry);
+        m_menu.showLosePage(_registry, m_currentLevel, m_maxLevel);
     } else {
         // Réactive le menu pour afficher la page Lose
         _state = GameState::MENU;
-        m_menu.activate(_registry, Menu::Page::LOSE);
+        m_menu.activate(_registry, Menu::Page::LOSE, m_currentLevel, m_maxLevel);
     }
 }
 

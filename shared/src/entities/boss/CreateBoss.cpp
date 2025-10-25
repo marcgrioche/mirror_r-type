@@ -18,7 +18,7 @@ Entity createBoss(Registry& registry, const Level* level)
     std::cout << "HEIGHT = " << BOSS_HEIGHT << " WIDTH = " << BOSS_WIDTH << std::endl;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
-    float posX = level ? (SCREEN_WIDTH - width * 0.75) : SCREEN_WIDTH - BOSS_WIDTH;
+    float posX = level ? (SCREEN_WIDTH - width * level->getBossPosXFactor()) : SCREEN_WIDTH - BOSS_WIDTH;
     float posY = 0.0f;
 
     Entity boss = registry.create_entity();
@@ -26,6 +26,8 @@ Entity createBoss(Registry& registry, const Level* level)
     registry.emplace<PreviousPosition>(boss, posX, posY);
     registry.emplace<Velocity>(boss, velocityX, velocityY);
     registry.emplace<Health>(boss, static_cast<int>(bossHealth));
+    registry.emplace<MaxHealth>(boss, static_cast<int>(bossHealth));
+    registry.emplace<IsAttacking>(boss, false);
     registry.emplace<Hitbox>(boss, width, height, 0.0f, 0.0f);
     registry.emplace<Dead>(boss);
     registry.emplace<EnemyTag>(boss);

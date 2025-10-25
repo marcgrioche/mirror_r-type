@@ -57,9 +57,9 @@ void buttonSystem(Registry& registry)
         if (registry.has<Sprite>(e)) {
             Sprite& sprite = registry.get<Sprite>(e);
             if (button.is_hovered)
-                sprite.current_frame = 1;
+                sprite.current_frameX = 1;
             else
-                sprite.current_frame = 0;
+                sprite.current_frameX = 0;
         }
 
         if (button.interactable && hovered && justPressed && !clickConsumedForThisPress) {

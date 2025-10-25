@@ -305,9 +305,9 @@ void ParameterMenu::render(GraphicsManager& gfx, Registry& registry)
 void ParameterMenu::loadBindings()
 {
     m_bindings.clear();
-    std::ifstream ifs(m_iniPath);
+    std::ifstream ifs(ConfigManager::getInstance().getConfigFilePath());
     if (!ifs.is_open()) {
-        std::cerr << "ParameterMenu: can't open " << m_iniPath << ", using defaults\n";
+        std::cerr << "ParameterMenu: can't open " << ConfigManager::getInstance().getConfigFilePath() << ", using defaults\n";
         // fallback defaults
         m_bindings = {
             { "move_up", { 122, 273 } },
@@ -367,9 +367,9 @@ void ParameterMenu::loadBindings()
 
 void ParameterMenu::saveBindings()
 {
-    std::ofstream ofs(m_iniPath, std::ios::trunc);
+    std::ofstream ofs(ConfigManager::getInstance().getConfigFilePath(), std::ios::trunc);
     if (!ofs.is_open()) {
-        std::cerr << "ParameterMenu: can't write " << m_iniPath << std::endl;
+        std::cerr << "ParameterMenu: can't write " << ConfigManager::getInstance().getConfigFilePath() << std::endl;
         return;
     }
     ofs << "# R-Type Keybindings Configuration\n";
@@ -386,7 +386,7 @@ void ParameterMenu::saveBindings()
     ofs << "auto_shoot=" << (m_autoShoot ? "1" : "0") << "\n";
     ofs << "colorblind_type=" << m_colorblindType << "\n";
     ofs.close();
-    std::cout << "ParameterMenu: saved keybindings to " << m_iniPath << std::endl;
+    std::cout << "ParameterMenu: saved keybindings to " << ConfigManager::getInstance().getConfigFilePath() << std::endl;
 
     try {
         ConfigManager::getInstance().loadKeyBindings();

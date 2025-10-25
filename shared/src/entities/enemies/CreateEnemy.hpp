@@ -31,6 +31,7 @@
 #include "components/Position.hpp"
 #include "components/PreviousPosition.hpp"
 #include "components/Tags.hpp"
+#include "components/IsAttacking.hpp"
 #include "components/Velocity.hpp"
 #include <iostream>
 

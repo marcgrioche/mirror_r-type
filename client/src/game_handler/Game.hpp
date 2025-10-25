@@ -12,6 +12,7 @@
 #include "../../../shared/include/EntityType.hpp"
 #include "../../../shared/include/GameInstance.hpp"
 #include "../../../shared/include/Message.hpp"
+#include "../../../shared/src/levels/Level.hpp"
 #include "../network/RTypeClient.hpp"
 #include "../ui/Menu.hpp"
 #include "ButtonSystem.hpp"
@@ -248,6 +249,9 @@ private:
     // Entity cleanup
     void clearGameEntities();
 
+    // Level management
+    uint32_t determineMaxLevel();
+
     Menu m_menu;
 
     Registry _registry;
@@ -266,6 +270,9 @@ private:
     InputHistory m_inputHistory;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
+    uint32_t m_currentLevel = 1;
+    uint32_t m_maxLevel = 1;
+    Level m_currentLevelData;
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
