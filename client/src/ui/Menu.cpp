@@ -13,10 +13,15 @@ Menu::Menu()
     = default;
 Menu::~Menu() = default;
 
-void Menu::activate(Registry& _registry, Page page)
+void Menu::activate(Registry& _registry, Page page, uint32_t currentLevel, uint32_t maxLevel)
 {
     m_active = true;
     m_currentPage = page;
+
+    if (page == Page::WIN || page == Page::LOSE) {
+        m_currentLevel = currentLevel;
+        m_maxLevel = maxLevel;
+    }
 
     switch (page) {
     case Page::HOME:
@@ -29,7 +34,7 @@ void Menu::activate(Registry& _registry, Page page)
         m_joinPage.show(_registry);
         break;
     case Page::LOBBY:
-        m_lobbyPage.show(_registry, 0);
+        m_lobbyPage.show(_registry, 0, m_currentLevel, m_maxLevel);
         break;
     case Page::WIN:
         m_endPage.show(_registry, true);
@@ -91,18 +96,20 @@ void Menu::showJoinPage(Registry& registry)
     m_joinPage.show(registry);
 }
 
-void Menu::showLobbyPage(Registry& registry, int lobbyId)
+void Menu::showLobbyPage(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel)
 {
+    m_currentLevel = currentLevel;
+    m_maxLevel = maxLevel;
     hideAllPages(registry);
     m_currentPage = Page::LOBBY;
-    m_lobbyPage.show(registry, lobbyId);
+    m_lobbyPage.show(registry, lobbyId, currentLevel, maxLevel);
 }
 
-void Menu::showLobbyPageAfterGame(Registry& registry)
+void Menu::showLobbyPageAfterGame(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
 {
     hideAllPages(registry);
     m_currentPage = Page::LOBBY;
-    m_lobbyPage.showAfterGameEnd(registry);
+    m_lobbyPage.showAfterGameEnd(registry, currentLevel, maxLevel);
 }
 
 void Menu::clearGameEntities(Registry& registry)
@@ -119,16 +126,20 @@ void Menu::showParametersPage(Registry& registry)
     m_parameterPage.show(registry);
 }
 
-void Menu::showWinPage(Registry& registry)
+void Menu::showWinPage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
 {
+    m_currentLevel = currentLevel;
+    m_maxLevel = maxLevel;
     hideAllPages(registry);
     m_currentPage = Page::WIN;
     // Ensure end page entities/state are (re)created with WIN state
     m_endPage.show(registry, true);
 }
 
-void Menu::showLosePage(Registry& registry)
+void Menu::showLosePage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
 {
+    m_currentLevel = currentLevel;
+    m_maxLevel = maxLevel;
     hideAllPages(registry);
     m_currentPage = Page::LOSE;
     // Ensure end page entities/state are (re)created with LOSE state
@@ -245,13 +256,13 @@ void Menu::processPageTransitions(Registry& registry)
     case Page::WIN:
         if (m_endPage.hasReturnRequest()) {
             m_endPage.clearConnectionRequest();
-            showLobbyPageAfterGame(registry);
+            showLobbyPageAfterGame(registry, m_currentLevel, m_maxLevel);
         }
         break;
     case Page::LOSE:
         if (m_endPage.hasReturnRequest()) {
             m_endPage.clearConnectionRequest();
-            showLobbyPageAfterGame(registry);
+            showLobbyPageAfterGame(registry, m_currentLevel, m_maxLevel);
         }
         break;
     default:

@@ -24,9 +24,11 @@ LobbyMenu::LobbyMenu()
 
 LobbyMenu::~LobbyMenu() = default;
 
-void LobbyMenu::show(Registry& registry, int lobbyId)
+void LobbyMenu::show(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel)
 {
     if (!m_visible) {
+        m_currentLevel = currentLevel;
+        m_maxLevel = maxLevel;
         createEntities(registry, lobbyId);
         m_visible = true;
         clearRequests();
@@ -34,9 +36,11 @@ void LobbyMenu::show(Registry& registry, int lobbyId)
     }
 }
 
-void LobbyMenu::showAfterGameEnd(Registry& registry)
+void LobbyMenu::showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
 {
     if (!m_visible) {
+        m_currentLevel = currentLevel;
+        m_maxLevel = maxLevel;
         createEntities(registry, 0);
         m_visible = true;
         clearRequests();
@@ -160,6 +164,48 @@ void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
     drawTextBox(gfx, registry, m_connectTextBoxEntity);
     drawButton(gfx, registry, m_returnButtonEntity);
     drawTextBox(gfx, registry, m_textBoxLobbyEntity);
+
+    // Render dungeon map
+    renderDungeonMap(renderer);
+}
+
+void LobbyMenu::renderDungeonMap(SDL_Renderer* renderer)
+{
+    if (m_maxLevel == 0)
+        return;
+
+    const int mapY = 450; // Position Y of the dungeon map
+    const int squareSize = 40; // Size of level squares
+    const int connectorWidth = 40; // Width of connecting rectangles (same as spacing)
+    const int connectorHeight = 10; // Height of connecting rectangles
+    const int spacing = 80; // Space between level squares
+    const int startX = (SCREEN_WIDTH - (m_maxLevel * spacing - (spacing - squareSize))) / 2; // Center the map
+
+    for (uint32_t level = 1; level <= m_maxLevel; ++level) {
+        int x = startX + (level - 1) * spacing;
+        if (level > 1) {
+            int connectorX = x - spacing + squareSize;
+            SDL_Rect connector = { connectorX, mapY + (squareSize - connectorHeight) / 2, connectorWidth, connectorHeight };
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
+            SDL_RenderFillRect(renderer, &connector);
+        }
+        SDL_Rect square = { x, mapY, squareSize, squareSize };
+        if (level < m_currentLevel) {
+            SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+            SDL_RenderFillRect(renderer, &square);
+        } else if (level == m_currentLevel) {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &square);
+            SDL_Rect indicator = { x + 5, mapY + 5, squareSize - 10, squareSize - 10 };
+            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+            SDL_RenderFillRect(renderer, &indicator);
+        } else {
+            SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
+            SDL_RenderFillRect(renderer, &square);
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(renderer, &square);
+    }
 }
 
 bool LobbyMenu::hasRequest() const

@@ -148,13 +148,13 @@ void Game::onConnectionSuccess()
 void Game::onLobbyJoined(uint32_t lobbyId)
 {
     //(void)lobbyId;
-    m_menu.showLobbyPage(_registry, lobbyId);
+    m_menu.showLobbyPage(_registry, lobbyId, m_currentLevel, m_maxLevel);
 }
 
 void Game::onLobbyCreated(uint32_t lobbyId)
 {
     //(void)lobbyId;
-    m_menu.showLobbyPage(_registry, lobbyId);
+    m_menu.showLobbyPage(_registry, lobbyId, m_currentLevel, m_maxLevel);
 }
 
 void Game::onGameStarted()

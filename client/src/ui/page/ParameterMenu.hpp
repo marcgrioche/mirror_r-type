@@ -59,7 +59,6 @@ private:
     bool m_waitingForKey = false;
     bool m_returnRequested = false;
     size_t m_selectedIndex = 0;
-    std::string m_iniPath = "client/res/config/keybindings.ini";
 
     // pair: action name -> list of keycodes (persisted)
     std::vector<std::pair<std::string, std::vector<int>>> m_bindings;

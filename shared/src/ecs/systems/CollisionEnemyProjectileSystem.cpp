@@ -22,14 +22,12 @@
 
 void collisionEnemyProjectileSystem(Registry& registry, float)
 {
-    // Pattern calqué sur collision power-up: on utilise les Tags pour filtrer
     auto projView = registry.view<ProjectileTag>();
     auto enemyView = registry.view<EnemyTag>();
     
     for (auto it = projView.begin(); it != projView.end(); ++it) {
         Entity projE = it.entity();
         
-        // require Position + Hitbox on both sides
         if (!registry.has<Position>(projE) || !registry.has<Hitbox>(projE))
             continue;
         
@@ -37,7 +35,7 @@ void collisionEnemyProjectileSystem(Registry& registry, float)
         for (auto eIT = enemyView.begin(); eIT != enemyView.end(); ++eIT) {
             Entity EnE = eIT.entity();
             if (!registry.has<Position>(EnE) || !registry.has<Hitbox>(EnE))
-            continue;
+                continue;
             
             // avoid friendly fire by checking Parent
             if (registry.has<Parent>(projE)) {

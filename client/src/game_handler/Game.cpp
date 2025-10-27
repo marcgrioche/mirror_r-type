@@ -18,6 +18,7 @@
 #include "systems/EyeSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL.h>
+#include <fstream>
 #include <iostream>
 
 Game::Game(uint16_t clientPort, std::string colorblindType)
@@ -62,8 +63,12 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
     }
 
-    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", "client/res/sprites/Heads_Boss/heads_monster_idle.png")) {
+    if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_all_idle.png"))) {
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
+        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
     }
 
     if (!resourceManager.loadTexture(renderer, "bydo_flying.png", resourceManager.getAssetPath("sprites/bydo_flying.png"))) {
@@ -125,6 +130,12 @@ bool Game::initialize()
     _lastTickTime = std::chrono::steady_clock::now();
     _accumulatedTime = 0.0f;
     _isRunning = true;
+
+    m_maxLevel = determineMaxLevel();
+
+    // Preload level 1 data
+    std::string level1Path = "shared/res/levels/level1.json";
+    m_currentLevelData.loadFromJson(level1Path);
 
     initializeMenuMode();
     return true;
@@ -342,4 +353,17 @@ void Game::connectToServer(const std::string& serverIp, uint16_t serverPort)
     m_clientNetwork->connectToServerRequest();
 
     // Optionnel: changer vers une page "connecting" ou garder le menu
+}
+
+uint32_t Game::determineMaxLevel()
+{
+    uint32_t level = 1;
+    while (true) {
+        std::string levelPath = "shared/res/levels/level" + std::to_string(level) + ".json";
+        std::ifstream checkFile(levelPath);
+        if (!checkFile.is_open()) {
+            return level - 1;
+        }
+        level++;
+    }
 }

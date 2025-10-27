@@ -31,6 +31,7 @@ struct Lobby {
     std::vector<uint32_t> players;
     LobbyState state;
     uint32_t maxPlayers;
+    int currentLevel;
     std::unique_ptr<GameInstance> gameInstance;
     std::thread gameThread;
     std::atomic<bool> threadRunning;
