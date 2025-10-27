@@ -17,9 +17,11 @@ add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
 
 if (sqlite3_ADDED)
     message(STATUS "Using sqlite3 from CPM")
+    target_include_directories(r-type_server PRIVATE ${sqlite3_SOURCE_DIR})
     target_link_libraries(r-type_server PRIVATE sqlite3)
 else()
     find_package(SQLite3 REQUIRED)
+    target_include_directories(r-type_server PRIVATE ${SQLite3_INCLUDE_DIRS})
     target_link_libraries(r-type_server PRIVATE SQLite::SQLite3)
 endif()
 
