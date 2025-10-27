@@ -8,22 +8,15 @@ include_directories(src db include ../shared/include ../shared/src ../shared/src
 include_directories(${CMAKE_SOURCE_DIR})
 
 CPMAddPackage(
-    NAME sqlite
-    GITHUB_REPOSITORY sqlite/sqlite
-    GIT_TAG        version-3.42.1
-    OPTIONS        "SQLITE_ENABLE_JSON1 ON" "SQLITE_ENABLE_FTS5 ON"
+        NAME sqlite3
+        GITHUB_REPOSITORY "azadkuh/sqlite-amalgamation"
+        GIT_TAG "3.38.2"
 )
 
 add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
 
-CPMAddPackage(
-        NAME sqlite
-        GITHUB_REPOSITORY sqlite/sqlite
-        GIT_TAG version-3.42.1
-)
-
-if (sqlite_ADDED)
-    message(STATUS "Using sqlite3 from CPM (sqlite package)")
+if (sqlite3_ADDED)
+    message(STATUS "Using sqlite3 from CPM")
     target_link_libraries(r-type_server PRIVATE sqlite3)
 else()
     find_package(SQLite3 REQUIRED)
