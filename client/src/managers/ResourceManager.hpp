@@ -27,6 +27,12 @@ public:
     std::string getAssetPath(const std::string& relativePath) const;
 
     /**
+     * @brief Gets the base path where the executable is located
+     * @return Base path to the executable directory
+     */
+    std::string getBasePath() const;
+
+    /**
      * @brief Loads a texture from file and stores it with the given ID
      * @param renderer The SDL renderer to create the texture with
      * @param id Unique identifier for the texture

@@ -26,6 +26,11 @@ std::string ResourceManager::getAssetPath(const std::string& relativePath) const
     return basePath_ + "res/" + relativePath;
 }
 
+std::string ResourceManager::getBasePath() const
+{
+    return basePath_;
+}
+
 SDL_Texture* ResourceManager::loadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path)
 {
     SDL_Texture* tex = IMG_LoadTexture(renderer, path.c_str());
