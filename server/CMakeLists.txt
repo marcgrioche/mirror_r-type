@@ -2,12 +2,38 @@ cmake_minimum_required(VERSION 3.16)
 
 project(r-type_server)
 
-file(GLOB SERVER_SOURCES src/*.cpp)
+file(GLOB SERVER_SOURCES src/*.cpp db/*.cpp)
 file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
-include_directories(src include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
+include_directories(src db include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 include_directories(${CMAKE_SOURCE_DIR})
 
+CPMAddPackage(
+        NAME sqlite3
+        GITHUB_REPOSITORY "azadkuh/sqlite-amalgamation"
+        GIT_TAG "3.38.2"
+)
+
+# Create a library target from the amalgamation if it was added via CPM
+if (sqlite3_ADDED)
+    add_library(sqlite3_lib STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+    target_include_directories(sqlite3_lib PUBLIC ${sqlite3_SOURCE_DIR})
+    # Add pthread and dl libraries which SQLite needs on Linux
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(sqlite3_lib PUBLIC pthread dl)
+    endif()
+endif()
+
 add_executable(r-type_server ${SERVER_SOURCES} ${SHARED_SOURCES})
+
+
+if (sqlite3_ADDED)
+    message(STATUS "Using sqlite3 from CPM")
+    target_link_libraries(r-type_server PRIVATE sqlite3_lib)
+else()
+    find_package(SQLite3 REQUIRED)
+    target_include_directories(r-type_server PRIVATE ${SQLite3_INCLUDE_DIRS})
+    target_link_libraries(r-type_server PRIVATE SQLite::SQLite3)
+endif()
 
 if(WIN32)
     target_link_libraries(r-type_server PRIVATE ws2_32)

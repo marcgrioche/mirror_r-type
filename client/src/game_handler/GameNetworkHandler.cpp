@@ -49,6 +49,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::KICK_NOTICE:
         handleKickPlayerNotice(event);
         break;
+    case MessageType::AUTH_RESPONSE:
+        handleAuthResponse(event);
+        break;
     default:
         break;
     }
@@ -179,6 +182,23 @@ void Game::handleUsername(const Client::NetworkEvent& event)
     if (std::holds_alternative<bool>(event.payload)) {
         const auto state = std::get<bool>(event.payload);
         std::cout << "Username creation state: " << state << std::endl;
+    }
+}
+
+void Game::handleAuthResponse(const Client::NetworkEvent& event)
+{
+    if (!std::holds_alternative<Message>(event.payload)) {
+        return;
+    }
+    const Message& raw = std::get<Message>(event.payload);
+    const auto state = raw.readU32();
+    if (state) {
+        std::cout << "Login successful!" << std::endl;
+        onLoginSuccess();
+    } else {
+        const auto messageLen = raw.readU8();
+        const auto errMsg = raw.readString(messageLen);
+        std::cout << "Login failed! Reason: " << errMsg << std::endl;
     }
 }
 

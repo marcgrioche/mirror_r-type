@@ -18,6 +18,15 @@ void RTypeClient::handleConnectionAccepted(const Message& t_msg, PeerInfo& t_pee
     pingRequest();
 }
 
+void RTypeClient::createAuthenticationRequest(const std::string& t_username, const std::string& t_password)
+{
+    Message msg(MessageType::AUTH_REQUEST, m_msgSequenceNumber, m_playerId, 1);
+
+    msg.write(t_username);
+    msg.write(t_password);
+    sendMessage(msg);
+}
+
 void RTypeClient::pingRequest()
 {
     sendMessage(MessageType::PING);
@@ -58,4 +67,17 @@ void RTypeClient::handleUsernameRequestState(const Message& t_msg, PeerInfo& t_p
 
     bool result = state == 1;
     m_eventsQueue.push({ MessageType::USERNAME_ACK, result });
+}
+
+void RTypeClient::handleAuthenticationResponse(const Message& t_msg, PeerInfo& t_peerInfo)
+{
+    (void)t_peerInfo;
+    Message msg = t_msg;
+    msg.resetReadPosition();
+    const auto state = msg.readU32();
+
+    if (state) {
+        m_playerId = state;
+    }
+    m_eventsQueue.push({ MessageType::AUTH_RESPONSE, t_msg });
 }

@@ -98,6 +98,8 @@ public:
      */
     void connectToServerRequest();
 
+    void createAuthenticationRequest(const std::string& t_username, const std::string& t_password);
+
     /**
      * @brief Sends a disconnect request to the server
      */
@@ -222,5 +224,6 @@ private:
     void handleUsernameRequestState(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleKickPlayerAck(const Message& t_msg, PeerInfo& t_peerInfo);
     void handleKickPlayerNotice(const Message& t_msg, PeerInfo& t_peerInfo);
+    void handleAuthenticationResponse(const Message& t_msg, PeerInfo& t_peerInfo);
 };
 }

@@ -199,6 +199,11 @@ private:
      */
     void handleMenuStartRequest();
 
+    /**
+     * @brief Handles menu login request (legacy method)
+     */
+    void handleMenuLoginRequest();
+
     // Network event handling
     void processNetworkEvents();
     void handleNetworkEvent(const Client::NetworkEvent& event);
@@ -211,6 +216,7 @@ private:
     void handleGameEndLose();
     void handleUsername(const Client::NetworkEvent& event);
     void handleKickPlayerNotice(const Client::NetworkEvent& event);
+    void handleAuthResponse(const Client::NetworkEvent& event);
 
     // Entity deserialization
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
@@ -273,6 +279,7 @@ private:
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     Level m_currentLevelData;
+    std::string m_pseudo = "";
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
@@ -284,4 +291,5 @@ private:
     void onLobbyJoined(uint32_t lobbyId);
     void onLobbyCreated(uint32_t lobbyId);
     void onGameStarted();
+    void onLoginSuccess();
 };

@@ -44,6 +44,10 @@ RTypeServer::RTypeServer(uint16_t port)
     _socket = std::make_unique<UdpSocket>(_port);
     _lobbyManager.setServer(this);
     registerHandlers();
+    _db = std::make_unique<SqlDB::DB>("rtype.db");
+    if (_db) {
+        _db->init();
+    }
 }
 
 void RTypeServer::start()
@@ -127,6 +131,7 @@ void RTypeServer::registerHandlers()
     _handlers[MessageType::LOBBY_STATE] = [this](const Message& msg, PeerInfo& peerInfo) { handleLobbyState(msg, peerInfo); };
     _handlers[MessageType::SET_USERNAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleUsername(msg, peerInfo); };
     _handlers[MessageType::KICK_PLAYER] = [this](const Message& msg, PeerInfo& peerInfo) { handleKickPlayer(msg, peerInfo); };
+    _handlers[MessageType::AUTH_REQUEST] = [this](const Message& msg, PeerInfo& peerInfo) { handleAuthRequest(msg, peerInfo); };
     // Add more handlers as needed for other message types
 }
 

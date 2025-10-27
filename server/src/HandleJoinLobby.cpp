@@ -24,7 +24,9 @@ void RTypeServer::handleJoinLobby(const Message& msg, PeerInfo& peerInfo)
         response.write(static_cast<uint32_t>(0));
         response.write(static_cast<uint8_t>(0));
         sendToClient(msg.player_id, response);
+        return;
     }
+    _lobbyManager.addUsername(msg.player_id, _usernames[msg.player_id]);
     Message successResponse = _lobbyManager.initLobbyInfo(lobbyId);
 
     broadcastToLobby(lobbyId, successResponse);

@@ -10,6 +10,8 @@
 #include "page/ParameterMenu.hpp"
 #include <SDL.h>
 
+#include "page/LoginMenu.hpp"
+
 class Menu {
 public:
     /**
@@ -18,6 +20,7 @@ public:
     enum class Page {
         HOME, /**< Main home page */
         CONNECTION, /**< Server connection page */
+        LOGIN, /**< Server login / register page */
         JOIN_LOBBY, /**< Lobby joining page */
         LOBBY, /**< Lobby waiting page */
         PARAMETERS, /**< Settings/parameters page */
@@ -95,6 +98,7 @@ public:
      */
     void showConnectionPage(Registry& registry);
 
+    void showLoginPage(Registry& registry);
     /**
      * @brief Shows the lobby joining page
      * @param registry The ECS registry to use for entity management
@@ -156,6 +160,8 @@ public:
      */
     std::string getJoinCode(Registry& registry) const;
 
+    std::string getInput(Registry& registry, AMenu::Input inputType);
+
     /**
      * @brief Gets the username entered by the user
      * @param registry The ECS registry to use for entity management
@@ -170,6 +176,8 @@ public:
      * @return True if connection request is pending, false otherwise
      */
     bool hasConnectionRequest() const;
+
+    bool hasLoginRequest() const;
 
     /**
      * @brief Checks if the user has requested to join a lobby
@@ -229,6 +237,7 @@ private:
     LobbyMenu m_lobbyPage;
     EndMenuPage m_endPage;
     ParameterMenu m_parameterPage;
+    LoginMenu m_loginPage;
 
     // Gestion des transitions
     void hideAllPages(Registry& registry);
