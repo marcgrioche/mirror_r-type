@@ -27,7 +27,7 @@ Entity createBoss(Registry& registry, const Level* level)
     registry.emplace<Velocity>(boss, velocityX, velocityY);
     registry.emplace<Health>(boss, static_cast<int>(bossHealth));
     registry.emplace<MaxHealth>(boss, static_cast<int>(bossHealth));
-    registry.emplace<IsAttacking>(boss, false);
+    registry.emplace<IsAttacking>(boss, 0);
     registry.emplace<Hitbox>(boss, width, height, 0.0f, 0.0f);
     registry.emplace<Dead>(boss);
     registry.emplace<EnemyTag>(boss);
@@ -72,7 +72,7 @@ Entity createBoss(Registry& registry, const Position& position, const Health& he
 
     registry.emplace<BossTag>(boss);
     registry.emplace<MaxHealth>(boss, health.hp);
-    registry.emplace<IsAttacking>(boss, false);
+    registry.emplace<IsAttacking>(boss, 0);
 
     Entity enemy = factories::createEnemyTemplate(
         registry,

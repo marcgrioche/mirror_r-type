@@ -177,7 +177,6 @@ bool handleEnemyAttacks(
                 int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height * 2));
                 int offset = maxOffset > 0 ? rand() % maxOffset : 0;
                 spawnPos.v.y = enemyPos.v.y + offset;
-                registry.get<IsAttacking>(owner).attacking = true;
             }
             const Parent spawnParent { weaponEntity };
 

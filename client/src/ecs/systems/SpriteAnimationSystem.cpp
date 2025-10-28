@@ -29,22 +29,22 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         MaxHealth& max_health = registry.get<MaxHealth>(e);
         Health& health = registry.get<Health>(e);
         
-        // if (!registry.has<IsAttacking>(e)) {
-        //     std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
-        //     continue;
-        // }
+        if (!registry.has<IsAttacking>(e)) {
+            std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
+            continue;
+        }
         
-        // IsAttacking& is_attacking = registry.get<IsAttacking>(e);
+        IsAttacking& is_attacking = registry.get<IsAttacking>(e);
 
-        // std::cout << "[CLIENT SpriteAnimationSystem] Boss isAttacking = " << is_attacking.attacking << std::endl;
-        // if (is_attacking.attacking > 0) {
-        //     std::cout << "[CLIENT] IS ATTACKING - Changing sprite!" << std::endl;
-        //     // sprite.texture_id = "heads_monster_attack.png";
-        //     // sprite.current_frameY = 0;
-        //     is_attacking.attacking = 0;
-        //     continue;
-        // }
-        sprite.texture_id = "heads_monster_idle.png";
+        std::cout << "[CLIENT SpriteAnimationSystem] Boss isAttacking = " << is_attacking.attacking << std::endl;
+        if (is_attacking.attacking > 0) {
+            std::cout << "[CLIENT] IS ATTACKING - Changing sprite!" << std::endl;
+            sprite.current_id = sprite.attack_id;
+            sprite.current_frameY = 0;
+            is_attacking.attacking = 0;
+            continue;
+        }
+        sprite.current_id = sprite.texture_id;
         for (int i = 0; i <= sprite.nb_state; i++) {
             if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
                 sprite.current_frameY = sprite.nb_state - i + 1;
