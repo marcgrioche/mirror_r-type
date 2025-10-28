@@ -52,4 +52,14 @@ void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY
  */
 void addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 void addBossSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f, const Level* level = nullptr);
+
+/**
+ * @brief Adds a weapon sprite component that can be rotated toward the mouse
+ * @param registry The ECS registry
+ * @param entity The entity to add the sprite to
+ * @param posX Entity X position (unused, for future compatibility)
+ * @param posY Entity Y position (unused, for future compatibility)
+ * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
+ */
+void addWeaponSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
 } // namespace SpriteManager

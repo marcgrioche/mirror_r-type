@@ -36,12 +36,12 @@ void LobbyMenu::show(Registry& registry, int lobbyId, uint32_t currentLevel, uin
     }
 }
 
-void LobbyMenu::showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
+void LobbyMenu::showAfterGameEnd(Registry& registry, uint32_t lobbyId, uint32_t currentLevel, uint32_t maxLevel)
 {
     if (!m_visible) {
         m_currentLevel = currentLevel;
         m_maxLevel = maxLevel;
-        createEntities(registry, 0);
+        createEntities(registry, lobbyId);
         m_visible = true;
         clearRequests();
         m_isReturningFromGame = true;
@@ -99,6 +99,10 @@ void LobbyMenu::destroyEntities(Registry& registry)
     registry.kill_entity(m_connectTextBoxEntity);
     registry.kill_entity(m_textBoxLobbyEntity);
     registry.kill_entity(m_backgroundEntity);
+    for (auto& entity : m_playerTextEntities) {
+        registry.kill_entity(entity);
+    }
+    m_playerTextEntities.clear();
 }
 
 void LobbyMenu::setupEventHandlers()
@@ -165,6 +169,11 @@ void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
     drawButton(gfx, registry, m_returnButtonEntity);
     drawTextBox(gfx, registry, m_textBoxLobbyEntity);
 
+    // Draw player names
+    for (auto& entity : m_playerTextEntities) {
+        drawTextBox(gfx, registry, entity);
+    }
+
     // Render dungeon map
     renderDungeonMap(renderer);
 }
@@ -222,4 +231,40 @@ void LobbyMenu::clearRequests()
 {
     m_LobbyRequested = false;
     m_returnRequested = false;
+}
+
+void LobbyMenu::setPlayerNames(const std::unordered_map<uint32_t, std::string>& players)
+{
+    m_playerNames = players;
+    std::cout << "[LOBBY] Set player names:" << std::endl;
+    for (const auto& pair : m_playerNames) {
+        std::cout << "  Player " << pair.first << ": '" << pair.second << "'" << std::endl;
+    }
+}
+
+void LobbyMenu::setPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores)
+{
+    m_playerScores = scores;
+}
+
+void LobbyMenu::updatePlayerEntities(Registry& registry)
+{
+    for (auto& entity : m_playerTextEntities) {
+        registry.kill_entity(entity);
+    }
+    m_playerTextEntities.clear();
+
+    std::cout << "[LOBBY] Creating player text entities for " << m_playerNames.size() << " players:" << std::endl;
+    float y = 100.0f;
+    for (const auto& pair : m_playerNames) {
+        std::string displayText = pair.second;
+        auto scoreIt = m_playerScores.find(pair.first);
+        if (scoreIt != m_playerScores.end()) {
+            displayText += " - " + std::to_string(scoreIt->second) + " XP";
+        }
+        std::cout << "  Creating text for Player " << pair.first << ": '" << displayText << "' at y=" << y << std::endl;
+        Entity textEntity = factories::createTextBox(registry, displayText, 50.0f, y, 16, { 255, 255, 255, 255 });
+        m_playerTextEntities.push_back(textEntity);
+        y += 30.0f;
+    }
 }

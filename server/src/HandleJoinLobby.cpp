@@ -12,6 +12,10 @@ void RTypeServer::handleJoinLobby(const Message& msg, PeerInfo& peerInfo)
 
     std::cout << "Player " << msg.player_id << " attempting to join lobby " << lobbyId << std::endl;
 
+    if (_lobbyManager.getPlayerLobby(msg.player_id) != 0) {
+        _lobbyManager.removePlayer(msg.player_id);
+    }
+
     bool success = _lobbyManager.joinLobby(lobbyId, msg.player_id);
 
     if (!success) {
@@ -24,7 +28,9 @@ void RTypeServer::handleJoinLobby(const Message& msg, PeerInfo& peerInfo)
         response.write(static_cast<uint32_t>(0));
         response.write(static_cast<uint8_t>(0));
         sendToClient(msg.player_id, response);
+        return;
     }
+    _lobbyManager.addUsername(msg.player_id, _usernames[msg.player_id]);
     Message successResponse = _lobbyManager.initLobbyInfo(lobbyId);
 
     broadcastToLobby(lobbyId, successResponse);

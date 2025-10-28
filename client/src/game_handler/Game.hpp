@@ -199,6 +199,11 @@ private:
      */
     void handleMenuStartRequest();
 
+    /**
+     * @brief Handles menu login request (legacy method)
+     */
+    void handleMenuLoginRequest();
+
     // Network event handling
     void processNetworkEvents();
     void handleNetworkEvent(const Client::NetworkEvent& event);
@@ -211,6 +216,7 @@ private:
     void handleGameEndLose();
     void handleUsername(const Client::NetworkEvent& event);
     void handleKickPlayerNotice(const Client::NetworkEvent& event);
+    void handleAuthResponse(const Client::NetworkEvent& event);
 
     // Entity deserialization
     void deserializeAndCreateEntity(const Message& msg, Registry& registry);
@@ -265,11 +271,15 @@ private:
 
     bool _isRunning;
     bool m_connected = false;
+    bool m_isConnecting = false;
+    float m_connectionTimeout = 0.0f;
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
     InputHistory m_inputHistory;
+    uint32_t m_currentLobbyId = 0;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
+    std::unordered_map<uint32_t, uint32_t> m_lobbyPlayerScores;
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     Level m_currentLevelData;
@@ -284,4 +294,5 @@ private:
     void onLobbyJoined(uint32_t lobbyId);
     void onLobbyCreated(uint32_t lobbyId);
     void onGameStarted();
+    void onLoginSuccess();
 };

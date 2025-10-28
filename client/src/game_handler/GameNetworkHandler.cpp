@@ -49,6 +49,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
     case MessageType::KICK_NOTICE:
         handleKickPlayerNotice(event);
         break;
+    case MessageType::AUTH_RESPONSE:
+        handleAuthResponse(event);
+        break;
     default:
         break;
     }
@@ -57,6 +60,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
 void Game::handleConnectAck()
 {
     std::cout << "Connection acknowledged by server" << std::endl;
+    m_connected = true;
+    m_isConnecting = false;
+    m_connectionTimeout = 0.0f;
     // CORRIGE : Appelle la méthode helper au lieu de naviguer directement
     onConnectionSuccess();
 }
@@ -115,18 +121,26 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
     const uint8_t numPlayers = msg.readU8();
 
     (void)lobbyState;
+    m_currentLobbyId = lobbyId;
     m_lobbyOwnerId = ownerId;
     if (numPlayers != 0) {
         m_lobbyPlayers.clear();
+        m_lobbyPlayerScores.clear();
     }
     for (uint8_t i = 0; i < numPlayers; i++) {
         uint32_t playerId = msg.readU32();
         const uint8_t playerUsernameLen = msg.readU8();
         const std::string username = msg.readString(playerUsernameLen);
+        uint32_t xp = msg.readU32();
         m_lobbyPlayers[playerId] = username;
+        m_lobbyPlayerScores[playerId] = xp;
     }
 
     std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
+
+    m_menu.setCurrentLobbyId(lobbyId);
+    m_menu.setLobbyPlayerNames(m_lobbyPlayers);
+    m_menu.setLobbyPlayerScores(m_lobbyPlayerScores);
 
     onLobbyJoined(lobbyId);
 }
@@ -152,6 +166,10 @@ void Game::handleGameEndWin()
         _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::WIN, m_currentLevel, m_maxLevel);
     }
+
+    if (m_clientNetwork) {
+        m_clientNetwork->lobbyInfoRequest();
+    }
 }
 
 void Game::handleGameEndLose()
@@ -172,6 +190,10 @@ void Game::handleGameEndLose()
         _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::LOSE, m_currentLevel, m_maxLevel);
     }
+
+    if (m_clientNetwork) {
+        m_clientNetwork->lobbyInfoRequest();
+    }
 }
 
 void Game::handleUsername(const Client::NetworkEvent& event)
@@ -179,6 +201,23 @@ void Game::handleUsername(const Client::NetworkEvent& event)
     if (std::holds_alternative<bool>(event.payload)) {
         const auto state = std::get<bool>(event.payload);
         std::cout << "Username creation state: " << state << std::endl;
+    }
+}
+
+void Game::handleAuthResponse(const Client::NetworkEvent& event)
+{
+    if (!std::holds_alternative<Message>(event.payload)) {
+        return;
+    }
+    const Message& raw = std::get<Message>(event.payload);
+    const auto state = raw.readU32();
+    if (state) {
+        std::cout << "Login successful!" << std::endl;
+        onLoginSuccess();
+    } else {
+        const auto messageLen = raw.readU8();
+        const auto errMsg = raw.readString(messageLen);
+        std::cout << "Login failed! Reason: " << errMsg << std::endl;
     }
 }
 

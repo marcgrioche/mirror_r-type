@@ -121,6 +121,15 @@ public:
      */
     void setColorblindMode(std::string type);
 
+    /**
+     * @brief Converts window coordinates to logical coordinates
+     * @param windowX The X coordinate in window space (from SDL_GetMouseState or SDL event)
+     * @param windowY The Y coordinate in window space (from SDL_GetMouseState or SDL event)
+     * @param logicalX Output parameter for the X coordinate in logical space
+     * @param logicalY Output parameter for the Y coordinate in logical space
+     */
+    void windowToLogical(int windowX, int windowY, int& logicalX, int& logicalY) const;
+
 private:
     GraphicsManager() = default;
     ~GraphicsManager() = default;

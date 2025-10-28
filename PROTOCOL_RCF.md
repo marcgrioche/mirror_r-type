@@ -24,27 +24,29 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 
 ## 3. Message Types
 
-| Name         | Value | Direction         | Description                               |
-|--------------|-------|-------------------|-------------------------------------------|
-| CONNECT      | 1     | Client → Server   | Request connection                        |
-| INPUT        | 2     | Client → Server   | Player input                              |
-| PING         | 3     | Client → Server   | Keepalive                                 |
-| DISCONNECT   | 4     | Client → Server   | Disconnect request                        |
-| CREATE_LOBBY | 5     | Client → Server   | Create a new game lobby                   |
-| JOIN_LOBBY   | 6     | Client → Server   | Join an existing lobby                    |
-| START_GAME   | 7     | Client → Server   | Start game in lobby                       |
-| LOBBY_STATE  | 8     | Client → Server   | Request lobby information                 |
-| SET_USERNAME | 9     | Client → Server   | Set or update player username             |
-| KICK_PLAYER  | 10    | Client → Server   | Player: kick player from lobby            |
-| CONNECT_ACK  | 101   | Server → Client   | Connection accepted                       |
-| GAME_STATE   | 102   | Server → Client   | Game state update                         |
-| PONG         | 103   | Server → Client   | Keepalive response                        |
-| LOBBY_INFO   | 104   | Server → Client   | Lobby creation/join info                  |
-| SPAWN_ENTITY | 105   | Server → Client   | Spawn game entity                         |
-| ROLLBACK     | 106   | Server → Client   | Rollback game state                       |
-| USERNAME_ACK | 107   | Server → Client   | Username set/updated confirmation         |
-| KICK_ACK     | 108   | Server → Client   | Acknowledge kick request                  |
-| KICK_NOTICE  | 109   | Server → Client   | Notification sent to players in the lobby |
+| Name          | Value | Direction         | Description                               |
+|---------------|-------|-------------------|-------------------------------------------|
+| CONNECT       | 1     | Client → Server   | Request connection                        |
+| INPUT         | 2     | Client → Server   | Player input                              |
+| PING          | 3     | Client → Server   | Keepalive                                 |
+| DISCONNECT    | 4     | Client → Server   | Disconnect request                        |
+| CREATE_LOBBY  | 5     | Client → Server   | Create a new game lobby                   |
+| JOIN_LOBBY    | 6     | Client → Server   | Join an existing lobby                    |
+| START_GAME    | 7     | Client → Server   | Start game in lobby                       |
+| LOBBY_STATE   | 8     | Client → Server   | Request lobby information                 |
+| SET_USERNAME  | 9     | Client → Server   | Set or update player username             |
+| KICK_PLAYER   | 10    | Client → Server   | Player: kick player from lobby            |
+| AUTH_REQUEST  | 11    | Client → Server   | Request login                             |
+| CONNECT_ACK   | 101   | Server → Client   | Connection accepted                       |
+| GAME_STATE    | 102   | Server → Client   | Game state update                         |
+| PONG          | 103   | Server → Client   | Keepalive response                        |
+| LOBBY_INFO    | 104   | Server → Client   | Lobby creation/join info                  |
+| SPAWN_ENTITY  | 105   | Server → Client   | Spawn game entity                         |
+| ROLLBACK      | 106   | Server → Client   | Rollback game state                       |
+| USERNAME_ACK  | 107   | Server → Client   | Username set/updated confirmation         |
+| KICK_ACK      | 108   | Server → Client   | Acknowledge kick request                  |
+| KICK_NOTICE   | 109   | Server → Client   | Notification sent to players in the lobby |
+| AUTH_RESPONSE | 110   | Server → Client   | Authentication state sent to player       |
 
 ## 4. Encoding Rules
 
@@ -97,6 +99,15 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
 - **Direction**: Client → Server
 - **Payload**: String
 - **Response**: USERNAME_ACK with the request state
+
+### AUTH_REQUEST
+- **Direction**: Client → Server
+- **Payload**:
+  - uint8: Username length (L)
+  - bytes[L]: Username (UTF-8)
+  - uint8: Password length (L)
+  - bytes[L]: Password (UTF-8)
+- **Response**: AUTH_RESPONSE with the request state
 
 ### INPUT
 - **Direction**: Client → Server
@@ -168,6 +179,13 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
     - float: Position X
     - float: Position Y
     - uint32: Health value
+
+### AUTH_RESPONSE
+- **Direction**: Server → Client
+- **Payload**:
+  - uint32: Player id if success or 0 if failure
+  - uint8: failure message length L (if failure)
+  - bytes[L]: error message
 
 ### ROLLBACK
 - **Direction**: Server → Client

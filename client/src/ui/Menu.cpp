@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include "page/AMenu.hpp"
+
 Menu::Menu()
     = default;
 Menu::~Menu() = default;
@@ -58,6 +60,7 @@ void Menu::hideAllPages(Registry& registry)
 {
     m_homePage.hide(registry);
     m_connectionPage.hide(registry);
+    m_loginPage.hide(registry);
     m_joinPage.hide(registry);
     // Hide all other pages to avoid leaving stale UI/entities around
     m_lobbyPage.hide(registry);
@@ -77,6 +80,13 @@ void Menu::showConnectionPage(Registry& registry)
     hideAllPages(registry);
     m_currentPage = Page::CONNECTION;
     m_connectionPage.show(registry);
+}
+
+void Menu::showLoginPage(Registry& registry)
+{
+    hideAllPages(registry);
+    m_currentPage = Page::LOGIN;
+    m_loginPage.show(registry);
 }
 
 void Menu::showJoinPage(Registry& registry)
@@ -99,7 +109,25 @@ void Menu::showLobbyPageAfterGame(Registry& registry, uint32_t currentLevel, uin
 {
     hideAllPages(registry);
     m_currentPage = Page::LOBBY;
-    m_lobbyPage.showAfterGameEnd(registry, currentLevel, maxLevel);
+    m_lobbyPage.showAfterGameEnd(registry, m_currentLobbyId, currentLevel, maxLevel);
+    m_lobbyPage.setPlayerNames(m_lobbyPlayers);
+    updateLobbyPlayerEntities(registry);
+}
+
+void Menu::updateLobbyPlayerEntities(Registry& registry)
+{
+    m_lobbyPage.updatePlayerEntities(registry);
+}
+
+void Menu::setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames)
+{
+    m_lobbyPlayers = playerNames;
+    m_lobbyPage.setPlayerNames(playerNames);
+}
+
+void Menu::setLobbyPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores)
+{
+    m_lobbyPage.setPlayerScores(scores);
 }
 
 void Menu::clearGameEntities(Registry& registry)
@@ -148,6 +176,9 @@ void Menu::handleEvent(const SDL_Event& e, Registry& registry)
     case Page::CONNECTION:
         m_connectionPage.handleEvent(registry, e);
         break;
+    case Page::LOGIN:
+        m_loginPage.handleEvent(registry, e);
+        break;
     case Page::JOIN_LOBBY:
         m_joinPage.handleEvent(registry, e);
         break;
@@ -181,6 +212,9 @@ void Menu::update(Registry& registry, float deltaTime)
     case Page::CONNECTION:
         m_connectionPage.update(registry, deltaTime);
         break;
+    case Page::LOGIN:
+        m_loginPage.update(registry, deltaTime);
+        break;
     case Page::JOIN_LOBBY:
         m_joinPage.update(registry, deltaTime);
         break;
@@ -200,7 +234,6 @@ void Menu::processPageTransitions(Registry& registry)
     switch (m_currentPage) {
     case Page::HOME:
         if (m_homePage.hasJoinRequest()) {
-            m_joinPage.setUserName(m_homePage.getPseudo(registry));
             m_homePage.clearRequests();
             showJoinPage(registry);
         } else if (m_homePage.hasCreateRequest()) {
@@ -214,6 +247,8 @@ void Menu::processPageTransitions(Registry& registry)
 
     case Page::CONNECTION:
         // Transition gérée par le système principal via hasConnectionRequest()
+        break;
+    case Page::LOGIN:
         break;
     case Page::LOBBY:
         if (m_lobbyPage.hasReturnRequest()) {
@@ -265,6 +300,9 @@ void Menu::render(GraphicsManager& gfx, Registry& registry)
     case Page::CONNECTION:
         m_connectionPage.render(gfx, registry);
         break;
+    case Page::LOGIN:
+        m_loginPage.render(gfx, registry);
+        break;
     case Page::JOIN_LOBBY:
         m_joinPage.render(gfx, registry);
         break;
@@ -298,15 +336,27 @@ std::string Menu::getJoinCode(Registry& registry) const
 
 std::string Menu::getUserPseudo(Registry& registry) const
 {
-    if (m_currentPage == Page::JOIN_LOBBY)
-        return m_joinPage.getPseudo();
-    return m_homePage.getPseudo(registry);
+    (void)registry;
+    return m_username;
+}
+
+std::string Menu::getInput(Registry& registry, AMenu::Input inputType)
+{
+    if (inputType == AMenu::Input::USERNAME || inputType == AMenu::Input::PASSWORD) {
+        return m_loginPage.getInputData(registry, inputType);
+    }
+    return "";
 }
 
 // Vérification des demandes utilisateur
 bool Menu::hasConnectionRequest() const
 {
     return m_connectionPage.hasConnectionRequest();
+}
+
+bool Menu::hasLoginRequest() const
+{
+    return m_loginPage.hasRequest();
 }
 
 bool Menu::hasJoinRequest() const
@@ -331,4 +381,5 @@ void Menu::clearAllRequests()
     m_homePage.clearRequests();
     m_lobbyPage.clearRequests();
     m_parameterPage.clearRequests();
+    m_loginPage.clearRequests();
 }

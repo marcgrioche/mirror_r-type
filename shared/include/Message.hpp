@@ -35,6 +35,7 @@ enum class MessageType : uint8_t {
     LOBBY_STATE = 8,
     SET_USERNAME = 9,
     KICK_PLAYER = 10,
+    AUTH_REQUEST = 11,
 
     // Server to Client Messages
     CONNECT_ACK = 101,
@@ -49,6 +50,7 @@ enum class MessageType : uint8_t {
     USERNAME_ACK = 110,
     KICK_ACK = 111,
     KICK_NOTICE = 112,
+    AUTH_RESPONSE = 113,
 };
 
 class Message {

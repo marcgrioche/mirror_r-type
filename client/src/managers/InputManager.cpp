@@ -7,6 +7,7 @@
 
 #include "InputManager.hpp"
 #include "ConfigManager.hpp"
+#include "GraphicsManager.hpp"
 #include <iostream>
 
 InputManager& InputManager::getInstance()
@@ -63,8 +64,11 @@ void InputManager::handleSDLEvent(const SDL_Event& e)
             }
         }
     } else if (e.type == SDL_MOUSEMOTION) {
-        mousex = e.motion.x;
-        mousey = e.motion.y;
+        // Convert window coordinates to logical coordinates
+        int logicalX = 0, logicalY = 0;
+        GraphicsManager::getInstance().windowToLogical(e.motion.x, e.motion.y, logicalX, logicalY);
+        mousex = logicalX;
+        mousey = logicalY;
     }
 }
 

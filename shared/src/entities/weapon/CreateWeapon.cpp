@@ -18,7 +18,7 @@ Entity factories::createWeapon(Registry &registry)
     registry.emplace<WeaponTag>(weapon);
     registry.emplace<Magazine>(weapon, Magazine{30, 30});
     registry.emplace<Damage>(weapon, Damage{10});
-    registry.emplace<Frequency>(weapon, Frequency{1});
+    registry.emplace<Frequency>(weapon, Frequency{0.08});
     return weapon;
 }
 

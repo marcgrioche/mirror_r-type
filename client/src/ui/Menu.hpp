@@ -10,6 +10,8 @@
 #include "page/ParameterMenu.hpp"
 #include <SDL.h>
 
+#include "page/LoginMenu.hpp"
+
 class Menu {
 public:
     /**
@@ -18,6 +20,7 @@ public:
     enum class Page {
         HOME, /**< Main home page */
         CONNECTION, /**< Server connection page */
+        LOGIN, /**< Server login / register page */
         JOIN_LOBBY, /**< Lobby joining page */
         LOBBY, /**< Lobby waiting page */
         PARAMETERS, /**< Settings/parameters page */
@@ -95,6 +98,7 @@ public:
      */
     void showConnectionPage(Registry& registry);
 
+    void showLoginPage(Registry& registry);
     /**
      * @brief Shows the lobby joining page
      * @param registry The ECS registry to use for entity management
@@ -124,13 +128,37 @@ public:
     void showLosePage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
-     * @brief Shows the lobby page
-     * @param registry The ECS registry to use for entity management
+     * @brief Shows the lobby menu
+     * @param registry The ECS registry to create entities in
      * @param lobbyId The lobby ID to display
      * @param currentLevel The player's current level
      * @param maxLevel The maximum available level
      */
     void showLobbyPage(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel);
+
+    /**
+     * @brief Updates the player entities in the lobby menu
+     * @param registry The ECS registry to update entities in
+     */
+    void updateLobbyPlayerEntities(Registry& registry);
+
+    /**
+     * @brief Sets the player names for the lobby menu
+     * @param playerNames Map of player IDs to names
+     */
+    void setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames);
+
+    /**
+     * @brief Sets the player scores for the lobby menu
+     * @param scores Map of player IDs to XP scores
+     */
+    void setLobbyPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores);
+
+    /**
+     * @brief Sets the current lobby ID
+     * @param lobbyId The lobby ID to set
+     */
+    void setCurrentLobbyId(uint32_t lobbyId) { m_currentLobbyId = lobbyId; }
 
     /**
      * @brief Shows the lobby page after a game has ended
@@ -156,12 +184,20 @@ public:
      */
     std::string getJoinCode(Registry& registry) const;
 
+    std::string getInput(Registry& registry, AMenu::Input inputType);
+
     /**
      * @brief Gets the username entered by the user
      * @param registry The ECS registry to use for entity management
      * @return The username string
      */
     std::string getUserPseudo(Registry& registry) const;
+
+    /**
+     * @brief Sets the username for the current session
+     * @param username The username to set
+     */
+    void setUsername(const std::string& username) { m_username = username; }
 
     // Vérification des demandes utilisateur
 
@@ -170,6 +206,8 @@ public:
      * @return True if connection request is pending, false otherwise
      */
     bool hasConnectionRequest() const;
+
+    bool hasLoginRequest() const;
 
     /**
      * @brief Checks if the user has requested to join a lobby
@@ -221,6 +259,9 @@ private:
     Page m_currentPage = Page::HOME;
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
+    std::string m_username;
+    uint32_t m_currentLobbyId = 0;
+    std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
 
     // Pages modulaires
     HomeMenu m_homePage;
@@ -229,6 +270,7 @@ private:
     LobbyMenu m_lobbyPage;
     EndMenuPage m_endPage;
     ParameterMenu m_parameterPage;
+    LoginMenu m_loginPage;
 
     // Gestion des transitions
     void hideAllPages(Registry& registry);

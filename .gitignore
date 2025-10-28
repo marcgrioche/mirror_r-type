@@ -21,4 +21,7 @@ CMakeFiles/
 Client/CMakeFiles/
 Server/CMakeFiles/
 .idea/
+
+rtype.db-shm
+rtype.db-wal
 *.ini

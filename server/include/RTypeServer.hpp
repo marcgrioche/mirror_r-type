@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DB.hpp"
 #include "LobbyManager.hpp"
 #include "RTypeNetwork.hpp"
 #include <cstdint>
@@ -50,12 +51,19 @@ public:
      */
     void broadcastToLobby(uint32_t lobbyId, const Message& msg);
 
+    /**
+     * @brief Gets a reference to the database instance
+     * @return Reference to the database
+     */
+    SqlDB::DB& getDB() { return *_db; }
+
 private:
     uint16_t _port;
     std::unordered_map<uint32_t, PeerInfo> _clients;
     LobbyManager _lobbyManager;
     uint32_t _nextPlayerId;
     std::unordered_map<uint32_t, std::string> _usernames;
+    std::unique_ptr<SqlDB::DB> _db;
 
     static void handleSignal(int);
 
@@ -70,6 +78,7 @@ private:
     void handleLobbyState(const Message& msg, PeerInfo& peerInfo);
     void handleUsername(const Message& msg, PeerInfo& peerInfo);
     void handleKickPlayer(const Message& msg, PeerInfo& peerInfo);
+    void handleAuthRequest(const Message& msg, PeerInfo& peerInfo);
     void removePlayerAndNotifyLobby(const Message& msg, const Lobby* t_lobby, uint32_t playerId);
     // ...other handlers per message type
 

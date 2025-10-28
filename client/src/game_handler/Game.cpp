@@ -75,6 +75,15 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
     }
 
+    // Load weapon textures
+    if (!resourceManager.loadTexture(renderer, "wp1.png", resourceManager.getAssetPath("sprites/weapons/wp1.png"))) {
+        std::cout << "Warning: Failed to load wp1 weapon texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "laser_bullet.png", resourceManager.getAssetPath("sprites/weapons/laser_bullet.png"))) {
+        std::cout << "Warning: Failed to load laser_bullet texture" << std::endl;
+    }
+
     // Load parallax background textures
     if (!resourceManager.loadTexture(renderer, "TopLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/TopLayer.png"))) {
         std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
@@ -191,6 +200,21 @@ void Game::handleInputEvents(SDL_Event& event)
 
 void Game::runMenuLoop()
 {
+    if (m_isConnecting) {
+        m_connectionTimeout += _timer.getDeltaTime() * 1000.0f;
+        if (m_connectionTimeout >= 5.0f) {
+            m_isConnecting = false;
+            m_connectionTimeout = 0.0f;
+            if (m_clientNetwork) {
+                m_clientNetwork->stop();
+                if (m_networkThread.joinable()) {
+                    m_networkThread.join();
+                }
+                m_clientNetwork.reset();
+            }
+        }
+    }
+
     // Traite les événements du nouveau système de menu
     processMenuEvents(); // Utilise la version adaptée
 
@@ -253,6 +277,10 @@ void Game::cleanupNetwork()
     if (m_networkThread.joinable()) {
         m_networkThread.join();
     }
+
+    m_connected = false;
+    m_isConnecting = false;
+    m_clientNetwork.reset();
 }
 
 void Game::sendDisconnectMessage()

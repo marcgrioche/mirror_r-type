@@ -15,9 +15,7 @@
 #include "managers/EventManager.hpp"
 #include "managers/GraphicsManager.hpp"
 #include "render/ButtonRender.hpp"
-#include "render/TextBoxInputRender.hpp"
 #include "systems/ButtonSystem.hpp"
-#include "systems/TextBoxInputSystem.hpp"
 #include <string>
 
 class HomeMenu {
@@ -77,13 +75,6 @@ public:
 
     // Récupère le pseudo saisi
 
-    /**
-     * @brief Gets the username entered in the text input field
-     * @param registry The ECS registry containing the text input entity
-     * @return The entered username as a string
-     */
-    std::string getPseudo(Registry& registry) const;
-
     // Vérifie les actions utilisateur
 
     /**
@@ -110,7 +101,6 @@ public:
     void clearRequests();
 
 private:
-    Entity m_textBoxEntity;
     Entity m_paramButtonEntity;
     Entity m_joinButtonEntity;
     Entity m_createButtonEntity;

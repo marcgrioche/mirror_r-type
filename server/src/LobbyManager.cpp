@@ -282,8 +282,10 @@ std::unordered_map<uint32_t, std::string> LobbyManager::getLobbyPlayersUsernames
     for (const auto playerId : it->second->players) {
         if (it->second->_usernames.find(playerId) != it->second->_usernames.end()) {
             playersUsernames[playerId] = it->second->_usernames[playerId];
+            std::cout << "Player " << playerId << " has username: " << it->second->_usernames[playerId] << std::endl;
         } else {
             playersUsernames[playerId] = std::to_string(playerId);
+            std::cout << "Player " << playerId << " has no username, using ID: " << std::to_string(playerId) << std::endl;
         }
     }
     return playersUsernames;
@@ -311,6 +313,15 @@ Message LobbyManager::initLobbyInfo(const uint32_t lobbyId)
     for (const auto& pair : playersUsernames) {
         response.write(pair.first);
         response.write(pair.second);
+        auto* server = dynamic_cast<RTypeServer*>(_server);
+        uint32_t xp = 0;
+        if (server) {
+            auto xpOpt = server->getDB().getXP(pair.first);
+            if (xpOpt) {
+                xp = static_cast<uint32_t>(xpOpt.value());
+            }
+        }
+        response.write(xp);
     }
     return response;
 }
@@ -337,6 +348,14 @@ void LobbyManager::runLobbyThread(Lobby* lobby)
 
         if (lobby->gameInstance->hasWon()) {
             std::cout << "Game won in lobby " << lobby->id << std::endl;
+
+            for (uint32_t playerId : lobby->players) {
+                auto* server = dynamic_cast<RTypeServer*>(_server);
+                if (server) {
+                    server->getDB().addXP(playerId, lobby->currentLevel);
+                }
+            }
+
             lobby->currentLevel++;
             std::string nextLevelPath = "shared/res/levels/level" + std::to_string(lobby->currentLevel) + ".json";
             std::ifstream checkFile(nextLevelPath);
