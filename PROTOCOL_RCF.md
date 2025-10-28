@@ -146,13 +146,6 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
   - uint8: Entity Type (0=Player, 1=Projectile, 2=Platform, 3=Enemy)
   - Entity-specific component data (see below)
 
-### AUTH_RESPONSE
-- **Direction**: Server → Client
-- **Payload**:
-  - uint32: Player id if success or 0 if failure
-  - uint8: failure message length L (if failure)
-  - bytes[L]: error message
-
 **Entity Type Data Formats:**
 
 **All Entity Types:**
@@ -186,6 +179,13 @@ All multi-byte fields are encoded in **network byte order** (big-endian).
     - float: Position X
     - float: Position Y
     - uint32: Health value
+
+### AUTH_RESPONSE
+- **Direction**: Server → Client
+- **Payload**:
+  - uint32: Player id if success or 0 if failure
+  - uint8: failure message length L (if failure)
+  - bytes[L]: error message
 
 ### ROLLBACK
 - **Direction**: Server → Client
