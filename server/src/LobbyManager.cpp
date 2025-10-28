@@ -282,8 +282,10 @@ std::unordered_map<uint32_t, std::string> LobbyManager::getLobbyPlayersUsernames
     for (const auto playerId : it->second->players) {
         if (it->second->_usernames.find(playerId) != it->second->_usernames.end()) {
             playersUsernames[playerId] = it->second->_usernames[playerId];
+            std::cout << "Player " << playerId << " has username: " << it->second->_usernames[playerId] << std::endl;
         } else {
             playersUsernames[playerId] = std::to_string(playerId);
+            std::cout << "Player " << playerId << " has no username, using ID: " << std::to_string(playerId) << std::endl;
         }
     }
     return playersUsernames;

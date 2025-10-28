@@ -134,6 +134,8 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 
     std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
 
+    m_menu.setLobbyPlayerNames(m_lobbyPlayers);
+
     onLobbyJoined(lobbyId);
 }
 

@@ -281,7 +281,6 @@ private:
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     Level m_currentLevelData;
-    std::string m_pseudo = "";
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;
