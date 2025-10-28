@@ -60,6 +60,9 @@ void Game::handleNetworkEvent(const Client::NetworkEvent& event)
 void Game::handleConnectAck()
 {
     std::cout << "Connection acknowledged by server" << std::endl;
+    m_connected = true;
+    m_isConnecting = false;
+    m_connectionTimeout = 0.0f;
     // CORRIGE : Appelle la méthode helper au lieu de naviguer directement
     onConnectionSuccess();
 }

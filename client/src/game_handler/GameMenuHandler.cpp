@@ -11,6 +11,10 @@
 
 void Game::handleMenuConnectRequest()
 {
+    if (m_isConnecting) {
+        return;
+    }
+
     std::string connectionCode = m_menu.getConnectionCode(_registry);
 
     std::string ip;
@@ -19,12 +23,10 @@ void Game::handleMenuConnectRequest()
     ip = ip.empty() ? "127.0.0.1" : ip;
     port = (port == 0) ? 4242 : port;
 
+    m_isConnecting = true;
     m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, m_clientPort, m_events);
     m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
     m_clientNetwork->connectToServerRequest();
-
-    m_menu.showLoginPage(_registry);
-    std::cout << "Connected to server " << ip << ":" << port << std::endl;
 }
 
 // HERE
@@ -108,6 +110,11 @@ void Game::processMenuEvents()
     if (m_menu.hasConnectionRequest()) {
         handleMenuConnectRequest();
         m_menu.clearAllRequests();
+        return;
+    }
+
+    // Only allow navigation to login page if connected
+    if (m_menu.hasConnectionRequest() && !m_connected) {
         return;
     }
 

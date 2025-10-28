@@ -271,6 +271,8 @@ private:
 
     bool _isRunning;
     bool m_connected = false;
+    bool m_isConnecting = false;
+    float m_connectionTimeout = 0.0f;
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
     InputHistory m_inputHistory;
