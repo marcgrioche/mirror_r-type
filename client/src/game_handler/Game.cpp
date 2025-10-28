@@ -75,6 +75,15 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
     }
 
+    // Load weapon textures
+    if (!resourceManager.loadTexture(renderer, "wp1.png", resourceManager.getAssetPath("sprites/weapons/wp1.png"))) {
+        std::cout << "Warning: Failed to load wp1 weapon texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "laser_bullet.png", resourceManager.getAssetPath("sprites/weapons/laser_bullet.png"))) {
+        std::cout << "Warning: Failed to load laser_bullet texture" << std::endl;
+    }
+
     // Load parallax background textures
     if (!resourceManager.loadTexture(renderer, "TopLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/TopLayer.png"))) {
         std::cout << "Warning: Failed to load TopLayer texture" << std::endl;

@@ -47,7 +47,7 @@ Entity createPlayer(
 
     Entity projectile = factories::createProjectileTemplate(
         registry,
-        Velocity { 1000, 0 },
+        Velocity { 1500, 0 },
         Damage { 5 },
         Hitbox { 25, 25 });
     createWeapon(registry, Parent { player }, projectile);

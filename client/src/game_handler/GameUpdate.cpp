@@ -16,6 +16,7 @@
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "ecs/systems/RigidBodySystem.hpp"
+#include "ecs/systems/WeaponRotationSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include "systems/SpriteAnimationSystem.hpp"
 #include <iostream>
@@ -93,6 +94,7 @@ void Game::updateNetworkGameTick()
     GameInstancePhysics::updatePreviousPositions(_registry);
     updateSystemsComponents();
     movementSystem(_registry, TICK_DURATION);
+    WeaponRotationSystem::updateWeaponRotations(_registry, mouseX, mouseY);
     if (_registry.has<Position>(playerEntity)) {
         const auto& pos = _registry.get<Position>(playerEntity);
         updatePlayerSprite(_registry, playerEntity, pos.v.x, pos.v.y);
