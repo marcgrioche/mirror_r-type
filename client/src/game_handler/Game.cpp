@@ -51,7 +51,7 @@ bool Game::initialize()
     }
     SDL_Renderer* renderer = _graphics.getRenderer();
 
-    if (!resourceManager.loadTexture(renderer, "player_sprite.png", resourceManager.getAssetPath("sprites/player_sprite.png"))) {
+    if (!resourceManager.loadTexture(renderer, "player_sprite.png", resourceManager.getAssetPath("sprites/player_running_without_head.png"))) {
         std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
     }
 
@@ -73,6 +73,15 @@ bool Game::initialize()
 
     if (!resourceManager.loadTexture(renderer, "bydo_flying.png", resourceManager.getAssetPath("sprites/bydo_flying.png"))) {
         std::cout << "Warning: Failed to load bydo_flying texture - using fallback rectangles" << std::endl;
+    }
+
+    // Load weapon textures
+    if (!resourceManager.loadTexture(renderer, "wp1.png", resourceManager.getAssetPath("sprites/weapons/wp1.png"))) {
+        std::cout << "Warning: Failed to load wp1 weapon texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "laser_bullet.png", resourceManager.getAssetPath("sprites/weapons/laser_bullet.png"))) {
+        std::cout << "Warning: Failed to load laser_bullet texture" << std::endl;
     }
 
     // Load parallax background textures
@@ -134,7 +143,7 @@ bool Game::initialize()
     m_maxLevel = determineMaxLevel();
 
     // Preload level 1 data
-    std::string level1Path = "shared/res/levels/level1.json";
+    std::string level1Path = resourceManager.getBasePath() + "../shared/res/levels/level1.json";
     m_currentLevelData.loadFromJson(level1Path);
 
     initializeMenuMode();
@@ -376,9 +385,10 @@ void Game::connectToServer(const std::string& serverIp, uint16_t serverPort)
 
 uint32_t Game::determineMaxLevel()
 {
+    auto& resourceManager = ResourceManager::getInstance();
     uint32_t level = 1;
     while (true) {
-        std::string levelPath = "shared/res/levels/level" + std::to_string(level) + ".json";
+        std::string levelPath = resourceManager.getBasePath() + "../shared/res/levels/level" + std::to_string(level) + ".json";
         std::ifstream checkFile(levelPath);
         if (!checkFile.is_open()) {
             return level - 1;

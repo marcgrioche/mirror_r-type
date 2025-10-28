@@ -232,6 +232,19 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     uint8_t numPlayers = msg.readU8();
 
     updateNonPredictedEntities(msg, registry, numPlayers, tick);
+
+    // Update boss entities
+    uint8_t numBosses = msg.readU8();
+    for (uint8_t i = 0; i < numBosses; ++i) {
+        uint32_t entityId = msg.readU32();
+        uint32_t health = msg.readU32();
+
+        Entity entity = findEntityByServerId(registry, entityId);
+        if (entity.id != 0 && registry.has<Health>(entity)) {
+            auto& healthComp = registry.get<Health>(entity);
+            healthComp.hp = static_cast<int>(health);
+        }
+    }
 }
 
 void Game::updateNonPredictedEntities(const Message& msg, Registry& registry,

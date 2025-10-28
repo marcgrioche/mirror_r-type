@@ -14,8 +14,8 @@
 
 void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
 {
-    (void)posX; // Unused parameter, kept for API compatibility
-    (void)posY; // Unused parameter, kept for API compatibility
+    (void)posX;
+    (void)posY;
 
     if (!registry.has<Hitbox>(entity)) {
         return; // Cannot add sprite without hitbox
@@ -23,8 +23,10 @@ void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float pos
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    const float SPRITE_WIDTH = 623.0f;
-    const float SPRITE_HEIGHT = 623.0f;
+    const float SPRITE_WIDTH = 29.0f;
+    const float SPRITE_HEIGHT = 29.0f;
+    const int FRAME_NUMBER = 4;
+    const float FRAME_DURATION = 0.15f;
 
     float scale_x = (hitbox.width * sizeFactor) / SPRITE_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / SPRITE_HEIGHT;
@@ -34,12 +36,19 @@ void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float pos
     float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
-    Sprite sprite = SpriteFactory::createStaticSprite(
-        "player_sprite.png", // texture ID
-        0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect (x, y, w, h) - full image
-        scale_x, scale_y, // separate scales for exact hitbox matching
-        offset_x, offset_y // offset to center on entity
-    );
+    // Sprite sprite = SpriteFactory::createStaticSprite(
+    //     "player_sprite.png", // texture ID
+    //     0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect (x, y, w, h) - full image
+    //     scale_x, scale_y, // separate scales for exact hitbox matching
+    //     offset_x, offset_y // offset to center on entity
+    // );
+
+    Sprite sprite = SpriteFactory::createAnimatedSprite(
+        "player_sprite.png",
+        SPRITE_WIDTH, SPRITE_HEIGHT,
+        FRAME_NUMBER, FRAME_DURATION,
+        scale_x, scale_y,
+        offset_x, offset_y);
 
     registry.add<Sprite>(entity, sprite);
 }
@@ -111,7 +120,7 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
         FRAME_WIDTH, FRAME_HEIGHT,
         TOTAL_FRAMES, FRAME_DURATION,
         scale_x, scale_y,
-        offset_x, offset_y);
+        offset_x, offset_y, level ? level->getBossHealthStatesNumber() : 0);
 
     registry.add<Sprite>(entity, sprite);
 }
@@ -160,34 +169,92 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    // Eye spritesheet: 224x24 pixels total, 7 frames, each 32x24 pixels
-    const int FRAME_WIDTH = 32;
-    const int FRAME_HEIGHT = 24;
-    const int TOTAL_FRAMES = 7;
-    const float FRAME_DURATION = 0.1f; // 100ms per frame
+    // Déterminer si c'est un projectile joueur ou ennemi via velocity.x
+    bool isPlayerProjectile = false;
+    if (registry.has<Velocity>(entity)) {
+        const Velocity& velocity = registry.get<Velocity>(entity);
+        isPlayerProjectile = (velocity.v.x > 0);
+    }
 
-    // Apply size factor for visual scaling without changing hitbox
-    float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
-    float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
+    Sprite sprite;
+    
+    if (isPlayerProjectile) {
+        // Laser pour le joueur
+        const float SPRITE_WIDTH = 249.0f;
+        const float SPRITE_HEIGHT = 144.0f;
 
-    float rendered_width = FRAME_WIDTH * scale_x;
-    float rendered_height = FRAME_HEIGHT * scale_y;
-    float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
-    float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+        float scale_x = (hitbox.width * sizeFactor) / SPRITE_WIDTH;
+        float scale_y = (hitbox.height * sizeFactor) / SPRITE_HEIGHT;
 
-    Sprite sprite = SpriteFactory::createAnimatedSprite(
-        "eye_spritesheet.png", // texture ID
-        FRAME_WIDTH, FRAME_HEIGHT, // frame dimensions
-        TOTAL_FRAMES, FRAME_DURATION, // animation parameters
-        scale_x, scale_y, // separate scales for exact hitbox matching
-        offset_x, offset_y // offset to center on entity
-    );
+        float rendered_width = SPRITE_WIDTH * scale_x;
+        float rendered_height = SPRITE_HEIGHT * scale_y;
+        float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
+        float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+
+        sprite = SpriteFactory::createStaticSprite(
+            "laser_bullet.png",
+            0, 0, SPRITE_WIDTH, SPRITE_HEIGHT,
+            scale_x, scale_y,
+            offset_x, offset_y
+        );
+    } else {
+        // Eye spritesheet pour les ennemis
+        const int FRAME_WIDTH = 32;
+        const int FRAME_HEIGHT = 24;
+        const int TOTAL_FRAMES = 7;
+        const float FRAME_DURATION = 0.1f;
+
+        float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
+        float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
+
+        float rendered_width = FRAME_WIDTH * scale_x;
+        float rendered_height = FRAME_HEIGHT * scale_y;
+        float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
+        float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+
+        sprite = SpriteFactory::createAnimatedSprite(
+            "eye_spritesheet.png",
+            FRAME_WIDTH, FRAME_HEIGHT,
+            TOTAL_FRAMES, FRAME_DURATION,
+            scale_x, scale_y,
+            offset_x, offset_y
+        );
+    }
 
     // Calculate rotation based on velocity direction
     if (registry.has<Velocity>(entity)) {
-        Velocity& velocity = registry.get<Velocity>(entity);
-        sprite.rotation = atan2(velocity.v.y, velocity.v.x) * 180.0f / M_PI + 180.0f;
+        const Velocity& velocity = registry.get<Velocity>(entity);
+        float baseRotation = atan2(velocity.v.y, velocity.v.x) * 180.0f / M_PI;
+        sprite.rotation = isPlayerProjectile ? baseRotation : (baseRotation + 180.0f);
     }
+
+    registry.add<Sprite>(entity, sprite);
+}
+
+void SpriteManager::addWeaponSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+{
+    (void)posX;
+    (void)posY;
+
+    const float SPRITE_WIDTH = 66.0f;
+    const float SPRITE_HEIGHT = 22.0f;
+
+    float scale_x = sizeFactor;
+    float scale_y = sizeFactor;
+
+    float rendered_width = SPRITE_WIDTH * scale_x;
+    float rendered_height = SPRITE_HEIGHT * scale_y;
+
+    // Offset pour positionner l'arme devant le joueur
+    float offset_x = -rendered_width / 3.0f;
+    float offset_y = -rendered_height / 2.0f;
+
+    Sprite sprite = SpriteFactory::createStaticSprite(
+        "wp1.png", // texture ID
+        0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect
+        scale_x, scale_y,
+        offset_x, offset_y
+    );
 
     registry.add<Sprite>(entity, sprite);
 }
