@@ -157,6 +157,13 @@ add_custom_command(TARGET r-type_client POST_BUILD
     "${CMAKE_BINARY_DIR}/res"
 )
 
+# Copy shared resources to build directory
+add_custom_command(TARGET r-type_client POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/../shared/res"
+    "${CMAKE_BINARY_DIR}/shared/res"
+)
+
 set_target_properties(r-type_client PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON

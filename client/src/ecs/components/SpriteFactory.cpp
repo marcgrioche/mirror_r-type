@@ -36,7 +36,7 @@ Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
 Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     int frameWidth, int frameHeight,
     int totalFrames, float frameDuration,
-    float scaleX, float scaleY, int offsetX, int offsetY)
+    float scaleX, float scaleY, int offsetX, int offsetY, int health_state_nb)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
@@ -56,6 +56,7 @@ Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     sprite.elapsed_time = 0.0f;
     sprite.frame_width = frameWidth;
     sprite.frame_height = frameHeight;
+    sprite.nb_state = health_state_nb;
 
     return sprite;
 }

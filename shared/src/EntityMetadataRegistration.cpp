@@ -20,6 +20,7 @@
 #include "ecs/components/TextBox.hpp"
 #include "ecs/components/Velocity.hpp"
 #include "entities/enemies/CreateEnemy.hpp"
+#include "entities/boss/CreateBoss.hpp"
 #include "entities/platform/CreatePlatform.hpp"
 #include "entities/player/CreatePlayer.hpp"
 #include "entities/powerUp/CreatePowerUp.hpp"
@@ -191,7 +192,7 @@ Entity createBossFromData(class Registry& registry, const class EntityData& data
     int health = data.get<int>("health");
     std::array<float, 4> hitbox = data.get<std::array<float, 4>>("hitbox");
 
-    return factories::createEnemy(registry,
+    return factories::createBoss(registry,
         Position { position.x, position.y },
         Health { health },
         Hitbox { hitbox[0], hitbox[1], hitbox[2], hitbox[3] },

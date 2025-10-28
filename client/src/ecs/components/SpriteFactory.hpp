@@ -45,7 +45,7 @@ public:
     static Sprite createAnimatedSprite(const std::string& textureId,
         int frameWidth, int frameHeight,
         int totalFrames, float frameDuration = 0.1f,
-        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0);
+        float scaleX = 1.0f, float scaleY = 1.0f, int offsetX = 0, int offsetY = 0, int health_state_nb = 0);
 
     /**
      * @brief Creates a custom sprite with full control over source and destination rectangles
