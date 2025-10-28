@@ -14,6 +14,7 @@
 #include "../src/ecs/components/Position.hpp"
 #include "../src/ecs/components/PowerUp.hpp"
 #include "../src/ecs/components/Tags.hpp"
+#include "../src/ecs/components/TextBox.hpp"
 #include "../src/ecs/components/Velocity.hpp"
 #include <stdexcept>
 
@@ -254,39 +255,43 @@ void initializeComponentMappings()
             }
         });
 
-    // Player ID mapping (special case - stored in usernames map, not a component)
+    // Player ID mapping
     mapper.registerMapping(
         "player_id",
         [](Entity entity, const Registry& registry) -> PropertyValue {
-            (void)entity;
-            (void)registry;
-            // This would need access to the playerEntities map
-            // For now, return a default - this will be handled specially
-            return static_cast<uint32_t>(0);
+            if (!registry.has<PlayerTag>(entity)) {
+                throw std::runtime_error("Entity missing PlayerTag component");
+            }
+            const auto& tag = registry.get<PlayerTag>(entity);
+            return tag.playerId;
         },
         [](Entity entity, Registry& registry, const PropertyValue& value) {
-            (void)entity;
-            (void)registry;
-            (void)value;
-            // This will be handled by the deserialization context
-            // The player ID is used to look up the entity, not stored as a component
+            uint32_t id = std::get<uint32_t>(value);
+            if (registry.has<PlayerTag>(entity)) {
+                auto& tag = registry.get<PlayerTag>(entity);
+                tag.playerId = id;
+            } else {
+                registry.add<PlayerTag>(entity, PlayerTag { id });
+            }
         });
 
-    // Username mapping (special case - stored in usernames map, not a component)
+    // Username mapping
     mapper.registerMapping(
         "username",
         [](Entity entity, const Registry& registry) -> PropertyValue {
-            (void)entity;
-            (void)registry;
-            // This would need access to the usernames map
-            // For now, return empty string - this will be handled specially
-            return std::string("");
+            if (!registry.has<TextBox>(entity)) {
+                throw std::runtime_error("Entity missing TextBox component");
+            }
+            const auto& textbox = registry.get<TextBox>(entity);
+            return textbox.text;
         },
         [](Entity entity, Registry& registry, const PropertyValue& value) {
-            (void)entity;
-            (void)registry;
-            (void)value;
-            // Usernames are handled by the deserialization context
-            // Not stored as components
+            std::string text = std::get<std::string>(value);
+            if (registry.has<TextBox>(entity)) {
+                auto& textbox = registry.get<TextBox>(entity);
+                textbox.text = text;
+            } else {
+                registry.add<TextBox>(entity, TextBox { text, 12 }); // default fontSize
+            }
         });
 }
