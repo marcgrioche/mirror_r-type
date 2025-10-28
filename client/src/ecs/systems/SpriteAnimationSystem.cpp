@@ -19,8 +19,6 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
 
     for (auto it = view1.begin(); it != view1.end(); ++it) {
         Entity e = it.entity();
-
-        std::cout << "bss" << std::endl;
         
         if (!registry.has<Sprite>(e) || !registry.has<Health>(e) || !registry.has<MaxHealth>(e)) {
             std::cout << "[SpriteAnimationSystem ACCA] Boss entity missing required components!" << std::endl;
@@ -46,14 +44,10 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         //     is_attacking.attacking = 0;
         //     continue;
         // }
-        std::cout << "[INJURIES BEFORE] Health = " << health.hp << " max health = " << max_health.hp
-        << " nb state = " << sprite.nb_state << std::endl;
         sprite.texture_id = "heads_monster_idle.png";
         for (int i = 0; i <= sprite.nb_state; i++) {
             if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
                 sprite.current_frameY = sprite.nb_state - i + 1;
-                std::cout << "[INJURIES] Health = " << health.hp << " max health = " << max_health.hp
-                    << " nb state = " << sprite.nb_state << " i = " << i << " frame Y =" << sprite.current_frameY << std::endl;
                 break;
             }
         }
