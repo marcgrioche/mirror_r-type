@@ -10,8 +10,7 @@
 #include "../include/PropertySerializer.hpp"
 #include <stdexcept>
 
-void EntitySerializer::serializeEntity(Message& msg, Entity entity, const Registry& registry,
-    const std::unordered_map<uint32_t, std::string>& usernames)
+void EntitySerializer::serializeEntity(Message& msg, Entity entity, const Registry& registry)
 {
     EntityType type = EntityTypeDetector::detectEntityType(registry, entity);
 
@@ -23,17 +22,6 @@ void EntitySerializer::serializeEntity(Message& msg, Entity entity, const Regist
     for (const auto& property : metadata->properties) {
         try {
             PropertyValue value = ComponentMapper::getInstance().extractProperty(entity, registry, property.name);
-            if (std::holds_alternative<std::string>(value)) {
-                if (std::get<std::string>(value).empty()) {
-                    auto itUsername = usernames.find(entity.id);
-                    if (itUsername != usernames.end()) {
-                        std::cout << "Property serialized: " << property.name << ", value: " << itUsername->second << std::endl;
-                        msg.write(itUsername->second);
-                    } else {
-                        msg.write("");
-                    }
-                }
-            }
             PropertySerializer::serializeProperty(msg, value, property.type);
         } catch (const std::exception& e) {
             throw std::runtime_error("Failed to serialize property '" + property.name + "' for entity type " + std::string(entityTypeToString(type)) + ": " + e.what());

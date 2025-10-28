@@ -101,7 +101,7 @@ Message GameInstanceSerialization::serializeEntityBatch(
         msg.write(entityType);
 
         try {
-            EntitySerializer::serializeEntity(msg, entity, registry, usernames);
+            EntitySerializer::serializeEntity(msg, entity, registry);
         } catch (const std::exception&) {
             continue;
         }
