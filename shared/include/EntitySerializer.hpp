@@ -33,9 +33,11 @@ public:
      * @param msg The message to write entity data to
      * @param entity The entity to serialize
      * @param registry The ECS registry containing the entity
+     * @param usernames The players usernames map for special handling
      * @throws std::runtime_error if entity type cannot be determined or serialization fails
      */
-    static void serializeEntity(Message& msg, Entity entity, const Registry& registry);
+    static void serializeEntity(Message& msg, Entity entity, const Registry& registry,
+        const std::unordered_map<uint32_t, std::string>& usernames);
 
     /**
      * @brief Deserialize entity data from a network message
