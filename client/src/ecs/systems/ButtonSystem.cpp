@@ -10,6 +10,7 @@
 
 #include "ButtonSystem.hpp"
 #include "../../managers/EventManager.hpp"
+#include "../../managers/GraphicsManager.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Position.hpp"
@@ -22,9 +23,13 @@ void buttonSystem(Registry& registry)
     static bool prevMousePressed = false;
     static bool clickConsumedForThisPress = false;
 
-    int mx = 0, my = 0;
-    const Uint32 mouseState = SDL_GetMouseState(&mx, &my);
+    int windowX = 0, windowY = 0;
+    const Uint32 mouseState = SDL_GetMouseState(&windowX, &windowY);
     const bool mousePressed = (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+
+    // Convert window coordinates to logical coordinates
+    int mx = 0, my = 0;
+    GraphicsManager::getInstance().windowToLogical(windowX, windowY, mx, my);
 
     const bool justPressed = mousePressed && !prevMousePressed;
     const bool justReleased = !mousePressed && prevMousePressed;
