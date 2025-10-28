@@ -7,6 +7,10 @@ void RTypeServer::handleCreateLobby(const Message& msg, PeerInfo& peerInfo)
 
     std::cout << "CREATE_LOBBY received from player " << msg.player_id << std::endl;
 
+    if (_lobbyManager.getPlayerLobby(msg.player_id) != 0) {
+        _lobbyManager.removePlayer(msg.player_id);
+    }
+
     uint32_t lobbyId = _lobbyManager.createLobby(msg.player_id);
 
     if (lobbyId) {
