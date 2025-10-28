@@ -165,6 +165,11 @@ void RTypeClient::lobbyStartRequest()
     sendMessage(MessageType::LOBBY_STATE);
 }
 
+void RTypeClient::lobbyInfoRequest()
+{
+    sendMessage(MessageType::LOBBY_STATE);
+}
+
 void RTypeClient::handleGameState(const Message& t_msg, PeerInfo& t_peerInfo)
 {
     (void)t_peerInfo;

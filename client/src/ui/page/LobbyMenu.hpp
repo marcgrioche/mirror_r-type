@@ -119,6 +119,12 @@ public:
     void setPlayerNames(const std::unordered_map<uint32_t, std::string>& players);
 
     /**
+     * @brief Sets the player scores for display in the lobby
+     * @param scores Map of player IDs to XP scores
+     */
+    void setPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores);
+
+    /**
      * @brief Updates the player entities in the lobby menu
      * @param registry The ECS registry to update entities in
      */
@@ -133,6 +139,7 @@ private:
     Entity m_backgroundEntity;
     std::vector<Entity> m_playerTextEntities;
     std::unordered_map<uint32_t, std::string> m_playerNames;
+    std::unordered_map<uint32_t, uint32_t> m_playerScores;
     bool m_visible = false;
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;

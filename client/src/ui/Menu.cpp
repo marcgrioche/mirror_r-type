@@ -125,6 +125,11 @@ void Menu::setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& 
     m_lobbyPage.setPlayerNames(playerNames);
 }
 
+void Menu::setLobbyPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores)
+{
+    m_lobbyPage.setPlayerScores(scores);
+}
+
 void Menu::clearGameEntities(Registry& registry)
 {
     (void)registry;

@@ -19,6 +19,9 @@ public:
     // Atomically add XP and optionally log it. Returns true on success.
     bool addXP(int64_t t_playerId, int64_t t_delta);
 
+    // Get player's current XP. Returns XP value or nullopt if not found.
+    std::optional<int64_t> getXP(int64_t t_playerId);
+
     // Create a safe backup into the given file path using sqlite3_backup API.
     bool backup_to_file(const std::string& t_backupPath);
 

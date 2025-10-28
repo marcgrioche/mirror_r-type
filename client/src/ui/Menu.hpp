@@ -149,6 +149,12 @@ public:
     void setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames);
 
     /**
+     * @brief Sets the player scores for the lobby menu
+     * @param scores Map of player IDs to XP scores
+     */
+    void setLobbyPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores);
+
+    /**
      * @brief Sets the current lobby ID
      * @param lobbyId The lobby ID to set
      */

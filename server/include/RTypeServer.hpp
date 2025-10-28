@@ -51,6 +51,12 @@ public:
      */
     void broadcastToLobby(uint32_t lobbyId, const Message& msg);
 
+    /**
+     * @brief Gets a reference to the database instance
+     * @return Reference to the database
+     */
+    SqlDB::DB& getDB() { return *_db; }
+
 private:
     uint16_t _port;
     std::unordered_map<uint32_t, PeerInfo> _clients;
