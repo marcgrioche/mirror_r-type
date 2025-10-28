@@ -6,6 +6,8 @@
 #include "../include/game_instance/GameInstancePlayer.hpp"
 #include "../include/game_instance/GameInstanceSerialization.hpp"
 #include "ecs/components/Velocity.hpp"
+#include "ecs/components/IsAttacking.hpp"
+#include "ecs/components/Tags.hpp"
 #include "ecs/systems/WeaponSystem.hpp"
 #include <iostream>
 
@@ -54,6 +56,18 @@ void GameInstance::update()
 void GameInstance::updateTick()
 {
     _core.incrementTick();
+
+    // Decay transient boss attack flags at the start of the tick
+    {
+        auto view = _core.getRegistry().view<BossTag, IsAttacking>();
+        for (auto it = view.begin(); it != view.end(); ++it) {
+            Entity e = it.entity();
+            auto &atk = _core.getRegistry().get<IsAttacking>(e);
+            if (atk.attacking > 0) {
+                atk.attacking -= 1;
+            }
+        }
+    }
 
     // Update previous positions for interpolation
     GameInstancePhysics::updatePreviousPositions(_core.getRegistry());

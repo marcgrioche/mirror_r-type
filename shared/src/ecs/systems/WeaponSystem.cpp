@@ -18,6 +18,7 @@
 #include "components/ProjectileType.hpp"
 #include "components/Tags.hpp"
 #include "components/Velocity.hpp"
+#include "components/IsAttacking.hpp"
 #include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
 #include <iostream>
@@ -209,6 +210,12 @@ bool handleEnemyAttacks(
             if (registry.has<Frequency>(weaponEntity)) {
                 Frequency& frequency = registry.get<Frequency>(weaponEntity);
                 FrequencyUtils::reset(frequency);
+            }
+
+            // If the owner is a boss, flag it as attacking (short countdown to survive multi-tick updates)
+            if (registry.has<BossTag>(owner) && registry.has<IsAttacking>(owner)) {
+                auto &isAtk = registry.get<IsAttacking>(owner);
+                isAtk.attacking = 10;
             }
         }
     }

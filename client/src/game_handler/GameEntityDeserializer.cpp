@@ -22,6 +22,8 @@
 #include "ecs/components/SpriteFactory.hpp"
 #include "ecs/components/SpriteManager.hpp"
 #include "ecs/components/Velocity.hpp"
+#include "ecs/components/Tags.hpp"
+#include "ecs/components/IsAttacking.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -238,11 +240,18 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     for (uint8_t i = 0; i < numBosses; ++i) {
         uint32_t entityId = msg.readU32();
         uint32_t health = msg.readU32();
+        uint8_t isAttacking = msg.readU8();
 
         Entity entity = findEntityByServerId(registry, entityId);
         if (entity.id != 0 && registry.has<Health>(entity)) {
             auto& healthComp = registry.get<Health>(entity);
             healthComp.hp = static_cast<int>(health);
+        }
+
+        // Update the transient attack flag on the boss (used by SpriteAnimationSystem)
+        if (entity.id != 0 && registry.has<BossTag>(entity) && registry.has<IsAttacking>(entity)) {
+            auto &atk = registry.get<IsAttacking>(entity);
+            atk.attacking = static_cast<int>(isAttacking);
         }
     }
 }
