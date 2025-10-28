@@ -328,3 +328,62 @@ void GraphicsManager::destroyColorblindFilterTextures()
         m_colorblindFilterTexture = nullptr;
     }
 }
+
+void GraphicsManager::windowToLogical(int windowX, int windowY, int& logicalX, int& logicalY) const
+{
+    if (!m_renderer || !m_window) {
+        logicalX = windowX;
+        logicalY = windowY;
+        return;
+    }
+
+    // Get the actual window size
+    int windowWidth, windowHeight;
+    SDL_GetWindowSize(m_window, &windowWidth, &windowHeight);
+
+    // Get the logical size
+    int logicalWidth = m_logicalWidth;
+    int logicalHeight = m_logicalHeight;
+
+    // Calculate the scaling and viewport
+    float scaleX = static_cast<float>(windowWidth) / static_cast<float>(logicalWidth);
+    float scaleY = static_cast<float>(windowHeight) / static_cast<float>(logicalHeight);
+
+    // When using SDL_RenderSetLogicalSize with letter/pillarboxing,
+    // SDL maintains aspect ratio. We need to account for this.
+    float scale;
+    int viewportX = 0;
+    int viewportY = 0;
+    int viewportWidth = windowWidth;
+    int viewportHeight = windowHeight;
+
+    if (MAINTAIN_ASPECT_RATIO) {
+        // SDL uses the smaller scale to maintain aspect ratio
+        scale = (scaleX < scaleY) ? scaleX : scaleY;
+        
+        // Calculate viewport (the actual rendering area)
+        viewportWidth = static_cast<int>(logicalWidth * scale);
+        viewportHeight = static_cast<int>(logicalHeight * scale);
+        
+        // Calculate letterbox/pillarbox offsets
+        viewportX = (windowWidth - viewportWidth) / 2;
+        viewportY = (windowHeight - viewportHeight) / 2;
+    } else {
+        scale = scaleX; // Use X scale if not maintaining aspect ratio
+    }
+
+    // Convert window coordinates to logical coordinates
+    // First, subtract the viewport offset (letterbox/pillarbox)
+    int adjustedX = windowX - viewportX;
+    int adjustedY = windowY - viewportY;
+
+    // Then scale down to logical coordinates
+    logicalX = static_cast<int>(adjustedX / scale);
+    logicalY = static_cast<int>(adjustedY / scale);
+
+    // Clamp to logical bounds (in case mouse is outside viewport)
+    if (logicalX < 0) logicalX = 0;
+    if (logicalY < 0) logicalY = 0;
+    if (logicalX >= logicalWidth) logicalX = logicalWidth - 1;
+    if (logicalY >= logicalHeight) logicalY = logicalHeight - 1;
+}

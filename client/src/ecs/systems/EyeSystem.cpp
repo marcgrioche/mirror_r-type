@@ -3,6 +3,7 @@
 */
 
 #include "EyeSystem.hpp"
+#include "../../managers/GraphicsManager.hpp"
 #include "components/Eye.hpp"
 #include "components/Position.hpp"
 #include "components/Sprite.hpp"
@@ -11,8 +12,12 @@
 
 void eyeSystem(Registry& registry, float /*deltaTime*/)
 {
+    int windowX = 0, windowY = 0;
+    SDL_GetMouseState(&windowX, &windowY);
+
+    // Convert window coordinates to logical coordinates
     int mx = 0, my = 0;
-    SDL_GetMouseState(&mx, &my);
+    GraphicsManager::getInstance().windowToLogical(windowX, windowY, mx, my);
 
     auto view = registry.view<Eye, Position>();
     for (auto it = view.begin(); it != view.end(); ++it) {
