@@ -109,7 +109,9 @@ void Menu::showLobbyPageAfterGame(Registry& registry, uint32_t currentLevel, uin
 {
     hideAllPages(registry);
     m_currentPage = Page::LOBBY;
-    m_lobbyPage.showAfterGameEnd(registry, currentLevel, maxLevel);
+    m_lobbyPage.showAfterGameEnd(registry, m_currentLobbyId, currentLevel, maxLevel);
+    m_lobbyPage.setPlayerNames(m_lobbyPlayers);
+    updateLobbyPlayerEntities(registry);
 }
 
 void Menu::updateLobbyPlayerEntities(Registry& registry)
@@ -119,6 +121,7 @@ void Menu::updateLobbyPlayerEntities(Registry& registry)
 
 void Menu::setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames)
 {
+    m_lobbyPlayers = playerNames;
     m_lobbyPage.setPlayerNames(playerNames);
 }
 

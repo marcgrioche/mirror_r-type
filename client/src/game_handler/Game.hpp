@@ -276,6 +276,7 @@ private:
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
     InputHistory m_inputHistory;
+    uint32_t m_currentLobbyId = 0;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
     uint32_t m_currentLevel = 1;

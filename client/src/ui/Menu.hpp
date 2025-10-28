@@ -149,6 +149,12 @@ public:
     void setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames);
 
     /**
+     * @brief Sets the current lobby ID
+     * @param lobbyId The lobby ID to set
+     */
+    void setCurrentLobbyId(uint32_t lobbyId) { m_currentLobbyId = lobbyId; }
+
+    /**
      * @brief Shows the lobby page after a game has ended
      * @param registry The ECS registry to use for entity management
      * @param currentLevel The player's current level
@@ -248,6 +254,8 @@ private:
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     std::string m_username;
+    uint32_t m_currentLobbyId = 0;
+    std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
 
     // Pages modulaires
     HomeMenu m_homePage;

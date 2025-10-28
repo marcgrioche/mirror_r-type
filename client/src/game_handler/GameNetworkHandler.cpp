@@ -121,6 +121,7 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
     const uint8_t numPlayers = msg.readU8();
 
     (void)lobbyState;
+    m_currentLobbyId = lobbyId;
     m_lobbyOwnerId = ownerId;
     if (numPlayers != 0) {
         m_lobbyPlayers.clear();
@@ -134,6 +135,7 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
 
     std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
 
+    m_menu.setCurrentLobbyId(lobbyId);
     m_menu.setLobbyPlayerNames(m_lobbyPlayers);
 
     onLobbyJoined(lobbyId);

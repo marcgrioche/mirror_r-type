@@ -36,12 +36,12 @@ void LobbyMenu::show(Registry& registry, int lobbyId, uint32_t currentLevel, uin
     }
 }
 
-void LobbyMenu::showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel)
+void LobbyMenu::showAfterGameEnd(Registry& registry, uint32_t lobbyId, uint32_t currentLevel, uint32_t maxLevel)
 {
     if (!m_visible) {
         m_currentLevel = currentLevel;
         m_maxLevel = maxLevel;
-        createEntities(registry, 0);
+        createEntities(registry, lobbyId);
         m_visible = true;
         clearRequests();
         m_isReturningFromGame = true;

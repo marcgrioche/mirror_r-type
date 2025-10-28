@@ -46,10 +46,11 @@ public:
     /**
      * @brief Shows the lobby menu after a game has ended
      * @param registry The ECS registry to create entities in
+     * @param lobbyId The lobby ID to display
      * @param currentLevel The player's current level
      * @param maxLevel The maximum available level
      */
-    void showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
+    void showAfterGameEnd(Registry& registry, uint32_t lobbyId, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Hides the lobby menu by destroying its UI elements
