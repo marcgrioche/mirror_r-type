@@ -8,6 +8,7 @@
 #include "../ecs/components/Parent.hpp"
 #include "../ecs/components/Position.hpp"
 #include "../ecs/components/PowerUp.hpp"
+#include "../ecs/components/ServerEntityId.hpp"
 #include "../ecs/components/Tags.hpp"
 #include "../ecs/components/Velocity.hpp"
 
@@ -38,6 +39,21 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
         } else {
             msg.write(static_cast<uint32_t>(100));
         }
+    }
+
+    // Serialize boss entities
+    const auto* bossStorage = registry.get_storage_if_exists<BossTag>();
+    if (bossStorage) {
+        const auto& entities = bossStorage->dense_entities_ref();
+        msg.write(static_cast<uint8_t>(entities.size()));
+
+        for (const auto& entity : entities) {
+            const auto& health = registry.get<Health>(entity);
+            msg.write(static_cast<uint32_t>(entity.id));
+            msg.write(static_cast<uint32_t>(health.hp));
+        }
+    } else {
+        msg.write(static_cast<uint8_t>(0));
     }
 
     return msg.getPayload();

@@ -134,7 +134,7 @@ bool Game::initialize()
     m_maxLevel = determineMaxLevel();
 
     // Preload level 1 data
-    std::string level1Path = "shared/res/levels/level1.json";
+    std::string level1Path = resourceManager.getBasePath() + "../shared/res/levels/level1.json";
     m_currentLevelData.loadFromJson(level1Path);
 
     initializeMenuMode();
@@ -357,9 +357,10 @@ void Game::connectToServer(const std::string& serverIp, uint16_t serverPort)
 
 uint32_t Game::determineMaxLevel()
 {
+    auto& resourceManager = ResourceManager::getInstance();
     uint32_t level = 1;
     while (true) {
-        std::string levelPath = "shared/res/levels/level" + std::to_string(level) + ".json";
+        std::string levelPath = resourceManager.getBasePath() + "../shared/res/levels/level" + std::to_string(level) + ".json";
         std::ifstream checkFile(levelPath);
         if (!checkFile.is_open()) {
             return level - 1;
