@@ -133,6 +133,11 @@ public:
     void lobbyStartRequest();
 
     /**
+     * @brief Sends a request for lobby information
+     */
+    void lobbyInfoRequest();
+
+    /**
      * @brief Sends a ping request to measure latency
      */
     void pingRequest();

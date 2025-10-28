@@ -242,6 +242,11 @@ void LobbyMenu::setPlayerNames(const std::unordered_map<uint32_t, std::string>& 
     }
 }
 
+void LobbyMenu::setPlayerScores(const std::unordered_map<uint32_t, uint32_t>& scores)
+{
+    m_playerScores = scores;
+}
+
 void LobbyMenu::updatePlayerEntities(Registry& registry)
 {
     for (auto& entity : m_playerTextEntities) {
@@ -252,8 +257,13 @@ void LobbyMenu::updatePlayerEntities(Registry& registry)
     std::cout << "[LOBBY] Creating player text entities for " << m_playerNames.size() << " players:" << std::endl;
     float y = 100.0f;
     for (const auto& pair : m_playerNames) {
-        std::cout << "  Creating text for Player " << pair.first << ": '" << pair.second << "' at y=" << y << std::endl;
-        Entity textEntity = factories::createTextBox(registry, pair.second, 50.0f, y, 16, { 255, 255, 255, 255 });
+        std::string displayText = pair.second;
+        auto scoreIt = m_playerScores.find(pair.first);
+        if (scoreIt != m_playerScores.end()) {
+            displayText += " - " + std::to_string(scoreIt->second) + " XP";
+        }
+        std::cout << "  Creating text for Player " << pair.first << ": '" << displayText << "' at y=" << y << std::endl;
+        Entity textEntity = factories::createTextBox(registry, displayText, 50.0f, y, 16, { 255, 255, 255, 255 });
         m_playerTextEntities.push_back(textEntity);
         y += 30.0f;
     }

@@ -224,6 +224,29 @@ bool DB::addXP(const int64_t t_playerId, const int64_t t_delta)
     return true;
 }
 
+std::optional<int64_t> DB::getXP(int64_t t_playerId)
+{
+    sqlite3_stmt* stmt = nullptr;
+    const char* sql = "SELECT xp FROM players WHERE id = ?;";
+    int rc = sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        if (stmt)
+            sqlite3_finalize(stmt);
+        logError();
+        return std::nullopt;
+    }
+    sqlite3_bind_int64(stmt, 1, t_playerId);
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        int64_t xp = sqlite3_column_int64(stmt, 0);
+        sqlite3_finalize(stmt);
+        return xp;
+    }
+    sqlite3_finalize(stmt);
+    return std::nullopt;
+}
+
 bool DB::backup_to_file(const std::string& backup_path)
 {
     sqlite3* dest = nullptr;

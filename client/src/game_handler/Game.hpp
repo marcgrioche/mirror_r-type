@@ -279,6 +279,7 @@ private:
     uint32_t m_currentLobbyId = 0;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
+    std::unordered_map<uint32_t, uint32_t> m_lobbyPlayerScores;
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     Level m_currentLevelData;

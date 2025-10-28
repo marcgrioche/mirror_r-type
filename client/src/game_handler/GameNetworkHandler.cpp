@@ -125,18 +125,22 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
     m_lobbyOwnerId = ownerId;
     if (numPlayers != 0) {
         m_lobbyPlayers.clear();
+        m_lobbyPlayerScores.clear();
     }
     for (uint8_t i = 0; i < numPlayers; i++) {
         uint32_t playerId = msg.readU32();
         const uint8_t playerUsernameLen = msg.readU8();
         const std::string username = msg.readString(playerUsernameLen);
+        uint32_t xp = msg.readU32();
         m_lobbyPlayers[playerId] = username;
+        m_lobbyPlayerScores[playerId] = xp;
     }
 
     std::cout << "Lobby operation confirmed by server - Lobby ID: " << lobbyId << std::endl;
 
     m_menu.setCurrentLobbyId(lobbyId);
     m_menu.setLobbyPlayerNames(m_lobbyPlayers);
+    m_menu.setLobbyPlayerScores(m_lobbyPlayerScores);
 
     onLobbyJoined(lobbyId);
 }
@@ -162,6 +166,10 @@ void Game::handleGameEndWin()
         _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::WIN, m_currentLevel, m_maxLevel);
     }
+
+    if (m_clientNetwork) {
+        m_clientNetwork->lobbyInfoRequest();
+    }
 }
 
 void Game::handleGameEndLose()
@@ -181,6 +189,10 @@ void Game::handleGameEndLose()
         // Réactive le menu pour afficher la page Lose
         _state = GameState::MENU;
         m_menu.activate(_registry, Menu::Page::LOSE, m_currentLevel, m_maxLevel);
+    }
+
+    if (m_clientNetwork) {
+        m_clientNetwork->lobbyInfoRequest();
     }
 }
 
