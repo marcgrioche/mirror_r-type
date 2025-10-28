@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Oct 21 1:07:22 AM 2025 jojo
-** Last update Wed Oct 21 3:29:54 PM 2025 jojo
+** Last update Wed Oct 28 4:17:03 PM 2025 jojo
 */
 
 #include "BackgroundMenu.hpp"
@@ -136,6 +136,20 @@ void BackgroundMenu::reload(Registry& registry, int eyeCount, const std::vector<
                         r.x, r.y, r.w, r.h, std::max(4.0f, std::min(w, h) * 0.09f))) {
                     overlap = true;
                     break;
+                }
+            }
+            if (overlap)
+                continue;
+            overlap = false;
+            for (auto& entity : existingEntities) {
+                if (registry.has<Sprite>(entity)) {
+                    Sprite spr = registry.get<Sprite>(entity);
+                    auto& r = spr.dstRect;
+                    if (rectsOverlap(x, y, static_cast<float>(w), static_cast<float>(h),
+                            r.x + r.w / 3, r.y + r.h / 3, r.w - r.w / 3, r.h - r.h / 3, std::max(4.0f, std::min(w, h) * 0.09f))) {
+                        overlap = true;
+                        break;
+                    }
                 }
             }
             if (overlap)
