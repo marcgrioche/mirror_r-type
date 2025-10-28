@@ -98,10 +98,7 @@ void PropertySerializer::serializeDouble(Message& msg, double value)
 
 void PropertySerializer::serializeString(Message& msg, const std::string& value)
 {
-    msg.write(static_cast<uint8_t>(value.length()));
-    for (char c : value) {
-        msg.write(static_cast<uint8_t>(c));
-    }
+    msg.write(value);
 }
 
 void PropertySerializer::serializeVector2(Message& msg, const Vector2& value)
@@ -159,7 +156,10 @@ double PropertySerializer::deserializeDouble(Message& msg)
 std::string PropertySerializer::deserializeString(Message& msg)
 {
     uint8_t length = msg.readU8();
-    return msg.readString(length);
+    auto str = msg.readString(length);
+
+    std::cout << "Length: " << length << ", str: " << str << std::endl;
+    return str;
 }
 
 Vector2 PropertySerializer::deserializeVector2(Message& msg)

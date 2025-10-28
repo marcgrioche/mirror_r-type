@@ -128,13 +128,31 @@ public:
     void showLosePage(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
-     * @brief Shows the lobby page
-     * @param registry The ECS registry to use for entity management
+     * @brief Shows the lobby menu
+     * @param registry The ECS registry to create entities in
      * @param lobbyId The lobby ID to display
      * @param currentLevel The player's current level
      * @param maxLevel The maximum available level
      */
     void showLobbyPage(Registry& registry, int lobbyId, uint32_t currentLevel, uint32_t maxLevel);
+
+    /**
+     * @brief Updates the player entities in the lobby menu
+     * @param registry The ECS registry to update entities in
+     */
+    void updateLobbyPlayerEntities(Registry& registry);
+
+    /**
+     * @brief Sets the player names for the lobby menu
+     * @param playerNames Map of player IDs to names
+     */
+    void setLobbyPlayerNames(const std::unordered_map<uint32_t, std::string>& playerNames);
+
+    /**
+     * @brief Sets the current lobby ID
+     * @param lobbyId The lobby ID to set
+     */
+    void setCurrentLobbyId(uint32_t lobbyId) { m_currentLobbyId = lobbyId; }
 
     /**
      * @brief Shows the lobby page after a game has ended
@@ -168,6 +186,12 @@ public:
      * @return The username string
      */
     std::string getUserPseudo(Registry& registry) const;
+
+    /**
+     * @brief Sets the username for the current session
+     * @param username The username to set
+     */
+    void setUsername(const std::string& username) { m_username = username; }
 
     // Vérification des demandes utilisateur
 
@@ -229,6 +253,9 @@ private:
     Page m_currentPage = Page::HOME;
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
+    std::string m_username;
+    uint32_t m_currentLobbyId = 0;
+    std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
 
     // Pages modulaires
     HomeMenu m_homePage;

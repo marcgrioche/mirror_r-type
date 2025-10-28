@@ -101,21 +101,9 @@ Message GameInstanceSerialization::serializeEntityBatch(
         msg.write(entityType);
 
         try {
-            EntitySerializer::serializeEntity(msg, entity, registry);
+            EntitySerializer::serializeEntity(msg, entity, registry, usernames);
         } catch (const std::exception&) {
             continue;
-        }
-
-        // Handle special cases that aren't in metadata (player_id, username)
-        if (type == EntityType::PLAYER) {
-            const auto playerId = findPlayerIdByEntity(entity, playerEntities);
-            msg.write(playerId);
-            auto itUsername = usernames.find(entity.id);
-            if (itUsername != usernames.end()) {
-                msg.write(itUsername->second);
-            } else {
-                msg.write(std::to_string(playerId));
-            }
         }
     }
 

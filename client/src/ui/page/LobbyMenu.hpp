@@ -18,6 +18,7 @@
 #include "systems/ButtonSystem.hpp"
 #include "systems/TextBoxInputSystem.hpp"
 #include <string>
+#include <unordered_map>
 
 class LobbyMenu {
 public:
@@ -45,10 +46,11 @@ public:
     /**
      * @brief Shows the lobby menu after a game has ended
      * @param registry The ECS registry to create entities in
+     * @param lobbyId The lobby ID to display
      * @param currentLevel The player's current level
      * @param maxLevel The maximum available level
      */
-    void showAfterGameEnd(Registry& registry, uint32_t currentLevel, uint32_t maxLevel);
+    void showAfterGameEnd(Registry& registry, uint32_t lobbyId, uint32_t currentLevel, uint32_t maxLevel);
 
     /**
      * @brief Hides the lobby menu by destroying its UI elements
@@ -110,6 +112,18 @@ public:
      */
     void clearRequests();
 
+    /**
+     * @brief Sets the player names for display in the lobby
+     * @param players Map of player IDs to usernames
+     */
+    void setPlayerNames(const std::unordered_map<uint32_t, std::string>& players);
+
+    /**
+     * @brief Updates the player entities in the lobby menu
+     * @param registry The ECS registry to update entities in
+     */
+    void updatePlayerEntities(Registry& registry);
+
 private:
     // Entity m_textBoxEntity;
     Entity m_connectButtonEntity;
@@ -117,6 +131,8 @@ private:
     Entity m_returnButtonEntity;
     Entity m_textBoxLobbyEntity;
     Entity m_backgroundEntity;
+    std::vector<Entity> m_playerTextEntities;
+    std::unordered_map<uint32_t, std::string> m_playerNames;
     bool m_visible = false;
     bool m_LobbyRequested = false;
     bool m_returnRequested = false;

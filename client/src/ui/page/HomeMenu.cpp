@@ -15,8 +15,9 @@
 #include "entities/Sprite/CreateAnimateSprite.hpp"
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
-#include "entities/textbox/TextBoxInput.hpp"
+
 #include "render/SpriteRender.hpp"
+#include "render/TextBoxRender.hpp"
 
 #include <iostream>
 
@@ -47,9 +48,6 @@ void HomeMenu::hide(Registry& registry)
 
 void HomeMenu::createEntities(Registry& registry)
 {
-    m_textBoxEntity = factories::createTextBoxInput(registry,
-        "Enter your username...", 300.0f, 200.0f, 18, { 255, 255, 255, 255 });
-
     m_joinButtonEntity = factories::createButton(registry,
         SCREEN_WIDTH / 2 - 250 + 600, SCREEN_HEIGHT / 2 - 250, 380.0f, 120.0f, "home_join", true, "ButtonMouth", 500, 500, 1200, 1080);
 
@@ -71,8 +69,6 @@ void HomeMenu::createEntities(Registry& registry)
 
 void HomeMenu::destroyEntities(Registry& registry)
 {
-    registry.kill_entity(m_textBoxEntity);
-
     registry.kill_entity(m_joinButtonEntity);
     registry.kill_entity(m_createButtonEntity);
     registry.kill_entity(m_paramButtonEntity);
@@ -109,14 +105,16 @@ void HomeMenu::update(Registry& registry, float deltaTime)
 {
     if (!m_visible)
         return;
-    textBoxInputUpdateSystem(registry, deltaTime);
+    (void)registry;
+    (void)deltaTime;
 }
 
 void HomeMenu::handleEvent(Registry& registry, const SDL_Event& event)
 {
     if (!m_visible)
         return;
-    textBoxInputSystem(registry, event);
+    (void)registry;
+    (void)event;
 }
 
 void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
@@ -134,8 +132,6 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
     // Rendu des composants
     m_backgroundMenu.draw(gfx, registry);
 
-    drawTextBoxInput(gfx, registry, m_textBoxEntity);
-
     drawButton(gfx, registry, m_joinButtonEntity);
     drawButton(gfx, registry, m_createButtonEntity);
     drawButton(gfx, registry, m_paramButtonEntity);
@@ -144,16 +140,6 @@ void HomeMenu::render(GraphicsManager& gfx, Registry& registry)
     drawTextBox(gfx, registry, m_textBoxCreateEntity);
     drawTextBox(gfx, registry, m_textBoxJoinEntity);
     drawTextBox(gfx, registry, m_textBoxParamEntity);
-}
-
-std::string HomeMenu::getPseudo(Registry& registry) const
-{
-    if (!m_visible || !registry.has<TextBoxInput>(m_textBoxEntity)) {
-        return "";
-    }
-
-    const auto& input = registry.get<TextBoxInput>(m_textBoxEntity);
-    return input.inputText;
 }
 
 bool HomeMenu::hasJoinRequest() const

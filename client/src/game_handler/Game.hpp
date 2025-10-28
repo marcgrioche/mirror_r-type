@@ -271,15 +271,17 @@ private:
 
     bool _isRunning;
     bool m_connected = false;
+    bool m_isConnecting = false;
+    float m_connectionTimeout = 0.0f;
     bool m_lobbyCreated = false;
     uint16_t m_clientPort;
     InputHistory m_inputHistory;
+    uint32_t m_currentLobbyId = 0;
     uint32_t m_lobbyOwnerId = 0;
     std::unordered_map<uint32_t, std::string> m_lobbyPlayers;
     uint32_t m_currentLevel = 1;
     uint32_t m_maxLevel = 1;
     Level m_currentLevelData;
-    std::string m_pseudo = "";
 
     std::chrono::steady_clock::time_point _lastTickTime;
     float _accumulatedTime = 0.0f;

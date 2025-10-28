@@ -25,7 +25,7 @@ Entity createTextBox(Registry& registry, const std::string& text,
 
     registry.emplace<Position>(textBox, x, y);
     registry.emplace<TextBox>(textBox, text, fontSize, color,
-        ResourceManager::getInstance().getAssetPath("fonts/metali1.ttf"), true,
+        ResourceManager::getInstance().getAssetPath("fonts/OpenSans-Medium.ttf"), true,
         alignement);
 
     if (!textureId.empty()) {

@@ -200,6 +200,21 @@ void Game::handleInputEvents(SDL_Event& event)
 
 void Game::runMenuLoop()
 {
+    if (m_isConnecting) {
+        m_connectionTimeout += _timer.getDeltaTime() * 1000.0f;
+        if (m_connectionTimeout >= 5.0f) {
+            m_isConnecting = false;
+            m_connectionTimeout = 0.0f;
+            if (m_clientNetwork) {
+                m_clientNetwork->stop();
+                if (m_networkThread.joinable()) {
+                    m_networkThread.join();
+                }
+                m_clientNetwork.reset();
+            }
+        }
+    }
+
     // Traite les événements du nouveau système de menu
     processMenuEvents(); // Utilise la version adaptée
 
@@ -262,6 +277,10 @@ void Game::cleanupNetwork()
     if (m_networkThread.joinable()) {
         m_networkThread.join();
     }
+
+    m_connected = false;
+    m_isConnecting = false;
+    m_clientNetwork.reset();
 }
 
 void Game::sendDisconnectMessage()

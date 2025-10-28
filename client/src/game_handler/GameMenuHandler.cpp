@@ -11,6 +11,10 @@
 
 void Game::handleMenuConnectRequest()
 {
+    if (m_isConnecting) {
+        return;
+    }
+
     std::string connectionCode = m_menu.getConnectionCode(_registry);
 
     std::string ip;
@@ -19,12 +23,10 @@ void Game::handleMenuConnectRequest()
     ip = ip.empty() ? "127.0.0.1" : ip;
     port = (port == 0) ? 4242 : port;
 
+    m_isConnecting = true;
     m_clientNetwork = std::make_unique<Client::RTypeClient>(ip, port, m_clientPort, m_events);
     m_networkThread = std::thread([this]() { m_clientNetwork->start(); });
     m_clientNetwork->connectToServerRequest();
-
-    m_menu.showLoginPage(_registry);
-    std::cout << "Connected to server " << ip << ":" << port << std::endl;
 }
 
 // HERE
@@ -36,11 +38,11 @@ void Game::handleMenuCreateLobbyRequest()
         return;
     }
 
-    // std::string pseudo = m_menu.getUserPseudo(_registry);
+    std::string pseudo = m_menu.getUserPseudo(_registry);
 
     m_clientNetwork->createLobbyRequest();
-    // m_clientNetwork->createUsernameRequest(pseudo);
-    std::cout << "Lobby creation requested, waiting for server response..." << m_pseudo << std::endl;
+    m_clientNetwork->createUsernameRequest(pseudo);
+    std::cout << "Lobby creation requested, waiting for server response..." << pseudo << std::endl;
 }
 
 void Game::handleMenuLoginRequest()
@@ -55,7 +57,6 @@ void Game::handleMenuLoginRequest()
     auto password = m_menu.getInput(_registry, AMenu::Input::PASSWORD);
 
     // m_clientNetwork->createLoginRequest(username, password);
-    m_pseudo = username;
     std::cout << "[USERNAME]: " << username << std::endl;
     std::cout << "[PASSWORD]: " << password << std::endl;
     std::cout << "[LOGIN] requested to server" << std::endl;
@@ -71,7 +72,7 @@ void Game::handleMenuJoinLobbyRequest()
     }
 
     std::string lobbyCode = m_menu.getJoinCode(_registry);
-    // std::string pseudo = m_menu.getUserPseudo(_registry);
+    std::string pseudo = m_menu.getUserPseudo(_registry);
 
     if (lobbyCode.empty()) {
         std::cout << "ERROR: Please enter a lobby ID" << std::endl;
@@ -81,8 +82,8 @@ void Game::handleMenuJoinLobbyRequest()
     try {
         uint32_t lobbyId = static_cast<uint32_t>(std::stoul(lobbyCode));
         m_clientNetwork->joinLobbyRequest(lobbyId);
-        // m_clientNetwork->createUsernameRequest(pseudo);
-        std::cout << "Join lobby " << lobbyId << "requested by " << m_pseudo << ", waiting for server response..." << std::endl;
+        m_clientNetwork->createUsernameRequest(pseudo);
+        std::cout << "Join lobby " << lobbyId << "requested by " << pseudo << ", waiting for server response..." << std::endl;
     } catch (const std::exception& e) {
         std::cout << "ERROR: Invalid lobby ID: " << lobbyCode << " - " << e.what() << std::endl;
         return;
@@ -108,6 +109,11 @@ void Game::processMenuEvents()
     if (m_menu.hasConnectionRequest()) {
         handleMenuConnectRequest();
         m_menu.clearAllRequests();
+        return;
+    }
+
+    // Only allow navigation to login page if connected
+    if (m_menu.hasConnectionRequest() && !m_connected) {
         return;
     }
 
@@ -149,6 +155,7 @@ void Game::onLobbyJoined(uint32_t lobbyId)
 {
     //(void)lobbyId;
     m_menu.showLobbyPage(_registry, lobbyId, m_currentLevel, m_maxLevel);
+    m_menu.updateLobbyPlayerEntities(_registry);
 }
 
 void Game::onLobbyCreated(uint32_t lobbyId)
@@ -165,5 +172,7 @@ void Game::onGameStarted()
 
 void Game::onLoginSuccess()
 {
+    auto username = m_menu.getInput(_registry, AMenu::Input::USERNAME);
+    m_menu.setUsername(username);
     m_menu.showHomePage(_registry);
 }
