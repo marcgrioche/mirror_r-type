@@ -23,7 +23,7 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         std::cout << "bss" << std::endl;
         
         if (!registry.has<Sprite>(e) || !registry.has<Health>(e) || !registry.has<MaxHealth>(e)) {
-            std::cout << "[SpriteAnimationSystem] Boss entity missing required components!" << std::endl;
+            std::cout << "[SpriteAnimationSystem ACCA] Boss entity missing required components!" << std::endl;
             continue;
         }
         
@@ -31,12 +31,12 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         MaxHealth& max_health = registry.get<MaxHealth>(e);
         Health& health = registry.get<Health>(e);
         
-        if (!registry.has<IsAttacking>(e)) {
-            std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
-            continue;
-        }
+        // if (!registry.has<IsAttacking>(e)) {
+        //     std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
+        //     continue;
+        // }
         
-        IsAttacking& is_attacking = registry.get<IsAttacking>(e);
+        // IsAttacking& is_attacking = registry.get<IsAttacking>(e);
 
         // std::cout << "[CLIENT SpriteAnimationSystem] Boss isAttacking = " << is_attacking.attacking << std::endl;
         // if (is_attacking.attacking > 0) {
