@@ -12,6 +12,7 @@
 #include "../../../shared/include/EntityType.hpp"
 #include "../../../shared/include/GameInstance.hpp"
 #include "../../../shared/include/Message.hpp"
+#include "../../../shared/include/PlayerMovementState.hpp"
 #include "../../../shared/src/levels/Level.hpp"
 #include "../network/RTypeClient.hpp"
 #include "../ui/Menu.hpp"
@@ -241,7 +242,8 @@ private:
     Entity findEntityByServerId(Registry& registry, uint32_t serverId);
     Entity findEntityByClientId(Registry& registry, uint32_t clientId);
     void updateEntityState(Registry& registry, Entity entity, float posX, float posY, uint32_t health,
-        uint32_t serverTick);
+        PlayerMovementState movementState, FacingDirection facingDirection, uint32_t serverTick);
+    void updateEntitySyncState(Registry& registry, Entity entity, PlayerMovementState movementState, FacingDirection facingDirection);
     void updateEntityPosition(Registry& registry, Entity entity, float posX, float posY,
         uint32_t serverTick);
     void updateEntityHealth(Registry& registry, Entity entity, uint32_t health);

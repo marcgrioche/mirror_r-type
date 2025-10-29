@@ -10,20 +10,22 @@
 #include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "../../shared/include/EntitySerializer.hpp"
 #include "../../shared/include/EntityType.hpp"
+#include "../../shared/include/PlayerMovementState.hpp"
 #include "Game.hpp"
 #include "ecs/components/Damage.hpp"
 #include "ecs/components/Health.hpp"
 #include "ecs/components/Hitbox.hpp"
+#include "ecs/components/IsAttacking.hpp"
 #include "ecs/components/Lifetime.hpp"
+#include "ecs/components/PlayerSyncState.hpp"
 #include "ecs/components/Position.hpp"
 #include "ecs/components/PowerUp.hpp"
 #include "ecs/components/ServerEntityId.hpp"
 #include "ecs/components/Sprite.hpp"
 #include "ecs/components/SpriteFactory.hpp"
 #include "ecs/components/SpriteManager.hpp"
-#include "ecs/components/Velocity.hpp"
 #include "ecs/components/Tags.hpp"
-#include "ecs/components/IsAttacking.hpp"
+#include "ecs/components/Velocity.hpp"
 #include <iostream>
 
 void Game::deserializeAndCreateEntity(const Message& msg, Registry& registry)
@@ -250,7 +252,7 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
 
         // Update the transient attack flag on the boss (used by SpriteAnimationSystem)
         if (entity.id != 0 && registry.has<BossTag>(entity) && registry.has<IsAttacking>(entity)) {
-            auto &atk = registry.get<IsAttacking>(entity);
+            auto& atk = registry.get<IsAttacking>(entity);
             atk.attacking = static_cast<int>(isAttacking);
         }
     }
@@ -270,13 +272,18 @@ void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t t
     float posX = msg.readFloat();
     float posY = msg.readFloat();
     uint32_t health = msg.readU32();
+    uint8_t movementStateRaw = msg.readU8();
+    uint8_t facingDirectionRaw = msg.readU8();
+
+    PlayerMovementState movementState = static_cast<PlayerMovementState>(movementStateRaw);
+    FacingDirection facingDirection = static_cast<FacingDirection>(facingDirectionRaw);
 
     Entity entity = findEntityByServerId(registry, entityId);
     if (entity.id == 0) {
         return;
     }
 
-    updateEntityState(registry, entity, posX, posY, health, tick);
+    updateEntityState(registry, entity, posX, posY, health, movementState, facingDirection, tick);
 }
 
 Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
@@ -306,10 +313,12 @@ Entity Game::findEntityByClientId(Registry& registry, const uint32_t clientId)
 }
 
 void Game::updateEntityState(Registry& registry, Entity entity,
-    float posX, float posY, uint32_t health, const uint32_t serverTick)
+    float posX, float posY, uint32_t health, PlayerMovementState movementState,
+    FacingDirection facingDirection, const uint32_t serverTick)
 {
     updateEntityPosition(registry, entity, posX, posY, serverTick);
     updateEntityHealth(registry, entity, health);
+    updateEntitySyncState(registry, entity, movementState, facingDirection);
 }
 
 void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, float posY,
@@ -356,5 +365,17 @@ void Game::updateEntityHealth(Registry& registry, Entity entity, uint32_t health
     if (registry.has<Health>(entity)) {
         auto& healthComp = registry.get<Health>(entity);
         healthComp.hp = static_cast<int>(health);
+    }
+}
+
+void Game::updateEntitySyncState(Registry& registry, Entity entity,
+    PlayerMovementState movementState, FacingDirection facingDirection)
+{
+    if (!registry.has<PlayerSyncState>(entity)) {
+        registry.add<PlayerSyncState>(entity, PlayerSyncState { movementState, facingDirection });
+    } else {
+        auto& syncState = registry.get<PlayerSyncState>(entity);
+        syncState.movementState = movementState;
+        syncState.facingDirection = facingDirection;
     }
 }

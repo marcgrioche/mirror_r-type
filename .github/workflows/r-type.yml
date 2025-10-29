@@ -27,7 +27,7 @@ jobs:
       - name: Configure and build with CMake
         run: |
           cmake -S . -B build
-          cmake --build build
+          cmake --build build --parallel 20
       - name: Verify executables
         run: |
           EXECUTABLE_LIST=$(echo "${{ env.EXECUTABLES }}" | tr ',' ' ')
@@ -53,7 +53,7 @@ jobs:
       - name: Configure and build with CMake
         run: |
           cmake -S . -B build
-          cmake --build build --config Release
+          cmake --build build --parallel 20 --config Release
       - name: Verify executables
         run: |
           $executables = "${{ env.EXECUTABLES }}" -split ","

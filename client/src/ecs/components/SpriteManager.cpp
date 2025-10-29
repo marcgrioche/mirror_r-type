@@ -7,6 +7,7 @@
 
 #include "SpriteManager.hpp"
 #include "components/Hitbox.hpp"
+#include "components/PlayerSyncState.hpp"
 #include "components/Sprite.hpp"
 #include "components/SpriteFactory.hpp"
 #include "components/Velocity.hpp"
@@ -44,13 +45,17 @@ void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float pos
     // );
 
     Sprite sprite = SpriteFactory::createAnimatedSprite(
-        "player_sprite.png",
+        "player_idle_without_head.png",
         SPRITE_WIDTH, SPRITE_HEIGHT,
         FRAME_NUMBER, FRAME_DURATION,
         scale_x, scale_y,
         offset_x, offset_y);
 
     registry.add<Sprite>(entity, sprite);
+
+    if (!registry.has<PlayerSyncState>(entity)) {
+        registry.add<PlayerSyncState>(entity, PlayerSyncState { PlayerMovementState::IDLE, FacingDirection::RIGHT });
+    }
 }
 
 void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
@@ -179,7 +184,7 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
     }
 
     Sprite sprite;
-    
+
     if (isPlayerProjectile) {
         // Laser pour le joueur
         const float SPRITE_WIDTH = 249.0f;
@@ -197,8 +202,7 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
             "laser_bullet.png",
             0, 0, SPRITE_WIDTH, SPRITE_HEIGHT,
             scale_x, scale_y,
-            offset_x, offset_y
-        );
+            offset_x, offset_y);
     } else {
         // Eye spritesheet pour les ennemis
         const int FRAME_WIDTH = 32;
@@ -219,8 +223,7 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
             FRAME_WIDTH, FRAME_HEIGHT,
             TOTAL_FRAMES, FRAME_DURATION,
             scale_x, scale_y,
-            offset_x, offset_y
-        );
+            offset_x, offset_y);
     }
 
     // Calculate rotation based on velocity direction
@@ -255,8 +258,7 @@ void SpriteManager::addWeaponSprite(Registry& registry, Entity entity, float pos
         "wp1.png", // texture ID
         0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect
         scale_x, scale_y,
-        offset_x, offset_y
-    );
+        offset_x, offset_y);
 
     registry.add<Sprite>(entity, sprite);
 }

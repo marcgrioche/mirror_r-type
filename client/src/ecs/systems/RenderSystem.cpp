@@ -10,6 +10,7 @@
 #include "PlayerListRenderSystem.hpp"
 #include "components/Button.hpp"
 #include "components/Hitbox.hpp"
+#include "components/PlayerSyncState.hpp"
 #include "components/Position.hpp"
 #include "components/Sprite.hpp"
 #include "components/Tags.hpp"
@@ -55,9 +56,17 @@ void renderSystem(Registry& registry)
             dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale_y);
         }
 
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        if (registry.has<PlayerSyncState>(e)) {
+            const PlayerSyncState& syncState = registry.get<PlayerSyncState>(e);
+            if (syncState.facingDirection == FacingDirection::RIGHT) {
+                flip = SDL_FLIP_HORIZONTAL;
+            }
+        }
+
         if (texture) {
             SDL_RenderCopyEx(renderer, texture, &sprite.srcRect, &dstRect,
-                sprite.rotation, nullptr, SDL_FLIP_NONE);
+                sprite.rotation, nullptr, flip);
         } else {
             if (registry.has<PlayerTag>(e)) {
                 graphics.setDrawColor(255, 0, 255, 255); // Magenta for players

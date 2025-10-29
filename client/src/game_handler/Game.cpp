@@ -51,8 +51,12 @@ bool Game::initialize()
     }
     SDL_Renderer* renderer = _graphics.getRenderer();
 
-    if (!resourceManager.loadTexture(renderer, "player_sprite.png", resourceManager.getAssetPath("sprites/player_running_without_head.png"))) {
-        std::cout << "Warning: Failed to load player sprite texture - using fallback rectangles" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "player_idle_without_head.png", resourceManager.getAssetPath("sprites/player_idle_without_head.png"))) {
+        std::cout << "Warning: Failed to load player idle sprite texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "player_running_without_head.png", resourceManager.getAssetPath("sprites/player_running_without_head.png"))) {
+        std::cout << "Warning: Failed to load player running sprite texture - using fallback rectangles" << std::endl;
     }
 
     if (!resourceManager.loadTexture(renderer, "eye_spritesheet.png", resourceManager.getAssetPath("sprites/eye_spritesheet.png"))) {
