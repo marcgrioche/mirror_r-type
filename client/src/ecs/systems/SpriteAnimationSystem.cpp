@@ -7,6 +7,7 @@
 
 #include "SpriteAnimationSystem.hpp"
 #include "components/Sprite.hpp"
+#include "components/AttackFlash.hpp"
 #include "../../../../shared/src/ecs/components/Tags.hpp"
 #include "../../../../shared/src/ecs/components/MaxHealth.hpp"
 #include "../../../../shared/src/ecs/components/Health.hpp"
@@ -28,27 +29,47 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         Sprite& sprite = registry.get<Sprite>(e);
         MaxHealth& max_health = registry.get<MaxHealth>(e);
         Health& health = registry.get<Health>(e);
-        
-        // if (!registry.has<IsAttacking>(e)) {
-        //     std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
-        //     continue;
-        // }
-        
-        // IsAttacking& is_attacking = registry.get<IsAttacking>(e);
 
-        // std::cout << "[CLIENT SpriteAnimationSystem] Boss isAttacking = " << is_attacking.attacking << std::endl;
-        // if (is_attacking.attacking > 0) {
-        //     std::cout << "[CLIENT] IS ATTACKING - Changing sprite!" << std::endl;
-        //     // sprite.texture_id = "heads_monster_attack.png";
-        //     // sprite.current_frameY = 0;
-        //     is_attacking.attacking = 0;
-        //     continue;
-        // }
-        sprite.texture_id = "heads_monster_idle.png";
-        for (int i = 0; i <= sprite.nb_state; i++) {
-            if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
-                sprite.current_frameY = sprite.nb_state - i + 1;
-                break;
+        if (!registry.has<IsAttacking>(e)) {
+            std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
+            continue;
+        }
+
+        IsAttacking& is_attacking = registry.get<IsAttacking>(e);
+
+        if (is_attacking.attacking > 0) {
+            if (!registry.has<AttackFlash>(e)) {
+                float oneFrame = (sprite.frame_duration > 0.0f) ? sprite.frame_duration : 0.1f;
+                registry.emplace<AttackFlash>(e, AttackFlash { oneFrame });
+                sprite.current_id = sprite.attack_id;
+                sprite.current_frameY = 0;
+            }
+        }
+
+        if (registry.has<AttackFlash>(e)) {
+            auto &flash = registry.get<AttackFlash>(e);
+            flash.timeLeft -= deltaTime;
+            sprite.current_id = sprite.attack_id;
+            if (flash.timeLeft <= 0.0f) {
+                registry.remove<AttackFlash>(e);
+                sprite.current_id = sprite.texture_id;
+                is_attacking.attacking = 0;
+                for (int i = 0; i <= sprite.nb_state; i++) {
+                    if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
+                        sprite.current_frameY = sprite.nb_state - i + 1;
+                        break;
+                    }
+                }
+            }
+            continue;
+        }
+
+        if (sprite.current_id == sprite.texture_id) {
+            for (int i = 0; i <= sprite.nb_state; i++) {
+                if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
+                    sprite.current_frameY = sprite.nb_state - i + 1;
+                    break;
+                }
             }
         }
     }
@@ -62,8 +83,6 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         if (sprite.total_frames <= 1) {
             continue;
         }
-        // if (registry.has<PlayerTag>(e) && registry.has<Velocity>(e) && registry.get<Velocity>(e).v.x == 0.0)
-        //     continue;
 
         sprite.elapsed_time += deltaTime;
 
@@ -71,8 +90,6 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
             sprite.elapsed_time = 0.0f;
 
             sprite.current_frameX = (sprite.current_frameX + 1) % sprite.total_frames;
-
-            // std::cout << "[CLIENT] current frame X = " << sprite.current_frameX << " current frame Y = " << sprite.current_frameY << std::endl;
 
             sprite.srcRect.x = sprite.current_frameX * sprite.frame_width;
             sprite.srcRect.y = sprite.current_frameY * sprite.frame_height;

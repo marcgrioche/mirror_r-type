@@ -13,5 +13,5 @@
  * @brief Component that tell if the entity is currently attacking or not
  */
 struct IsAttacking {
-    bool attacking;
+    int attacking;
 };

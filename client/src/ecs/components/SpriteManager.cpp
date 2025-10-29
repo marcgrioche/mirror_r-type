@@ -106,6 +106,7 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     const int TOTAL_FRAMES = level ? level->getBossFramesNb() : 3;
     const float FRAME_DURATION = level ? level->getBossFrameDuration() : 0.15;
     const std::string texture_id = level ? level->getBossIdlePath() : "heads_monster_idle.png";
+    const std::string attack_id = level ? level->getBossAttackPaths()[0] : "heads_monster_idle.png";
 
     float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
@@ -120,7 +121,8 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
         FRAME_WIDTH, FRAME_HEIGHT,
         TOTAL_FRAMES, FRAME_DURATION,
         scale_x, scale_y,
-        offset_x, offset_y, level ? level->getBossHealthStatesNumber() : 0);
+        offset_x, offset_y, level ? level->getBossHealthStatesNumber() : 0,
+        attack_id);
 
     registry.add<Sprite>(entity, sprite);
 }
