@@ -132,21 +132,20 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     registry.add<Sprite>(entity, sprite);
 }
 
-void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor, const Level* level)
 {
-    (void)posX; // Unused parameter, kept for API compatibility
-    (void)posY; // Unused parameter, kept for API compatibility
+    (void)posX;
+    (void)posY;
 
     if (!registry.has<Hitbox>(entity)) {
-        return; // Cannot add sprite without hitbox
+        return;
     }
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    const float SPRITE_WIDTH = 420.0f;
-    const float SPRITE_HEIGHT = 190.0f;
+    const float SPRITE_WIDTH = level ? level->getPlatformWidth() : 1.0;
+    const float SPRITE_HEIGHT = level ? level->getPlatformHeight() : 1.0;
 
-    // Apply size factor for visual scaling without changing hitbox
     float scale_x = (hitbox.width * sizeFactor) / SPRITE_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / SPRITE_HEIGHT;
 
@@ -156,10 +155,10 @@ void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float p
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createStaticSprite(
-        "WallOfFlesh.png", // texture ID
-        0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, // src rect (x, y, w, h) - full image
-        scale_x, scale_y, // separate scales for exact hitbox matching
-        offset_x, offset_y // offset to center on entity
+        level ? level->getPlatformSpritePath() : "",
+        0, 0, SPRITE_WIDTH, SPRITE_HEIGHT,
+        scale_x, scale_y,
+        offset_x, offset_y
     );
 
     registry.add<Sprite>(entity, sprite);

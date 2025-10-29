@@ -40,7 +40,7 @@ void addProjectileSprite(Registry& registry, Entity entity, float posX, float po
  * @param posY Entity Y position (unused, for future compatibility)
  * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
-void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
+void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f, const Level* level = nullptr);
 
 /**
  * @brief Adds an animated sprite component to an enemy entity, automatically sizing and centering it

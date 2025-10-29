@@ -28,6 +28,10 @@ private:
     float _platformReachableX = 270.0f;
     float _platformVelocityX = -30.0f;
     float _platformVelocityY = 0.0f;
+    std::string _platformSpritePath = "";
+    float _platformWidth = 0;
+    float _platformHeight = 0;
+    float _platformSizeFactor = 0;
 
     // Enemy parameters
     float _enemyVelocityX = -80.0f;
@@ -90,7 +94,11 @@ public:
     float getPlatformReachableX() const { return _platformReachableX; }
     float getPlatformVelocityX() const { return _platformVelocityX; }
     float getPlatformVelocityY() const { return _platformVelocityY; }
-    // --- Getters for new parameters ---
+    const std::string& getPlatformSpritePath() const { return _platformSpritePath; }
+    float getPlatformWidth() const { return _platformWidth; }
+    float getPlatformHeight() const { return _platformHeight; }
+    float getPlatformSizeFactor() const { return _platformSizeFactor; }
+    // Enemy parameters
     float getEnemyVelocityX() const { return _enemyVelocityX; }
     float getEnemyVelocityY() const { return _enemyVelocityY; }
     int getEnemyHealth() const { return _enemyHealth; }
@@ -98,6 +106,7 @@ public:
     float getEnemyHeight() const { return _enemyHeight; }
     float getEnemyProjectileSpeed() const { return _enemyProjectileSpeed; }
     int getEnemyProjectileDamage() const { return _enemyProjectileDamage; }
+    // Boss parameters
     int getBossHealth() const { return _bossHealth; }
     float getBossWidth() const { return _bossWidth; }
     float getBossHeight() const { return _bossHeight; }

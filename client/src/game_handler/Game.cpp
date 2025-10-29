@@ -63,8 +63,8 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load eye spritesheet texture - using fallback rectangles" << std::endl;
     }
 
-    if (!resourceManager.loadTexture(renderer, "WallOfFlesh.png", resourceManager.getAssetPath("sprites/WallOfFlesh.png"))) {
-        std::cout << "Warning: Failed to load WallOfFlesh texture - using fallback rectangles" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsPlatform.png", resourceManager.getAssetPath("sprites/Heads_Boss/paltform.png"))) {
+        std::cout << "Warning: Failed to load HeadsPlatform texture - using fallback rectangles" << std::endl;
     }
 
     if (!resourceManager.loadTexture(renderer, "heads_monster_idle.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_all_idle.png"))) {
