@@ -56,11 +56,11 @@ void renderSystem(Registry& registry)
             dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale_y);
         }
 
-        SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
         if (registry.has<PlayerSyncState>(e)) {
             const PlayerSyncState& syncState = registry.get<PlayerSyncState>(e);
-            if (syncState.facingDirection == FacingDirection::LEFT) {
-                flip = SDL_FLIP_NONE;
+            if (syncState.facingDirection == FacingDirection::RIGHT) {
+                flip = SDL_FLIP_HORIZONTAL;
             }
         }
 
