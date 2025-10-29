@@ -142,7 +142,9 @@ void Game::handleLobbyInfo(const Client::NetworkEvent& event)
     m_menu.setLobbyPlayerNames(m_lobbyPlayers);
     m_menu.setLobbyPlayerScores(m_lobbyPlayerScores);
 
-    onLobbyJoined(lobbyId);
+    if (m_menu.getCurrentPage() != Menu::Page::WIN && m_menu.getCurrentPage() != Menu::Page::LOSE) {
+        onLobbyJoined(lobbyId);
+    }
 }
 
 void Game::handleGameEndWin()
