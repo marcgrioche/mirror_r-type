@@ -6,12 +6,14 @@
 */
 
 #include "SpriteAnimationSystem.hpp"
-#include "components/Sprite.hpp"
-#include "../../../../shared/src/ecs/components/Tags.hpp"
-#include "../../../../shared/src/ecs/components/MaxHealth.hpp"
+#include "../../../../shared/include/PlayerMovementState.hpp"
 #include "../../../../shared/src/ecs/components/Health.hpp"
 #include "../../../../shared/src/ecs/components/IsAttacking.hpp"
+#include "../../../../shared/src/ecs/components/MaxHealth.hpp"
+#include "../../../../shared/src/ecs/components/Tags.hpp"
 #include "../../../../shared/src/ecs/components/Velocity.hpp"
+#include "components/PlayerSyncState.hpp"
+#include "components/Sprite.hpp"
 
 void spriteAnimationSystem(Registry& registry, float deltaTime)
 {
@@ -21,21 +23,21 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         Entity e = it.entity();
 
         std::cout << "bss" << std::endl;
-        
+
         if (!registry.has<Sprite>(e) || !registry.has<Health>(e) || !registry.has<MaxHealth>(e)) {
             std::cout << "[SpriteAnimationSystem] Boss entity missing required components!" << std::endl;
             continue;
         }
-        
+
         Sprite& sprite = registry.get<Sprite>(e);
         MaxHealth& max_health = registry.get<MaxHealth>(e);
         Health& health = registry.get<Health>(e);
-        
+
         if (!registry.has<IsAttacking>(e)) {
             std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
             continue;
         }
-        
+
         IsAttacking& is_attacking = registry.get<IsAttacking>(e);
 
         // std::cout << "[CLIENT SpriteAnimationSystem] Boss isAttacking = " << is_attacking.attacking << std::endl;
@@ -47,15 +49,44 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         //     continue;
         // }
         std::cout << "[INJURIES BEFORE] Health = " << health.hp << " max health = " << max_health.hp
-        << " nb state = " << sprite.nb_state << std::endl;
+                  << " nb state = " << sprite.nb_state << std::endl;
         sprite.texture_id = "heads_monster_idle.png";
         for (int i = 0; i <= sprite.nb_state; i++) {
             if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
                 sprite.current_frameY = sprite.nb_state - i + 1;
                 std::cout << "[INJURIES] Health = " << health.hp << " max health = " << max_health.hp
-                    << " nb state = " << sprite.nb_state << " i = " << i << " frame Y =" << sprite.current_frameY << std::endl;
+                          << " nb state = " << sprite.nb_state << " i = " << i << " frame Y =" << sprite.current_frameY << std::endl;
                 break;
             }
+        }
+    }
+
+    // Handle player movement state-based texture switching
+    auto playerView = registry.view<Sprite, PlayerSyncState>();
+    for (auto it = playerView.begin(); it != playerView.end(); ++it) {
+        Entity e = it.entity();
+        Sprite& sprite = registry.get<Sprite>(e);
+        const PlayerSyncState& syncState = registry.get<PlayerSyncState>(e);
+
+        std::string newTextureId;
+        switch (syncState.movementState) {
+        case PlayerMovementState::IDLE:
+            newTextureId = "player_idle_without_head.png";
+            break;
+        case PlayerMovementState::RUNNING:
+            newTextureId = "player_running_without_head.png";
+            break;
+        case PlayerMovementState::DASHING:
+        case PlayerMovementState::JUMPING:
+        default:
+            newTextureId = "player_idle_without_head.png";
+            break;
+        }
+
+        if (sprite.texture_id != newTextureId) {
+            sprite.texture_id = newTextureId;
+            sprite.current_frameX = 0;
+            sprite.elapsed_time = 0.0f;
         }
     }
 

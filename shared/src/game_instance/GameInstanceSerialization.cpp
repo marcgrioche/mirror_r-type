@@ -1,16 +1,58 @@
 #include "../../include/game_instance/GameInstanceSerialization.hpp"
 #include "../../include/EntitySerializer.hpp"
 #include "../../include/EntityTypeDetector.hpp"
+#include "../../include/PlayerMovementState.hpp"
 #include "../ecs/components/Damage.hpp"
+#include "../ecs/components/Dash.hpp"
 #include "../ecs/components/Health.hpp"
 #include "../ecs/components/Hitbox.hpp"
 #include "../ecs/components/Lifetime.hpp"
 #include "../ecs/components/Parent.hpp"
+#include "../ecs/components/PlayerInputState.hpp"
 #include "../ecs/components/Position.hpp"
 #include "../ecs/components/PowerUp.hpp"
+#include "../ecs/components/RigidBody.hpp"
 #include "../ecs/components/ServerEntityId.hpp"
 #include "../ecs/components/Tags.hpp"
 #include "../ecs/components/Velocity.hpp"
+
+PlayerMovementState GameInstanceSerialization::calculatePlayerMovementState(const Registry& registry, Entity entity)
+{
+    if (registry.has<Dash>(entity) && registry.get<Dash>(entity).isDashing) {
+        return PlayerMovementState::DASHING;
+    }
+
+    if (registry.has<RigidBody>(entity) && !registry.get<RigidBody>(entity).isOnGround) {
+        return PlayerMovementState::JUMPING;
+    }
+
+    if (registry.has<PlayerInputState>(entity)) {
+        const auto& inputState = registry.get<PlayerInputState>(entity);
+        if (inputState.leftPressed || inputState.rightPressed) {
+            return PlayerMovementState::RUNNING;
+        }
+    }
+
+    return PlayerMovementState::IDLE;
+}
+
+FacingDirection GameInstanceSerialization::calculatePlayerFacingDirection(const Registry& registry, Entity entity)
+{
+    if (registry.has<PlayerInputState>(entity)) {
+        const auto& inputState = registry.get<PlayerInputState>(entity);
+        return inputState.lastFacingDirection;
+    }
+
+    if (registry.has<Velocity>(entity)) {
+        const auto& velocity = registry.get<Velocity>(entity);
+        if (velocity.v.x < 0)
+            return FacingDirection::LEFT;
+        if (velocity.v.x > 0)
+            return FacingDirection::RIGHT;
+    }
+
+    return FacingDirection::RIGHT;
+}
 
 std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
     const Registry& registry,
@@ -39,6 +81,11 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
         } else {
             msg.write(static_cast<uint32_t>(100));
         }
+
+        PlayerMovementState movementState = calculatePlayerMovementState(registry, entity);
+        FacingDirection facingDirection = calculatePlayerFacingDirection(registry, entity);
+        msg.write(static_cast<uint8_t>(movementState));
+        msg.write(static_cast<uint8_t>(facingDirection));
     }
 
     // Serialize boss entities
