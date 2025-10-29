@@ -113,8 +113,14 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     const std::string texture_id = level ? level->getBossIdlePath() : "heads_monster_idle.png";
     const std::string attack_id = level ? level->getBossAttackPaths()[0] : "heads_monster_idle.png";
 
-    float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
-    float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
+    // If texture was downscaled at load time, adjust frame dimensions accordingly
+    auto& resourceManager = ResourceManager::getInstance();
+    float texScale = resourceManager.getTextureScale(texture_id);
+    int effectiveFrameW = static_cast<int>(FRAME_WIDTH * texScale);
+    int effectiveFrameH = static_cast<int>(FRAME_HEIGHT * texScale);
+
+    float scale_x = (hitbox.width * sizeFactor) / effectiveFrameW;
+    float scale_y = (hitbox.height * sizeFactor) / effectiveFrameH;
 
     float rendered_width = FRAME_WIDTH * scale_x;
     float rendered_height = FRAME_HEIGHT * scale_y;
@@ -122,8 +128,8 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createAnimatedSprite(
-        texture_id,
-        FRAME_WIDTH, FRAME_HEIGHT,
+    texture_id,
+    effectiveFrameW, effectiveFrameH,
         TOTAL_FRAMES, FRAME_DURATION,
         scale_x, scale_y,
         offset_x, offset_y, level ? level->getBossHealthStatesNumber() : 0,
