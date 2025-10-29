@@ -149,8 +149,23 @@ Entity createPlatformFromData(class Registry& registry, const class EntityData& 
 {
     Vector2 position = data.get<Vector2>("position");
     Vector2 velocity = data.get<Vector2>("velocity");
+    std::array<float, 4> hitbox = data.get<std::array<float, 4>>("hitbox");
 
-    return factories::createOneWayPlatform(registry, position.x, position.y, velocity.x, velocity.y);
+    std::cout << "[PLATFORM DATA] hitbox W = " << hitbox[0]
+              << ", H = " << hitbox[1]
+              << ", offX = " << hitbox[2]
+              << ", offY = " << hitbox[3] << std::endl;
+
+    return factories::createOneWayPlatform(
+        registry,
+        position.x,
+        position.y,
+        velocity.x,
+        velocity.y,
+        hitbox[0],
+        hitbox[1],
+        hitbox[2],
+        hitbox[3]);
 }
 
 Entity createEnemyFromData(class Registry& registry, const class EntityData& data)

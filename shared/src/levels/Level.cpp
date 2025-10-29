@@ -41,6 +41,10 @@ void Level::loadFromJson(const std::string& filepath)
             _platformReachableX = platform.value("reachableX", _platformReachableX);
             _platformVelocityX = platform.value("velocityX", _platformVelocityX);
             _platformVelocityY = platform.value("velocityY", _platformVelocityY);
+            _platformSpritePath = platform.value("sprite_path", _platformSpritePath);
+            _platformWidth = platform.value("width", _platformWidth);
+            _platformHeight = platform.value("height", _platformHeight);
+            _platformSizeFactor = platform.value("size_factor", _platformSizeFactor);
         }
         if (config.contains("enemy")) {
             auto& enemy = config["enemy"];

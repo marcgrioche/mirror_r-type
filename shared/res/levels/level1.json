@@ -9,7 +9,11 @@
     "maxDiffY": 250.0,
     "reachableX": 200.0,
     "velocityX": -10.0,
-    "velocityY": 0.0
+    "velocityY": 0.0,
+    "sprite_path": "HeadsPlatform.png",
+    "width": 128.0,
+    "height": 30.0,
+    "size_factor": 1.0
   },
   "enemy": {
     "velocityX": -80.0,

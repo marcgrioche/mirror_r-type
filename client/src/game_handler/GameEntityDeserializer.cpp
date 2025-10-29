@@ -114,17 +114,19 @@ void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
     float width = msg.readFloat();
-    (void)width;
     float height = msg.readFloat();
-    (void)height;
     float offsetX = msg.readFloat();
-    (void)offsetX;
     float offsetY = msg.readFloat();
-    (void)offsetY;
 
     Entity platform = factories::createOneWayPlatform(registry,
         posX,
-        posY);
+        posY,
+        0.0,
+        0.0,
+        width,
+        height,
+        offsetX,
+        offsetY);
 
     registry.add<ServerEntityId>(platform, ServerEntityId { entityId });
     SpriteManager::addPlatformSprite(registry, platform, posX, posY);
@@ -195,7 +197,7 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, 1.5f);
         break;
     case EntityType::PLATFORM:
-        SpriteManager::addPlatformSprite(registry, entity, position.x, position.y);
+        SpriteManager::addPlatformSprite(registry, entity, position.x, position.y, m_currentLevelData.getPlatformSizeFactor(), &m_currentLevelData);
         break;
     case EntityType::ENEMY:
         SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 2.0f);
