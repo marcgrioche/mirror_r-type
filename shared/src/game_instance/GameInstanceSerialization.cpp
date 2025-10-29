@@ -6,6 +6,7 @@
 #include "../ecs/components/Dash.hpp"
 #include "../ecs/components/Health.hpp"
 #include "../ecs/components/Hitbox.hpp"
+#include "../ecs/components/IsAttacking.hpp"
 #include "../ecs/components/Lifetime.hpp"
 #include "../ecs/components/Parent.hpp"
 #include "../ecs/components/PlayerInputState.hpp"
@@ -98,6 +99,13 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
             const auto& health = registry.get<Health>(entity);
             msg.write(static_cast<uint32_t>(entity.id));
             msg.write(static_cast<uint32_t>(health.hp));
+            // Serialize boss attack flag (1 if attacking this tick, else 0)
+            uint8_t isAttacking = 0;
+            if (registry.has<IsAttacking>(entity)) {
+                const auto& atk = registry.get<IsAttacking>(entity);
+                isAttacking = static_cast<uint8_t>(atk.attacking ? 1 : 0);
+            }
+            msg.write(isAttacking);
         }
     } else {
         msg.write(static_cast<uint8_t>(0));

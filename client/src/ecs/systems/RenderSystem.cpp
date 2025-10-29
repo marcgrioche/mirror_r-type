@@ -40,7 +40,7 @@ void renderSystem(Registry& registry)
         Sprite& sprite = registry.get<Sprite>(e);
         Position& pos = registry.get<Position>(e);
 
-        SDL_Texture* texture = resourceManager.getTexture(sprite.texture_id);
+        SDL_Texture* texture = resourceManager.getTexture(sprite.current_id);
 
         SDL_Rect dstRect = {
             static_cast<int>(pos.v.x + sprite.offset_x),

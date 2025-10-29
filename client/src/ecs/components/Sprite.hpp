@@ -33,6 +33,8 @@
  */
 struct Sprite {
     std::string texture_id; // ID referencing a texture in a texture manager, not raw SDL_Texture, too big
+    std::string attack_id;
+    std::string current_id;
     SDL_Rect srcRect; // texture rect in sprite-sheet
     SDL_Rect dstRect; // position/size on the screen
     int offset_x = 0;
