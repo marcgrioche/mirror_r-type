@@ -243,6 +243,7 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
         uint32_t entityId = msg.readU32();
         uint32_t health = msg.readU32();
         uint8_t isAttacking = msg.readU8();
+        uint8_t isHit = msg.readU8();
 
         Entity entity = findEntityByServerId(registry, entityId);
         if (entity.id != 0 && registry.has<Health>(entity)) {
@@ -255,6 +256,8 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
             auto& atk = registry.get<IsAttacking>(entity);
             atk.attacking = static_cast<int>(isAttacking);
         }
+
+        std::cout << "Boss " << entityId << " hit state: " << static_cast<int>(isHit) << std::endl;
     }
 }
 
