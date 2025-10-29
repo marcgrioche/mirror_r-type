@@ -106,6 +106,8 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
                 isAttacking = static_cast<uint8_t>(atk.attacking ? 1 : 0);
             }
             msg.write(isAttacking);
+            uint8_t isHit = 69;
+            msg.write(isHit);
         }
     } else {
         msg.write(static_cast<uint8_t>(0));
