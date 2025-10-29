@@ -52,11 +52,30 @@ void Level::loadFromJson(const std::string& filepath)
             _enemyVelocityY = enemy.value("velocityY", _enemyVelocityY);
             _enemyHealth = enemy.value("health", _enemyHealth);
             _enemyWidth = enemy.value("width", _enemyWidth);
+
+            // Enemy animation parameters
+            _enemyFrameWidth = enemy.value("frame_width", _enemyFrameWidth);
+            _enemyFrameHeight = enemy.value("frame_height", _enemyFrameHeight);
+            _enemyFramesNb = enemy.value("frames_nb", _enemyFramesNb);
+            _enemyFrameDuration = enemy.value("frame_duration", _enemyFrameDuration);
+            _enemySizeFactor = enemy.value("size_factor", _enemySizeFactor);
             _enemyHeight = enemy.value("height", _enemyHeight);
+
+        if (config.contains("projectile")) {
+            auto& proj = config["projectile"];
+            _enemyProjectileSpriteId = proj.value("sprite_path", _enemyProjectileSpriteId);
+            _projectileFrameWidth = proj.value("frame_width", _projectileFrameWidth);
+            _projectileFrameHeight = proj.value("frame_height", _projectileFrameHeight);
+            _projectileFramesNb = proj.value("frames_nb", _projectileFramesNb);
+            _projectileFrameDuration = proj.value("frame_duration", _projectileFrameDuration);
+            _projectileSizeFactor = proj.value("size_factor", _projectileSizeFactor);
+        }
             _enemyProjectileSpeed = enemy.value("projectileSpeed", _enemyProjectileSpeed);
             _enemyProjectileDamage = enemy.value("projectileDamage", _enemyProjectileDamage);
             _enemyProjectileWidth = enemy.value("projectileWidth", _enemyProjectileWidth);
             _enemyProjectileHeight = enemy.value("projectileHeight", _enemyProjectileHeight);
+            _enemySpriteId = enemy.value("sprite_path", _enemySpriteId);
+            // _enemyProjectileSpriteId = enemy.value("projectile_sprite_path", _enemyProjectileSpriteId);
         }
         if (config.contains("boss")) {
             auto& boss = config["boss"];

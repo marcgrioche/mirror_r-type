@@ -111,7 +111,7 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 
     registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
-    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, 1.5f);
+    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, m_currentLevelData.getProjectileSizeFactor(), &m_currentLevelData);
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
@@ -161,7 +161,8 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
-    // SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
+    // Attach enemy sprite based on level config
+    SpriteManager::addEnemySprite(registry, enemy, posX, posY, m_currentLevelData.getEnemySizeFactor(), &m_currentLevelData);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
@@ -198,13 +199,13 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         SpriteManager::addPlayerSprite(registry, entity, position.x, position.y, 1.5f);
         break;
     case EntityType::PROJECTILE:
-        SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, 1.5f);
+        SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, m_currentLevelData.getProjectileSizeFactor(), &m_currentLevelData);
         break;
     case EntityType::PLATFORM:
         SpriteManager::addPlatformSprite(registry, entity, position.x, position.y, m_currentLevelData.getPlatformSizeFactor(), &m_currentLevelData);
         break;
     case EntityType::ENEMY:
-        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 2.0f);
+        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, m_currentLevelData.getEnemySizeFactor(), &m_currentLevelData);
         break;
     case EntityType::POWERUP:
         // TODO: PowerUp sprite attachment
@@ -259,7 +260,7 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
             atk.attacking = static_cast<int>(isAttacking);
         }
 
-        std::cout << "Boss " << entityId << " hit state: " << static_cast<int>(isHit) << std::endl;
+        // std::cout << "Boss " << entityId << " hit state: " << static_cast<int>(isHit) << std::endl;
     }
 }
 
