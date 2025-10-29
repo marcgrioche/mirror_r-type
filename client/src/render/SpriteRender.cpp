@@ -70,5 +70,7 @@ void drawSprite(GraphicsManager& gfx, Registry& registry, Entity sprite)
     angle = spr.rotation;
 #endif
 
-    SDL_RenderCopyEx(renderer, tex, srcPtr, &dst, angle, nullptr, SDL_FLIP_NONE);
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+    SDL_RenderCopyEx(renderer, tex, srcPtr, &dst, angle, nullptr, flip);
 }

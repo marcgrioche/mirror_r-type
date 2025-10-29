@@ -36,10 +36,12 @@ Sprite SpriteFactory::createStaticSprite(const std::string& textureId,
 Sprite SpriteFactory::createAnimatedSprite(const std::string& textureId,
     int frameWidth, int frameHeight,
     int totalFrames, float frameDuration,
-    float scaleX, float scaleY, int offsetX, int offsetY, int health_state_nb)
+    float scaleX, float scaleY, int offsetX, int offsetY, int health_state_nb, const std::string& attackId)
 {
     Sprite sprite;
     sprite.texture_id = textureId;
+    sprite.current_id = textureId;
+    sprite.attack_id = attackId;
     sprite.srcRect = { 0, 0, frameWidth, frameHeight };
     sprite.dstRect = { 0, 0, frameWidth, frameHeight };
     sprite.offset_x = offsetX;

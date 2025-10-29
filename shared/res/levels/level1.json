@@ -38,7 +38,7 @@
     "size_factor": 1.65,
     "posX_factor": 0.75,
     "posY_factor": 0.0,
-    "health": 20,
+    "health": 200,
     "width": 900.0,
     "height": 900.0,
     "shootFrequency": 5,
