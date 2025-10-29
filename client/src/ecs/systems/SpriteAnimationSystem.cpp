@@ -41,11 +41,6 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
         MaxHealth& max_health = registry.get<MaxHealth>(e);
         Health& health = registry.get<Health>(e);
 
-        if (!registry.has<IsAttacking>(e)) {
-            std::cout << "[SpriteAnimationSystem] Boss entity missing IsAttacking component!" << std::endl;
-            continue;
-        }
-
         IsAttacking& is_attacking = registry.get<IsAttacking>(e);
 
         if (is_attacking.attacking > 0) {
@@ -115,8 +110,8 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
             break;
         }
 
-        if (sprite.texture_id != newTextureId) {
-            sprite.texture_id = newTextureId;
+        if (sprite.current_id != newTextureId) {
+            sprite.current_id = newTextureId;
             sprite.current_frameX = 0;
             sprite.elapsed_time = 0.0f;
         }
