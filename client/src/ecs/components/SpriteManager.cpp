@@ -176,11 +176,12 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    // Déterminer si c'est un projectile joueur ou ennemi via velocity.x
     bool isPlayerProjectile = false;
     if (registry.has<Velocity>(entity)) {
         const Velocity& velocity = registry.get<Velocity>(entity);
-        isPlayerProjectile = (velocity.v.x > 0);
+        // Check if the magnitude of the velocity vector is 1500, hardcode lol don't touch
+        float magnitude = std::sqrt(velocity.v.x * velocity.v.x + velocity.v.y * velocity.v.y);
+        isPlayerProjectile = (std::abs(magnitude - 1500.0f) < 1.0f);
     }
 
     Sprite sprite;
