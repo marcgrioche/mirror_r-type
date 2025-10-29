@@ -1,6 +1,8 @@
 #include "RTypeServer.hpp"
 #include <iostream>
 
+#include "Metrics.hpp"
+
 /**
  * Handle DISCONNECT message from a client.
  *
@@ -13,6 +15,7 @@ void RTypeServer::handleDisconnect(const Message& msg, PeerInfo& peerInfo)
     (void)peerInfo; // Unused parameter
     std::cout << "Player " << msg.player_id << " disconnected." << std::endl;
 
+    Promotheus::Metrics::DecrementConnections();
     _lobbyManager.removePlayer(msg.player_id);
 
     _clients.erase(msg.player_id);

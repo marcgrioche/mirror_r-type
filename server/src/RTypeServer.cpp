@@ -2,6 +2,7 @@
 #include "../../shared/include/ComponentMapper.hpp"
 #include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "IpEncoding.hpp"
+#include "Metrics.hpp"
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -96,6 +97,7 @@ void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 {
     auto it = _clients.find(playerId);
     if (it != _clients.end()) {
+        Promotheus::Metrics::IncrementPacketsSent();
         queueMessage(msg, it->second);
     }
 }
@@ -103,6 +105,7 @@ void RTypeServer::sendToClient(uint32_t playerId, const Message& msg)
 void RTypeServer::broadcast(const Message& msg)
 {
     for (const auto& client : _clients) {
+        Promotheus::Metrics::IncrementPacketsSent();
         queueMessage(msg, client.second);
     }
 }
@@ -114,6 +117,7 @@ void RTypeServer::broadcastToLobby(uint32_t lobbyId, const Message& msg)
     for (uint32_t playerId : players) {
         auto it = _clients.find(playerId);
         if (it != _clients.end()) {
+            Promotheus::Metrics::IncrementPacketsSent();
             queueMessage(msg, it->second);
         }
     }
@@ -121,17 +125,50 @@ void RTypeServer::broadcastToLobby(uint32_t lobbyId, const Message& msg)
 
 void RTypeServer::registerHandlers()
 {
-    _handlers[MessageType::CONNECT] = [this](const Message& msg, PeerInfo& peerInfo) { handleConnect(msg, peerInfo); };
-    _handlers[MessageType::INPUT] = [this](const Message& msg, PeerInfo& peerInfo) { handleInput(msg, peerInfo); };
-    _handlers[MessageType::PING] = [this](const Message& msg, PeerInfo& peerInfo) { handlePing(msg, peerInfo); };
-    _handlers[MessageType::DISCONNECT] = [this](const Message& msg, PeerInfo& peerInfo) { handleDisconnect(msg, peerInfo); };
-    _handlers[MessageType::CREATE_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) { handleCreateLobby(msg, peerInfo); };
-    _handlers[MessageType::JOIN_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) { handleJoinLobby(msg, peerInfo); };
-    _handlers[MessageType::START_GAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleStartGame(msg, peerInfo); };
-    _handlers[MessageType::LOBBY_STATE] = [this](const Message& msg, PeerInfo& peerInfo) { handleLobbyState(msg, peerInfo); };
-    _handlers[MessageType::SET_USERNAME] = [this](const Message& msg, PeerInfo& peerInfo) { handleUsername(msg, peerInfo); };
-    _handlers[MessageType::KICK_PLAYER] = [this](const Message& msg, PeerInfo& peerInfo) { handleKickPlayer(msg, peerInfo); };
-    _handlers[MessageType::AUTH_REQUEST] = [this](const Message& msg, PeerInfo& peerInfo) { handleAuthRequest(msg, peerInfo); };
+    _handlers[MessageType::CONNECT] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleConnect(msg, peerInfo);
+    };
+    _handlers[MessageType::INPUT] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleInput(msg, peerInfo);
+    };
+    _handlers[MessageType::PING] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handlePing(msg, peerInfo);
+    };
+    _handlers[MessageType::DISCONNECT] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleDisconnect(msg, peerInfo);
+    };
+    _handlers[MessageType::CREATE_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleCreateLobby(msg, peerInfo);
+    };
+    _handlers[MessageType::JOIN_LOBBY] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleJoinLobby(msg, peerInfo);
+    };
+    _handlers[MessageType::START_GAME] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleStartGame(msg, peerInfo);
+    };
+    _handlers[MessageType::LOBBY_STATE] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleLobbyState(msg, peerInfo);
+    };
+    _handlers[MessageType::SET_USERNAME] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleUsername(msg, peerInfo);
+    };
+    _handlers[MessageType::KICK_PLAYER] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleKickPlayer(msg, peerInfo);
+    };
+    _handlers[MessageType::AUTH_REQUEST] = [this](const Message& msg, PeerInfo& peerInfo) {
+        Promotheus::Metrics::IncrementPacketsReceived();
+        handleAuthRequest(msg, peerInfo);
+    };
     // Add more handlers as needed for other message types
 }
 
