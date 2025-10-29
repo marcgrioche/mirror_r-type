@@ -43,33 +43,41 @@ void spriteAnimationSystem(Registry& registry, float deltaTime)
                 registry.emplace<AttackFlash>(e, AttackFlash { oneFrame });
                 sprite.current_id = sprite.attack_id;
                 sprite.current_frameY = 0;
+                sprite.elapsed_time = 0.0f;
+                sprite.srcRect.x = 0;
+                sprite.srcRect.y = 0;
+                sprite.srcRect.w = sprite.frame_width;
+                sprite.srcRect.h = sprite.frame_height;
             }
         }
 
         if (registry.has<AttackFlash>(e)) {
             auto &flash = registry.get<AttackFlash>(e);
             flash.timeLeft -= deltaTime;
-            sprite.current_id = sprite.attack_id;
             if (flash.timeLeft <= 0.0f) {
                 registry.remove<AttackFlash>(e);
                 sprite.current_id = sprite.texture_id;
-                is_attacking.attacking = 0;
                 for (int i = 0; i <= sprite.nb_state; i++) {
                     if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
                         sprite.current_frameY = sprite.nb_state - i + 1;
                         break;
                     }
                 }
+                sprite.elapsed_time = 0.0f;
+                sprite.srcRect.x = 0;
+                sprite.srcRect.y = sprite.current_frameY * sprite.frame_height;
+                sprite.srcRect.w = sprite.frame_width;
+                sprite.srcRect.h = sprite.frame_height;
+                is_attacking.attacking = 0;
             }
             continue;
         }
 
-        if (sprite.current_id == sprite.texture_id) {
-            for (int i = 0; i <= sprite.nb_state; i++) {
-                if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
-                    sprite.current_frameY = sprite.nb_state - i + 1;
-                    break;
-                }
+        sprite.current_id = sprite.texture_id;
+        for (int i = 0; i <= sprite.nb_state; i++) {
+            if (health.hp < max_health.hp / (sprite.nb_state + 1) * i) {
+                sprite.current_frameY = sprite.nb_state - i + 1;
+                break;
             }
         }
     }
