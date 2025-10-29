@@ -66,8 +66,13 @@ bool handlePlayerAttack(
             playerPos.v.x + playerHitbox.width / 2,
             playerPos.v.y + playerHitbox.height / 2
         };
+
+        playerCenter.x += 100;
+        playerCenter.y += 85;
         
         Vector2 mousePos = { mouseX, mouseY };
+        std::cout << "PLAYER CENTER:" << playerCenter.x << ", " << playerCenter.y << std::endl;
+        std::cout << "MOUSEPOS:" << mousePos.x << ", " << mousePos.y << std::endl;
         Vector2 shootDirection = direction(playerCenter, mousePos);
         
         // If the weapon has a ProjectileType, add this entity type in the registry
