@@ -71,6 +71,18 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "BabyBossIdle.png", resourceManager.getAssetPath("sprites/Baby_Boss/BabyBossIdle.png"))) {
+        std::cout << "Warning: Failed to load BabyBossIdle texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "sbirMouth.png", resourceManager.getAssetPath("sprites/Baby_Boss/sbirMouth.png"))) {
+        std::cout << "Warning: Failed to load sbirMouth texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "projectileBill.png", resourceManager.getAssetPath("sprites/Baby_Boss/projectileBill.png"))) {
+        std::cout << "Warning: Failed to load projectileBill texture - using fallback rectangles" << std::endl;
+    }
+
     if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
         std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
     }

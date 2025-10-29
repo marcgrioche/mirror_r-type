@@ -30,7 +30,7 @@ void addPlayerSprite(Registry& registry, Entity entity, float posX, float posY, 
  * @param posY Entity Y position (unused, for future compatibility)
  * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
-void addProjectileSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
+void addProjectileSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f, const Level* level = nullptr);
 
 /**
  * @brief Adds a static sprite component to a platform entity, automatically sizing and centering it
@@ -50,7 +50,7 @@ void addPlatformSprite(Registry& registry, Entity entity, float posX, float posY
  * @param posY Entity Y position (unused, for future compatibility)
  * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
-void addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
+void addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f, const Level* level = nullptr);
 void addBossSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f, const Level* level = nullptr);
 
 /**

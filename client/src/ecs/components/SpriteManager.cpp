@@ -58,7 +58,7 @@ void SpriteManager::addPlayerSprite(Registry& registry, Entity entity, float pos
     }
 }
 
-void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor, const Level* level)
 {
     (void)posX; // Unused parameter, kept for API compatibility
     (void)posY; // Unused parameter, kept for API compatibility
@@ -69,11 +69,11 @@ void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX
 
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    // Bydo flying sprite sheet: 316x69 pixels total, 4 frames horizontally
-    const int FRAME_WIDTH = 79; // 316/4 = 79 pixels per frame
-    const int FRAME_HEIGHT = 69; // Full height of sprite sheet
-    const int TOTAL_FRAMES = 4;
-    const float FRAME_DURATION = 0.15f; // 150ms per frame for smooth animation
+    // Use level-provided animation params (fallback to defaults if level is null)
+    const int FRAME_WIDTH = level ? level->getEnemyFrameWidth() : 79;
+    const int FRAME_HEIGHT = level ? level->getEnemyFrameHeight() : 69;
+    const int TOTAL_FRAMES = level ? level->getEnemyFramesNb() : 4;
+    const float FRAME_DURATION = level ? level->getEnemyFrameDuration() : 0.15f;
 
     // Apply size factor for visual scaling without changing hitbox
     float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
@@ -84,12 +84,15 @@ void SpriteManager::addEnemySprite(Registry& registry, Entity entity, float posX
     float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
+    // Use level-specific enemy sprite id if provided; fallback to default bydo
+    const std::string enemyTextureId = (level && !level->getEnemySpriteId().empty()) ? level->getEnemySpriteId() : std::string("bydo_flying.png");
+
     Sprite sprite = SpriteFactory::createAnimatedSprite(
-        "bydo_flying.png", // texture ID
-        FRAME_WIDTH, FRAME_HEIGHT, // frame dimensions
-        TOTAL_FRAMES, FRAME_DURATION, // animation parameters
-        scale_x, scale_y, // separate scales for exact hitbox matching
-        offset_x, offset_y // offset to center on entity
+        enemyTextureId,
+        FRAME_WIDTH, FRAME_HEIGHT,
+        TOTAL_FRAMES, FRAME_DURATION,
+        scale_x, scale_y,
+        offset_x, offset_y
     );
 
     registry.add<Sprite>(entity, sprite);
@@ -113,8 +116,14 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     const std::string texture_id = level ? level->getBossIdlePath() : "heads_monster_idle.png";
     const std::string attack_id = level ? level->getBossAttackPaths()[0] : "heads_monster_idle.png";
 
-    float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
-    float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
+    // If texture was downscaled at load time, adjust frame dimensions accordingly
+    auto& resourceManager = ResourceManager::getInstance();
+    float texScale = resourceManager.getTextureScale(texture_id);
+    int effectiveFrameW = static_cast<int>(FRAME_WIDTH * texScale);
+    int effectiveFrameH = static_cast<int>(FRAME_HEIGHT * texScale);
+
+    float scale_x = (hitbox.width * sizeFactor) / effectiveFrameW;
+    float scale_y = (hitbox.height * sizeFactor) / effectiveFrameH;
 
     float rendered_width = FRAME_WIDTH * scale_x;
     float rendered_height = FRAME_HEIGHT * scale_y;
@@ -122,8 +131,8 @@ void SpriteManager::addBossSprite(Registry& registry, Entity entity, float posX,
     float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createAnimatedSprite(
-        texture_id,
-        FRAME_WIDTH, FRAME_HEIGHT,
+    texture_id,
+    effectiveFrameW, effectiveFrameH,
         TOTAL_FRAMES, FRAME_DURATION,
         scale_x, scale_y,
         offset_x, offset_y, level ? level->getBossHealthStatesNumber() : 0,
@@ -164,7 +173,7 @@ void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float p
     registry.add<Sprite>(entity, sprite);
 }
 
-void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor)
+void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor, const Level* level)
 {
     (void)posX;
     (void)posY;
@@ -203,11 +212,11 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
             scale_x, scale_y,
             offset_x, offset_y);
     } else {
-        // Eye spritesheet pour les ennemis
-        const int FRAME_WIDTH = 32;
-        const int FRAME_HEIGHT = 24;
-        const int TOTAL_FRAMES = 7;
-        const float FRAME_DURATION = 0.1f;
+        // Enemy projectile uses level-configured animation params
+        const int FRAME_WIDTH = level ? level->getProjectileFrameWidth() : 32;
+        const int FRAME_HEIGHT = level ? level->getProjectileFrameHeight() : 24;
+        const int TOTAL_FRAMES = level ? level->getProjectileFramesNb() : 7;
+        const float FRAME_DURATION = level ? level->getProjectileFrameDuration() : 0.1f;
 
         float scale_x = (hitbox.width * sizeFactor) / FRAME_WIDTH;
         float scale_y = (hitbox.height * sizeFactor) / FRAME_HEIGHT;
@@ -217,8 +226,11 @@ void SpriteManager::addProjectileSprite(Registry& registry, Entity entity, float
         float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
         float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
+        // Use level-specific enemy projectile sprite id if provided; fallback to legacy eye spritesheet
+        const std::string enemyProjTextureId = (level && !level->getEnemyProjectileSpriteId().empty()) ? level->getEnemyProjectileSpriteId() : std::string("eye_spritesheet.png");
+
         sprite = SpriteFactory::createAnimatedSprite(
-            "eye_spritesheet.png",
+            enemyProjTextureId,
             FRAME_WIDTH, FRAME_HEIGHT,
             TOTAL_FRAMES, FRAME_DURATION,
             scale_x, scale_y,

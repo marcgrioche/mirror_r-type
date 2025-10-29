@@ -42,6 +42,13 @@ public:
     SDL_Texture* loadTexture(SDL_Renderer* renderer, const std::string& id, const std::string& path);
 
     /**
+     * @brief Returns the uniform scale factor applied to a texture at load time.
+     * If a texture was downscaled to fit GPU limits, this value will be < 1.0.
+     * If no scaling was applied, returns 1.0.
+     */
+    float getTextureScale(const std::string& id) const;
+
+    /**
      * @brief Retrieves a previously loaded texture by ID
      * @param id The unique identifier of the texture
      * @return Pointer to the SDL texture, or nullptr if not found
@@ -72,6 +79,8 @@ private:
     ~ResourceManager();
 
     std::unordered_map<std::string, SDL_Texture*> textures;
+    // Tracks per-texture uniform downscale factor applied at load time
+    std::unordered_map<std::string, float> textureScales;
     std::string basePath_;
     std::string defaultFontPath = "client/res/fonts/OpenSans-Medium.ttf";
     std::unordered_map<int, TTF_Font*> fonts;

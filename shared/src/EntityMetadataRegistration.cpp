@@ -151,11 +151,6 @@ Entity createPlatformFromData(class Registry& registry, const class EntityData& 
     Vector2 velocity = data.get<Vector2>("velocity");
     std::array<float, 4> hitbox = data.get<std::array<float, 4>>("hitbox");
 
-    std::cout << "[PLATFORM DATA] hitbox W = " << hitbox[0]
-              << ", H = " << hitbox[1]
-              << ", offX = " << hitbox[2]
-              << ", offY = " << hitbox[3] << std::endl;
-
     return factories::createOneWayPlatform(
         registry,
         position.x,
