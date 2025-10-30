@@ -68,7 +68,7 @@ You would likely have an issue with grafana on Linux with permissions, in that c
 ```bash
     sudo rm -rf grafana/grafana-data
     mkdir grafana/grafana-data
-    sudo chown 472:472 grafana-data
+    sudo chown -R 472:472 grafana-data
 ```
 
 ### 4. Access Dashboards
