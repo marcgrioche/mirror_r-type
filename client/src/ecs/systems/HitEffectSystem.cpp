@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Wed Oct 29 6:02:32 PM 2025 jojo
-** Last update Thu Oct 29 7:16:39 PM 2025 jojo
+** Last update Fri Oct 30 12:05:07 PM 2025 jojo
 */
 
 #include "HitEffectSystem.hpp"
@@ -19,7 +19,7 @@ void hitEffectSystem(Registry& registry)
     for (auto it = view.begin(); it != view.end(); ++it) {
         auto [e, hp, spr] = it.entity_and_components();
         if (hp.hit == 1) {
-            spr.color = { 255, 255, static_cast<uint8_t>(spr.color.g - 10), static_cast<uint8_t>(spr.color.b - 10) };
+            spr.color = { 255, 255, 50, 50 };
         } else {
             spr.color = { 255, 255, 255, 255 };
         }

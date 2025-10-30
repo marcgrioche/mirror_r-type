@@ -109,7 +109,6 @@ std::vector<uint8_t> GameInstanceSerialization::serializeGameState(
             uint8_t isHit = health.hit;
             msg.write(isHit);
 
-            std::cout << "pipi" << health.hitTime << std::endl;
             msg.write(health.hitTime);
         }
     } else {
