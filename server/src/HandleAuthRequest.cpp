@@ -11,7 +11,12 @@ void RTypeServer::handleAuthRequest(const Message& msg, PeerInfo& peerInfo)
 
     Message response(MessageType::AUTH_RESPONSE, msg.sequence_number, msg.player_id);
 
-    std::cout << "[SERVER] Authenticating " << username << " " << password << std::endl;
+    if (password.empty() || username.empty()) {
+        response.write(static_cast<uint32_t>(0));
+        response.write("Username or password cannot be empty");
+        sendToClient(playerId, response);
+        return;
+    }
     if (_db->isUserRegistered(username)) {
         auto id = _db->authenticate(username, password);
         if (id != std::nullopt) {
