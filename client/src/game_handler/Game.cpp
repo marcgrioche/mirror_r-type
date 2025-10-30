@@ -48,7 +48,8 @@ bool Game::initialize()
     soundManager.initialize();
 
     // sound
-    soundManager.loadMusicFromAsset("menuMusic", "");
+    soundManager.loadMusicFromAsset("menuMusic", "sound/music/menuMusic.wav");
+    soundManager.loadChunkFromAsset("playerAttack", "sound/effect/playerAttack.mp3");
 
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
@@ -176,6 +177,11 @@ void Game::initializeMenuMode()
 {
     _state = GameState::MENU;
     m_menu.activate(_registry, Menu::Page::CONNECTION); // Change Connect -> HOME pour commencer par la page d'accueil
+
+    if (SoundManager::getInstance().isInitialized() && !m_menuMusicPlaying) {
+        SoundManager::getInstance().playMusic("menuMusic", -1, 800); // loop infini, fade in 800ms
+        m_menuMusicPlaying = true;
+    }
 }
 
 void Game::run()
@@ -261,6 +267,13 @@ void Game::runMenuLoop()
 
 void Game::runGameLoop(float deltaTime)
 {
+    if (m_menuMusicPlaying) {
+        if (SoundManager::getInstance().isInitialized()) {
+            SoundManager::getInstance().stopMusic(500); // fade out 500ms
+        }
+        m_menuMusicPlaying = false;
+    }
+
     bool hasParallax = false;
     for (auto [entity] : _registry.view<ParallaxState>()) {
         hasParallax = true;

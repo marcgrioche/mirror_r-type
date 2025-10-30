@@ -5,7 +5,7 @@
 ** Login   <jojo>
 **
 ** Started on  Thu Oct 30 1:35:49 PM 2025 jojo
-** Last update Fri Oct 30 3:13:45 PM 2025 jojo
+** Last update Fri Oct 30 3:42:31 PM 2025 jojo
 */
 
 #pragma once
@@ -42,7 +42,7 @@ public:
 
     void unloadAll();
 
-    std::string getAssetPath(const std::string& relativePath) const;
+    // std::string getAssetPath(const std::string& relativePath) const;
 
 private:
     SoundManager() = default;

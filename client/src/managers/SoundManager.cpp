@@ -5,11 +5,12 @@
 ** Login   <jojo>
 **
 ** Started on  Thu Oct 30 1:36:00 PM 2025 jojo
-** Last update Fri Oct 30 3:14:44 PM 2025 jojo
+** Last update Fri Oct 30 4:31:19 PM 2025 jojo
 */
 
 #include "SoundManager.hpp"
 #include "ResourceManager.hpp"
+#include <SDL.h> // <-- nécessaire pour SDL_Init, SDL_GetCurrentAudioDriver
 #include <iostream>
 
 SoundManager& SoundManager::getInstance()
@@ -23,40 +24,54 @@ bool SoundManager::initialize(int frequency, Uint16 format, int channels, int ch
     if (m_initialized)
         return true;
 
-    int want = MIX_INIT_OGG | MIX_INIT_MP3;
-    int initted = Mix_Init(want);
-    if ((initted & want) != want) {
-        std::cerr << "Warning: Mix_Init missing codecs: " << Mix_GetError() << std::endl;
+    // Initialise uniquement le sous-système audio si pas déjà fait
+    if ((SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO) == 0) {
+        if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
+            std::cerr << "SDL_INIT_AUDIO failed: " << SDL_GetError() << std::endl;
+            // on continue, on va tenter 'dummy' plus bas
+        }
     }
 
-    if (Mix_OpenAudio(frequency, format, channels, chunksize) != 0) {
-        std::cerr << "Error: Mix_OpenAudio failed: " << Mix_GetError() << std::endl;
-        Mix_Quit();
+    auto tryOpen = [&](const char* driver) -> bool {
+        if (driver)
+            SDL_setenv("SDL_AUDIODRIVER", driver, 1);
+
+        int want = MIX_INIT_OGG | MIX_INIT_MP3;
+        int initted = Mix_Init(want);
+        if ((initted & want) != want) {
+            std::cerr << "Mix_Init missing codecs: " << Mix_GetError() << std::endl;
+        }
+
+        if (Mix_OpenAudio(frequency, format, channels, chunksize) != 0) {
+            std::cerr << "Mix_OpenAudio failed (" << (driver ? driver : "default")
+                      << "): " << Mix_GetError() << std::endl;
+            Mix_Quit();
+            return false;
+        }
+        return true;
+    };
+
+    // Ordre: natif moderne -> legacy -> dummy
+    const char* drivers[] = { nullptr, "pipewire", "pulseaudio", "alsa", "jack", "dsp", "dummy" };
+    bool ok = false;
+    for (const char* d : drivers) {
+        if (tryOpen(d)) {
+            ok = true;
+            break;
+        }
+    }
+    if (!ok) {
+        std::cerr << "Audio disabled (no usable driver)." << std::endl;
         return false;
     }
 
-    // Autorise la lecture simultanée de plusieurs SFX
     Mix_AllocateChannels(32);
     Mix_Volume(-1, m_chunkVolume);
     Mix_VolumeMusic(m_musicVolume);
 
-    char* basePath = SDL_GetBasePath();
-    if (basePath) {
-        basePath_ = basePath;
-        SDL_free(basePath);
-    } else {
-        std::cerr << "Warning: Could not get base path, using relative paths" << std::endl;
-        basePath_ = "";
-        // defaultFontPath = "res/fonts/OpenSans-Medium.ttf";
-    }
-
     m_initialized = true;
+    std::cout << "Audio driver: " << (SDL_GetCurrentAudioDriver() ? SDL_GetCurrentAudioDriver() : "none") << std::endl;
     return true;
-}
-
-std::string ResourceManager::getAssetPath(const std::string& relativePath) const
-{
-    return basePath_ + "res/" + relativePath;
 }
 
 void SoundManager::cleanup()
