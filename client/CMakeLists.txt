@@ -99,9 +99,9 @@ target_include_directories(r-type_client PRIVATE
 target_link_libraries(r-type_client PRIVATE
     SDL2::SDL2
     SDL2::SDL2main
-    SDL2_image::SDL2_image
-    SDL2_ttf::SDL2_ttf
-    SDL2_mixer::SDL2_mixer
+    SDL2_image
+    SDL2_ttf
+    SDL2_mixer
     nlohmann_json::nlohmann_json
 )
 
