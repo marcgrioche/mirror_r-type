@@ -10,6 +10,21 @@ A C++17 client-server project built with CMake.
 - C++17 compiler (g++, clang++)
 - Git (optional)
 
+**Optional Dependencies:**
+- Promotheus C++ Client Library for metrics:
+  - Debian/Ubuntu:
+  ```sh
+    sudo apt update && sudo apt install libcurl4-openssl-dev
+    ```
+    - Fedora:
+    ```sh
+    sudo dnf install libcurl-devel
+    ```
+    - Arch Linux:
+    ```sh
+    sudo pacman -Syu curl
+    ```
+
 ## Build Instructions
 
 Clone the repository using git and proceed with the following command inside the cloned repository.

@@ -1,6 +1,8 @@
 #include "RTypeServer.hpp"
 #include <iostream>
 
+#include "Metrics.hpp"
+
 /**
  * Handle CONNECT message from a client.
  *
@@ -19,6 +21,7 @@ void RTypeServer::handleConnect(const Message& msg, PeerInfo& peerInfo)
         _clients[assignedPlayerId] = peerInfo;
     }
 
+    Promotheus::Metrics::IncrementConnections();
     Message connectAckMsg(MessageType::CONNECT_ACK, msg.sequence_number, assignedPlayerId);
     sendToClient(assignedPlayerId, connectAckMsg);
 }

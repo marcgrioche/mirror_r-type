@@ -2,15 +2,34 @@ cmake_minimum_required(VERSION 3.16)
 
 project(r-type_server)
 
-file(GLOB SERVER_SOURCES src/*.cpp db/*.cpp)
+file(GLOB SERVER_SOURCES src/*.cpp db/*.cpp metrics/*.cpp)
 file(GLOB_RECURSE SHARED_SOURCES ../shared/src/*.cpp)
-include_directories(src db include ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
+include_directories(src db include metrics ../shared/include ../shared/src ../shared/src/ecs ../shared/src/ecs/components ../shared/src/ecs/systems ../shared/src/entities ../shared/src/levels)
 include_directories(${CMAKE_SOURCE_DIR})
 
 CPMAddPackage(
         NAME sqlite3
         GITHUB_REPOSITORY "azadkuh/sqlite-amalgamation"
         GIT_TAG "3.38.2"
+)
+
+CPMAddPackage(
+        NAME zlib
+        GITHUB_REPOSITORY "madler/zlib"
+        GIT_TAG "v1.3.1"
+)
+
+# Set prometheus-cpp options BEFORE adding the package
+set(ENABLE_PUSH OFF CACHE BOOL "" FORCE)
+set(ENABLE_PULL ON CACHE BOOL "" FORCE)
+set(ENABLE_COMPRESSION OFF CACHE BOOL "" FORCE)
+set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+CPMAddPackage(
+     NAME prometheus-cpp
+     GIT_REPOSITORY "https://github.com/jupp0r/prometheus-cpp.git"
+     GIT_TAG "v1.3.0"
 )
 
 # Create a library target from the amalgamation if it was added via CPM
@@ -39,6 +58,7 @@ if(WIN32)
     target_link_libraries(r-type_server PRIVATE ws2_32)
 endif()
 
+target_link_libraries(r-type_server PRIVATE prometheus-cpp::core prometheus-cpp::pull)
 target_link_libraries(r-type_server PRIVATE nlohmann_json::nlohmann_json)
 
 set_target_properties(r-type_server PROPERTIES

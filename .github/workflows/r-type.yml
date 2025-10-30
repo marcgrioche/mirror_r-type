@@ -19,6 +19,8 @@ jobs:
       image: epitechcontent/epitest-docker
     steps:
       - uses: actions/checkout@v4
+      - name: Install CURL development package
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
       - name: Cache CPM dependencies
         uses: actions/cache@v4
         with:
@@ -45,6 +47,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install libcurl
+        shell: powershell
+        run: |
+          # install curl for MSVC x64; switch triplet if you build x86 or static libs
+          C:\vcpkg\vcpkg.exe install curl[ssl]:x64-windows
+          # export VCPKG_ROOT to subsequent steps
+          "VCPKG_ROOT=C:\\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding ASCII
+
+
       - name: Cache CPM dependencies
         uses: actions/cache@v4
         with:
