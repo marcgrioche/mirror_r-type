@@ -13,15 +13,22 @@ CPMAddPackage(
         GIT_TAG "3.38.2"
 )
 
- CPMAddPackage(
-         NAME prometheus-cpp
-         GIT_REPOSITORY "https://github.com/jupp0r/prometheus-cpp.git"
-         GIT_TAG "v1.3.0"
-         OPTIONS
-             "BUILD_SHARED_LIBS:BOOL=ON"
-             "ENABLE_PUSH:BOOL=OFF"
-             "ENABLE_COMPRESSION:BOOL=OFF"
- )
+CPMAddPackage(
+        NAME zlib
+        GITHUB_REPOSITORY "madler/zlib"
+        GIT_TAG "v1.3.1"
+)
+
+CPMAddPackage(
+     NAME prometheus-cpp
+     GIT_REPOSITORY "https://github.com/jupp0r/prometheus-cpp.git"
+     GIT_TAG "v1.3.0"
+     OPTIONS
+         "BUILD_SHARED_LIBS:BOOL=OFF"
+         "ENABLE_PUSH:BOOL=OFF"
+         "ENABLE_COMPRESSION:BOOL=OFF"
+        "ENABLE_PULL:BOOL=ON"
+)
 
 # Create a library target from the amalgamation if it was added via CPM
 if (sqlite3_ADDED)
