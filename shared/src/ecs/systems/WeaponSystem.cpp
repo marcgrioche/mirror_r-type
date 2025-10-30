@@ -66,6 +66,9 @@ bool handlePlayerAttack(
             playerPos.v.x + playerHitbox.width / 2,
             playerPos.v.y + playerHitbox.height / 2
         };
+
+        playerCenter.x += 100;
+        playerCenter.y += 85;
         
         Vector2 mousePos = { mouseX, mouseY };
         Vector2 shootDirection = direction(playerCenter, mousePos);
