@@ -84,16 +84,6 @@ void Game::updateNetworkGameTick()
     const auto playerEntity = findEntityByClientId(_registry, clientId);
     float mouseX = static_cast<float>(_inputs.getMouseX());
     float mouseY = static_cast<float>(_inputs.getMouseY());
-    
-    // Debug: print what we're sending to server when shooting
-    if (!currentInputs.empty() && _registry.has<Position>(playerEntity) && _registry.has<Hitbox>(playerEntity)) {
-        const Position& playerPos = _registry.get<Position>(playerEntity);
-        const Hitbox& playerHitbox = _registry.get<Hitbox>(playerEntity);
-        float playerCenterX = playerPos.v.x + playerHitbox.width / 2.0f;
-        float playerCenterY = playerPos.v.y + playerHitbox.height / 2.0f;
-        std::cout << "CLIENT - Player center: (" << playerCenterX << ", " << playerCenterY 
-                  << ") Mouse: (" << mouseX << ", " << mouseY << ")" << std::endl;
-    }
 
     m_clientNetwork->sendCurrentInputStateWithMouse(currentInputs, mouseX, mouseY);
     m_inputHistory.recordInput(m_clientNetwork->getCurrentTick(), currentInputs);
