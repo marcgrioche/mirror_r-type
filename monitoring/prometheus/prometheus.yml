@@ -5,3 +5,7 @@ scrape_configs:
   - job_name: 'r-type_server'
     static_configs:
       - targets: ['172.17.0.1:8080']  # replace <server-host> with IP or hostname
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node_exporter:9100']
