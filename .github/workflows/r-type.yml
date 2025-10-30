@@ -47,11 +47,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install vcpkg and libcurl
+      - name: Install libcurl
         shell: powershell
         run: |
-          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-          C:\vcpkg\bootstrap-vcpkg.bat
           # install curl for MSVC x64; switch triplet if you build x86 or static libs
           C:\vcpkg\vcpkg.exe install curl[ssl]:x64-windows
           # export VCPKG_ROOT to subsequent steps
