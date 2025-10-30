@@ -5,19 +5,19 @@
 ** Login   <jojo>
 **
 ** Started on  Tue Sep 23 2:19:56 PM 2025 jojo
-** Last update Wed Sep 23 2:53:21 PM 2025 jojo
+** Last update Thu Oct 29 7:02:40 PM 2025 jojo
 */
 
 #include "CollisionPlayerProjectileSystem.hpp"
-#include "components/Position.hpp"
-#include "components/Hitbox.hpp"
-#include "components/Health.hpp"
+#include "Parent.hpp"
 #include "components/Damage.hpp"
-#include "components/Lifetime.hpp"
 #include "components/Dead.hpp"
+#include "components/Health.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Lifetime.hpp"
+#include "components/Position.hpp"
 #include "components/Tags.hpp"
 #include "components/componentutils/HitboxUtils.hpp"
-#include "Parent.hpp"
 #include <iostream>
 
 void collisionPlayerProjectileSystem(Registry& registry, float)
@@ -53,6 +53,8 @@ void collisionPlayerProjectileSystem(Registry& registry, float)
                     Health& h = registry.get<Health>(plE);
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
+                    h.hit = 1;
+                    h.hitTime = 0.1f;
                     if (h.hp <= 0) {
                         Dead& dead = registry.get<Dead>(plE);
                         dead.dead = true;

@@ -13,4 +13,6 @@
  */
 struct Health {
     int hp;
+    int hit = 0;
+    float hitTime = 0.0f;
 };
