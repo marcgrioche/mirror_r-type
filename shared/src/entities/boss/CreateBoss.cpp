@@ -14,12 +14,11 @@ Entity createBoss(Registry& registry, const Level* level)
     float bossHealth = level ? level->getBossHealth() : BOSS_HEALTH;
     float width = level ? level->getBossWidth() : BOSS_WIDTH;
     float height = level ? level->getBossHeight() : BOSS_HEIGHT;
-    std::cout << "heigh = " << height << " width = " << width << std::endl;
-    std::cout << "HEIGHT = " << BOSS_HEIGHT << " WIDTH = " << BOSS_WIDTH << std::endl;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
     float posX = level ? (SCREEN_WIDTH - width * level->getBossPosXFactor()) : SCREEN_WIDTH - BOSS_WIDTH;
-    float posY = 0.0f;
+    float posY = level ? (SCREEN_HEIGHT - width * level->getBossPosYFactor()) : SCREEN_HEIGHT - BOSS_HEIGHT;
+    // float posY = 0.0f;
 
     Entity boss = registry.create_entity();
     registry.emplace<Position>(boss, posX, posY);
