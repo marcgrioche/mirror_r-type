@@ -19,15 +19,17 @@ CPMAddPackage(
         GIT_TAG "v1.3.1"
 )
 
+# Set prometheus-cpp options BEFORE adding the package
+set(ENABLE_PUSH OFF CACHE BOOL "" FORCE)
+set(ENABLE_PULL ON CACHE BOOL "" FORCE)
+set(ENABLE_COMPRESSION OFF CACHE BOOL "" FORCE)
+set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
 CPMAddPackage(
      NAME prometheus-cpp
      GIT_REPOSITORY "https://github.com/jupp0r/prometheus-cpp.git"
      GIT_TAG "v1.3.0"
-     OPTIONS
-         "BUILD_SHARED_LIBS:BOOL=OFF"
-         "ENABLE_PUSH:BOOL=OFF"
-         "ENABLE_COMPRESSION:BOOL=OFF"
-        "ENABLE_PULL:BOOL=ON"
 )
 
 # Create a library target from the amalgamation if it was added via CPM
