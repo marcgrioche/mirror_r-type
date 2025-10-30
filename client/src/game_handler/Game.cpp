@@ -15,6 +15,7 @@
 #include "managers/ConfigManager.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "managers/SoundManager.hpp"
 #include "systems/EyeSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL.h>
@@ -42,7 +43,12 @@ bool Game::initialize()
     initializeComponentMappings();
 
     auto& resourceManager = ResourceManager::getInstance();
+    auto& soundManager = SoundManager::getInstance();
     resourceManager.initialize();
+    soundManager.initialize();
+
+    // sound
+    soundManager.loadMusicFromAsset("menuMusic", "");
 
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
