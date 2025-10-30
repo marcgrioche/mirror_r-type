@@ -10,17 +10,21 @@
 #include "../../shared/include/EntityMetadataRegistration.hpp"
 #include "../../shared/include/EntitySerializer.hpp"
 #include "../../shared/include/EntityType.hpp"
+#include "../../shared/include/PlayerMovementState.hpp"
 #include "Game.hpp"
 #include "ecs/components/Damage.hpp"
 #include "ecs/components/Health.hpp"
 #include "ecs/components/Hitbox.hpp"
+#include "ecs/components/IsAttacking.hpp"
 #include "ecs/components/Lifetime.hpp"
+#include "ecs/components/PlayerSyncState.hpp"
 #include "ecs/components/Position.hpp"
 #include "ecs/components/PowerUp.hpp"
 #include "ecs/components/ServerEntityId.hpp"
 #include "ecs/components/Sprite.hpp"
 #include "ecs/components/SpriteFactory.hpp"
 #include "ecs/components/SpriteManager.hpp"
+#include "ecs/components/Tags.hpp"
 #include "ecs/components/Velocity.hpp"
 #include <iostream>
 
@@ -107,24 +111,26 @@ void Game::createProjectileFromMessage(const Message& msg, Registry& registry,
         Lifetime { lifetimeValue });
 
     registry.add<ServerEntityId>(projectile, ServerEntityId { entityId });
-    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, 1.5f);
+    SpriteManager::addProjectileSprite(registry, projectile, posX, posY, m_currentLevelData.getProjectileSizeFactor(), &m_currentLevelData);
 }
 
 void Game::createPlatformFromMessage(const Message& msg, Registry& registry,
     uint32_t entityId, float posX, float posY)
 {
     float width = msg.readFloat();
-    (void)width;
     float height = msg.readFloat();
-    (void)height;
     float offsetX = msg.readFloat();
-    (void)offsetX;
     float offsetY = msg.readFloat();
-    (void)offsetY;
 
     Entity platform = factories::createOneWayPlatform(registry,
         posX,
-        posY);
+        posY,
+        0.0,
+        0.0,
+        width,
+        height,
+        offsetX,
+        offsetY);
 
     registry.add<ServerEntityId>(platform, ServerEntityId { entityId });
     SpriteManager::addPlatformSprite(registry, platform, posX, posY);
@@ -155,7 +161,8 @@ void Game::createEnemyFromMessage(const Message& msg, Registry& registry,
     }
 
     registry.add<ServerEntityId>(enemy, ServerEntityId { entityId });
-    // SpriteManager::addEnemySprite(registry, enemy, posX, posY, 2.0f);
+    // Attach enemy sprite based on level config
+    SpriteManager::addEnemySprite(registry, enemy, posX, posY, m_currentLevelData.getEnemySizeFactor(), &m_currentLevelData);
 }
 
 void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
@@ -192,13 +199,13 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         SpriteManager::addPlayerSprite(registry, entity, position.x, position.y, 1.5f);
         break;
     case EntityType::PROJECTILE:
-        SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, 1.5f);
+        SpriteManager::addProjectileSprite(registry, entity, position.x, position.y, m_currentLevelData.getProjectileSizeFactor(), &m_currentLevelData);
         break;
     case EntityType::PLATFORM:
-        SpriteManager::addPlatformSprite(registry, entity, position.x, position.y);
+        SpriteManager::addPlatformSprite(registry, entity, position.x, position.y, m_currentLevelData.getPlatformSizeFactor(), &m_currentLevelData);
         break;
     case EntityType::ENEMY:
-        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, 2.0f);
+        SpriteManager::addEnemySprite(registry, entity, position.x, position.y, m_currentLevelData.getEnemySizeFactor(), &m_currentLevelData);
         break;
     case EntityType::POWERUP:
         // TODO: PowerUp sprite attachment
@@ -238,12 +245,22 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
     for (uint8_t i = 0; i < numBosses; ++i) {
         uint32_t entityId = msg.readU32();
         uint32_t health = msg.readU32();
+        uint8_t isAttacking = msg.readU8();
+        uint8_t isHit = msg.readU8();
 
         Entity entity = findEntityByServerId(registry, entityId);
         if (entity.id != 0 && registry.has<Health>(entity)) {
             auto& healthComp = registry.get<Health>(entity);
             healthComp.hp = static_cast<int>(health);
         }
+
+        // Update the transient attack flag on the boss (used by SpriteAnimationSystem)
+        if (entity.id != 0 && registry.has<BossTag>(entity) && registry.has<IsAttacking>(entity)) {
+            auto& atk = registry.get<IsAttacking>(entity);
+            atk.attacking = static_cast<int>(isAttacking);
+        }
+
+        // std::cout << "Boss " << entityId << " hit state: " << static_cast<int>(isHit) << std::endl;
     }
 }
 
@@ -261,13 +278,18 @@ void Game::updateSingleEntity(const Message& msg, Registry& registry, uint32_t t
     float posX = msg.readFloat();
     float posY = msg.readFloat();
     uint32_t health = msg.readU32();
+    uint8_t movementStateRaw = msg.readU8();
+    uint8_t facingDirectionRaw = msg.readU8();
+
+    PlayerMovementState movementState = static_cast<PlayerMovementState>(movementStateRaw);
+    FacingDirection facingDirection = static_cast<FacingDirection>(facingDirectionRaw);
 
     Entity entity = findEntityByServerId(registry, entityId);
     if (entity.id == 0) {
         return;
     }
 
-    updateEntityState(registry, entity, posX, posY, health, tick);
+    updateEntityState(registry, entity, posX, posY, health, movementState, facingDirection, tick);
 }
 
 Entity Game::findEntityByServerId(Registry& registry, uint32_t serverId)
@@ -297,10 +319,12 @@ Entity Game::findEntityByClientId(Registry& registry, const uint32_t clientId)
 }
 
 void Game::updateEntityState(Registry& registry, Entity entity,
-    float posX, float posY, uint32_t health, const uint32_t serverTick)
+    float posX, float posY, uint32_t health, PlayerMovementState movementState,
+    FacingDirection facingDirection, const uint32_t serverTick)
 {
     updateEntityPosition(registry, entity, posX, posY, serverTick);
     updateEntityHealth(registry, entity, health);
+    updateEntitySyncState(registry, entity, movementState, facingDirection);
 }
 
 void Game::updateEntityPosition(Registry& registry, Entity entity, float posX, float posY,
@@ -347,5 +371,17 @@ void Game::updateEntityHealth(Registry& registry, Entity entity, uint32_t health
     if (registry.has<Health>(entity)) {
         auto& healthComp = registry.get<Health>(entity);
         healthComp.hp = static_cast<int>(health);
+    }
+}
+
+void Game::updateEntitySyncState(Registry& registry, Entity entity,
+    PlayerMovementState movementState, FacingDirection facingDirection)
+{
+    if (!registry.has<PlayerSyncState>(entity)) {
+        registry.add<PlayerSyncState>(entity, PlayerSyncState { movementState, facingDirection });
+    } else {
+        auto& syncState = registry.get<PlayerSyncState>(entity);
+        syncState.movementState = movementState;
+        syncState.facingDirection = facingDirection;
     }
 }

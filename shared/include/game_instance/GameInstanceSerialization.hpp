@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../Message.hpp"
-#include "../../src/ecs/Registry.hpp"
 #include "../../src/ecs/Entity.hpp"
+#include "../../src/ecs/Registry.hpp"
+#include "../Message.hpp"
+#include "../PlayerMovementState.hpp"
 #include <cstdint>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 /**
  * @brief Handles serialization and deserialization of game state and entities
@@ -23,8 +24,7 @@ public:
     static std::vector<uint8_t> serializeGameState(
         const Registry& registry,
         uint32_t currentTick,
-        const std::unordered_map<uint32_t, Entity>& playerEntities
-    );
+        const std::unordered_map<uint32_t, Entity>& playerEntities);
 
     /**
      * @brief Deserializes game state (TODO: implement for rollback)
@@ -44,8 +44,7 @@ public:
         const Registry& registry,
         Entity entity,
         const std::unordered_map<uint32_t, Entity>& playerEntities,
-        const std::unordered_map<uint32_t, std::string>& usernames
-    );
+        const std::unordered_map<uint32_t, std::string>& usernames);
 
     /**
      * @brief Serializes multiple entity spawns
@@ -59,15 +58,29 @@ public:
         const Registry& registry,
         const std::vector<Entity>& entities,
         const std::unordered_map<uint32_t, Entity>& playerEntities,
-        const std::unordered_map<uint32_t, std::string>& usernames
-    );
+        const std::unordered_map<uint32_t, std::string>& usernames);
 
 private:
+    /**
+     * @brief Calculates the current movement state for a player entity
+     * @param registry The game registry
+     * @param entity The player entity
+     * @return The current movement state
+     */
+    static PlayerMovementState calculatePlayerMovementState(const Registry& registry, Entity entity);
+
+    /**
+     * @brief Calculates the current facing direction for a player entity
+     * @param registry The game registry
+     * @param entity The player entity
+     * @return The current facing direction
+     */
+    static FacingDirection calculatePlayerFacingDirection(const Registry& registry, Entity entity);
+
     /**
      * @brief Helper to find player ID by entity
      */
     static uint32_t findPlayerIdByEntity(
         const Entity& entity,
-        const std::unordered_map<uint32_t, Entity>& playerEntities
-    );
+        const std::unordered_map<uint32_t, Entity>& playerEntities);
 };

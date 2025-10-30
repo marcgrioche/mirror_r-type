@@ -25,7 +25,10 @@ namespace factories {
  * @param vely Y velocity for the platform (default: PLATFORM_VELOCITY_Y)
  * @return The created one-way platform entity
  */
-Entity createOneWayPlatform(Registry& registry, float posx, float posy, float velx = PLATFORM_VELOCITY_X, float vely = PLATFORM_VELOCITY_Y);
+Entity createOneWayPlatform(Registry& registry, float posx, float posy, float velx = PLATFORM_VELOCITY_X, float vely = PLATFORM_VELOCITY_Y, const Level* level = nullptr);
+Entity createOneWayPlatform(Registry& registry, float posx, float posy, float velx = PLATFORM_VELOCITY_X, float vely = PLATFORM_VELOCITY_Y, float width = PLATFORM_WIDTH, float height = PLATFORM_HEIGHT);
+// Overload allowing explicit hitbox offsets
+Entity createOneWayPlatform(Registry& registry, float posx, float posy, float velx, float vely, float width, float height, float offsetX, float offsetY);
 
 /**
  * @brief Creates a solid platform entity
@@ -36,7 +39,7 @@ Entity createOneWayPlatform(Registry& registry, float posx, float posy, float ve
  * @param vely Y velocity for the platform (default: PLATFORM_VELOCITY_Y)
  * @return The created platform entity
  */
-Entity createPlatform(Registry& registry, float posx, float posy, float velx = PLATFORM_VELOCITY_X, float vely = PLATFORM_VELOCITY_Y);
+Entity createPlatform(Registry& registry, float posx, float posy, float velx = PLATFORM_VELOCITY_X, float vely = PLATFORM_VELOCITY_Y, const Level* level = nullptr);
 
 /**
  * @brief Generates a specified quantity of random platforms

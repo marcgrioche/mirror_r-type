@@ -28,6 +28,10 @@ private:
     float _platformReachableX = 270.0f;
     float _platformVelocityX = -30.0f;
     float _platformVelocityY = 0.0f;
+    std::string _platformSpritePath = "";
+    float _platformWidth = 0;
+    float _platformHeight = 0;
+    float _platformSizeFactor = 0;
 
     // Enemy parameters
     float _enemyVelocityX = -80.0f;
@@ -39,6 +43,22 @@ private:
     int _enemyProjectileDamage = 10;
     float _enemyProjectileWidth = 32.0f;
     float _enemyProjectileHeight = 32.0f;
+    // Enemy level-specific sprites
+    std::string _enemySpriteId = "bydo_flying.png";
+    std::string _enemyProjectileSpriteId = "eye_spritesheet.png";
+    // Enemy animation params (defaults align with bydo_flying.png)
+    int _enemyFrameWidth = 79;
+    int _enemyFrameHeight = 69;
+    int _enemyFramesNb = 4;
+    float _enemyFrameDuration = 0.15f;
+    float _enemySizeFactor = 2.0f;
+
+    // Enemy projectile animation params (defaults align with eye_spritesheet.png)
+    int _projectileFrameWidth = 32;
+    int _projectileFrameHeight = 24;
+    int _projectileFramesNb = 7;
+    float _projectileFrameDuration = 0.1f;
+    float _projectileSizeFactor = 1.5f;
 
     // Boss parameters
     int _bossHealth = 200;
@@ -90,7 +110,11 @@ public:
     float getPlatformReachableX() const { return _platformReachableX; }
     float getPlatformVelocityX() const { return _platformVelocityX; }
     float getPlatformVelocityY() const { return _platformVelocityY; }
-    // --- Getters for new parameters ---
+    const std::string& getPlatformSpritePath() const { return _platformSpritePath; }
+    float getPlatformWidth() const { return _platformWidth; }
+    float getPlatformHeight() const { return _platformHeight; }
+    float getPlatformSizeFactor() const { return _platformSizeFactor; }
+    // Enemy parameters
     float getEnemyVelocityX() const { return _enemyVelocityX; }
     float getEnemyVelocityY() const { return _enemyVelocityY; }
     int getEnemyHealth() const { return _enemyHealth; }
@@ -98,6 +122,21 @@ public:
     float getEnemyHeight() const { return _enemyHeight; }
     float getEnemyProjectileSpeed() const { return _enemyProjectileSpeed; }
     int getEnemyProjectileDamage() const { return _enemyProjectileDamage; }
+    const std::string& getEnemySpriteId() const { return _enemySpriteId; }
+    const std::string& getEnemyProjectileSpriteId() const { return _enemyProjectileSpriteId; }
+    // Enemy animation getters
+    int getEnemyFrameWidth() const { return _enemyFrameWidth; }
+    int getEnemyFrameHeight() const { return _enemyFrameHeight; }
+    int getEnemyFramesNb() const { return _enemyFramesNb; }
+    float getEnemyFrameDuration() const { return _enemyFrameDuration; }
+    float getEnemySizeFactor() const { return _enemySizeFactor; }
+    // Projectile animation getters
+    int getProjectileFrameWidth() const { return _projectileFrameWidth; }
+    int getProjectileFrameHeight() const { return _projectileFrameHeight; }
+    int getProjectileFramesNb() const { return _projectileFramesNb; }
+    float getProjectileFrameDuration() const { return _projectileFrameDuration; }
+    float getProjectileSizeFactor() const { return _projectileSizeFactor; }
+    // Boss parameters
     int getBossHealth() const { return _bossHealth; }
     float getBossWidth() const { return _bossWidth; }
     float getBossHeight() const { return _bossHeight; }

@@ -18,6 +18,7 @@
 #include "components/ProjectileType.hpp"
 #include "components/Tags.hpp"
 #include "components/Velocity.hpp"
+#include "components/IsAttacking.hpp"
 #include "components/componentutils/VectorUtils.hpp"
 #include <algorithm>
 #include <iostream>
@@ -65,6 +66,9 @@ bool handlePlayerAttack(
             playerPos.v.x + playerHitbox.width / 2,
             playerPos.v.y + playerHitbox.height / 2
         };
+
+        playerCenter.x += 100;
+        playerCenter.y += 85;
         
         Vector2 mousePos = { mouseX, mouseY };
         Vector2 shootDirection = direction(playerCenter, mousePos);
@@ -177,7 +181,6 @@ bool handleEnemyAttacks(
                 int maxOffset = static_cast<int>(std::max(0.0f, ownerHit.height - projHit.height * 2));
                 int offset = maxOffset > 0 ? rand() % maxOffset : 0;
                 spawnPos.v.y = enemyPos.v.y + offset;
-                registry.get<IsAttacking>(owner).attacking = true;
             }
             const Parent spawnParent { weaponEntity };
 
@@ -210,6 +213,12 @@ bool handleEnemyAttacks(
             if (registry.has<Frequency>(weaponEntity)) {
                 Frequency& frequency = registry.get<Frequency>(weaponEntity);
                 FrequencyUtils::reset(frequency);
+            }
+
+            // If the owner is a boss, flag it as attacking (short countdown to survive multi-tick updates)
+            if (registry.has<BossTag>(owner) && registry.has<IsAttacking>(owner)) {
+                auto &isAtk = registry.get<IsAttacking>(owner);
+                isAtk.attacking = 10;
             }
         }
     }

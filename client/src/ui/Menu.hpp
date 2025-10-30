@@ -61,6 +61,12 @@ public:
      */
     bool isActive() const { return m_active; }
 
+    /**
+     * @brief Gets the current menu page
+     * @return The current page enum value
+     */
+    Page getCurrentPage() const { return m_currentPage; }
+
     // Gestion des événements et rendu
 
     /**

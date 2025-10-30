@@ -1,6 +1,7 @@
 #include "../../include/Config.hpp"
 #include "../../include/game_instance/GameInstancePlayer.hpp"
 #include "../ecs/components/Dash.hpp"
+#include "../ecs/components/PlayerInputState.hpp"
 #include "../ecs/components/RigidBody.hpp"
 #include "../ecs/components/Velocity.hpp"
 #include "../ecs/systems/FrequencyUtils.hpp"
@@ -29,6 +30,11 @@ bool processInput(
     auto& dash = registry.get<Dash>(playerEntity);
     auto& rb = registry.get<RigidBody>(playerEntity);
 
+    if (!registry.has<PlayerInputState>(playerEntity)) {
+        registry.add<PlayerInputState>(playerEntity, PlayerInputState {});
+    }
+    auto& inputState = registry.get<PlayerInputState>(playerEntity);
+
     if (!dash.isDashing) {
         rb.acceleration = { 0.0f, 0.0f };
         dash.direction = { 0.0f, 0.0f };
@@ -38,8 +44,21 @@ bool processInput(
     float accel = rb.isOnGround ? rb.groundAccel : rb.airAccel;
 
     for (const auto& [input, isPressed] : inputs) {
+        if (input == GameInput::LEFT) {
+            inputState.leftPressed = isPressed;
+            if (isPressed) {
+                inputState.lastFacingDirection = FacingDirection::LEFT;
+            }
+        } else if (input == GameInput::RIGHT) {
+            inputState.rightPressed = isPressed;
+            if (isPressed) {
+                inputState.lastFacingDirection = FacingDirection::RIGHT;
+            }
+        }
+
         if (!isPressed)
             continue;
+
         hasRealInputs = true;
 
         switch (input) {

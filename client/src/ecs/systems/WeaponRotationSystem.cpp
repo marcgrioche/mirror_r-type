@@ -53,11 +53,15 @@ void updateWeaponRotations(Registry& registry, float mouseX, float mouseY)
 
         // Positionner l'arme au centre du joueur
         if (!registry.has<Position>(weaponEntity)) {
-            registry.add<Position>(weaponEntity, Position { centerX, centerY });
-        } else {
-            Position& weaponPos = registry.get<Position>(weaponEntity);
-            weaponPos.v.x = centerX;
-            weaponPos.v.y = centerY;
+            registry.add<Position>(weaponEntity, Position{Vector2{centerX, centerY}});
+        }
+        Position& weaponPos = registry.get<Position>(weaponEntity);
+        weaponPos.v.x = centerX;
+        weaponPos.v.y = centerY;
+
+        if (registry.has<PlayerTag>(ownerEntity)) {
+            centerX += 100;
+            centerY += 85;
         }
 
         // Calculer l'angle vers la souris
