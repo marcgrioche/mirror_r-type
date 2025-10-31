@@ -15,6 +15,7 @@
 #include "managers/ConfigManager.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "managers/SoundManager.hpp"
 #include "systems/EyeSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL.h>
@@ -42,7 +43,13 @@ bool Game::initialize()
     initializeComponentMappings();
 
     auto& resourceManager = ResourceManager::getInstance();
+    auto& soundManager = SoundManager::getInstance();
     resourceManager.initialize();
+    soundManager.initialize();
+
+    // sound
+    soundManager.loadMusicFromAsset("menuMusic", "sound/music/menuMusic.wav");
+    soundManager.loadChunkFromAsset("playerAttack", "sound/effect/playerAttack.mp3");
 
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
@@ -71,6 +78,14 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
+        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "projectile_head.png", resourceManager.getAssetPath("sprites/Heads_Boss/projectile_head.png"))) {
+        std::cout << "Warning: Failed to load projectile_head texture - using fallback rectangles" << std::endl;
+    }
+
     if (!resourceManager.loadTexture(renderer, "BabyBossIdle.png", resourceManager.getAssetPath("sprites/Baby_Boss/BabyBossIdle.png"))) {
         std::cout << "Warning: Failed to load BabyBossIdle texture - using fallback rectangles" << std::endl;
     }
@@ -81,10 +96,6 @@ bool Game::initialize()
 
     if (!resourceManager.loadTexture(renderer, "projectileBill.png", resourceManager.getAssetPath("sprites/Baby_Boss/projectileBill.png"))) {
         std::cout << "Warning: Failed to load projectileBill texture - using fallback rectangles" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
-        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
     }
 
     if (!resourceManager.loadTexture(renderer, "bydo_flying.png", resourceManager.getAssetPath("sprites/bydo_flying.png"))) {
@@ -115,6 +126,9 @@ bool Game::initialize()
     }
     if (!resourceManager.loadTexture(renderer, "Sky.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Sky.png"))) {
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "flying_eye.png", resourceManager.getAssetPath("sprites/Heads_Boss/flying_eye.png"))) {
+        std::cout << "Warning: Failed to load flying_eye texture" << std::endl;
     }
 
     // LOAD UI
@@ -170,6 +184,11 @@ void Game::initializeMenuMode()
 {
     _state = GameState::MENU;
     m_menu.activate(_registry, Menu::Page::CONNECTION); // Change Connect -> HOME pour commencer par la page d'accueil
+
+    if (SoundManager::getInstance().isInitialized() && !m_menuMusicPlaying) {
+        SoundManager::getInstance().playMusic("menuMusic", -1, 800); // loop infini, fade in 800ms
+        m_menuMusicPlaying = true;
+    }
 }
 
 void Game::run()
@@ -255,6 +274,13 @@ void Game::runMenuLoop()
 
 void Game::runGameLoop(float deltaTime)
 {
+    if (m_menuMusicPlaying) {
+        if (SoundManager::getInstance().isInitialized()) {
+            SoundManager::getInstance().stopMusic(500); // fade out 500ms
+        }
+        m_menuMusicPlaying = false;
+    }
+
     bool hasParallax = false;
     for (auto [entity] : _registry.view<ParallaxState>()) {
         hasParallax = true;

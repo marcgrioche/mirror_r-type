@@ -25,3 +25,7 @@ Server/CMakeFiles/
 rtype.db-shm
 rtype.db-wal
 *.ini
+
+monitoring/grafana/grafana-data/log/
+monitoring/grafana/grafana-data/plugins/
+monitoring/grafana/grafana-data/png/

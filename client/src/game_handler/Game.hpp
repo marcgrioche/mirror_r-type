@@ -291,6 +291,8 @@ private:
     GameState _state = GameState::MENU;
     bool m_networkStarted = false;
 
+    bool m_menuMusicPlaying = false;
+
     // Nouvelles méthodes pour les réponses serveur
     void onConnectionSuccess();
     void onLobbyJoined(uint32_t lobbyId);

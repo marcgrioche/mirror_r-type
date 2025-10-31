@@ -24,7 +24,21 @@
     "projectileSpeed": -300.0,
     "projectileDamage": 10,
     "projectileWidth": 32.0,
-    "projectileHeight": 32.0
+    "projectileHeight": 32.0,
+    "sprite_path": "flying_eye.png",
+    "frame_width": 80,
+    "frame_height": 80,
+    "frames_nb": 4,
+    "frame_duration": 0.17,
+    "size_factor": 2.0
+  },
+    "projectile": {
+    "sprite_path": "projectile_head.png",
+    "frame_width": 64,
+    "frame_height": 64,
+    "frames_nb": 4,
+    "frame_duration": 0.17,
+    "size_factor": 1.0
   },
   "boss": {
     "health_states_number": 3,
