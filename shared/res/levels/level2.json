@@ -33,7 +33,6 @@
     "size_factor": 2.0
   },
   "projectile": {
-    "sprite_id": "projectileBill.png",
     "sprite_path": "projectileBill.png",
     "frame_width": 75,
     "frame_height": 52,
