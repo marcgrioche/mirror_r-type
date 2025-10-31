@@ -80,7 +80,6 @@ void DB::logError()
 
 void DB::init()
 {
-    // Set PRAGMA: WAL for concurrency, synchronous=NORMAL for performance with safety
     exec_sql("PRAGMA journal_mode = WAL;");
     exec_sql("PRAGMA synchronous = NORMAL;");
     exec_sql("PRAGMA foreign_keys = ON;");
@@ -155,8 +154,11 @@ bool DB::isUserRegistered(const std::string& t_username)
 
 std::optional<int64_t> DB::registerPlayer(const std::string& t_username, const std::string& t_password)
 {
-    // Hash password afterward
-    auto inserted = insert_player_stmt(t_username, t_password);
+    auto hashedPwd = m_passwordManager.hashPassword(t_password);
+    if (hashedPwd.empty()) {
+        hashedPwd = t_password;
+    }
+    auto inserted = insert_player_stmt(t_username, hashedPwd);
     return inserted;
 }
 
@@ -168,9 +170,8 @@ std::optional<int64_t> DB::authenticate(const std::string& t_username, const std
     int64_t id = row->first;
     const std::string& stored = row->second;
 
-    // Verify
-    if (stored == t_password) {
-        // success - update last_login_utc
+    // Verification: either empty hash (legacy plain) or verify hashed
+    if (m_passwordManager.verifyPassword(stored, t_password)) {
         sqlite3_stmt* stmt = nullptr;
         const char* sql = "UPDATE players SET last_login_utc = datetime('now') WHERE id = ?;";
         int rc = sqlite3_prepare_v2(m_db, sql, -1, &stmt, nullptr);
