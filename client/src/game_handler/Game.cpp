@@ -71,6 +71,14 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load heads_monster_idle texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
+        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "projectile_head.png", resourceManager.getAssetPath("sprites/Heads_Boss/projectile_head.png"))) {
+        std::cout << "Warning: Failed to load projectile_head texture - using fallback rectangles" << std::endl;
+    }
+
     if (!resourceManager.loadTexture(renderer, "BabyBossIdle.png", resourceManager.getAssetPath("sprites/Baby_Boss/BabyBossIdle.png"))) {
         std::cout << "Warning: Failed to load BabyBossIdle texture - using fallback rectangles" << std::endl;
     }
@@ -81,10 +89,6 @@ bool Game::initialize()
 
     if (!resourceManager.loadTexture(renderer, "projectileBill.png", resourceManager.getAssetPath("sprites/Baby_Boss/projectileBill.png"))) {
         std::cout << "Warning: Failed to load projectileBill texture - using fallback rectangles" << std::endl;
-    }
-
-    if (!resourceManager.loadTexture(renderer, "heads_monster_attack.png", resourceManager.getAssetPath("sprites/Heads_Boss/heads_monster_attack.png"))) {
-        std::cout << "Warning: Failed to load heads_monster_attack texture - using fallback rectangles" << std::endl;
     }
 
     if (!resourceManager.loadTexture(renderer, "bydo_flying.png", resourceManager.getAssetPath("sprites/bydo_flying.png"))) {
@@ -115,6 +119,9 @@ bool Game::initialize()
     }
     if (!resourceManager.loadTexture(renderer, "Sky.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Sky.png"))) {
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "flying_eye.png", resourceManager.getAssetPath("sprites/Heads_Boss/flying_eye.png"))) {
+        std::cout << "Warning: Failed to load flying_eye texture" << std::endl;
     }
 
     // LOAD UI
