@@ -5,6 +5,7 @@
 ** enemy
 */
 #include "CreateEnemy.hpp"
+#include <random>
 #include "levels/Level.hpp"
 
 namespace factories {
@@ -12,8 +13,16 @@ Entity createEnemy(Registry& registry, const Level* level)
 {
     std::cout << "\ncreating enemy\n\n";
     Entity enemy = registry.create_entity();
-    float velocityX = level ? level->getEnemyVelocityX() : ENEMY_VELOCITY_X;
-    float velocityY = level ? level->getEnemyVelocityY() : ENEMY_VELOCITY_Y;
+    // Base velocities, from level if provided, otherwise from defaults
+    const float baseVX = level ? level->getEnemyVelocityX() : ENEMY_VELOCITY_X;
+    const float baseVY = level ? level->getEnemyVelocityY() : ENEMY_VELOCITY_Y;
+
+    // Randomize speed slightly to vary enemy movement while preserving direction
+    // Adjust the range [minFactor, maxFactor] as desired
+    static thread_local std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<float> factorDist(0.8f, 1.2f);
+    float velocityX = baseVX * factorDist(rng);
+    float velocityY = baseVY; // keep Y as-is; tweak if needed
     int health = level ? level->getEnemyHealth() : ENEMY_HEALTH;
     float width = level ? level->getEnemyWidth() : ENEMY_WIDTH;
     float height = level ? level->getEnemyHeight() : ENEMY_HEIGHT;
