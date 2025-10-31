@@ -19,6 +19,14 @@ CPMAddPackage(
         GIT_TAG "v1.3.1"
 )
 
+CPMAddPackage(
+        NAME sodium
+        GITHUB_REPOSITORY "robinlinden/libsodium-cmake"
+        GIT_TAG e5b985ad0dd235d8c4307ea3a385b45e76c74c6a
+        OPTIONS
+            "SODIUM_DISABLE_TESTS ON"
+)
+
 # Set prometheus-cpp options BEFORE adding the package
 set(ENABLE_PUSH OFF CACHE BOOL "" FORCE)
 set(ENABLE_PULL ON CACHE BOOL "" FORCE)
@@ -52,6 +60,14 @@ else()
     find_package(SQLite3 REQUIRED)
     target_include_directories(r-type_server PRIVATE ${SQLite3_INCLUDE_DIRS})
     target_link_libraries(r-type_server PRIVATE SQLite::SQLite3)
+endif()
+
+if (libsodium_ADDED)
+    message(STATUS "Using libsodium from CPM")
+    target_link_libraries(r-type_server PRIVATE sodium)
+else()
+    find_package(sodium REQUIRED)
+    target_link_libraries(r-type_server PRIVATE sodium)
 endif()
 
 if(WIN32)
