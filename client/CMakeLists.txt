@@ -19,10 +19,10 @@ CPMAddPackage(
         "SDL2_DISABLE_INSTALL ON"
         "SDL2_DISABLE_UNINSTALL ON"
 
-        "SDL_ALSA OFF"
-        "SDL_PULSEAUDIO OFF"
+        "SDL_ALSA ON"
+        "SDL_PULSEAUDIO ON"
         "SDL_JACK OFF"
-        "SDL_PIPEWIRE OFF"
+        "SDL_PIPEWIRE ON"
         "SDL_SNDIO OFF"
         "SDL_ESD OFF"
         "SDL_ARTS OFF"
