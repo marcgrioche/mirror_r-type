@@ -5,9 +5,10 @@
 ** Login   <jojo>
 **
 ** Started on  Mon Oct 6 10:44:53 AM 2025 jojo
-** Last update Tue Oct 6 10:44:54 AM 2025 jojo
+** Last update Thu Oct 29 6:09:13 PM 2025 jojo
 */
 
+#include "components/Color.hpp"
 #include <SDL.h>
 #include <string>
 
@@ -51,4 +52,5 @@ struct Sprite {
     int frame_width = 0;
     int frame_height = 0;
     int nb_state = 0;
+    Color color = { 255, 255, 255, 255 };
 };
