@@ -6,6 +6,7 @@
 */
 
 #include "RenderSystem.hpp"
+#include "HitEffectSystem.hpp"
 #include "ParallaxBackgroundSystem.hpp"
 #include "PlayerListRenderSystem.hpp"
 #include "components/Button.hpp"
@@ -33,6 +34,7 @@ void renderSystem(Registry& registry)
     graphics.clear(20, 30, 50, 255);
 
     parallaxBackgroundSystem(registry);
+    hitEffectSystem(registry);
 
     auto spriteView = registry.view<Sprite, Position>();
     for (auto it = spriteView.begin(); it != spriteView.end(); ++it) {
@@ -65,8 +67,14 @@ void renderSystem(Registry& registry)
         }
 
         if (texture) {
+            SDL_SetTextureColorMod(texture, sprite.color.r, sprite.color.g, sprite.color.b);
+            SDL_SetTextureAlphaMod(texture, sprite.color.a);
+
             SDL_RenderCopyEx(renderer, texture, &sprite.srcRect, &dstRect,
                 sprite.rotation, nullptr, flip);
+
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
+            SDL_SetTextureAlphaMod(texture, 255);
         } else {
             if (registry.has<PlayerTag>(e)) {
                 graphics.setDrawColor(255, 0, 255, 255); // Magenta for players

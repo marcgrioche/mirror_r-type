@@ -247,11 +247,14 @@ void Game::deserializeAndUpdateGameState(const Message& msg, Registry& registry)
         uint32_t health = msg.readU32();
         uint8_t isAttacking = msg.readU8();
         uint8_t isHit = msg.readU8();
+        float hitTime = msg.readFloat();
 
         Entity entity = findEntityByServerId(registry, entityId);
         if (entity.id != 0 && registry.has<Health>(entity)) {
             auto& healthComp = registry.get<Health>(entity);
             healthComp.hp = static_cast<int>(health);
+            healthComp.hit = static_cast<int>(isHit);
+            healthComp.hitTime = static_cast<float>(hitTime);
         }
 
         // Update the transient attack flag on the boss (used by SpriteAnimationSystem)

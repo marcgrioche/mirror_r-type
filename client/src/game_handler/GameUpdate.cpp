@@ -13,6 +13,7 @@
 #include "Game.hpp"
 #include "ecs/systems/CollisionSystem.hpp"
 #include "ecs/systems/HealthSystem.hpp"
+#include "ecs/systems/HitEffectTimerSystem.hpp"
 #include "ecs/systems/MovementSystem.hpp"
 #include "ecs/systems/ProjectileSystem.hpp"
 #include "ecs/systems/RigidBodySystem.hpp"
@@ -101,6 +102,7 @@ void Game::updateNetworkGameTick()
     }
     spriteAnimationSystem(_registry, TICK_DURATION);
     collisionSystem(_registry, TICK_DURATION);
+    // hitEffectTimerSystem(_registry, TICK_DURATION);
 }
 
 void Game::startGameplay()
