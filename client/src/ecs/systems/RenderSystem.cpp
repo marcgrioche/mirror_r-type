@@ -20,25 +20,16 @@
 #include "managers/ResourceManager.hpp"
 #include <SDL.h>
 
-void renderSystem(Registry& registry)
+void renderPlayer(Registry& registry, ResourceManager& resourceManager, SDL_Renderer* renderer, GraphicsManager& graphics)
 {
-    auto& graphics = GraphicsManager::getInstance();
-
-    if (!graphics.isInitialized()) {
-        return;
-    }
-
-    SDL_Renderer* renderer = graphics.getRenderer();
-    auto& resourceManager = ResourceManager::getInstance();
-
-    graphics.clear(20, 30, 50, 255);
-
-    parallaxBackgroundSystem(registry);
-    hitEffectSystem(registry);
-
     auto spriteView = registry.view<Sprite, Position>();
+
+     // draw player before everything
     for (auto it = spriteView.begin(); it != spriteView.end(); ++it) {
         Entity e = it.entity();
+        if (!registry.has<PlayerTag>(e)) {
+            continue; // Only player in this pass
+        }
         Sprite& sprite = registry.get<Sprite>(e);
         Position& pos = registry.get<Position>(e);
 
@@ -76,10 +67,76 @@ void renderSystem(Registry& registry)
             SDL_SetTextureColorMod(texture, 255, 255, 255);
             SDL_SetTextureAlphaMod(texture, 255);
         } else {
-            if (registry.has<PlayerTag>(e)) {
-                graphics.setDrawColor(255, 0, 255, 255); // Magenta for players
-            } else if (registry.has<PlatformTag>(e)) {
-                graphics.setDrawColor(255, 255, 255, 255); // White for platforms
+            graphics.setDrawColor(255, 255, 255, 255); // White for platforms
+            SDL_RenderFillRect(renderer, &dstRect);
+            SDL_RenderDrawRect(renderer, &dstRect);
+        }
+    }
+}
+
+void renderSystem(Registry& registry)
+{
+    auto& graphics = GraphicsManager::getInstance();
+
+    if (!graphics.isInitialized()) {
+        return;
+    }
+
+    SDL_Renderer* renderer = graphics.getRenderer();
+    auto& resourceManager = ResourceManager::getInstance();
+
+    graphics.clear(20, 30, 50, 255);
+
+    parallaxBackgroundSystem(registry);
+    hitEffectSystem(registry);
+
+    renderPlayer(registry, resourceManager, renderer, graphics);
+
+    auto spriteView = registry.view<Sprite, Position>();
+    for (auto it = spriteView.begin(); it != spriteView.end(); ++it) {
+        Entity e = it.entity();
+        if (registry.has<PlayerTag>(e)) {
+            continue;
+        }
+        Sprite& sprite = registry.get<Sprite>(e);
+        Position& pos = registry.get<Position>(e);
+
+        SDL_Texture* texture = resourceManager.getTexture(sprite.current_id);
+
+        SDL_Rect dstRect = {
+            static_cast<int>(pos.v.x + sprite.offset_x),
+            static_cast<int>(pos.v.y + sprite.offset_y),
+            static_cast<int>(sprite.dstRect.w * sprite.scale_x),
+            static_cast<int>(sprite.dstRect.h * sprite.scale_y)
+        };
+
+        if (dstRect.w == 0) {
+            dstRect.w = static_cast<int>(sprite.srcRect.w * sprite.scale_x);
+        }
+        if (dstRect.h == 0) {
+            dstRect.h = static_cast<int>(sprite.srcRect.h * sprite.scale_y);
+        }
+
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        if (registry.has<PlayerSyncState>(e)) {
+            const PlayerSyncState& syncState = registry.get<PlayerSyncState>(e);
+            if (syncState.facingDirection == FacingDirection::RIGHT) {
+                flip = SDL_FLIP_HORIZONTAL;
+            }
+        }
+
+        if (texture) {
+            SDL_SetTextureColorMod(texture, sprite.color.r, sprite.color.g, sprite.color.b);
+            SDL_SetTextureAlphaMod(texture, sprite.color.a);
+
+            SDL_RenderCopyEx(renderer, texture, &sprite.srcRect, &dstRect,
+                sprite.rotation, nullptr, flip);
+
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
+            SDL_SetTextureAlphaMod(texture, 255);
+        } else {
+            if (registry.has<PlatformTag>(e)) {
+                graphics.setDrawColor(255, 0, 255, 255); // Magenta for platforms
             } else if (registry.has<ProjectileTag>(e)) {
                 graphics.setDrawColor(255, 255, 0, 255); // Yellow for projectiles
             } else if (registry.has<EnemyTag>(e)) {
