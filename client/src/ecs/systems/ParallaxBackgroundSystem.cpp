@@ -30,12 +30,19 @@ void parallaxBackgroundSystem(Registry& registry)
         float* offsetPtr;
     };
 
+    // Resolve IDs from state with safe fallbacks to default IDs
+    const std::string skyId = parallaxState.skyId.empty() ? std::string("Sky.png") : parallaxState.skyId;
+    const std::string downId = parallaxState.downLayerId.empty() ? std::string("DownLayer.png") : parallaxState.downLayerId;
+    const std::string midId = parallaxState.middleLayerId.empty() ? std::string("MiddleLayer.png") : parallaxState.middleLayerId;
+    const std::string lightId = parallaxState.lightId.empty() ? std::string("Light.png") : parallaxState.lightId;
+    const std::string topId = parallaxState.topLayerId.empty() ? std::string("TopLayer.png") : parallaxState.topLayerId;
+
     std::vector<LayerInfo> layers = {
-        { "Sky.png", 0.2f, &parallaxState.skyOffset }, // Sky: 20% of platform speed
-        { "DownLayer.png", 0.4f, &parallaxState.downLayerOffset }, // Down layer: 40% of platform speed
-        { "MiddleLayer.png", 0.6f, &parallaxState.middleLayerOffset }, // Middle layer: 60% of platform speed
-        { "Light.png", 0.8f, &parallaxState.lightOffset }, // Light: 80% of platform speed
-        { "TopLayer.png", 1.0f, &parallaxState.topLayerOffset } // Top layer: 100% of platform speed (same as platforms)
+        { skyId, 0.2f, &parallaxState.skyOffset }, // Sky: 20% of platform speed
+        { downId, 0.4f, &parallaxState.downLayerOffset }, // Down layer: 40% of platform speed
+        { midId, 0.6f, &parallaxState.middleLayerOffset }, // Middle layer: 60% of platform speed
+        { lightId, 0.8f, &parallaxState.lightOffset }, // Light: 80% of platform speed
+        { topId, 1.0f, &parallaxState.topLayerOffset } // Top layer: 100% of platform speed (same as platforms)
     };
 
     // Use platform velocity from config (positive speed)

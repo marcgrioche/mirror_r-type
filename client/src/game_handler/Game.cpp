@@ -15,6 +15,7 @@
 #include "managers/ConfigManager.hpp"
 #include "managers/EventManager.hpp" // Ajoute cet include
 #include "managers/ResourceManager.hpp"
+#include "managers/SoundManager.hpp"
 #include "systems/EyeSystem.hpp"
 #include "systems/RenderSystem.hpp"
 #include <SDL.h>
@@ -42,7 +43,13 @@ bool Game::initialize()
     initializeComponentMappings();
 
     auto& resourceManager = ResourceManager::getInstance();
+    auto& soundManager = SoundManager::getInstance();
     resourceManager.initialize();
+    soundManager.initialize();
+
+    // sound
+    soundManager.loadMusicFromAsset("menuMusic", "sound/music/menuMusic.wav");
+    soundManager.loadChunkFromAsset("playerAttack", "sound/effect/playerAttack.mp3");
 
     // Initialize with window size (physical window), not game resolution
     if (!_graphics.initialize("R-Type - ECS + SDL2 Demo", WINDOW_WIDTH, WINDOW_HEIGHT)) {
@@ -87,6 +94,10 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load sbirMouth texture - using fallback rectangles" << std::endl;
     }
 
+    if (!resourceManager.loadTexture(renderer, "platformFoetus.png", resourceManager.getAssetPath("sprites/Baby_Boss/platformFoetus.png"))) {
+        std::cout << "Warning: Failed to load platformFoetus texture - using fallback rectangles" << std::endl;
+    }
+
     if (!resourceManager.loadTexture(renderer, "projectileBill.png", resourceManager.getAssetPath("sprites/Baby_Boss/projectileBill.png"))) {
         std::cout << "Warning: Failed to load projectileBill texture - using fallback rectangles" << std::endl;
     }
@@ -105,23 +116,39 @@ bool Game::initialize()
     }
 
     // Load parallax background textures
-    if (!resourceManager.loadTexture(renderer, "TopLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/TopLayer.png"))) {
-        std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsTopLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/TopLayer.png"))) {
+        std::cout << "Warning: Failed to load HeadsTopLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "Light.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Light.png"))) {
-        std::cout << "Warning: Failed to load Light texture" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsLight.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Light.png"))) {
+        std::cout << "Warning: Failed to load HeadsLight texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/MiddleLayer.png"))) {
-        std::cout << "Warning: Failed to load MiddleLayer texture" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsMiddleLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/MiddleLayer.png"))) {
+        std::cout << "Warning: Failed to load HeadsMiddleLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "DownLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/DownLayer.png"))) {
-        std::cout << "Warning: Failed to load DownLayer texture" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsDownLayer.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/DownLayer.png"))) {
+        std::cout << "Warning: Failed to load HeadsDownLayer texture" << std::endl;
     }
-    if (!resourceManager.loadTexture(renderer, "Sky.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Sky.png"))) {
-        std::cout << "Warning: Failed to load Sky texture" << std::endl;
+    if (!resourceManager.loadTexture(renderer, "HeadsSky.png", resourceManager.getAssetPath("sprites/Heads_Boss/ParallaxBackground/Sky.png"))) {
+        std::cout << "Warning: Failed to load HeadsSky texture" << std::endl;
     }
     if (!resourceManager.loadTexture(renderer, "flying_eye.png", resourceManager.getAssetPath("sprites/Heads_Boss/flying_eye.png"))) {
         std::cout << "Warning: Failed to load flying_eye texture" << std::endl;
+    }
+
+    if (!resourceManager.loadTexture(renderer, "TopLayer.png", resourceManager.getAssetPath("sprites/ParallaxBackground/TopLayer.png"))) {
+        std::cout << "Warning: Failed to load TopLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "Light.png", resourceManager.getAssetPath("sprites/ParallaxBackground/Light.png"))) {
+        std::cout << "Warning: Failed to load Light texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "MiddleLayer.png", resourceManager.getAssetPath("sprites/ParallaxBackground/MiddleLayer.png"))) {
+        std::cout << "Warning: Failed to load MiddleLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "DownLayer.png", resourceManager.getAssetPath("sprites/ParallaxBackground/DownLayer.png"))) {
+        std::cout << "Warning: Failed to load DownLayer texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "Sky.png", resourceManager.getAssetPath("sprites/ParallaxBackground/Sky.png"))) {
+        std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
 
     // LOAD UI
@@ -177,6 +204,11 @@ void Game::initializeMenuMode()
 {
     _state = GameState::MENU;
     m_menu.activate(_registry, Menu::Page::CONNECTION); // Change Connect -> HOME pour commencer par la page d'accueil
+
+    if (SoundManager::getInstance().isInitialized() && !m_menuMusicPlaying) {
+        SoundManager::getInstance().playMusic("menuMusic", -1, 800); // loop infini, fade in 800ms
+        m_menuMusicPlaying = true;
+    }
 }
 
 void Game::run()
@@ -262,13 +294,28 @@ void Game::runMenuLoop()
 
 void Game::runGameLoop(float deltaTime)
 {
+    if (m_menuMusicPlaying) {
+        if (SoundManager::getInstance().isInitialized()) {
+            SoundManager::getInstance().stopMusic(500); // fade out 500ms
+        }
+        m_menuMusicPlaying = false;
+    }
+
     bool hasParallax = false;
     for (auto [entity] : _registry.view<ParallaxState>()) {
         hasParallax = true;
         break;
     }
     if (!hasParallax) {
-        _registry.emplace<ParallaxState>(_registry.create_entity(), ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
+        // Initialize parallax state with offsets and texture IDs from current level (IDs, not paths)
+        _registry.emplace<ParallaxState>(
+            _registry.create_entity(),
+            ParallaxState { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                m_currentLevelData.getParallaxSkyId(),
+                m_currentLevelData.getParallaxDownLayerId(),
+                m_currentLevelData.getParallaxMiddleLayerId(),
+                m_currentLevelData.getParallaxLightId(),
+                m_currentLevelData.getParallaxTopLayerId() });
     }
 
     update(deltaTime);

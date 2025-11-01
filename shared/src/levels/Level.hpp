@@ -82,6 +82,13 @@ private:
     float _bossPosXFactor = 0.75f;
     float _bossPosYFactor = 0.0f;
 
+    // Parallax background texture IDs (not paths)
+    std::string _parallaxDownLayerId = "DownLayer.png";
+    std::string _parallaxMiddleLayerId = "MiddleLayer.png";
+    std::string _parallaxTopLayerId = "TopLayer.png";
+    std::string _parallaxSkyId = "Sky.png";
+    std::string _parallaxLightId = "Light.png";
+
 public:
     /**
      * @brief Constructs a Level instance
@@ -159,4 +166,11 @@ public:
     float getBossSizeFactor() const { return _bossSizeFactor; }
     float getBossPosXFactor() const { return _bossPosXFactor; }
     float getBossPosYFactor() const { return _bossPosYFactor; }
+
+    // Parallax getters (IDs)
+    const std::string& getParallaxDownLayerId() const { return _parallaxDownLayerId; }
+    const std::string& getParallaxMiddleLayerId() const { return _parallaxMiddleLayerId; }
+    const std::string& getParallaxTopLayerId() const { return _parallaxTopLayerId; }
+    const std::string& getParallaxSkyId() const { return _parallaxSkyId; }
+    const std::string& getParallaxLightId() const { return _parallaxLightId; }
 };

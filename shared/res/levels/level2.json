@@ -1,4 +1,11 @@
 {
+  "parallax_background": {
+    "down_layer": "DownLayer.png",
+    "middle_layer": "MiddleLayer.png",
+    "top_layer": "TopLayer.png",
+    "sky": "Sky.png",
+    "light": "Light.png"
+  },
   "platform": {
     "layers": 8,
     "topMargin": 80.0,
@@ -8,12 +15,12 @@
     "crossDistX": 180.0,
     "maxDiffY": 110.0,
     "reachableX": 200.0,
-    "velocityX": -0.0,
+    "velocityX": -50.0,
     "velocityY": 0.0,
-    "sprite_path": "HeadsPlatform.png",
-    "width": 128.0,
-    "height": 30.0,
-    "size_factor": 1.0
+    "sprite_path": "platformFoetus.png",
+    "width": 298.0,
+    "height": 95.0,
+    "size_factor": 0.7
   },
   "enemy": {
     "velocityX": -60.0,
@@ -58,7 +65,7 @@
     "shootFrequency": 0.5,
     "spawnEnemyFrequency": 3.0,
     "projectileSpeed": -800.0,
-    "projectileDamage": 0,
+    "projectileDamage": 25,
     "projectileWidth": 100.0,
     "projectileHeight": 100.0
   }

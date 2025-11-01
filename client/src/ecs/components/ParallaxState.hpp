@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include <string>
 
 /**
  * @brief Component that stores the current scroll offsets for parallax background layers
@@ -22,4 +23,10 @@ struct ParallaxState {
     float middleLayerOffset; // Middle layer scroll offset
     float lightOffset; // Light layer scroll offset
     float topLayerOffset; // Top layer scroll offset
+    // Texture IDs (ResourceManager keys) to use for each layer
+    std::string skyId;
+    std::string downLayerId;
+    std::string middleLayerId;
+    std::string lightId;
+    std::string topLayerId;
 };

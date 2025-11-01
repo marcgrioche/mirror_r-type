@@ -360,11 +360,11 @@ void GraphicsManager::windowToLogical(int windowX, int windowY, int& logicalX, i
     if (MAINTAIN_ASPECT_RATIO) {
         // SDL uses the smaller scale to maintain aspect ratio
         scale = (scaleX < scaleY) ? scaleX : scaleY;
-        
+
         // Calculate viewport (the actual rendering area)
         viewportWidth = static_cast<int>(logicalWidth * scale);
         viewportHeight = static_cast<int>(logicalHeight * scale);
-        
+
         // Calculate letterbox/pillarbox offsets
         viewportX = (windowWidth - viewportWidth) / 2;
         viewportY = (windowHeight - viewportHeight) / 2;
@@ -382,8 +382,12 @@ void GraphicsManager::windowToLogical(int windowX, int windowY, int& logicalX, i
     logicalY = static_cast<int>(adjustedY / scale);
 
     // Clamp to logical bounds (in case mouse is outside viewport)
-    if (logicalX < 0) logicalX = 0;
-    if (logicalY < 0) logicalY = 0;
-    if (logicalX >= logicalWidth) logicalX = logicalWidth - 1;
-    if (logicalY >= logicalHeight) logicalY = logicalHeight - 1;
+    if (logicalX < 0)
+        logicalX = 0;
+    if (logicalY < 0)
+        logicalY = 0;
+    if (logicalX >= logicalWidth)
+        logicalX = logicalWidth - 1;
+    if (logicalY >= logicalHeight)
+        logicalY = logicalHeight - 1;
 }

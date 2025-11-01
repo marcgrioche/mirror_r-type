@@ -18,11 +18,13 @@ CPMAddPackage(
     OPTIONS
         "SDL2_DISABLE_INSTALL ON"
         "SDL2_DISABLE_UNINSTALL ON"
+        "SDL_SHARED ON"
+        "SDL_STATIC OFF" 
 
-        "SDL_ALSA OFF"
-        "SDL_PULSEAUDIO OFF"
+        "SDL_ALSA ON"
+        "SDL_PULSEAUDIO ON"
         "SDL_JACK OFF"
-        "SDL_PIPEWIRE OFF"
+        "SDL_PIPEWIRE ON"
         "SDL_SNDIO OFF"
         "SDL_ESD OFF"
         "SDL_ARTS OFF"
@@ -154,14 +156,14 @@ endif()
 add_custom_command(TARGET r-type_client POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/res"
-    "${CMAKE_BINARY_DIR}/res"
+    "$<TARGET_FILE_DIR:r-type_client>/res"
 )
 
 # Copy shared resources to build directory
 add_custom_command(TARGET r-type_client POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/../shared/res"
-    "${CMAKE_BINARY_DIR}/shared/res"
+    "$<TARGET_FILE_DIR:r-type_client>/shared/res"
 )
 
 set_target_properties(r-type_client PROPERTIES

@@ -8,7 +8,7 @@
     "crossDistX": 180.0,
     "maxDiffY": 110.0,
     "reachableX": 200.0,
-    "velocityX": -0.0,
+    "velocityX": -50.0,
     "velocityY": 0.0,
     "sprite_path": "HeadsPlatform.png",
     "width": 128.0,
@@ -58,7 +58,7 @@
     "shootFrequency": 0.5,
     "spawnEnemyFrequency": 3.0,
     "projectileSpeed": -800.0,
-    "projectileDamage": 0,
+    "projectileDamage": 25,
     "projectileWidth": 100.0,
     "projectileHeight": 100.0
   }
