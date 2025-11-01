@@ -105,6 +105,16 @@ void Level::loadFromJson(const std::string& filepath)
             _bossPosXFactor = boss.value("posX_factor", _bossPosXFactor);
             _bossPosYFactor = boss.value("posY_factor", _bossPosYFactor);
         }
+
+        // Optional parallax background texture IDs
+        if (config.contains("parallax_background")) {
+            auto& bg = config["parallax_background"];
+            _parallaxDownLayerId = bg.value("down_layer", _parallaxDownLayerId);
+            _parallaxMiddleLayerId = bg.value("middle_layer", _parallaxMiddleLayerId);
+            _parallaxTopLayerId = bg.value("top_layer", _parallaxTopLayerId);
+            _parallaxSkyId = bg.value("sky", _parallaxSkyId);
+            _parallaxLightId = bg.value("light", _parallaxLightId);
+        }
     } catch (const std::exception& e) {
         std::cerr << "Error loading level configuration: " << e.what() << std::endl;
     }

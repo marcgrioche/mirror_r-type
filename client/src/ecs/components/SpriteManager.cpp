@@ -150,18 +150,22 @@ void SpriteManager::addPlatformSprite(Registry& registry, Entity entity, float p
         return;
     }
 
+    if (sizeFactor < 1.0)
+        sizeFactor = 1.0;
+
     Hitbox& hitbox = registry.get<Hitbox>(entity);
 
-    const float SPRITE_WIDTH = level ? level->getPlatformWidth() : 1.0;
-    const float SPRITE_HEIGHT = level ? level->getPlatformHeight() : 1.0;
-
+    float SPRITE_WIDTH = level ? level->getPlatformWidth() : 1.0;
+    float SPRITE_HEIGHT = level ? level->getPlatformHeight() : 1.0;
+    
     float scale_x = (hitbox.width * sizeFactor) / SPRITE_WIDTH;
     float scale_y = (hitbox.height * sizeFactor) / SPRITE_HEIGHT;
 
     float rendered_width = SPRITE_WIDTH * scale_x;
     float rendered_height = SPRITE_HEIGHT * scale_y;
     float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
-    float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+    float offset_y = 0;
+    // float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
 
     Sprite sprite = SpriteFactory::createStaticSprite(
         level ? level->getPlatformSpritePath() : "",

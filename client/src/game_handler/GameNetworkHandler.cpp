@@ -6,6 +6,7 @@
 */
 
 #include "Game.hpp"
+#include "ecs/components/ParallaxState.hpp"
 #include <iostream>
 
 void Game::processNetworkEvents()
@@ -159,6 +160,18 @@ void Game::handleGameEndWin()
     std::string levelPath = "shared/res/levels/level" + std::to_string(m_currentLevel) + ".json";
     m_currentLevelData.loadFromJson(levelPath);
 
+    // Update parallax background IDs from new level
+    auto pView = _registry.view<ParallaxState>();
+    if (pView.begin() != pView.end()) {
+        Entity e = pView.begin().entity();
+        auto& ps = _registry.get<ParallaxState>(e);
+        ps.skyId = m_currentLevelData.getParallaxSkyId();
+        ps.downLayerId = m_currentLevelData.getParallaxDownLayerId();
+        ps.middleLayerId = m_currentLevelData.getParallaxMiddleLayerId();
+        ps.lightId = m_currentLevelData.getParallaxLightId();
+        ps.topLayerId = m_currentLevelData.getParallaxTopLayerId();
+    }
+
     clearGameEntities();
     // Utilise la méthode de navigation correcte
     if (m_menu.isActive()) {
@@ -182,6 +195,18 @@ void Game::handleGameEndLose()
     // Reload level 1 data
     std::string levelPath = "shared/res/levels/level1.json";
     m_currentLevelData.loadFromJson(levelPath);
+
+    // Update parallax background IDs from level 1
+    auto pView2 = _registry.view<ParallaxState>();
+    if (pView2.begin() != pView2.end()) {
+        Entity e = pView2.begin().entity();
+        auto& ps = _registry.get<ParallaxState>(e);
+        ps.skyId = m_currentLevelData.getParallaxSkyId();
+        ps.downLayerId = m_currentLevelData.getParallaxDownLayerId();
+        ps.middleLayerId = m_currentLevelData.getParallaxMiddleLayerId();
+        ps.lightId = m_currentLevelData.getParallaxLightId();
+        ps.topLayerId = m_currentLevelData.getParallaxTopLayerId();
+    }
 
     clearGameEntities();
     // Utilise la méthode de navigation correcte

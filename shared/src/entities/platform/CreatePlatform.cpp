@@ -5,8 +5,16 @@
 
 Entity factories::createOneWayPlatform(Registry& registry, float posx, float posy, float velx, float vely, const Level* level)
 {
-    float width = level ? level->getPlatformWidth() : 100.0;
-    float height = level ? level->getPlatformHeight() : 100.0;
+    // If a level is provided, apply the level's size_factor to the platform hitbox
+    float width = level ? (level->getPlatformWidth() * level->getPlatformSizeFactor()) : 100.0;
+    float height = level ? (level->getPlatformHeight() * level->getPlatformSizeFactor()) : 100.0;
+
+    std::cout << "[CREATE PLATFORM] sizefactor = " << level->getPlatformSizeFactor() << std::endl;
+    if (level->getPlatformSizeFactor() < 1.0) {
+        std::cout << "[CREATE PLATFORM 2222] sizefactor = " << level->getPlatformSizeFactor() << std::endl;
+        width *= level->getPlatformSizeFactor();
+        height *= level->getPlatformSizeFactor();
+    }
 
     Entity platform = registry.create_entity();
     registry.emplace<Position>(platform, Position { posx, posy });
@@ -50,7 +58,8 @@ Entity factories::createOneWayPlatform(Registry& registry, float posx, float pos
 
 Entity factories::createPlatform(Registry& registry, float posx, float posy, float velx, float vely, const Level* level)
 {
-    float width = level ? level->getPlatformWidth() : 100.0;
+    // Apply size_factor from level to ensure hitbox matches visual sprite when size_factor != 1
+    float width = level ? level->getPlatformWidth(): 100.0;
     float height = level ? level->getPlatformHeight() : 100.0;
 
     Entity platform = registry.create_entity();
@@ -111,7 +120,7 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
     const int edgeQuota = std::max(1, quantity / 3); // limiter empilement extrême haut/bas
 
     placed.push_back({ 0.0f, SCREEN_HEIGHT / 2 });
-    platformsEntities.push_back(createOneWayPlatform(registry, 0.0f, SCREEN_HEIGHT / 2, PLATFORM_VEL_X, PLATFORM_VEL_Y, platformWidth, platformHeight));
+    platformsEntities.push_back(createOneWayPlatform(registry, 0.0f, SCREEN_HEIGHT / 2, PLATFORM_VEL_X, PLATFORM_VEL_Y, level));
 
     for (int i = 0; i < quantity; ++i) {
         float x = 0.f, y = 0.f;
@@ -165,7 +174,7 @@ std::vector<Entity> factories::generateRandomPlatforms(Registry& registry, int q
         }
 
         placed.push_back({ x, y });
-        platformsEntities.push_back(createOneWayPlatform(registry, x, y, PLATFORM_VEL_X, PLATFORM_VEL_Y, platformWidth, platformHeight));
+        platformsEntities.push_back(createOneWayPlatform(registry, x, y, PLATFORM_VEL_X, PLATFORM_VEL_Y, level));
     }
 
     return platformsEntities;
@@ -271,7 +280,7 @@ std::vector<Entity> factories::reGenerateRandomPlatforms(Registry& registry, int
         }
 
         placed.push_back({ x, y });
-        platformsEntities.push_back(createOneWayPlatform(registry, x, y, PLATFORM_VEL_X, PLATFORM_VEL_Y, platformWidth, platformHeight));
+        platformsEntities.push_back(createOneWayPlatform(registry, x, y, PLATFORM_VEL_X, PLATFORM_VEL_Y, level));
     }
     return platformsEntities;
 }
