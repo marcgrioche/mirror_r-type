@@ -12,6 +12,7 @@
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "managers/ConfigManager.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
 #include <iostream>
 
 ParameterMenu::ParameterMenu()
@@ -56,17 +57,29 @@ void ParameterMenu::createEntities(Registry& registry)
     rebuildTextEntities(registry);
 
     // auto-shoot toggle button
-    m_autoShootButtonEntity = factories::createButton(registry, 120.0f, 450.0f, 100.0f, 40.0f, "auto_shoot_toggle", true);
-    m_autoShootTextEntity = factories::createTextBox(registry, m_autoShoot ? "AUTO ON" : "AUTO OFF", 170.0f, 465.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    m_autoShootTextEntity = factories::createTextBox(registry, m_autoShoot ? "AUTO ON" : "AUTO OFF", 170.0f, 465.0f, 24, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    const auto autoShootTextBoxDimensions = getTextBoxDimensions(registry, m_autoShootTextEntity);
+    m_autoShootButtonEntity = factories::createButton(registry,
+        getXOffset(autoShootTextBoxDimensions, 160.0f),
+        getYOffset(autoShootTextBoxDimensions, 50.0f),
+        160.0f, 50.0f, "auto_shoot_toggle", true);
 
     // colorblind toggle button
-    m_colorblindButtonEntity = factories::createButton(registry, 120.0f, 500.0f, 100.0f, 40.0f, "colorblind_toggle", true);
     std::string colorblindDisplay = m_colorblindType.empty() ? "NONE" : m_colorblindType;
-    m_colorblindTextEntity = factories::createTextBox(registry, colorblindDisplay, 170.0f, 515.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    m_colorblindTextEntity = factories::createTextBox(registry, colorblindDisplay, 190.0f, 525.0f, 24, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    const auto colorblindTextBoxDimensions = getTextBoxDimensions(registry, m_colorblindTextEntity);
+    m_colorblindButtonEntity = factories::createButton(registry,
+        getXOffset(colorblindTextBoxDimensions, 160.f),
+        getYOffset(colorblindTextBoxDimensions, 50.f),
+        160.0f, 50.0f, "colorblind_toggle", true);
 
     // return button
-    m_returnButtonEntity = factories::createButton(registry, 320.0f, 570.0f, 160.0f, 50.0f, "return_to_home", true);
-    m_returnTextEntity = factories::createTextBox(registry, "RETURN", 360.0f, 585.0f, 16, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    m_returnTextEntity = factories::createTextBox(registry, "RETURN", 360.0f, 585.0f, 24, Color { 255, 255, 255, 255 }, ::TextBox::Alignment::LEFT);
+    const auto returnTextBoxDimensions = getTextBoxDimensions(registry, m_returnTextEntity);
+    m_returnButtonEntity = factories::createButton(registry,
+        getXOffset(returnTextBoxDimensions, 160.f),
+        getYOffset(returnTextBoxDimensions, 50.f),
+        160.0f, 50.0f, "return_to_home", true);
 }
 
 void ParameterMenu::destroyEntities(Registry& registry)

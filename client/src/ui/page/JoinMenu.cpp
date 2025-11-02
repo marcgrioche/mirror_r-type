@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "entities/Sprite/CreateAnimateSprite.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
 
 JoinMenu::JoinMenu()
 {
@@ -59,29 +60,32 @@ void JoinMenu::createEntities(Registry& registry)
         400, 400, 500, 500);
 
     // Bouton Connect
-    m_entities["connect_to_lobby_btn"] = factories::createButton(registry,
-        WINDOW_WIDTH / 2.f - 630.0f,
-        WINDOW_HEIGHT / 2.f - 50.0f, 380.0f, 120.0f,
-        "connect_to_lobby", true, "ButtonMouth", 500, 500, 1200, 1080);
     m_entities["connect_textbox"] = factories::createTextBox(registry,
         "CONNECT",
         WINDOW_WIDTH / 2.f - 500.f,
         WINDOW_HEIGHT / 2.f + 180.0f,
         30,
         { 255, 0, 0, 0 });
+    const auto connectTextBoxDimensions = getTextBoxDimensions(registry, m_entities["connect_textbox"]);
+    m_entities["connect_to_lobby_btn"] = factories::createButton(registry,
+        getXOffset(connectTextBoxDimensions, 500.f),
+        getYOffset(connectTextBoxDimensions, 500.f),
+        380.0f, 120.0f,
+        "connect_to_lobby", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     // Bouton Return
-    m_entities["return_to_home_btn"] = factories::createButton(registry,
-        WINDOW_WIDTH / 2.f + 100.0f,
-        WINDOW_HEIGHT / 2 - 50.0f,
-        380.0f, 120.0f,
-        "return_to_home", true, "ButtonMouth", 500, 500, 1200, 1080);
     m_entities["return_texbox"] = factories::createTextBox(registry,
         "RETURN",
         WINDOW_WIDTH / 2.f + 230.f,
         WINDOW_HEIGHT / 2.f + 180.0f,
         30,
         { 255, 0, 0, 0 });
+    const auto returnTextBoxDimensions = getTextBoxDimensions(registry, m_entities["return_texbox"]);
+    m_entities["return_to_home_btn"] = factories::createButton(registry,
+        getXOffset(returnTextBoxDimensions, 500.f),
+        getYOffset(returnTextBoxDimensions, 500.f),
+        380.0f, 120.0f,
+        "return_to_home", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
         0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
