@@ -1,8 +1,8 @@
 #include "Position.hpp"
-#include "SDL2/SDL_ttf.h"
 #include "TextBox.hpp"
 #include "TextBoxDimensions.hpp"
 #include "managers/ResourceManager.hpp"
+#include <SDL_ttf.h>
 
 SDL_Rect getTextBoxDimensions(Registry& registry, const Entity& entity)
 {
