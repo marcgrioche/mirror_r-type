@@ -17,10 +17,14 @@ void LoginMenu::createEntities(Registry& registry)
 {
     // TextBoxInput for the username
     m_entities["username_input"] = factories::createTextBoxInput(registry,
-        "Enter your username...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 300, 30, { 255, 0, 0, 0 });
+        "Enter your username...", WINDOW_WIDTH / 2 - 500, WINDOW_HEIGHT / 2 - 250, 30, { 255, 0, 0, 0 });
+    m_entities["username_input_bg"] = factories::createSprite(registry, "zoneText",
+        WINDOW_WIDTH / 2 - 520, WINDOW_HEIGHT / 2 - 450, 400, 400, 500, 500);
+    // TextBoxInput for the password
     m_entities["password_input"] = factories::createTextBoxInput(registry,
-        "Enter your password...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 100, 30, { 255, 0, 0, 0 });
-
+        "Enter your password...", WINDOW_WIDTH / 2 + 20, WINDOW_HEIGHT / 2 - 250, 30, { 255, 0, 0, 0 });
+    m_entities["password_input_bg"] = factories::createSprite(registry, "zoneText",
+        WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 450, 400, 400, 500, 500);
     // Button login
     m_entities["login_button"] = factories::createButton(registry,
         WINDOW_WIDTH / 2 - 250, WINDOW_HEIGHT / 2 - 50, 380.0f, 120.0f, "login", true, "ButtonMouth", 500, 500, 1200, 1080);
@@ -81,6 +85,8 @@ void LoginMenu::render(GraphicsManager& gfx, Registry& registry)
         return;
 
     m_bg.draw(gfx, registry);
+    drawSprite(gfx, registry, m_entities["username_input_bg"]);
+    drawSprite(gfx, registry, m_entities["password_input_bg"]);
     drawTextBoxInput(gfx, registry, m_entities["username_input"]);
     drawTextBoxInput(gfx, registry, m_entities["password_input"]);
     drawButton(gfx, registry, m_entities["login_button"]);

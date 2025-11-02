@@ -53,7 +53,7 @@ void ConnectionMenu::createEntities(Registry& registry)
         "Enter connection code...", WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 300, 30, { 255, 0, 0, 0 });
 
     m_textBoxSpriteEntity = factories::createSprite(registry, "zoneText",
-        WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 500, 400, 400, 500, 500);
+        WINDOW_WIDTH / 2 - 220, WINDOW_HEIGHT / 2 - 500, 400, 400, 500, 500);
 
     // Bouton Connect
     m_connectButtonEntity = factories::createButton(registry,
