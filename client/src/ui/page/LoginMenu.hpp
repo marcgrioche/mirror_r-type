@@ -11,6 +11,13 @@ public:
     void resetOtherOptions() override { m_loginRequested = false; };
     void clearRequests() override;
     bool hasRequest() const override;
+
+    /**
+     * @brief Retrieves the input text for a given input reference
+     * @param registry The ECS registry to use for entity management
+     * @param inputRef The reference identifier for the input field
+     * @return The input text as a string
+     */
     std::string getInputText(Registry& registry, const std::string& inputRef);
     std::string getInputData(Registry& registry, Input input) override;
 
