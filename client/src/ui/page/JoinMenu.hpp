@@ -45,11 +45,8 @@ public:
     void clearConnectionRequest();
 
 private:
-    Entity m_textBoxEntity;
-    Entity m_connectButtonEntity;
-    Entity m_textBoxConnectEntity;
-    Entity m_returnButtonEntity;
     Entity m_backgroundEntity;
+    std::unordered_map<std::string, Entity> m_entities;
     bool m_visible = false;
     bool m_connectionRequested = false;
     bool m_returnRequested = false;

@@ -18,6 +18,9 @@
 #include "render/SpriteRender.hpp"
 #include <iostream>
 
+#include "entities/Sprite/CreateAnimateSprite.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
+
 JoinMenu::JoinMenu()
 {
     setupEventHandlers();
@@ -45,18 +48,44 @@ void JoinMenu::hide(Registry& registry)
 void JoinMenu::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
-    m_textBoxEntity = factories::createTextBoxInput(registry,
-        "Enter Lobby code...", 300.0f, 250.0f, 16, { 255, 255, 255, 255 });
+    m_entities["lobby_code_input"] = factories::createTextBoxInput(registry,
+        "Enter Lobby code...",
+        WINDOW_WIDTH / 2.f - 200.0f,
+        WINDOW_HEIGHT / 2.f - 300.0f,
+        30,
+        { 255, 255, 255, 255 });
+    m_entities["lobby_code_input_bg"] = factories::createSprite(registry, "zoneText",
+        WINDOW_WIDTH / 2.f - 220.0f,
+        WINDOW_HEIGHT / 2.f - 500.0f,
+        400, 400, 500, 500);
 
     // Bouton Connect
-    m_connectButtonEntity = factories::createButton(registry,
-        320.0f, 320.0f, 160.0f, 50.0f, "connect_to_lobby", true);
+    m_entities["connect_textbox"] = factories::createTextBox(registry,
+        "CONNECT",
+        WINDOW_WIDTH / 2.f - 500.f,
+        WINDOW_HEIGHT / 2.f + 180.0f,
+        30,
+        { 255, 0, 0, 0 });
+    const auto connectTextBoxDimensions = getTextBoxDimensions(registry, m_entities["connect_textbox"]);
+    m_entities["connect_to_lobby_btn"] = factories::createButton(registry,
+        getXOffset(connectTextBoxDimensions, 500.f),
+        getYOffset(connectTextBoxDimensions, 500.f),
+        380.0f, 120.0f,
+        "connect_to_lobby", true, "ButtonMouth", 500, 500, 1200, 1080);
 
-    m_returnButtonEntity = factories::createButton(registry,
-        320.0f, 380.0f, 160.0f, 50.0f, "return_to_home", true);
-
-    m_textBoxConnectEntity = factories::createTextBox(registry,
-        "CONNECT", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+    // Bouton Return
+    m_entities["return_texbox"] = factories::createTextBox(registry,
+        "RETURN",
+        WINDOW_WIDTH / 2.f + 230.f,
+        WINDOW_HEIGHT / 2.f + 180.0f,
+        30,
+        { 255, 0, 0, 0 });
+    const auto returnTextBoxDimensions = getTextBoxDimensions(registry, m_entities["return_texbox"]);
+    m_entities["return_to_home_btn"] = factories::createButton(registry,
+        getXOffset(returnTextBoxDimensions, 500.f),
+        getYOffset(returnTextBoxDimensions, 500.f),
+        380.0f, 120.0f,
+        "return_to_home", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
         0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
@@ -74,10 +103,9 @@ void JoinMenu::createEntities(Registry& registry)
 
 void JoinMenu::destroyEntities(Registry& registry)
 {
-    registry.kill_entity(m_textBoxEntity);
-    registry.kill_entity(m_connectButtonEntity);
-    registry.kill_entity(m_textBoxConnectEntity);
-    registry.kill_entity(m_returnButtonEntity);
+    for (const auto& pair : m_entities) {
+        registry.kill_entity(pair.second);
+    }
     registry.kill_entity(m_backgroundEntity);
 }
 
@@ -135,19 +163,28 @@ void JoinMenu::render(GraphicsManager& gfx, Registry& registry)
 
     // Rendu des composants
     drawSprite(gfx, registry, m_backgroundEntity);
-    drawTextBoxInput(gfx, registry, m_textBoxEntity);
-    drawButton(gfx, registry, m_connectButtonEntity);
-    drawTextBox(gfx, registry, m_textBoxConnectEntity);
-    drawButton(gfx, registry, m_returnButtonEntity);
+    drawSprite(gfx, registry, m_entities["lobby_code_input_bg"]);
+    drawTextBoxInput(gfx, registry, m_entities["lobby_code_input"]);
+    drawButton(gfx, registry, m_entities["connect_to_lobby_btn"]);
+    drawTextBox(gfx, registry, m_entities["connect_textbox"]);
+    drawButton(gfx, registry, m_entities["return_to_home_btn"]);
+    drawTextBox(gfx, registry, m_entities["return_texbox"]);
 }
 
 std::string JoinMenu::getConnectionCode(Registry& registry) const
 {
-    if (!m_visible || !registry.has<TextBoxInput>(m_textBoxEntity)) {
+    if (!m_visible)
         return "";
-    }
 
-    const auto& input = registry.get<TextBoxInput>(m_textBoxEntity);
+    auto it = m_entities.find("lobby_code_input");
+    if (it == m_entities.end())
+        return "";
+
+    const Entity lobbyEntity = it->second;
+    if (!registry.has<TextBoxInput>(lobbyEntity))
+        return "";
+
+    const auto& input = registry.get<TextBoxInput>(lobbyEntity);
     return input.inputText;
 }
 

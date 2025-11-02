@@ -16,6 +16,7 @@
 #include "entities/textbox/TextBox.hpp"
 #include "entities/textbox/TextBoxInput.hpp"
 #include "render/SpriteRender.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
 #include <iostream>
 
 EndMenuPage::EndMenuPage()
@@ -53,13 +54,19 @@ void EndMenuPage::createEntities(Registry& registry)
 {
     // TextBoxInput pour le code de connexion
     m_textBoxStateEntity = factories::createTextBox(registry,
-        m_state, 320.0f, 250.0f, 16, { 255, 255, 255, 255 });
-
-    m_returnButtonEntity = factories::createButton(registry,
-        320.0f, 320.0f, 160.0f, 50.0f, "return_to_lobby", true);
+        m_state,
+        WINDOW_WIDTH / 2.f - 177.0f,
+        WINDOW_HEIGHT / 2.f - 350.0f, 180, { 255, 255, 255, 255 });
 
     m_textBoxReturnEntity = factories::createTextBox(registry,
-        "RETURN", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+        "RETURN", WINDOW_WIDTH / 2.f - 48.0f, WINDOW_HEIGHT / 2.f + 120.0f, 24, { 255, 0, 0, 0 });
+    const auto returnTextBoxDimensions = getTextBoxDimensions(registry, m_textBoxReturnEntity);
+    m_returnButtonEntity = factories::createButton(registry,
+        getXOffset(returnTextBoxDimensions, 160.f),
+        getYOffset(returnTextBoxDimensions, 50.f),
+        160.0f, 50.0f, "return_to_lobby", true);
+
+    // Center the return text box on the button
 
     Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
         0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);

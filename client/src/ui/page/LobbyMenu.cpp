@@ -15,6 +15,7 @@
 #include "entities/button/CreateButton.hpp"
 #include "entities/textbox/TextBox.hpp"
 #include "render/SpriteRender.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
 #include <iostream>
 
 LobbyMenu::LobbyMenu()
@@ -64,18 +65,26 @@ void LobbyMenu::createEntities(Registry& registry, int lobbyId)
     // m_textBoxEntity = factories::createTextBoxInput(registry,
     //     "Enter Lobby code...", 300.0f, 250.0f, 16, { 255, 255, 255, 255 });
 
-    // Bouton Connect
-    m_connectButtonEntity = factories::createButton(registry,
-        320.0f, 320.0f, 160.0f, 50.0f, "connect_to_server", true);
-
+    // Return button
+    m_returnTextBoxEntity = factories::createTextBox(registry,
+        "RETURN", WINDOW_WIDTH / 2.f - 53.0f, WINDOW_HEIGHT / 2.f + 220.0f, 24, { 255, 0, 0, 0 });
+    const auto returnTextBoxDimensions = getTextBoxDimensions(registry, m_returnTextBoxEntity);
     m_returnButtonEntity = factories::createButton(registry,
-        320.0f, 380.0f, 160.0f, 50.0f, "return_to_home", true);
+        getXOffset(returnTextBoxDimensions, 160.f),
+        getYOffset(returnTextBoxDimensions, 50.f),
+        160.0f, 50.0f, "return_to_home", true);
 
+    // Bouton Connect
     m_connectTextBoxEntity = factories::createTextBox(registry,
-        "READY", 320.0f, 320.0f, 16, { 255, 0, 0, 0 });
+        "READY", WINDOW_WIDTH / 2.f - 48.0f, WINDOW_HEIGHT / 2.f + 120.0f, 24, { 255, 0, 0, 0 });
+    const auto readyTextBoxDimensions = getTextBoxDimensions(registry, m_connectTextBoxEntity);
+    m_connectButtonEntity = factories::createButton(registry,
+        getXOffset(readyTextBoxDimensions, 160.f),
+        getYOffset(readyTextBoxDimensions, 50.f),
+        160.0f, 50.0f, "connect_to_server", true);
 
     m_textBoxLobbyEntity = factories::createTextBox(registry,
-        std::to_string(lobbyId), 320.0f, 220.0f, 16, { 255, 255, 255, 255 });
+        "Lobby Number - " + std::to_string(lobbyId), 50.0f, 50.0f, 32, { 255, 255, 255, 255 });
 
     Sprite bg = SpriteFactory::createStaticSprite("MenuBackground",
         0, 0, 2480, 2486, 1.0f, 1.0f, 0, 0);
@@ -96,6 +105,7 @@ void LobbyMenu::destroyEntities(Registry& registry)
     // registry.kill_entity(m_textBoxEntity);
     registry.kill_entity(m_connectButtonEntity);
     registry.kill_entity(m_returnButtonEntity);
+    registry.kill_entity(m_returnTextBoxEntity);
     registry.kill_entity(m_connectTextBoxEntity);
     registry.kill_entity(m_textBoxLobbyEntity);
     registry.kill_entity(m_backgroundEntity);
@@ -167,6 +177,7 @@ void LobbyMenu::render(GraphicsManager& gfx, Registry& registry)
     drawButton(gfx, registry, m_connectButtonEntity);
     drawTextBox(gfx, registry, m_connectTextBoxEntity);
     drawButton(gfx, registry, m_returnButtonEntity);
+    drawTextBox(gfx, registry, m_returnTextBoxEntity);
     drawTextBox(gfx, registry, m_textBoxLobbyEntity);
 
     // Draw player names
@@ -263,8 +274,8 @@ void LobbyMenu::updatePlayerEntities(Registry& registry)
             displayText += " - " + std::to_string(scoreIt->second) + " XP";
         }
         std::cout << "  Creating text for Player " << pair.first << ": '" << displayText << "' at y=" << y << std::endl;
-        Entity textEntity = factories::createTextBox(registry, displayText, 50.0f, y, 16, { 255, 255, 255, 255 });
+        Entity textEntity = factories::createTextBox(registry, displayText, 50.0f, y, 32, { 255, 255, 255, 255 });
         m_playerTextEntities.push_back(textEntity);
-        y += 30.0f;
+        y += 50.0f;
     }
 }

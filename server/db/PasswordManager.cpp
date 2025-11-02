@@ -34,9 +34,6 @@ bool PasswordManager::verifyPassword(const std::string& t_hashedPassword,
 {
     if (m_status < 0)
         return false;
-    std::cout << "Verification in progress..." << std::endl;
-    std::cout << "Attempt: " << t_passwordAttempt << std::endl;
-    std::cout << "Real: " << t_hashedPassword << std::endl;
     return crypto_pwhash_str_verify(
                t_hashedPassword.c_str(),
                t_passwordAttempt.c_str(),
