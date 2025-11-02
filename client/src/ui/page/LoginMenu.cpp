@@ -7,6 +7,7 @@
 #include "managers/EventManager.hpp"
 #include "render/ButtonRender.hpp"
 #include "render/TextBoxInputRender.hpp"
+#include "ui/utilities/TextBoxDimensions.hpp"
 
 LoginMenu::LoginMenu()
 {
@@ -26,10 +27,13 @@ void LoginMenu::createEntities(Registry& registry)
     m_entities["password_input_bg"] = factories::createSprite(registry, "zoneText",
         WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 450, 400, 400, 500, 500);
     // Button login
-    m_entities["login_button"] = factories::createButton(registry,
-        WINDOW_WIDTH / 2 - 250, WINDOW_HEIGHT / 2 - 50, 380.0f, 120.0f, "login", true, "ButtonMouth", 500, 500, 1200, 1080);
     m_entities["login_textbox"] = factories::createTextBox(registry, "LOGIN",
         WINDOW_WIDTH / 2 - 120, WINDOW_HEIGHT / 2 + 180, 50, { 255, 00, 00, 00 }, TextBox::Alignment::CENTER);
+    const auto loginTextBoxDimensions = getTextBoxDimensions(registry, m_entities["login_textbox"]);
+    m_entities["login_button"] = factories::createButton(registry,
+        getXOffset(loginTextBoxDimensions, 500.f),
+        getYOffset(loginTextBoxDimensions, 500.f),
+        380.0f, 120.0f, "login", true, "ButtonMouth", 500, 500, 1200, 1080);
 
     m_bg.reload(registry, 75, { m_entities["login_button"] });
 }

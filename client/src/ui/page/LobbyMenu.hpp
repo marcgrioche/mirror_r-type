@@ -135,6 +135,7 @@ private:
     Entity m_connectButtonEntity;
     Entity m_connectTextBoxEntity;
     Entity m_returnButtonEntity;
+    Entity m_returnTextBoxEntity;
     Entity m_textBoxLobbyEntity;
     Entity m_backgroundEntity;
     std::vector<Entity> m_playerTextEntities;
