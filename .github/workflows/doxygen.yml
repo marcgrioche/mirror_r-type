@@ -1,5 +1,8 @@
 name: Doxygen Documentation
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
