@@ -1,0 +1,27 @@
+var classGameInstance =
+[
+    [ "GameInstance", "classGameInstance.html#a5841054aac722d8020139a923ac6e93b", null ],
+    [ "~GameInstance", "classGameInstance.html#a47f32c297f7005e70dfe541c978c750a", null ],
+    [ "addPlayer", "classGameInstance.html#ab639ad00c3ba623366216f204fc5fc85", null ],
+    [ "deserializeGameState", "classGameInstance.html#ae639a95ce39679a39ee3ec5060ecc554", null ],
+    [ "findPlayerIdByEntity", "classGameInstance.html#af94d76593a7c2071b99c474223225d0b", null ],
+    [ "getAndClearKilledEntities", "classGameInstance.html#a1dba005d2d05f748d48ee77f82344a3b", null ],
+    [ "getAndClearNewEntities", "classGameInstance.html#a1cef559ddc193b608a31b2085abedca0", null ],
+    [ "getCurrentTick", "classGameInstance.html#af151694a254db160e81f643933c6922e", null ],
+    [ "getLobbyId", "classGameInstance.html#aa8598a6c78e6cd7ccfc519c549fcdc43", null ],
+    [ "getPlayerEntityIdById", "classGameInstance.html#ac27bc5d2dda6f114ce25094329606efa", null ],
+    [ "getRegistry", "classGameInstance.html#a19ffb4ee21b6c057db8b866f5eb497fc", null ],
+    [ "getRegistry", "classGameInstance.html#a6ca66507f58465c87a0adc5191c7d9c0", null ],
+    [ "hasLost", "classGameInstance.html#a5adf0bde64900dad7514fab6cd2ad28d", null ],
+    [ "hasStateChanged", "classGameInstance.html#a8c17e0b2bd6f921b0ecf50cab76fa562", null ],
+    [ "hasWon", "classGameInstance.html#ae9fb0ac29afaef3fc6c9ff46f8192638", null ],
+    [ "initialize", "classGameInstance.html#abb2d1d1af8c766c78809e9c9639bb389", null ],
+    [ "isRunning", "classGameInstance.html#a39233f386c6381e22158ede0ed66410e", null ],
+    [ "processPlayerInput", "classGameInstance.html#ab533956d2db03b7557445aa27f411cf0", null ],
+    [ "removePlayer", "classGameInstance.html#af5ffcdb83322d42e52ead34bcd1dc13d", null ],
+    [ "serializeEntityBatch", "classGameInstance.html#a8d0b058ab7a9dd12fd229e2cfc85e88d", null ],
+    [ "serializeEntitySpawn", "classGameInstance.html#a32c85a78c126da07fdb18c014c1550a0", null ],
+    [ "serializeGameState", "classGameInstance.html#a388e56a95c6571cf919e899eaec9757d", null ],
+    [ "stop", "classGameInstance.html#a594f990542b7c13c8ce7fb691f07bda0", null ],
+    [ "update", "classGameInstance.html#aa523be51976a802811d722d3bfa4a851", null ]
+];

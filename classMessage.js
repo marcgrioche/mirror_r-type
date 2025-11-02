@@ -1,0 +1,28 @@
+var classMessage =
+[
+    [ "Message", "classMessage.html#a46f7c376af1a66c02cc347118d5f5777", null ],
+    [ "Message", "classMessage.html#a9aac2d4e76e2ee08722bf3bb066ce075", null ],
+    [ "Message", "classMessage.html#ad253b20930e70257e2523bb9fc7d299c", null ],
+    [ "canRead", "classMessage.html#add47772ebfb582cde6cb218bacce91fc", null ],
+    [ "getPayload", "classMessage.html#a608bbe941822e4eb68dfdd6ee601c680", null ],
+    [ "getReadPosition", "classMessage.html#a391464e18cb2ec6201fe86aa9589d9b6", null ],
+    [ "getType", "classMessage.html#a995db3fb8b9b0d1af2819f481d81d0e3", null ],
+    [ "isValid", "classMessage.html#a51dcf44719e3c4eac52f60c6f8ff60d8", null ],
+    [ "readBytes", "classMessage.html#a72a44ffef7f31440f85ed375d396c957", null ],
+    [ "readFloat", "classMessage.html#adfd7c4e131ff697670277f1722b91ea7", null ],
+    [ "readString", "classMessage.html#a4fbc15b1f163e87206d10942ec245a41", null ],
+    [ "readU16", "classMessage.html#a7aaf09d2a77f1111d10cc69a17d0f1e2", null ],
+    [ "readU32", "classMessage.html#af755846ee110a6113e93c26e0d79cb21", null ],
+    [ "readU64", "classMessage.html#a93a5679ef5addc808c51e2491fcf01b9", null ],
+    [ "readU8", "classMessage.html#afc1dde7b732be15e3f1b152770eaf221", null ],
+    [ "remainingBytes", "classMessage.html#a94eb450ccafacdd465b989d3d1144557", null ],
+    [ "resetReadPosition", "classMessage.html#a198601ab30c0f703f88661709a9e32f0", null ],
+    [ "serialize", "classMessage.html#ad15368e00fdc55506d04247951baf1a5", null ],
+    [ "write", "classMessage.html#a4d7f53b019d677cc35b5e39a9f2dc113", null ],
+    [ "write", "classMessage.html#a729736250f034fcf373c5196f2585224", null ],
+    [ "write", "classMessage.html#a05f09ec44e9fb494e0e5bddbd27d73eb", null ],
+    [ "write", "classMessage.html#a8dcc70f070bf5161163988020d29acf6", null ],
+    [ "write", "classMessage.html#ab3eabe5e92a66ee4c5727304791bdb56", null ],
+    [ "write", "classMessage.html#aa228461a67241675af0efb035d8a7f91", null ],
+    [ "write", "classMessage.html#a847254ec76da7f415b1ffe3d4eeaac45", null ]
+];

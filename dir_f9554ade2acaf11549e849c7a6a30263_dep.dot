@@ -1,0 +1,12 @@
+digraph "shared/src/levels"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_4f7b36fb0bfdfe16f35b59bd562960a4 {
+    graph [ bgcolor="#edf0f7", pencolor="grey50", label="src", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_4f7b36fb0bfdfe16f35b59bd562960a4.html",tooltip=""]
+  dir_f9554ade2acaf11549e849c7a6a30263 [label="levels", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_f9554ade2acaf11549e849c7a6a30263.html",tooltip=""];
+  }
+}
