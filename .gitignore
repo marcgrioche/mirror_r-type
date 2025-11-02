@@ -29,3 +29,7 @@ rtype.db-wal
 monitoring/grafana/grafana-data/log/
 monitoring/grafana/grafana-data/plugins/
 monitoring/grafana/grafana-data/png/
+
+doc/html
+doc/latex
+
