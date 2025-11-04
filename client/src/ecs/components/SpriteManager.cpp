@@ -278,3 +278,50 @@ void SpriteManager::addWeaponSprite(Registry& registry, Entity entity, float pos
 
     registry.add<Sprite>(entity, sprite);
 }
+
+void SpriteManager::addPowerUpSprite(Registry& registry, Entity entity, float posX, float posY, PowerUpType type, float sizeFactor)
+{
+    (void)posX;
+    (void)posY;
+
+    if (!registry.has<Hitbox>(entity)) {
+        return; // Can't size sprite without hitbox
+    }
+
+    Hitbox& hitbox = registry.get<Hitbox>(entity);
+
+    const float SPRITE_WIDTH = 32.0f;
+    const float SPRITE_HEIGHT = 32.0f;
+
+    float scale_x = (hitbox.width * sizeFactor) / SPRITE_WIDTH;
+    float scale_y = (hitbox.height * sizeFactor) / SPRITE_HEIGHT;
+
+    float rendered_width = SPRITE_WIDTH * scale_x;
+    float rendered_height = SPRITE_HEIGHT * scale_y;
+    float offset_x = -(rendered_width / 2.0f) + (hitbox.width / 2.0f);
+    float offset_y = -(rendered_height / 2.0f) + (hitbox.height / 2.0f);
+
+    std::string textureId;
+    switch (type) {
+        case PowerUpType::HEAL:
+            textureId = "heal_powerup.png";
+            break;
+        case PowerUpType::DAMAGE_BOOST:
+            textureId = "damage_powerup.png";
+            break;
+        case PowerUpType::FIRE_RATE:
+            textureId = "fire_rate_powerup.png";
+            break;
+        default:
+            textureId = "heal_powerup.png";
+            break;
+    }
+
+    Sprite sprite = SpriteFactory::createStaticSprite(
+        textureId,
+        0, 0, static_cast<int>(SPRITE_WIDTH), static_cast<int>(SPRITE_HEIGHT),
+        scale_x, scale_y,
+        offset_x, offset_y);
+
+    registry.add<Sprite>(entity, sprite);
+}
