@@ -113,17 +113,22 @@ $(document).ready(function(){initNavTree('PowerUp_8hpp_source.html',''); initRes
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">enum class</span> PowerUpType {</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    HEAL, </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    DAMAGE_BOOST </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>};</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="foldopen" id="foldopen00028" data-start="{" data-end="};">
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structPowerUp.html">   28</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structPowerUp.html">PowerUp</a> {</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">bool</span> is_power = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    PowerUpType type = PowerUpType::HEAL;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">float</span> effect_duration = 0.0f;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">float</span> remaining_time = 0.0f;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>};</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    , FIRE_RATE </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>};</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="foldopen" id="foldopen00029" data-start="{" data-end="};">
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structPowerUp.html">   29</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structPowerUp.html">PowerUp</a> {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordtype">bool</span> is_power = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    PowerUpType type = PowerUpType::HEAL;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">float</span> effect_duration = 0.0f;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">float</span> remaining_time = 0.0f;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="comment">// Multiplier applied to weapon Frequency.frequency (e.g. 0.5 -&gt; twice as fast)</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">float</span> fire_rate_multiplier = 1.0f;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="comment">// Tracks whether the effect was applied (so we can revert cleanly)</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordtype">bool</span> effect_applied = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>};</div>
 </div>
-<div class="ttc" id="astructPowerUp_html"><div class="ttname"><a href="structPowerUp.html">PowerUp</a></div><div class="ttdoc">Component representing power-up entities and their effects.</div><div class="ttdef"><b>Definition</b> PowerUp.hpp:28</div></div>
+<div class="ttc" id="astructPowerUp_html"><div class="ttname"><a href="structPowerUp.html">PowerUp</a></div><div class="ttdoc">Component representing power-up entities and their effects.</div><div class="ttdef"><b>Definition</b> PowerUp.hpp:29</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
