@@ -16,6 +16,7 @@
 enum class PowerUpType {
     HEAL, /**< Restores health to the player */
     DAMAGE_BOOST /**< Temporarily increases player damage output */
+    , FIRE_RATE /**< Temporarily increases player's fire rate (decreases weapon frequency) */
 };
 
 /**
@@ -30,4 +31,8 @@ struct PowerUp {
     PowerUpType type = PowerUpType::HEAL;
     float effect_duration = 0.0f;
     float remaining_time = 0.0f;
+    // Multiplier applied to weapon Frequency.frequency (e.g. 0.5 -> twice as fast)
+    float fire_rate_multiplier = 1.0f;
+    // Tracks whether the effect was applied (so we can revert cleanly)
+    bool effect_applied = false;
 };

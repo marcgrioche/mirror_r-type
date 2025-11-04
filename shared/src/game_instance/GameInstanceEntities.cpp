@@ -67,8 +67,12 @@ void GameInstanceEntities::cleanupEntities(Registry& registry, float tickDuratio
             // Drop power-ups from enemies
             if (registry.has<EnemyTag>(e) && registry.has<Position>(e)) {
                 Position& pos = registry.get<Position>(e);
-                PowerUpType type = (rand() % 2 == 0) ? PowerUpType::HEAL : PowerUpType::DAMAGE_BOOST;
-                float effectDuration = (type == PowerUpType::DAMAGE_BOOST) ? 10.0f : 0.0f;
+                // Add FIRE_RATE to the random pool; adjust effect durations accordingly
+                int pick = rand() % 3;
+                PowerUpType type = (pick == 0) ? PowerUpType::HEAL : (pick == 1 ? PowerUpType::DAMAGE_BOOST : PowerUpType::FIRE_RATE);
+                float effectDuration = 0.0f;
+                if (type == PowerUpType::DAMAGE_BOOST) effectDuration = 10.0f;
+                if (type == PowerUpType::FIRE_RATE) effectDuration = 10.0f;
                 _newEntitiesThisTick.push_back(factories::createPowerUp(
                     registry,
                     Position { pos.v.x, pos.v.y },

@@ -46,6 +46,16 @@ void collisionPlayerPowerUpSystem(Registry& registry, float)
                     }
                 } else if (powerUpData.type == PowerUpType::DAMAGE_BOOST) {
                     std::cout << "Player got damage boost!" << std::endl;
+                } else if (powerUpData.type == PowerUpType::FIRE_RATE) {
+                    std::cout << "Player got fire-rate boost!" << std::endl;
+                    // set default multiplier on the power-up data if not already set
+                    if (powerUpData.effect_duration <= 0.0f) {
+                        // give a sensible duration if none provided
+                        powerUpData.effect_duration = 10.0f;
+                    }
+                    // We'll use 0.5 to make frequency half (twice the fire rate)
+                    // store multiplier in the dropped power-up so it's transferred to the player
+                    powerUpData.fire_rate_multiplier = 0.5f;
                 }
 
                 if (registry.has<PowerUp>(plE)) {
@@ -53,6 +63,14 @@ void collisionPlayerPowerUpSystem(Registry& registry, float)
                     playerPowerUp.is_power = true;
                     playerPowerUp.type = powerUpData.type;
                     playerPowerUp.remaining_time = powerUpData.effect_duration;
+                    // Transfer any power-up specific parameters (e.g. fire rate multiplier)
+                    if (powerUpData.type == PowerUpType::FIRE_RATE) {
+                        playerPowerUp.fire_rate_multiplier = powerUpData.fire_rate_multiplier > 0.0f ? powerUpData.fire_rate_multiplier : 0.5f;
+                        playerPowerUp.effect_applied = false;
+                    }
+                    if (powerUpData.type == PowerUpType::DAMAGE_BOOST) {
+                        playerPowerUp.effect_applied = false;
+                    }
                 }
 
                 if (registry.has<Lifetime>(powerE)) {
