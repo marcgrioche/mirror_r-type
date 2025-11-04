@@ -54,7 +54,7 @@ void collisionEnemyProjectileSystem(Registry& registry, float)
                     float dmg = registry.get<Damage>(projE).value;
                     h.hp -= static_cast<int>(dmg);
                     h.hit = 1;
-                    h.hitTime = 0.2f;
+                    h.hitTime = 0.1f;
                     std::cout << "[Collision] Enemy " << EnE.id << " hit by projectile " << projE.id << " dmg=" << dmg << " hp=" << h.hp << "\n";
                     if (h.hp <= 0) {
                         Dead& dead = registry.get<Dead>(EnE);
