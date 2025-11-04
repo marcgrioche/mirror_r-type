@@ -7,7 +7,7 @@
     "light": "HeadsLight.png"
   },
   "platform": {
-    "layers": 1,
+    "layers": 2,
     "topMargin": 30.0,
     "bottomMargin": 100.0,
     "sameLevelEpsilon": 28.0,
@@ -59,13 +59,13 @@
     "size_factor": 1.5,
     "posX_factor": 1.0,
     "posY_factor": 1.1,
-    "health": 200,
+    "health": 300,
     "width": 900.0,
     "height": 900.0,
     "shootFrequency": 5,
     "spawnEnemyFrequency": 5.0,
     "projectileSpeed": -500.0,
-    "projectileDamage": 300,
+    "projectileDamage": 50,
     "projectileWidth": 70.0,
     "projectileHeight": 70.0
   }

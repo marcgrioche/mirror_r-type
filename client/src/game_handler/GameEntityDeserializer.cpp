@@ -188,6 +188,8 @@ void Game::createPowerUpFromMessage(const Message& msg, Registry& registry,
         effectDuration);
 
     registry.add<ServerEntityId>(powerUp, ServerEntityId { entityId });
+    // Attach the appropriate power-up sprite immediately
+    SpriteManager::addPowerUpSprite(registry, powerUp, posX, posY, type, 3.0f);
 }
 
 void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType type, const EntityData& data)
@@ -208,7 +210,13 @@ void Game::attachSpriteToEntity(Registry& registry, Entity entity, EntityType ty
         SpriteManager::addEnemySprite(registry, entity, position.x, position.y, m_currentLevelData.getEnemySizeFactor(), &m_currentLevelData);
         break;
     case EntityType::POWERUP:
-        // TODO: PowerUp sprite attachment
+        try {
+            PowerUpType ptype = data.get<PowerUpType>("powerup_type");
+            SpriteManager::addPowerUpSprite(registry, entity, position.x, position.y, ptype, 3.0f);
+        } catch (...) {
+            // Fallback: default to HEAL sprite if property missing
+            SpriteManager::addPowerUpSprite(registry, entity, position.x, position.y, PowerUpType::HEAL, 3.0f);
+        }
         break;
     case EntityType::BOSS:
         SpriteManager::addBossSprite(registry, entity, position.x, position.y, m_currentLevelData.getBossSizeFactor(), &m_currentLevelData);

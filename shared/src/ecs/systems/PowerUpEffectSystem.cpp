@@ -14,6 +14,7 @@
 #include "components/Tags.hpp"
 #include "components/Parent.hpp"
 #include <iostream>
+#include "components/Frequency.hpp"
 
 void powerUpEffectSystem(Registry& registry, float deltaTime)
 {
@@ -25,7 +26,37 @@ void powerUpEffectSystem(Registry& registry, float deltaTime)
             if (powerUp.remaining_time > 0.0f) {
                 powerUp.remaining_time -= deltaTime;
 
+                // If this is a FIRE_RATE power-up and not applied yet, apply to player's weapons
+                if (powerUp.type == PowerUpType::FIRE_RATE && !powerUp.effect_applied) {
+                    // find player's weapons and reduce their frequency
+                    auto weaponView = registry.view<WeaponTag, Parent, Frequency>();
+                    for (auto wit = weaponView.begin(); wit != weaponView.end(); ++wit) {
+                        Entity w = wit.entity();
+                        auto& parent = registry.get<Parent>(w);
+                        if (parent.parent.id == entity.id && registry.has<Frequency>(w)) {
+                            auto& freq = registry.get<Frequency>(w);
+                            freq.frequency = static_cast<double>(freq.frequency * powerUp.fire_rate_multiplier);
+                        }
+                    }
+                    powerUp.effect_applied = true;
+                }
+
                 if (powerUp.remaining_time <= 0.0f) {
+                    // Expire effect and revert any applied modifications
+                    if (powerUp.type == PowerUpType::FIRE_RATE && powerUp.effect_applied) {
+                        auto weaponView = registry.view<WeaponTag, Parent, Frequency>();
+                        for (auto wit = weaponView.begin(); wit != weaponView.end(); ++wit) {
+                            Entity w = wit.entity();
+                            auto& parent = registry.get<Parent>(w);
+                            if (parent.parent.id == entity.id && registry.has<Frequency>(w)) {
+                                auto& freq = registry.get<Frequency>(w);
+                                // revert by dividing by multiplier (guard against zero)
+                                if (powerUp.fire_rate_multiplier != 0.0f)
+                                    freq.frequency = static_cast<double>(freq.frequency / powerUp.fire_rate_multiplier);
+                            }
+                        }
+                        powerUp.effect_applied = false;
+                    }
                     powerUp.is_power = false;
                     powerUp.remaining_time = 0.0f;
                     std::cout << "Power-up effect expired for player" << std::endl;

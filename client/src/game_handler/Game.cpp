@@ -151,6 +151,17 @@ bool Game::initialize()
         std::cout << "Warning: Failed to load Sky texture" << std::endl;
     }
 
+    //LOAD POWERUPS
+    if (!resourceManager.loadTexture(renderer, "heal_powerup.png", resourceManager.getAssetPath("sprites/heal_powerup.png"))) {
+        std::cout << "Warning: Failed to load heal_powerup texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "damage_powerup.png", resourceManager.getAssetPath("sprites/damage_powerup.png"))) {
+        std::cout << "Warning: Failed to load damage_powerup texture" << std::endl;
+    }
+    if (!resourceManager.loadTexture(renderer, "fire_rate_powerup.png", resourceManager.getAssetPath("sprites/fire_rate_powerup.png"))) {
+        std::cout << "Warning: Failed to load fire_rate_powerup texture" << std::endl;
+    }
+
     // LOAD UI
     if (!resourceManager.loadTexture(renderer, "MenuBackground", resourceManager.getAssetPath("sprites/UI/Background/menuBackground.png"))) {
         std::cout << "Warning: Failed to load MenuBackground texture" << std::endl;

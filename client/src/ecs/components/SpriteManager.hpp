@@ -10,6 +10,7 @@
 #include "Entity.hpp"
 #include "Registry.hpp"
 #include "levels/Level.hpp"
+#include "ecs/components/PowerUp.hpp"
 
 namespace SpriteManager {
 /**
@@ -62,4 +63,18 @@ void addBossSprite(Registry& registry, Entity entity, float posX, float posY, fl
  * @param sizeFactor Scaling factor for the sprite size (1.0 = original size)
  */
 void addWeaponSprite(Registry& registry, Entity entity, float posX, float posY, float sizeFactor = 1.0f);
+
+// PowerUp type is defined in shared headers; include it so we can reference PowerUpType
+#include "ecs/components/PowerUp.hpp"
+
+/**
+ * @brief Adds a static sprite for a power-up entity based on its type
+ * @param registry The ECS registry
+ * @param entity The power-up entity
+ * @param posX Entity X position (unused currently)
+ * @param posY Entity Y position (unused currently)
+ * @param type The PowerUpType determining which texture to use
+ * @param sizeFactor Scaling factor for the sprite size
+ */
+void addPowerUpSprite(Registry& registry, Entity entity, float posX, float posY, PowerUpType type, float sizeFactor = 1.0f);
 } // namespace SpriteManager
