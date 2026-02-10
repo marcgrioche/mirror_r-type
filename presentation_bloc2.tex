@@ -1,0 +1,844 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% ─── Thème et couleurs ───────────────────────────────────────────────────────
+\usetheme{Madrid}
+\definecolor{rtypeblue}{RGB}{0,80,150}
+\definecolor{rtypedark}{RGB}{20,20,40}
+\definecolor{rtypegreen}{RGB}{40,140,60}
+\definecolor{rtypeorange}{RGB}{220,120,20}
+\definecolor{rtypegray}{RGB}{100,100,100}
+\definecolor{rtypelight}{RGB}{230,240,250}
+\usecolortheme[named=rtypeblue]{structure}
+\setbeamercolor{title}{fg=white,bg=rtypeblue}
+\setbeamercolor{frametitle}{fg=white,bg=rtypeblue}
+\setbeamercolor{block title}{bg=rtypeblue,fg=white}
+
+% ─── Packages ────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{adjustbox}
+\usepackage{colortbl}
+\arrayrulecolor{gray!50}
+\renewcommand{\arraystretch}{1.3}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc,backgrounds}
+\usepackage{forest}
+
+% ─── Listings config ─────────────────────────────────────────────────────────
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{rtypeblue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{red!60!black},
+  breaklines=true,
+  frame=single,
+  columns=fullflexible,
+  showstringspaces=false
+}
+
+% ─── Forest dirtree style ───────────────────────────────────────────────────
+\forestset{
+  dir tree/.style={
+    for tree={
+      font=\ttfamily\tiny,
+      grow'=0,
+      child anchor=west,
+      parent anchor=south,
+      anchor=west,
+      calign=first,
+      edge path={
+        \noexpand\path [draw, -{Stealth[length=1.5pt]}]
+        (!u.south west) +(4pt,0) |- node[fill,inner sep=0.6pt] {} (.child anchor)\forestoption{edge label};
+      },
+      before typesetting nodes={
+        if n=1 {insert before={[,phantom]}} {}
+      },
+      fit=band,
+      before computing xy={l=6pt},
+      inner ysep=0pt,
+    }
+  }
+}
+
+% ─── Métadonnées ─────────────────────────────────────────────────────────────
+\title[Bloc 2 — R-Type]{Bloc 2 — Concevoir une architecture logicielle}
+\subtitle{Projet R-Type — Jeu multijoueur en C++}
+\author{Équipe R-Type}
+\date{\today}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ─── SOMMAIRE ────────────────────────────────────────────────────────────────
+\begin{frame}{Sommaire}
+  \tableofcontents
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A3 — VEILLE TECHNOLOGIQUE
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A3 — Veille technologique}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 1 : B2-C06.1 — Étude comparative
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C06.1 — Étude comparative}
+\footnotesize
+Le projet R-Type a fait l'objet d'une étude comparative qualitative des technologies disponibles.
+
+\vspace{0.2em}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l c c c c}
+\toprule
+\textbf{Domaine} & \textbf{Option 1} & \textbf{Option 2} & \textbf{Option 3} & \textbf{Choix retenu} \\
+\midrule
+Langage       & C++          & Rust        & C\#          & \textbf{C++} \\ \hline
+Graphisme     & SDL2         & SFML        & Raylib       & \textbf{SDL2} \\ \hline
+Réseau        & TCP          & UDP brut    & UDP + fiabilité & \textbf{UDP + fiabilité} \\ \hline
+Sérialisation & JSON         & Protobuf    & Binaire custom  & \textbf{Binaire custom} \\ \hline
+Architecture  & Monolithe    & Micro-services & ECS + OOP  & \textbf{ECS + OOP} \\ \hline
+Build system  & Makefile     & Meson       & CMake        & \textbf{CMake} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.3em}
+Chaque choix évalué selon : \textbf{performance}, \textbf{latence}, \textbf{complexité}, \textbf{scalabilité} et \textbf{sécurité}.
+
+\vspace{0.2em}
+\textit{Détails complets dans le document COMPARATIVE\_STUDY.md.}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 2 : B2-C06.2 — Identification des technologies
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C06.2 — Identification des technologies}
+\footnotesize
+Technologies identifiées et retenues pour le projet :
+
+\vspace{0.2em}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Catégorie} & \textbf{Technologie} & \textbf{Rôle} \\
+\midrule
+Langage        & C++ (C++17)           & Logique de jeu, systèmes bas niveau \\ \hline
+Graphisme      & SDL2                  & Rendu 2D, gestion fenêtre, entrées \\ \hline
+Réseau         & BSD Sockets (UDP)     & Communication temps réel client/serveur \\ \hline
+Base de données & SQLite3              & Authentification, persistance XP joueurs \\ \hline
+Sécurité       & libsodium             & Hachage de mots de passe (Argon2) \\ \hline
+Configuration  & nlohmann/json         & Chargement des niveaux (JSON) \\ \hline
+Build          & CMake                 & Compilation cross-platform \\ \hline
+Conteneurisation & Docker \& Docker Compose & Déploiement serveur/client \\ \hline
+Monitoring     & Prometheus + Grafana  & Métriques serveur en temps réel \\ \hline
+Débogage       & Valgrind, GDB         & Détection fuites mémoire, debug runtime \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.3em}
+Stack technologique offrant contrôle complet sur les performances, maintenabilité et sécurité.
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 3 : B2-C07.1 — Étude sécurité informatique
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C07.1 — Étude sécurité informatique}
+\footnotesize
+Étude des failles de sécurité des technologies utilisées :
+
+\vspace{0.2em}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Menace identifiée} & \textbf{Technologie} & \textbf{Mitigation implémentée} \\
+\midrule
+Buffer overflow UDP         & BSD Sockets           & Validation taille paquets, bounds checking \\ \hline
+Injection SQL               & SQLite3               & Requêtes préparées (\texttt{sqlite3\_prepare\_v2}) \\ \hline
+Mots de passe en clair      & Authentification      & Hachage Argon2id via \textbf{libsodium} \\ \hline
+Flooding / DDoS             & Serveur UDP           & Rate limiting, quotas de connexion \\ \hline
+Triche (speed hack)         & Gameplay              & Serveur autoritaire, validation serveur \\ \hline
+Paquets falsifiés           & Protocole binaire     & Checksums, numéros de séquence \\ \hline
+État client manipulé        & Client                & Aucun état client n'est ``de confiance'' \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.3em}
+\textbf{Principe clé :} Le client n'envoie que des \textit{inputs}, jamais de résultats. Le serveur est la seule source de vérité.
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 4 : B2-C07.2 — Veille sécurité informatique
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C07.2 — Veille sécurité informatique}
+\footnotesize
+Connaissance de l'actualité sécurité informatique appliquée au projet :
+
+\begin{itemize}\setlength\itemsep{2pt}
+  \item \textbf{SDL2 :} Suivi des CVE (ex. CVE-2022-4743 — heap overflow SDL2 < 2.26.0). Version maintenue à jour.
+  \item \textbf{SQLite3 :} Vulnérabilités d'injection contournées par \textit{prepared statements} systématiques.
+  \item \textbf{libsodium :} Argon2id recommandé par l'OWASP. Gestion auto du \textit{rehashing} (\texttt{needsRehash()}).
+  \item \textbf{UDP / Réseau :} Risques de \textit{spoofing}, \textit{replay attacks}. Mitigation par numéros de séquence et validation stricte.
+  \item \textbf{OWASP Top 10 :} A01:Broken Access Control, A03:Injection, A07:Security Misconfiguration.
+  \item \textbf{C++ moderne :} \texttt{std::unique\_ptr}, \texttt{std::shared\_ptr} contre fuites mémoire et \textit{use-after-free}.
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Pratique :} Veille régulière via NVD et bulletins de sécurité des bibliothèques utilisées.
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A4 — PROTOTYPAGE
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A4 — Prototypage}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 5 : B2-C08.1 — Prototypes
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C08.1 — Prototypes}
+\footnotesize
+Différents prototypes réalisés au cours du développement :
+
+\begin{enumerate}\setlength\itemsep{2pt}
+  \item \textbf{Prototype réseau TCP} : Communication client/serveur en TCP. Fonctionnel mais latence trop élevée.
+  \item \textbf{Prototype réseau UDP brut} : Migration vers UDP pur. Gain de latence majeur, perte de fiabilité.
+  \item \textbf{Prototype UDP + couche de fiabilité} : Système ACK/NACK sélectif sur UDP. Compromis optimal retenu.
+  \item \textbf{Prototype ECS} : Implémentation initiale \textit{Array of Components}, puis migration vers \textit{Sparse Set}.
+  \item \textbf{Prototype rendu SDL2} : Pipeline de rendu 2D avec parallax, sprites animés et gestion d'entrées.
+  \item \textbf{Prototype système de lobby} : Architecture multi-lobby avec threads dédiés et file d'attente d'inputs.
+\end{enumerate}
+
+\vspace{0.2em}
+Chaque prototype a été évalué avant d'être intégré ou remplacé dans le projet final.
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 6 : B2-C08.2 — Prototypes - comparatif
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C08.2 — Prototypes — comparatif}
+\footnotesize
+Avantages et inconvénients de chaque prototype :
+
+\vspace{0.2em}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l p{4.5cm} p{4.5cm}}
+\toprule
+\textbf{Prototype} & \textbf{Avantages} & \textbf{Inconvénients} \\
+\midrule
+TCP                  & Fiable, ordonné, simple      & Latence élevée (head-of-line blocking) \\ \hline
+UDP brut             & Très faible latence           & Perte de paquets sans récupération \\ \hline
+UDP + fiabilité      & Latence faible + fiabilité sélective & Complexité modérée à implémenter \\ \hline
+ECS Array of Components & Cache-friendly, itération rapide & Rigide, mapping d'index complexe \\ \hline
+ECS Sparse Set       & Flexible, ajout/suppression dynamique & Légèrement plus complexe \\ \hline
+SDL2                 & Cross-platform, léger, accès bas niveau & API C-style, moins abstrait \\ \hline
+SFML                 & API C++ OOP intuitive         & Moins de contrôle bas niveau \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.3em}
+\textbf{Choix finaux :} UDP + couche de fiabilité, Sparse Set ECS, SDL2 — meilleur compromis performance/flexibilité/contrôle.
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 7 : B2-C09.1 — Architecture
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C09.1 — Architecture}
+\footnotesize
+Architecture \textbf{ECS + Client/Serveur} :
+
+\vspace{0.1em}
+\begin{columns}[T]
+\begin{column}{0.40\textwidth}
+\textbf{Patron ECS :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{Entity} : identifiant unique
+  \item \textbf{Component} : données pures (Position, Velocity, Health\ldots)
+  \item \textbf{System} : logique (Movement, Collision, Weapon\ldots)
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Modèle réseau :}\\
+Serveur autoritaire avec prédiction côté client et réconciliation.
+\end{column}
+
+\begin{column}{0.58\textwidth}
+\centering
+\begin{tikzpicture}[
+  node distance=0.25cm and 0.5cm,
+  box/.style={draw, rounded corners, minimum width=1.8cm, minimum height=0.5cm, font=\tiny\bfseries, text=white, align=center},
+  layer/.style={draw, rounded corners, minimum width=4.8cm, minimum height=0.4cm, font=\tiny, align=center, fill=rtypelight, text=rtypedark},
+  arr/.style={-{Stealth[length=2.5pt]}, thick},
+]
+  \node[box, fill=rtypeblue] (client) {Client SDL2};
+  \node[box, fill=rtypeorange, right=1.0cm of client] (server) {Serveur};
+  \node[box, fill=rtypegreen, below=0.2cm of server] (db) {SQLite3};
+
+  \draw[arr, <->] (client.east) -- node[above, font=\tiny] {UDP binaire} (server.west);
+  \draw[arr, <->] (server.south) -- (db.north);
+
+  \node[layer, below=0.6cm of $(client.south)!0.5!(server.south)$] (l1) {\textbf{Réseau} — UDP + protocole binaire custom};
+  \node[layer, below=0.1cm of l1] (l2) {\textbf{Logique} — GameInstance, systèmes ECS};
+  \node[layer, below=0.1cm of l2] (l3) {\textbf{Rendu} — SDL2, sprites, parallax};
+  \node[layer, below=0.1cm of l3] (l4) {\textbf{Données} — SQLite3, JSON niveaux};
+
+  \node[draw, dashed, rounded corners, fit=(l1)(l2)(l3)(l4), inner sep=2pt, label={[font=\tiny\bfseries, text=rtypeblue]left:Couches}] {};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 8 : B2-C09.2 — Intégration technique
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C09.2 — Intégration technique}
+\footnotesize
+Justification de l'architecture et intégration dans l'écosystème technique :
+
+\begin{itemize}\setlength\itemsep{2pt}
+  \item \textbf{CMake} : Build cross-platform (Linux, Windows) — un \texttt{CMakeLists.txt} racine orchestrant \texttt{client/}, \texttt{server/}, \texttt{shared/}.
+  \item \textbf{Docker} : Conteneurisation via \texttt{Dockerfile.server} et \texttt{Dockerfile.client}, orchestration \texttt{docker-compose.yml}.
+  \item \textbf{Monitoring} : Stack Prometheus + Grafana pour métriques serveur (latence, connexions, ticks/s).
+  \item \textbf{Shared library} : Code partagé (ECS, réseau, sérialisation) compilé en bibliothèque commune.
+  \item \textbf{Modularité} : ECS permet d'ajouter composants/systèmes sans modifier l'existant (Open/Closed).
+  \item \textbf{Scalabilité} : Système de lobbies avec threads dédiés et pool de workers.
+\end{itemize}
+
+\vspace{0.2em}
+Écosystème \textbf{reproductible} (Docker), \textbf{observable} (Grafana) et \textbf{extensible} (ECS).
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A5 — RÉSOLUTION DE PROBLÈMES ALGORITHMIQUES COMPLEXES
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A5 — Résolution de problèmes algorithmiques complexes}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 9 : B2-C10.1 — Implémentation de l'architecture
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B2-C10.1 — Implémentation de l'architecture}
+\footnotesize
+L'implémentation respecte l'architecture ECS + Client/Serveur :
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{Côté Shared (ECS) :}
+\begin{lstlisting}
+// Registry : coeur de l'ECS
+class Registry {
+  Entity create_entity();
+  void kill_entity(Entity e);
+  template<typename C>
+  void emplace(Entity e, Args&&... args);
+  template<typename... Cs>
+  View<Cs...> view();
+};
+\end{lstlisting}
+
+\textbf{ComponentStorage} : Sparse Set avec \texttt{dense\_entities}, \texttt{dense\_data}, \texttt{sparse} — accès $O(1)$.
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{Côté Serveur :}
+\begin{lstlisting}
+class RTypeServer : public RTypeNetwork {
+  void handleConnect(...);
+  void handleInput(...);
+  void handleAuthRequest(...);
+  LobbyManager _lobbyManager;
+  std::unique_ptr<SqlDB::DB> _db;
+};
+\end{lstlisting}
+
+\textbf{GameInstance} orchestre : Core, Player, Entities, Physics, Serialization, Conditions.
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 10 : B2-C10.2 — Bonnes pratiques de développement
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B2-C10.2 — Bonnes pratiques de développement}
+\footnotesize
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{RAII et Smart Pointers :}
+\begin{lstlisting}
+// Ownership clair
+std::unique_ptr<GameInstance> gameInstance;
+std::unique_ptr<SqlDB::DB> _db;
+std::unique_ptr<UdpSocket> _socket;
+\end{lstlisting}
+
+\textbf{Design Patterns :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{ECS} : séparation données/logique
+  \item \textbf{Factory} : \texttt{EntityFactory}
+  \item \textbf{Observer} : dispatch handlers réseau
+  \item \textbf{Template Method} : \texttt{RTypeNetwork}
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{Paradigmes utilisés :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{OOP} : héritage, polymorphisme
+  \item \textbf{Générique} : templates C++ (\texttt{ComponentStorage<T>}, \texttt{View<Cs...>})
+  \item \textbf{Data-Oriented} : ECS cache-friendly
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Qualité du code :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Documentation Doxygen
+  \item Pre-commit hooks
+  \item Valgrind pour les fuites mémoire
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 11 : B2-C11.1 — Organisation du code
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B2-C11.1 — Organisation du code}
+\scriptsize
+
+\begin{columns}[T]
+\begin{column}{0.42\textwidth}
+\textbf{Arborescence du projet :}
+
+\vspace{0.1em}
+\begin{forest}
+  dir tree
+  [\textbf{r-type/}
+    [\textcolor{rtypeblue}{\textbf{client/src/}}
+      [game\_handler/]
+      [managers/]
+      [network/]
+      [render/]
+      [ui/]
+      [prediction/]
+    ]
+    [\textcolor{rtypeorange}{\textbf{server/}}
+      [src/ {\tiny Handle*.cpp}]
+      [db/ {\tiny DB / PasswordManager}]
+      [metrics/]
+    ]
+    [\textcolor{rtypegreen}{\textbf{shared/src/}}
+      [ecs/ {\tiny Registry / Components / Systems}]
+      [game\_instance/ {\tiny 7 sous-modules}]
+      [entities/]
+      [levels/]
+    ]
+    [Docker/]
+    [monitoring/]
+  ]
+\end{forest}
+\end{column}
+
+\begin{column}{0.55\textwidth}
+\textbf{Gestion de version — Git :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{73 branches} feature créées au total
+  \item Nommage par issue : \texttt{XX-description}\\
+        {\scriptsize Ex: \texttt{3-basic-ecs-structure}, \texttt{29-player-synchronisation-rollback}}
+  \item Branche \texttt{main} protégée — merge après revue
+  \item Pre-commit hooks (\texttt{.pre-commit-config.yaml}) pour la qualité automatique
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Persistance des données :}
+
+\vspace{0.1em}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{l l}
+\toprule
+\textbf{Donnée} & \textbf{Solution} \\
+\midrule
+Auth. joueurs & SQLite3 (requêtes préparées) \\
+XP joueurs    & SQLite3 \\
+Config. niveaux & JSON (nlohmann/json) \\
+État réseau   & Binaire custom (UDP) \\
+État en mémoire & \texttt{std::vector}, \texttt{unordered\_map} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 12 : B2-C11.2 — Segmentation du code
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B2-C11.2 — Segmentation du code}
+\scriptsize
+
+\begin{columns}[T]
+\begin{column}{0.44\textwidth}
+\textbf{GameInstance — 7 sous-modules :}
+
+\vspace{0.1em}
+\begin{forest}
+  dir tree
+  [\textbf{game\_instance/}
+    [\textcolor{rtypeblue}{Core.cpp} {\tiny état / cycle de vie}]
+    [\textcolor{rtypeblue}{Player.cpp} {\tiny joueurs / inputs}]
+    [\textcolor{rtypeblue}{Entities.cpp} {\tiny spawn/destroy}]
+    [\textcolor{rtypeblue}{Physics.cpp} {\tiny physique / collisions}]
+    [\textcolor{rtypeblue}{Serialization.cpp} {\tiny sérialisation}]
+    [\textcolor{rtypeblue}{Conditions.cpp} {\tiny win/lose}]
+    [\textcolor{rtypeblue}{InputProcessor.cpp} {\tiny inputs}]
+  ]
+\end{forest}
+
+\vspace{0.2em}
+\textbf{Serveur — 1 fichier par message :}
+
+\vspace{0.1em}
+\begin{forest}
+  dir tree
+  [\textbf{server/src/}
+    [\textcolor{rtypeorange}{HandleConnect.cpp}]
+    [\textcolor{rtypeorange}{HandleInput.cpp}]
+    [\textcolor{rtypeorange}{HandleAuth.cpp}]
+    [\textcolor{rtypeorange}{HandleCreateLobby.cpp}]
+    [\textcolor{rtypeorange}{\ldots{} (11 handlers total)}]
+  ]
+\end{forest}
+\end{column}
+
+\begin{column}{0.53\textwidth}
+\textbf{Segmentation ECS :}
+
+\vspace{0.1em}
+\begin{forest}
+  dir tree
+  [\textbf{shared/src/ecs/}
+    [Registry.hpp {\tiny cœur ECS}]
+    [ComponentStorage.hpp {\tiny Sparse Set}]
+    [\textcolor{rtypegreen}{components/} {\tiny 30+ structs}
+      [{Position{,} Velocity{,} Health\ldots}]
+    ]
+    [\textcolor{rtypegreen}{systems/} {\tiny 15+ systèmes}
+      [{Movement{,} Collision{,} Weapon\ldots}]
+    ]
+  ]
+\end{forest}
+
+\vspace{0.2em}
+\textbf{Avantages :}
+\begin{itemize}\setlength\itemsep{0pt}
+  \item \textbf{Single Responsibility} : 1 fichier = 1 responsabilité
+  \item \textbf{Isolation} : modifier la physique ne touche pas la sérialisation
+  \item \textbf{Testable} : chaque module testable en isolation
+  \item \textbf{Scalable} : ajouter un composant = ajouter un fichier
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 13 : B2-C12.1 — Implémentation algorithmique
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C12.1 — Implémentation algorithmique}
+\footnotesize
+Algorithmes existants et optimaux implémentés :
+
+\begin{itemize}\setlength\itemsep{2pt}
+  \item \textbf{Spatial Hashing} pour la détection de collisions :
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Coût moyen $O(1)$ par requête, adapté aux entités mobiles en 2D.
+      \item Préféré au Quadtree (plus adapté aux environnements statiques).
+    \end{itemize}
+  \item \textbf{Client-Side Prediction} :
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Simulation locale immédiate pour masquer la latence.
+      \item Standard dans les jeux multijoueurs (Quake, Source Engine).
+    \end{itemize}
+  \item \textbf{Server Reconciliation} :
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Replay des inputs non confirmés après réception de l'état serveur.
+      \item Interpolation linéaire pour lisser les corrections.
+    \end{itemize}
+  \item \textbf{Sparse Set} pour le stockage ECS :
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Accès, insertion et suppression en $O(1)$.
+      \item Itération cache-friendly via vecteurs denses contigus.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 14 : B2-C12.2 — Implémentation d'algorithmes originaux
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C12.2 — Implémentation d'algorithmes originaux}
+\footnotesize
+
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\textbf{Protocole binaire custom :}
+
+\vspace{0.2em}
+\centering
+\begin{tikzpicture}[
+  field/.style={draw, minimum height=0.5cm, font=\tiny\ttfamily, fill=#1, text=white, align=center},
+  label/.style={font=\tiny, text=rtypegray, align=center}
+]
+  \node[field=rtypeblue, minimum width=0.85cm] (t) at (0,0) {Type};
+  \node[field=rtypegreen, minimum width=0.85cm, right=0pt of t] (v) {Ver};
+  \node[field=rtypeorange, minimum width=1.1cm, right=0pt of v] (s) {Seq};
+  \node[field=rtypeblue!70, minimum width=1.4cm, right=0pt of s] (p) {PlayerID};
+  \node[field=rtypegray, minimum width=0.9cm, right=0pt of p] (l) {Len};
+  \node[field=rtypedark, minimum width=1.6cm, right=0pt of l] (d) {Payload};
+
+  \node[label, below=1pt of t] {1B};
+  \node[label, below=1pt of v] {1B};
+  \node[label, below=1pt of s] {2B};
+  \node[label, below=1pt of p] {4B};
+  \node[label, below=1pt of l] {2B};
+  \node[label, below=1pt of d] {NB};
+\end{tikzpicture}
+
+\vspace{0.3em}
+\raggedright
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Sérialisation avec gestion du \textit{byte swapping}
+  \item \textbf{ACK/NACK sélectif} : seuls les messages critiques sont acquittés
+  \item \textbf{Agrégation} : petites mises à jour regroupées
+\end{itemize}
+\end{column}
+
+\begin{column}{0.43\textwidth}
+\textbf{Autres solutions originales :}
+
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{Niveaux par JSON :}
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Chargement dynamique (gravité, ennemis, boss, plateformes)
+      \item Nouveaux niveaux sans recompilation
+    \end{itemize}
+  \item \textbf{ECS View optimisé :}
+    \begin{itemize}\setlength\itemsep{0pt}
+      \item Itération multi-composants via intersection des sparse sets
+      \item Sélection auto du plus petit set
+    \end{itemize}
+  \item \textbf{Messages temps réel :} envoyés sans garantie (positions, inputs) pour minimiser la latence
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A6 — DÉFINITION DES MODÈLES DE DONNÉES
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A6 — Définition des modèles de données}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 15 : B2-C13.1 — Persistance des données
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C13.1 — Persistance des données}
+\footnotesize
+Les choix de persistance sont cohérents avec les besoins du projet :
+
+\vspace{0.2em}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l l l l}
+\toprule
+\textbf{Donnée} & \textbf{Solution} & \textbf{Contrainte} & \textbf{Justification} \\
+\midrule
+Authentification  & SQLite3         & Sécurité, intégrité      & Requêtes préparées, ACID \\
+XP joueurs        & SQLite3         & Persistance              & Transactions atomiques \\
+Niveaux de jeu    & Fichiers JSON   & Lisibilité               & Édition sans recompilation \\
+État de jeu       & Mémoire (RAM)   & Performance temps réel   & Accès $< 1\mu s$ \\
+Communication     & Binaire (UDP)   & Latence minimale         & Compact, pas de parsing lourd \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.3em}
+\textbf{Sécurité :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Mots de passe hachés avec \textbf{Argon2id} (libsodium) — jamais stockés en clair.
+  \item \texttt{PasswordManager::needsRehash()} pour adapter les paramètres de sécurité.
+  \item Backup de la base via \texttt{DB::backup\_to\_file()}.
+\end{itemize}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 16 : B2-C13.2 — Persistance des données - comparatif
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C13.2 — Persistance des données — comparatif}
+\footnotesize
+Comparaison des solutions de persistance envisagées :
+
+\vspace{0.2em}
+\textbf{Base de données :}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l c c c c}
+\toprule
+ & \textbf{SQLite3} & \textbf{PostgreSQL} & \textbf{MongoDB} & \textbf{Fichiers texte} \\
+\midrule
+Déploiement     & Embarqué, simple  & Serveur dédié   & Serveur dédié  & Trivial \\
+Performance     & Bonne (local)     & Excellente      & Bonne          & Variable \\
+Requêtes SQL    & Oui               & Oui             & Non (NoSQL)    & Non \\
+Dépendances     & Aucune (intégré)  & Lourde          & Lourde         & Aucune \\
+\textbf{Choix}  & \textbf{$\checkmark$ Retenu} & Non retenu & Non retenu & Non retenu \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.2em}
+\textbf{Format de configuration :}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l c c c c}
+\toprule
+ & \textbf{JSON} & \textbf{YAML} & \textbf{TOML} & \textbf{Binaire} \\
+\midrule
+Lisibilité    & Bonne     & Excellente & Bonne    & Nulle \\
+Parsing C++   & nlohmann  & yaml-cpp   & toml++   & Custom \\
+Écosystème    & Très large & Large     & Modéré   & Aucun \\
+\textbf{Choix} & \textbf{$\checkmark$ Retenu} & Non retenu & Non retenu & Non retenu \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.2em}
+\textbf{Justification :} SQLite3 embarqué (zéro config), JSON supporté nativement par nlohmann/json.
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 17 : B2-C14.1 — Structures de données
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C14.1 — Structures de données}
+\footnotesize
+
+\begin{columns}[T]
+\begin{column}{0.50\textwidth}
+\textbf{Structures utilisées :}
+
+\vspace{0.1em}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Structure} & \textbf{Usage} & \textbf{Complexité} \\
+\midrule
+\texttt{std::vector}         & Composants ECS   & $O(1)$ accès \\
+\texttt{std::unordered\_map} & Entité $\to$ idx  & $O(1)$ lookup \\
+\texttt{std::queue}          & Messages réseau   & $O(1)$ push/pop \\
+\texttt{std::unique\_ptr}    & Ownership RAII    & Zéro overhead \\
+Sparse Set                    & ComponentStorage  & $O(1)$ CRUD \\
+\texttt{std::atomic}         & Flags threads     & Lock-free \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{column}
+
+\begin{column}{0.47\textwidth}
+\textbf{Sparse Set — visualisation :}
+
+\vspace{0.1em}
+\centering
+\begin{tikzpicture}[
+  cell/.style={draw, minimum width=0.55cm, minimum height=0.4cm, font=\tiny\ttfamily, align=center},
+  lbl/.style={font=\tiny\bfseries, text=rtypeblue},
+  arr/.style={-{Stealth[length=1.5pt]}, rtypegray, thin},
+]
+  \node[lbl] at (-0.7, 1.8) {sparse};
+  \node[cell, fill=rtypelight] (s0) at (0, 1.8) {1};
+  \node[cell, fill=rtypelight] (s1) at (0.6, 1.8) {\textendash};
+  \node[cell, fill=rtypelight] (s2) at (1.2, 1.8) {0};
+  \node[cell, fill=rtypelight] (s3) at (1.8, 1.8) {\textendash};
+  \node[cell, fill=rtypelight] (s4) at (2.4, 1.8) {2};
+  \node[font=\tiny, below=0pt of s0] {id:0};
+  \node[font=\tiny, below=0pt of s2] {id:2};
+  \node[font=\tiny, below=0pt of s4] {id:4};
+
+  \node[lbl] at (-0.7, 0.8) {dense\_e};
+  \node[cell, fill=rtypeblue!20] (de0) at (0, 0.8) {E2};
+  \node[cell, fill=rtypeblue!20] (de1) at (0.6, 0.8) {E0};
+  \node[cell, fill=rtypeblue!20] (de2) at (1.2, 0.8) {E4};
+
+  \node[lbl] at (-0.7, 0.2) {dense\_d};
+  \node[cell, fill=rtypegreen!20] (dd0) at (0, 0.2) {Pos};
+  \node[cell, fill=rtypegreen!20] (dd1) at (0.6, 0.2) {Pos};
+  \node[cell, fill=rtypegreen!20] (dd2) at (1.2, 0.2) {Pos};
+
+  \draw[arr] (s0.south) -- (de1.north);
+  \draw[arr] (s2.south) -- (de0.north);
+  \draw[arr] (s4.south) -- (de2.north);
+\end{tikzpicture}
+
+\vspace{0.1em}
+{\tiny\texttt{sparse[entity\_id]} $\to$ index dense.\\
+Mémoire contiguë = cache-friendly.}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 18 : B2-C14.2 — Structures de données - justifications
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B2-C14.2 — Structures de données — justifications}
+\footnotesize
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{Performance :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \texttt{std::vector} : mémoire contiguë, cache CPU optimisé.
+  \item Sparse Set : $O(1)$ pour \texttt{has()}, \texttt{get()}, \texttt{emplace()}, \texttt{remove()}. Zéro allocation à l'itération.
+  \item \texttt{std::queue} : push/pop $O(1)$, pattern producteur/consommateur (I/O $\to$ workers).
+\end{itemize}
+
+\textbf{Maintenabilité :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \texttt{unique\_ptr} : ownership clair, pas de \texttt{delete} manuel.
+  \item Templates : \texttt{ComponentStorage<T>} générique pour tout composant.
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{Évolutivité :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Nouveau composant ECS = créer un \texttt{struct}, l'enregistrer. Aucune modification du Registry.
+  \item Nouveau système = une classe avec \texttt{update()}, itérer via \texttt{registry.view<Cs...>()}.
+  \item Protocole réseau : jusqu'à 255 types de messages (\texttt{uint8\_t}).
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Conclusion :}\\
+Accès $O(1)$ pour les opérations critiques. Extension simple grâce aux templates et au RAII.
+\end{column}
+\end{columns}
+\end{frame}
+
+% ─── SLIDE FINALE ────────────────────────────────────────────────────────────
+\begin{frame}
+\centering
+\vspace{2cm}
+{\Huge\bfseries Merci pour votre attention}
+
+\vspace{1cm}
+{\large Projet R-Type — Bloc 2}
+
+\vspace{0.5cm}
+{\small Questions ?}
+\end{frame}
+
+\end{document}
