@@ -278,24 +278,28 @@ Serveur autoritaire avec prédiction côté client et réconciliation.
 \begin{column}{0.58\textwidth}
 \centering
 \begin{tikzpicture}[
-  node distance=0.25cm and 0.5cm,
-  box/.style={draw, rounded corners, minimum width=1.8cm, minimum height=0.5cm, font=\tiny\bfseries, text=white, align=center},
-  layer/.style={draw, rounded corners, minimum width=4.8cm, minimum height=0.4cm, font=\tiny, align=center, fill=rtypelight, text=rtypedark},
+  node distance=0.3cm,
+  box/.style={draw, rounded corners, minimum width=2.2cm, minimum height=0.6cm, font=\tiny\bfseries, text=white, align=center},
+  layer/.style={draw, rounded corners, minimum width=5.0cm, minimum height=0.5cm, font=\tiny, align=center, fill=rtypelight, text=rtypedark},
   arr/.style={-{Stealth[length=2.5pt]}, thick},
 ]
+  % Composants principaux
   \node[box, fill=rtypeblue] (client) {Client SDL2};
-  \node[box, fill=rtypeorange, right=1.0cm of client] (server) {Serveur};
-  \node[box, fill=rtypegreen, below=0.2cm of server] (db) {SQLite3};
+  \node[box, fill=rtypeorange, right=1.2cm of client] (server) {Serveur};
+  \node[box, fill=rtypegreen, below=of server] (db) {SQLite3};
 
-  \draw[arr, <->] (client.east) -- node[above, font=\tiny] {UDP binaire} (server.west);
+  % Flèches de connexion
+  \draw[arr, <->] (client.east) -- node[above, font=\tiny] {UDP} (server.west);
   \draw[arr, <->] (server.south) -- (db.north);
 
-  \node[layer, below=0.6cm of $(client.south)!0.5!(server.south)$] (l1) {\textbf{Réseau} — UDP + protocole binaire custom};
-  \node[layer, below=0.1cm of l1] (l2) {\textbf{Logique} — GameInstance, systèmes ECS};
-  \node[layer, below=0.1cm of l2] (l3) {\textbf{Rendu} — SDL2, sprites, parallax};
-  \node[layer, below=0.1cm of l3] (l4) {\textbf{Données} — SQLite3, JSON niveaux};
+  % Couches architecturales (empilées verticalement)
+  \node[layer, below=1.2cm of client.south west, anchor=north west, xshift=-0.3cm] (l1) {\textbf{Réseau} — UDP + protocole binaire custom};
+  \node[layer, below=0.15cm of l1] (l2) {\textbf{Logique} — GameInstance, systèmes ECS};
+  \node[layer, below=0.15cm of l2] (l3) {\textbf{Rendu} — SDL2, sprites, parallax};
+  \node[layer, below=0.15cm of l3] (l4) {\textbf{Données} — SQLite3, JSON niveaux};
 
-  \node[draw, dashed, rounded corners, fit=(l1)(l2)(l3)(l4), inner sep=2pt, label={[font=\tiny\bfseries, text=rtypeblue]left:Couches}] {};
+  % Cadre autour des couches
+  \node[draw, dashed, rounded corners, fit=(l1)(l2)(l3)(l4), inner sep=3pt, label={[font=\tiny\bfseries, text=rtypeblue]above left:Couches}] {};
 \end{tikzpicture}
 \end{column}
 \end{columns}
