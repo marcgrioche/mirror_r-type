@@ -70,8 +70,32 @@
 % ─── Métadonnées ─────────────────────────────────────────────────────────────
 \title[Bloc 2 — R-Type]{Bloc 2 — Concevoir une architecture logicielle}
 \subtitle{Projet R-Type — Jeu multijoueur en C++}
-\author{Équipe R-Type}
-\date{\today}
+\author{Dytoma BATOGOUMA, Baptiste CAMERLYNCK, Jonathan UFARTE,\newline Noe ROBERTIES, Marc GRIOCHE}
+\date{16 février 2026}
+
+% ─── Navigation simplifiée ───────────────────────────────────────────────────
+% Keep only previous/next navigation arrows (remove all other navigation symbols)
+\setbeamertemplate{navigation symbols}{
+  \insertframenavigationsymbol
+}
+
+% ─── Footline personnalisée ──────────────────────────────────────────────────
+% Remove authors from footer, keep short title, date, and slide numbers
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\hspace*{1em}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertdate
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{1em}
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
 
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{document}
@@ -118,7 +142,6 @@ Build system  & Makefile     & Meson       & CMake        & \textbf{CMake} \\
 Chaque choix évalué selon : \textbf{performance}, \textbf{latence}, \textbf{complexité}, \textbf{scalabilité} et \textbf{sécurité}.
 
 \vspace{0.2em}
-\textit{Détails complets dans le document COMPARATIVE\_STUDY.md.}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
@@ -234,7 +257,7 @@ Avantages et inconvénients de chaque prototype :
 
 \vspace{0.2em}
 \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{l p{4.5cm} p{4.5cm}}
+\begin{tabular}{l p{5.0cm} p{5.0cm}}
 \toprule
 \textbf{Prototype} & \textbf{Avantages} & \textbf{Inconvénients} \\
 \midrule
@@ -256,13 +279,13 @@ SFML                 & API C++ OOP intuitive         & Moins de contrôle bas ni
 % ──────────────────────────────────────────────────────────────────────────────
 % SLIDE 7 : B2-C09.1 — Architecture
 % ──────────────────────────────────────────────────────────────────────────────
-\begin{frame}{B2-C09.1 — Architecture}
+\begin{frame}[fragile]{B2-C09.1 — Architecture}
 \footnotesize
-Architecture \textbf{ECS + Client/Serveur} :
+\textbf{Architecture ECS + Threads \& Réseau UDP :}
 
 \vspace{0.1em}
 \begin{columns}[T]
-\begin{column}{0.40\textwidth}
+\begin{column}{0.32\textwidth}
 \textbf{Patron ECS :}
 \begin{itemize}\setlength\itemsep{1pt}
   \item \textbf{Entity} : identifiant unique
@@ -270,36 +293,50 @@ Architecture \textbf{ECS + Client/Serveur} :
   \item \textbf{System} : logique (Movement, Collision, Weapon\ldots)
 \end{itemize}
 
-\vspace{0.2em}
-\textbf{Modèle réseau :}\\
-Serveur autoritaire avec prédiction côté client et réconciliation.
+\vspace{0.3em}
+\textbf{Threads :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \textbf{Serveur} : Main (I/O) + 1 Thread/Lobby.
+  \item \textbf{Client} : Main (Rendu) + Network.
+\end{itemize}
 \end{column}
 
-\begin{column}{0.58\textwidth}
+\begin{column}{0.66\textwidth}
 \centering
-\begin{tikzpicture}[
-  node distance=0.3cm,
-  box/.style={draw, rounded corners, minimum width=2.2cm, minimum height=0.6cm, font=\tiny\bfseries, text=white, align=center},
-  layer/.style={draw, rounded corners, minimum width=5.0cm, minimum height=0.5cm, font=\tiny, align=center, fill=rtypelight, text=rtypedark},
-  arr/.style={-{Stealth[length=2.5pt]}, thick},
-]
-  % Composants principaux
-  \node[box, fill=rtypeblue] (client) {Client SDL2};
-  \node[box, fill=rtypeorange, right=1.2cm of client] (server) {Serveur};
-  \node[box, fill=rtypegreen, below=of server] (db) {SQLite3};
+\begin{tikzpicture}[scale=0.92, transform shape]
+  \tikzset{
+    node distance=0.3cm,
+    font=\tiny,
+    box/.style={draw, rounded corners, align=center, fill=white},
+    thread/.style={draw, dashed, rounded corners, fill=rtypelight, inner sep=2pt, align=center},
+    packet/.style={font=\tiny\itshape, text=rtypegray, align=center}
+  }
 
-  % Flèches de connexion
-  \draw[arr, <->] (client.east) -- node[above, font=\tiny] {UDP} (server.west);
-  \draw[arr, <->] (server.south) -- (db.north);
+  % Server Container
+  \node[box, fill=rtypeorange!20, minimum width=3.2cm, minimum height=3.2cm, label={[text=rtypeorange]north:\textbf{Serveur}}] (server) {};
 
-  % Couches architecturales (empilées verticalement)
-  \node[layer, below=1.2cm of client.south west, anchor=north west, xshift=-0.3cm] (l1) {\textbf{Réseau} — UDP + protocole binaire custom};
-  \node[layer, below=0.15cm of l1] (l2) {\textbf{Logique} — GameInstance, systèmes ECS};
-  \node[layer, below=0.15cm of l2] (l3) {\textbf{Rendu} — SDL2, sprites, parallax};
-  \node[layer, below=0.15cm of l3] (l4) {\textbf{Données} — SQLite3, JSON niveaux};
+  % Server Threads
+  \node[thread, below=0.35cm of server.north, minimum width=2.8cm] (srv_main) {\textbf{Main Thread}\\(I/O, Auth)};
+  
+  \node[thread, below=0.2cm of srv_main, minimum width=1.3cm, xshift=-0.7cm] (lobby1) {\textbf{Lobby 1}\\(Thread)};
+  \node[thread, below=0.2cm of srv_main, minimum width=1.3cm, xshift=0.7cm] (lobby2) {\textbf{Lobby 2}\\(Thread)};
 
-  % Cadre autour des couches
-  \node[draw, dashed, rounded corners, fit=(l1)(l2)(l3)(l4), inner sep=3pt, label={[font=\tiny\bfseries, text=rtypeblue]above left:Couches}] {};
+  % Client Container
+  \node[box, fill=rtypeblue!20, minimum width=3.2cm, minimum height=2.4cm, label={[text=rtypeblue]north:\textbf{Client}}, left=1.8cm of server] (client) {};
+
+  % Client Threads
+  \node[thread, below=0.35cm of client.north, minimum width=2.8cm] (cli_main) {\textbf{Main Thread}\\(Display, Input)};
+  \node[thread, below=0.2cm of cli_main, minimum width=2.8cm] (cli_net) {\textbf{Network Thread}\\(Select/Poll)};
+
+  % UDP Arrows
+  \draw[-{Stealth}, thick, rtypeblue] ([yshift=0.4cm]client.east) -- node[above, packet] {INPUT, CONNECT,\\PING} ([yshift=0.4cm]server.west);
+  
+  \draw[-{Stealth}, thick, rtypeorange] ([yshift=-0.4cm]server.west) -- node[below, packet] {GAME\_STATE,\\SPAWN\_ENTITY} ([yshift=-0.4cm]client.east);
+
+  % Database - Moved below server to save horizontal space or tightly right
+  \node[box, fill=rtypegreen!20, right=0.2cm of server, anchor=west, minimum width=1.2cm] (db) {SQLite3};
+  \draw[{Stealth}-{Stealth}, thick] (srv_main.east) -| (db.north);
+
 \end{tikzpicture}
 \end{column}
 \end{columns}
