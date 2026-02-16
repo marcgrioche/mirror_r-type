@@ -172,7 +172,7 @@ Débogage       & Valgrind, GDB         & Détection fuites mémoire, debug runt
 \end{adjustbox}
 
 \vspace{0.3em}
-Stack technologique offrant contrôle complet sur les performances, maintenabilité et sécurité.
+Stack technologique offrant un contrôle complet sur les performances, maintenabilité et sécurité.
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
@@ -237,7 +237,6 @@ Différents prototypes réalisés au cours du développement :
 
 \begin{enumerate}\setlength\itemsep{2pt}
   \item \textbf{Prototype réseau TCP} : Communication client/serveur en TCP. Fonctionnel mais latence trop élevée.
-  \item \textbf{Prototype réseau UDP brut} : Migration vers UDP pur. Gain de latence majeur, perte de fiabilité.
   \item \textbf{Prototype UDP + couche de fiabilité} : Système ACK/NACK sélectif sur UDP. Compromis optimal retenu.
   \item \textbf{Prototype ECS} : Implémentation initiale \textit{Array of Components}, puis migration vers \textit{Sparse Set}.
   \item \textbf{Prototype rendu SDL2} : Pipeline de rendu 2D avec parallax, sprites animés et gestion d'entrées.
@@ -246,6 +245,9 @@ Différents prototypes réalisés au cours du développement :
 
 \vspace{0.2em}
 Chaque prototype a été évalué avant d'être intégré ou remplacé dans le projet final.
+
+\vspace{0.3em}
+\textit{Note : Vidéo de démonstration disponible (MicrosoftTeams-video.mp4)}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
@@ -257,12 +259,11 @@ Avantages et inconvénients de chaque prototype :
 
 \vspace{0.2em}
 \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{l p{5.0cm} p{5.0cm}}
+\begin{tabular}{l p{5.5cm} p{5.5cm}}
 \toprule
 \textbf{Prototype} & \textbf{Avantages} & \textbf{Inconvénients} \\
 \midrule
 TCP                  & Fiable, ordonné, simple      & Latence élevée (head-of-line blocking) \\ \hline
-UDP brut             & Très faible latence           & Perte de paquets sans récupération \\ \hline
 UDP + fiabilité      & Latence faible + fiabilité sélective & Complexité modérée à implémenter \\ \hline
 ECS Array of Components & Cache-friendly, itération rapide & Rigide, mapping d'index complexe \\ \hline
 ECS Sparse Set       & Flexible, ajout/suppression dynamique & Légèrement plus complexe \\ \hline
@@ -322,7 +323,7 @@ SFML                 & API C++ OOP intuitive         & Moins de contrôle bas ni
   \node[thread, below=0.2cm of srv_main, minimum width=1.3cm, xshift=0.7cm] (lobby2) {\textbf{Lobby 2}\\(Thread)};
 
   % Client Container
-  \node[box, fill=rtypeblue!20, minimum width=3.2cm, minimum height=2.4cm, label={[text=rtypeblue]north:\textbf{Client}}, left=1.8cm of server] (client) {};
+  \node[box, fill=rtypeblue!20, minimum width=3.2cm, minimum height=2.4cm, label={[text=rtypeblue]north:\textbf{Client}}, left=2.3cm of server] (client) {};
 
   % Client Threads
   \node[thread, below=0.35cm of client.north, minimum width=2.8cm] (cli_main) {\textbf{Main Thread}\\(Display, Input)};
