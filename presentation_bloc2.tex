@@ -105,6 +105,26 @@
   \titlepage
 \end{frame}
 
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 2 : Démonstration R-Type
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{Démonstration R-Type}
+\centering
+\vfill
+\includegraphics[width=0.85\textwidth,height=0.75\textheight,keepaspectratio]{r-type-example.png}
+\vfill
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE 3 : Aperçu du projet
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{Aperçu du projet}
+\centering
+\vfill
+\includegraphics[width=0.85\textwidth,height=0.75\textheight,keepaspectratio]{image.png}
+\vfill
+\end{frame}
+
 % ─── SOMMAIRE ────────────────────────────────────────────────────────────────
 \begin{frame}{Sommaire}
   \tableofcontents
@@ -116,7 +136,7 @@
 \section{A3 — Veille technologique}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 1 : B2-C06.1 — Étude comparative
+% SLIDE 5 : B2-C06.1 — Étude comparative
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C06.1 — Étude comparative}
 \footnotesize
@@ -144,8 +164,9 @@ Chaque choix évalué selon : \textbf{performance}, \textbf{latence}, \textbf{co
 \vspace{0.2em}
 \end{frame}
 
+
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 2 : B2-C06.2 — Identification des technologies
+% SLIDE 6 : B2-C06.2 — Identification des technologies
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C06.2 — Identification des technologies}
 \footnotesize
@@ -157,8 +178,8 @@ Technologies identifiées et retenues pour le projet :
 \toprule
 \textbf{Catégorie} & \textbf{Technologie} & \textbf{Rôle} \\
 \midrule
-Langage        & C++ (C++17)           & Logique de jeu, systèmes bas niveau \\ \hline
-Graphisme      & SDL2                  & Rendu 2D, gestion fenêtre, entrées \\ \hline
+Langage        & C++ (C++17)           & Logique de jeu \\ \hline
+Graphisme      & SDL2                  & Rendu 2D, entrées utilisateur \\ \hline
 Réseau         & BSD Sockets (UDP)     & Communication temps réel client/serveur \\ \hline
 Base de données & SQLite3              & Authentification, persistance XP joueurs \\ \hline
 Sécurité       & libsodium             & Hachage de mots de passe (Argon2) \\ \hline
@@ -176,7 +197,7 @@ Stack technologique offrant un contrôle complet sur les performances, maintenab
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 3 : B2-C07.1 — Étude sécurité informatique
+% SLIDE 7 : B2-C07.1 — Étude sécurité informatique
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C07.1 — Étude sécurité informatique}
 \footnotesize
@@ -204,7 +225,7 @@ Paquets falsifiés           & Protocole binaire     & Checksums, numéros de s�
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 4 : B2-C07.2 — Veille sécurité informatique
+% SLIDE 8 : B2-C07.2 — Veille sécurité informatique
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C07.2 — Veille sécurité informatique}
 \footnotesize
@@ -215,7 +236,6 @@ Connaissance de l'actualité sécurité informatique appliquée au projet :
   \item \textbf{SQLite3 :} Vulnérabilités d'injection contournées par \textit{prepared statements} systématiques.
   \item \textbf{libsodium :} Argon2id recommandé par l'OWASP. Gestion auto du \textit{rehashing} (\texttt{needsRehash()}).
   \item \textbf{UDP / Réseau :} Risques de \textit{spoofing}, \textit{replay attacks}. Mitigation par numéros de séquence et validation stricte.
-  \item \textbf{OWASP Top 10 :} A05:Injection, A02:Security Misconfiguration, A07:Authentication Failures.
   \item \textbf{C++ moderne :} \texttt{std::unique\_ptr}, \texttt{std::shared\_ptr} contre fuites mémoire et \textit{use-after-free}.
 \end{itemize}
 
@@ -228,7 +248,7 @@ Connaissance de l'actualité sécurité informatique appliquée au projet :
 \section{A4 — Prototypage}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 5 : B2-C08.1 — Prototypes
+% SLIDE 9 : B2-C08.1 — Prototypes
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C08.1 — Prototypes}
 \footnotesize
@@ -245,12 +265,10 @@ Différents prototypes réalisés au cours du développement :
 \vspace{0.2em}
 Chaque prototype a été évalué avant d'être intégré ou remplacé dans le projet final.
 
-\vspace{0.3em}
-\textit{Note : Vidéo de démonstration disponible (MicrosoftTeams-video.mp4)}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 6 : B2-C08.2 — Prototypes - comparatif
+% SLIDE 10 : B2-C08.2 — Prototypes - comparatif
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C08.2 — Prototypes — comparatif}
 \footnotesize
@@ -277,7 +295,7 @@ SFML                 & API C++ OOP intuitive         & Moins de contrôle bas ni
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 7 : B2-C09.1 — Architecture
+% SLIDE 11 : B2-C09.1 — Architecture
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}[fragile]{B2-C09.1 — Architecture}
 \footnotesize
@@ -343,7 +361,7 @@ SFML                 & API C++ OOP intuitive         & Moins de contrôle bas ni
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 8 : B2-C09.2 — Intégration technique
+% SLIDE 12 : B2-C09.2 — Intégration technique
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C09.2 — Intégration technique}
 \footnotesize
@@ -368,7 +386,7 @@ Justification de l'architecture et intégration dans l'écosystème technique :
 \section{A5 — Résolution de problèmes algorithmiques complexes}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 9 : B2-C10.1 — Implémentation de l'architecture
+% SLIDE 13 : B2-C10.1 — Implémentation de l'architecture
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}[fragile]{B2-C10.1 — Implémentation de l'architecture}
 \footnotesize
@@ -410,7 +428,7 @@ class RTypeServer : public RTypeNetwork {
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 10 : B2-C10.2 — Bonnes pratiques de développement
+% SLIDE 14 : B2-C10.2 — Bonnes pratiques de développement
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}[fragile]{B2-C10.2 — Bonnes pratiques de développement}
 \footnotesize
@@ -454,7 +472,7 @@ std::unique_ptr<UdpSocket> _socket;
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 11 : B2-C11.1 — Organisation du code
+% SLIDE 15 : B2-C11.1 — Organisation du code
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}[fragile]{B2-C11.1 — Organisation du code}
 \scriptsize
@@ -503,29 +521,14 @@ std::unique_ptr<UdpSocket> _socket;
 \end{itemize}
 
 \vspace{0.2em}
-\textbf{Persistance des données :}
-
-\vspace{0.1em}
-\begin{adjustbox}{max width=\columnwidth}
-\begin{tabular}{l l}
-\toprule
-\textbf{Donnée} & \textbf{Solution} \\
-\midrule
-Auth. joueurs & SQLite3 (requêtes préparées) \\
-XP joueurs    & SQLite3 \\
-Config. niveaux & JSON (nlohmann/json) \\
-État réseau   & Binaire custom (UDP) \\
-État en mémoire & \texttt{std::vector}, \texttt{unordered\_map} \\
-\bottomrule
-\end{tabular}
-\end{adjustbox}
+\includegraphics[width=\columnwidth]{rtype.png}
 
 \end{column}
 \end{columns}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 12 : B2-C11.2 — Segmentation du code
+% SLIDE 16 : B2-C11.2 — Segmentation du code
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}[fragile]{B2-C11.2 — Segmentation du code}
 \scriptsize
@@ -595,7 +598,7 @@ Config. niveaux & JSON (nlohmann/json) \\
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 13 : B2-C12.1 — Implémentation algorithmique
+% SLIDE 17 : B2-C12.1 — Implémentation algorithmique
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C12.1 — Implémentation algorithmique}
 \footnotesize
@@ -626,61 +629,41 @@ Algorithmes existants et optimaux implémentés :
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 14 : B2-C12.2 — Implémentation d'algorithmes originaux
+% SLIDE 18 : B2-C12.2 — Implémentation d'algorithmes originaux
 % ──────────────────────────────────────────────────────────────────────────────
-\begin{frame}{B2-C12.2 — Implémentation d'algorithmes originaux}
+\begin{frame}{B2-C12.2 — Implémentation de solutions originales}
 \footnotesize
+Solutions développées sur mesure car aucun algorithme standard ne correspondait à nos contraintes :
 
 \begin{columns}[T]
-\begin{column}{0.54\textwidth}
-\textbf{Protocole binaire custom :}
-
-\vspace{0.2em}
-\centering
-\begin{tikzpicture}[
-  field/.style={draw, minimum height=0.5cm, font=\tiny\ttfamily, fill=#1, text=white, align=center},
-  label/.style={font=\tiny, text=rtypegray, align=center}
-]
-  \node[field=rtypeblue, minimum width=0.85cm] (t) at (0,0) {Type};
-  \node[field=rtypegreen, minimum width=0.85cm, right=0pt of t] (v) {Ver};
-  \node[field=rtypeorange, minimum width=1.1cm, right=0pt of v] (s) {Seq};
-  \node[field=rtypeblue!70, minimum width=1.4cm, right=0pt of s] (p) {PlayerID};
-  \node[field=rtypegray, minimum width=0.9cm, right=0pt of p] (l) {Len};
-  \node[field=rtypedark, minimum width=1.6cm, right=0pt of l] (d) {Payload};
-
-  \node[label, below=1pt of t] {1B};
-  \node[label, below=1pt of v] {1B};
-  \node[label, below=1pt of s] {2B};
-  \node[label, below=1pt of p] {4B};
-  \node[label, below=1pt of l] {2B};
-  \node[label, below=1pt of d] {NB};
-\end{tikzpicture}
-
-\vspace{0.3em}
-\raggedright
+\begin{column}{0.50\textwidth}
+\textbf{Génération procédurale de plateformes :}
 \begin{itemize}\setlength\itemsep{1pt}
-  \item Sérialisation avec gestion du \textit{byte swapping}
-  \item \textbf{ACK/NACK sélectif} : seuls les messages critiques sont acquittés
-  \item \textbf{Agrégation} : petites mises à jour regroupées
+  \item Distribution par \textbf{couches verticales} (layers) paramétrables via JSON — nombre de couches, marges, espacement
+  \item \textbf{Contrainte d'atteignabilité} : chaque plateforme doit être accessible depuis une autre ($\Delta x \leq$ \texttt{reachableX}, $\Delta y \leq$ \texttt{maxDiffY})
+  \item \textbf{Distances minimales} entre plateformes (même étage et inter-étages) pour éviter le chevauchement
+  \item \textbf{Quotas de bords} : limite l'accumulation aux extrêmes haut/bas
+  \item Re-génération dynamique (\texttt{reGenerateRandomPlatforms}) tenant compte des plateformes existantes
 \end{itemize}
 \end{column}
 
-\begin{column}{0.43\textwidth}
-\textbf{Autres solutions originales :}
-
+\begin{column}{0.47\textwidth}
+\textbf{Physique custom (gravité + friction) :}
 \begin{itemize}\setlength\itemsep{1pt}
-  \item \textbf{Niveaux par JSON :}
-    \begin{itemize}\setlength\itemsep{0pt}
-      \item Chargement dynamique (gravité, ennemis, boss, plateformes)
-      \item Nouveaux niveaux sans recompilation
-    \end{itemize}
-  \item \textbf{ECS View optimisé :}
-    \begin{itemize}\setlength\itemsep{0pt}
-      \item Itération multi-composants via intersection des sparse sets
-      \item Sélection auto du plus petit set
-    \end{itemize}
-  \item \textbf{Messages temps réel :} envoyés sans garantie (positions, inputs) pour minimiser la latence
+  \item \textbf{RigidBodySystem} : gravité avec friction exponentielle différenciée sol/air ($v_x \cdot f^{\Delta t}$)
+  \item Paramètres par entité : \texttt{groundFriction}, \texttt{airFriction}, \texttt{maxSpeed}, \texttt{maxFallSpeed}
+  \item Plateformes mobiles transmettent leur \texttt{groundSpeed} au joueur
 \end{itemize}
+
+\vspace{0.2em}
+\textbf{Collision AABB + plateformes one-way :}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Résolution par \textbf{axe de moindre pénétration} (minimum overlap X vs Y)
+  \item Plateformes \textbf{traversables par le bas} : collision uniquement si le joueur descendait et était au-dessus au tick précédent (\texttt{PreviousPosition})
+\end{itemize}
+
+\vspace{0.2em}
+\textit{Tous les paramètres configurables via fichiers JSON de niveaux.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -691,7 +674,7 @@ Algorithmes existants et optimaux implémentés :
 \section{A6 — Définition des modèles de données}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 15 : B2-C13.1 — Persistance des données
+% SLIDE 19 : B2-C13.1 — Persistance des données
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C13.1 — Persistance des données}
 \footnotesize
@@ -722,7 +705,7 @@ Communication     & Binaire (UDP)   & Latence minimale         & Compact, pas de
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 16 : B2-C13.2 — Persistance des données - comparatif
+% SLIDE 20 : B2-C13.2 — Persistance des données - comparatif
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C13.2 — Persistance des données — comparatif}
 \footnotesize
@@ -764,7 +747,7 @@ Parsing C++   & nlohmann  & yaml-cpp   & toml++   & Custom \\
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 17 : B2-C14.1 — Structures de données
+% SLIDE 21 : B2-C14.1 — Structures de données
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C14.1 — Structures de données}
 \footnotesize
@@ -833,7 +816,7 @@ Mémoire contiguë = cache-friendly.}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────────────────────────
-% SLIDE 18 : B2-C14.2 — Structures de données - justifications
+% SLIDE 22 : B2-C14.2 — Structures de données - justifications
 % ──────────────────────────────────────────────────────────────────────────────
 \begin{frame}{B2-C14.2 — Structures de données — justifications}
 \footnotesize
