@@ -211,16 +211,15 @@ Paquets falsifiés           & Protocole binaire     & Checksums, numéros de s�
 Connaissance de l'actualité sécurité informatique appliquée au projet :
 
 \begin{itemize}\setlength\itemsep{2pt}
-  \item \textbf{SDL2 :} Suivi des CVE (ex. CVE-2022-4743 — heap overflow SDL2 < 2.26.0). Version maintenue à jour.
+  \item \textbf{SDL2 :} Suivi des CVE (ex. CVE-2022-4743 — fuite de mémoire affectant SDL2 v2.0.4). Version maintenue à jour.
   \item \textbf{SQLite3 :} Vulnérabilités d'injection contournées par \textit{prepared statements} systématiques.
   \item \textbf{libsodium :} Argon2id recommandé par l'OWASP. Gestion auto du \textit{rehashing} (\texttt{needsRehash()}).
   \item \textbf{UDP / Réseau :} Risques de \textit{spoofing}, \textit{replay attacks}. Mitigation par numéros de séquence et validation stricte.
-  \item \textbf{OWASP Top 10 :} A01:Broken Access Control, A03:Injection, A07:Security Misconfiguration.
+  \item \textbf{OWASP Top 10 :} A05:Injection, A02:Security Misconfiguration, A07:Authentication Failures.
   \item \textbf{C++ moderne :} \texttt{std::unique\_ptr}, \texttt{std::shared\_ptr} contre fuites mémoire et \textit{use-after-free}.
 \end{itemize}
 
-\vspace{0.2em}
-\textbf{Pratique :} Veille régulière via NVD et bulletins de sécurité des bibliothèques utilisées.
+
 \end{frame}
 
 % ══════════════════════════════════════════════════════════════════════════════
