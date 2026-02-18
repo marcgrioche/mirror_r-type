@@ -1,0 +1,477 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% ─── Thème et couleurs ───────────────────────────────────────────────────────
+\usetheme{Madrid}
+\definecolor{rtypeblue}{RGB}{0,80,150}
+\definecolor{rtypedark}{RGB}{20,20,40}
+\definecolor{rtypegreen}{RGB}{40,140,60}
+\definecolor{rtypeorange}{RGB}{220,120,20}
+\definecolor{rtypegray}{RGB}{100,100,100}
+\definecolor{rtypelight}{RGB}{230,240,250}
+\usecolortheme[named=rtypeblue]{structure}
+\setbeamercolor{title}{fg=white,bg=rtypeblue}
+\setbeamercolor{frametitle}{fg=white,bg=rtypeblue}
+\setbeamercolor{block title}{bg=rtypeblue,fg=white}
+
+% ─── Packages ────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{adjustbox}
+\usepackage{colortbl}
+\arrayrulecolor{gray!50}
+\renewcommand{\arraystretch}{1.3}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc,backgrounds}
+\usepackage{forest}
+
+% ─── Listings config ─────────────────────────────────────────────────────────
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{rtypeblue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{red!60!black},
+  breaklines=true,
+  frame=single,
+  columns=fullflexible,
+  showstringspaces=false
+}
+
+% ─── Forest dirtree style ───────────────────────────────────────────────────
+\forestset{
+  dir tree/.style={
+    for tree={
+      font=\ttfamily\tiny,
+      grow'=0,
+      child anchor=west,
+      parent anchor=south,
+      anchor=west,
+      calign=first,
+      edge path={
+        \noexpand\path [draw, -{Stealth[length=1.5pt]}]
+        (!u.south west) +(4pt,0) |- node[fill,inner sep=0.6pt] {} (.child anchor)\forestoption{edge label};
+      },
+      before typesetting nodes={
+        if n=1 {insert before={[,phantom]}} {}
+      },
+      fit=band,
+      before computing xy={l=6pt},
+      inner ysep=0pt,
+      }
+    }
+}
+
+% ─── Métadonnées ─────────────────────────────────────────────────────────────
+\title[Bloc 3 — R-Type]{Bloc 3 — Créer une architecture logicielle pour applications lourdes}
+\subtitle{Projet R-Type — Architecture et Intégration}
+\author{Dytoma BATOGOUMA, Baptiste CAMERLYNCK, Jonathan UFARTE,\newline Noe ROBERTIES, Marc GRIOCHE}
+\date{23 février 2026}
+
+% ─── Navigation simplifiée ───────────────────────────────────────────────────
+\setbeamertemplate{navigation symbols}{
+  \insertframenavigationsymbol
+}
+
+% ─── Footline personnalisée ──────────────────────────────────────────────────
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\hspace*{1em}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertdate
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{1em}
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ─── SOMMAIRE ────────────────────────────────────────────────────────────────
+\begin{frame}{Sommaire}
+  \tableofcontents
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A7 — IMPLEMENTATION DES INTERACTIONS AVEC LE S.I.
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A7 — Implémentation des interactions avec le S.I.}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C15.1 — Interfaces (GUI/TUI)
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C15.1 — Interfaces (GUI)}
+  \footnotesize
+  L'application R-Type propose une interface graphique (GUI) riche gérée par \textbf{SDL2}, structurée en ``Pages'' pour optimiser le flux utilisateur.
+  
+  \begin{columns}[T]
+  \begin{column}{0.48\textwidth}
+  \textbf{Machine à états des menus (Menu.cpp) :}
+  \begin{itemize}
+    \item Gestion centralisée des états (\texttt{Page::HOME}, \texttt{Page::LOBBY}, etc.).
+    \item Transition fluide sans rechargement complet de l'application.
+    \item Composants réutilisables (\texttt{Button}, \texttt{InputBox}).
+  \end{itemize}
+  
+  \vspace{0.2em}
+  \begin{lstlisting}
+  void Menu::activate(Registry& r, Page page, ...) {
+      switch (page) {
+      case Page::HOME: m_homePage.show(r); break;
+      case Page::LOBBY: m_lobbyPage.show(r, ...); break;
+      case Page::WIN: m_endPage.show(r, true); break;
+      // ...
+      }
+      m_currentPage = page;
+  }
+  \end{lstlisting}
+  \end{column}
+  
+  \begin{column}{0.48\textwidth}
+  \textbf{Interactions utilisateur :}
+  \begin{itemize}
+    \item \textbf{Menus} : Navigation à la souris et au clavier.
+    \item \textbf{Jeu} : Feedback visuel immédiat (animations, particules).
+    \item \textbf{Lobby} : Mise à jour temps réel de la liste des joueurs et du chat.
+  \end{itemize}
+  
+  \vspace{0.2em}
+  \centering
+  \begin{tikzpicture}[
+    node distance=0.5cm,
+    state/.style={draw, rounded corners, fill=rtypelight, font=\tiny\bfseries},
+    arrow/.style={-{Stealth}, thick, rtypeblue}
+  ]
+    \node[state] (home) {HOME};
+    \node[state, below left=of home] (conn) {CONNECTION};
+    \node[state, below right=of home] (join) {JOIN LOBBY};
+    \node[state, below=1.5cm of home] (lobby) {LOBBY};
+    \node[state, below=of lobby] (game) {GAME};
+    
+    \draw[arrow] (home) -- (conn);
+    \draw[arrow] (home) -- (join);
+    \draw[arrow] (conn) |- (lobby);
+    \draw[arrow] (join) |- (lobby);
+    \draw[arrow] (lobby) -- (game);
+    \draw[arrow] (game.east) to[out=0,in=0] (lobby.east);
+  \end{tikzpicture}
+  \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C15.2 — Accessibilité
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B3-C15.2 — Accessibilité et Ergonomie}
+  \footnotesize
+  L'interface est conçue pour être claire, réactive et navigable, respectant des critères d'accessibilité clés :
+  
+  \vspace{0.5em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Ergonomie Visuelle}
+        \begin{itemize}
+          \item \textbf{Contraste élevé} : Textes clairs sur fonds sombres (thème spatial) pour une lisibilité maximale.
+          \item \textbf{Police lisible} : Utilisation de polices sans-serif claires et de grande taille pour les éléments importants (scores, vies).
+          \item \textbf{Feedback visuel} : Survol des boutons (hover), indicateurs de focus.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Accessibilité des Contrôles}
+        \begin{itemize}
+          \item \textbf{Inputs Abstraits} : Le système \texttt{PlayerInputProcessor} mappe les actions (\texttt{GameInput::UP}, \texttt{ATTACK}) indépendamment du matériel.
+          \item \textbf{Support Clavier/Souris} : Navigation complète possible dans les menus.
+          \item \textbf{Messages d'erreur} : Retours explicites en cas d'échec de connexion ou de formulaire invalide.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C16.1 — Intégrité des données (Implémentation)
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C16.1 — Intégrité des données (Implémentation)}
+  \footnotesize
+  L'intégrité des échanges réseau et des données critiques est assurée par notre protocole binaire custom sur UDP.
+  
+  \begin{columns}[T]
+  \begin{column}{0.48\textwidth}
+  \textbf{Structure des paquets (Message.hpp) :}
+  \begin{itemize}
+    \item \textbf{Sequence Number} : Détection des paquets perdus, dupliqués ou désordonnés.
+    \item \textbf{Version} : Rejet des clients obsolètes.
+    \item \textbf{Player ID} : Identification source (validée coté serveur).
+  \end{itemize}
+  
+  \begin{lstlisting}
+  class Message {
+    uint16_t sequence_number; // Ordering
+    uint32_t player_id;       // Source check
+    uint8_t version;          // Compatibility
+    std::vector<uint8_t> payload;
+    
+    // Serialisation binaire stricte
+    std::vector<uint8_t> serialize() const;
+  };
+  \end{lstlisting}
+  \end{column}
+  
+  \begin{column}{0.48\textwidth}
+  \textbf{Validation à la réception (Server) :}
+  \begin{itemize}
+    \item Vérification de la taille du payload pour éviter les \textit{buffer overflows}.
+    \item Validation que le \texttt{player\_id} correspond à l'IP source (prévention IP spoofing).
+    \item Parsage strict via \texttt{Message::readBytes()} avec "bounds checking".
+  \end{itemize}
+  
+  \vspace{0.3em}
+  L'utilisation de \textbf{UDP} nécessite cette couche applicative pour garantir l'intégrité que TCP offrirait nativement, mais avec une latence bien moindre.
+  \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C16.2 — Justification Intégrité/Confidentialité
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B3-C16.2 — Justification Intégrité et Confidentialité}
+  \footnotesize
+  
+  \begin{block}{Confidentialité - Gestion des données sensibles (Server/DB)}
+    \begin{itemize}
+      \item \textbf{Mots de passe} : Hachage fort via \textbf{Argon2id} (bibliothèque \textit{libsodium}).
+      \item \textbf{Stockage} : Base de données \textbf{SQLite3} locale au serveur, non exposée publiquement.
+      \item \textbf{Principe} : Aucun mot de passe clair ne transite ou n'est stocké.
+    \end{itemize}
+  \end{block}
+  
+  \vspace{0.5em}
+  \begin{block}{Intégrité - Stabilité de la solution}
+    \begin{itemize}
+      \item \textbf{Autorité Serveur} : Le client n'envoie que des intentions (inputs). Le serveur calcule et valide l'état du monde. Impossible pour un client de "téléporter" son vaisseau (intégrité logique du jeu).
+      \item \textbf{Gestion mémoire} : Utilisation intensive de \texttt{std::unique\_ptr} et \texttt{RAII} pour empêcher les fuites de mémoire et la corruption de heap (\textit{memory corruption}).
+      \item \textbf{Validation des Entrées} : Toutes les chaînes (usernames, chat) sont tronquées et désinfectées (taille max 255 chars).
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C17.1 — Normes et Composants Tiers (Implémentation)
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C17.1 — Normes et Composants Tiers (Implémentation)}
+  \footnotesize
+  Le projet s'appuie sur des standards industriels et des bibliothèques robustes pour éviter de "réinventer la roue" sur les aspects critiques.
+  
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Standards utilisés :}
+      \begin{itemize}
+        \item \textbf{C++17} : Standard langage moderne (filesystem, optional).
+        \item \textbf{CMake} : Standard de build system.
+        \item \textbf{UDP/IPv4} : Protocole réseau standard (RFC 768).
+        \item \textbf{JSON} : Format d'échange standard (RFC 8259).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Bibliothèques Tierces :}
+      \begin{itemize}
+        \item \textbf{SDL2} : Abstraction hardware (Audio/Vidéo/Input).
+        \item \textbf{SQLite3} : Moteur SQL transactionnel ACID.
+        \item \textbf{nlohmann/json} : Parsing JSON moderne en C++.
+        \item \textbf{libsodium} : Cryptographie haute sécurité.
+        \item \textbf{Prometheus-cpp} : Métriques et monitoring.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C17.2 — Justification des Choix Techniques
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}{B3-C17.2 — Justification des Choix Techniques}
+  \footnotesize
+  \begin{adjustbox}{max width=\textwidth}
+  \begin{tabular}{l l l}
+  \toprule
+  \textbf{Composant} & \textbf{Rôle} & \textbf{Justification de la pertinence} \\
+  \midrule
+  \textbf{SDL2} & Rendu & \textit{Standard de facto} pour le développement 2D natif. Performance hardware, compatible Linux/Windows/Mac. \\ \hline
+  \textbf{SQLite3} & Persistance & Zéro-configuration, simple fichier \texttt{.db}, suffisant pour nos besoins de matchmaking et auth. \\ \hline
+  \textbf{UDP Binaire} & Réseau & Protocoles texte (HTTP/WS) trop lents pour le temps réel (60Hz). Binaire = 10x moins de bande passante. \\ \hline
+  \textbf{CMake} & Build & Indispensable pour la portabilité (génération Makefile ou Visual Studio Solution). \\ \hline
+  \textbf{Docker} & Déploiement & Garantit un environnement d'exécution identique (reproductibilité) pour le serveur. \\
+  \bottomrule
+  \end{tabular}
+  \end{adjustbox}
+  
+  \vspace{0.5em}
+  Ces choix garantissent \textbf{l'interopérabilité} (formats standards) et la \textbf{maintenance} (communautés actives pour chaque librairie).
+\end{frame}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  A8 — MISE EN PLACE DE FONCTIONNALITÉS COMPLEXES
+% ══════════════════════════════════════════════════════════════════════════════
+\section{A8 — Fonctionnalités complexes et Code}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C18.1 — Code Opérationnel et Fonctionnel
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C18.1 — Code Opérationnel (Complexité)}
+  \scriptsize
+  Le cœur du moteur de jeu (\texttt{GameInstance}) gère de manière autonome la simulation, intégrant physique, logique et réseau.
+  
+  \begin{columns}[T]
+  \begin{column}{0.55\textwidth}
+  \begin{lstlisting}[basicstyle=\ttfamily\tiny]
+// GameInstance.cpp - Boucle de simulation
+void GameInstance::update(double deltaTime) {
+    // 1. Mise a jour des systemes ECS
+    _registry.run_system<MovementSystem>(deltaTime);
+    _registry.run_system<CollisionSystem>();
+    _registry.run_system<WeaponSystem>();
+    
+    // 2. Gestion des inputs joueurs
+    processInputs();
+    
+    // 3. Generation procedurale (Obstacles)
+    _levelManager.update(deltaTime);
+    
+    // 4. Verification conditions de victoire
+    checkWinCondition();
+    
+    // 5. Serialisation etat pour le reseau
+    broadcastGameState();
+}
+  \end{lstlisting}
+  \end{column}
+  
+  \begin{column}{0.4\textwidth}
+  \textbf{Points forts du code :}
+  \begin{itemize}
+    \item \textbf{Autonomie} : Le serveur tourne en boucle infinie (\texttt{while(_running)}) et gère ses ticks (60 TPS).
+    \item \textbf{Découplage} : La logique métier est séparée du réseau grâce à l'ECS.
+    \item \textbf{Concurrence} : Utilisation de threads pour paralléliser I/O réseau et calculs physique (\texttt{LobbyManager}).
+  \end{itemize}
+  \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C18.2 — Conventions (Formatage et Nommage)
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C18.2 — Conventions de Formatage et Nommage}
+  \footnotesize
+  Le projet impose des conventions strictes pour garantir la lisibilité et la maintenance collaborative.
+  
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Outils Automatiques :}
+      \begin{itemize}
+        \item \textbf{.pre-commit-config.yaml} : Vérification automatique avant chaque commit.
+        \item \textbf{Clang-Format} : Style \texttt{WebKit} imposé.
+        \item \textbf{Standard} : C++17.
+      \end{itemize}
+      
+      \vspace{0.2em}
+      \begin{lstlisting}
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    hooks:
+      - id: clang-format
+        args: [--style=WebKit]
+      \end{lstlisting}
+    \end{column}
+    
+    \begin{column}{0.48\textwidth}
+      \textbf{Conventions de Nommage :}
+      \begin{itemize}
+        \item \textbf{Classes} : \texttt{PascalCase} (ex: \texttt{GameInstance})
+        \item \textbf{Méthodes} : \texttt{camelCase} (ex: \texttt{processInput})
+        \item \textbf{Membres} : \texttt{m\_} ou \texttt{\_} prefix (ex: \texttt{\_registry}, \texttt{m\_currentPage})
+        \item \textbf{Fichiers} : Identiques aux classes (ex: \texttt{Menu.cpp})
+      \end{itemize}
+      
+      \vspace{0.3em}
+      \textit{Respect strict vérifié lors des Code Reviews sur GitHub.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE : B3-C19.1/19.2 — Intégration Tiers et Erreurs
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}[fragile]{B3-C19.1/19.2 — Intégration Tiers et Gestion d'Erreur}
+  \footnotesize
+  L'intégration des librairies externes se fait via des wrappers qui isolent la complexité et gèrent les erreurs de manière robuste.
+  
+  \begin{columns}[T]
+  \begin{column}{0.48\textwidth}
+  \textbf{Exemple : Initialisation DB (SQLite)}
+  \begin{lstlisting}
+void DB::init() {
+    int rc = sqlite3_open(_path.c_str(), &_db);
+    // Gestion d'erreur explicite (B3-C19.2)
+    if (rc) {
+        std::cerr << "Can't open database: " 
+                  << sqlite3_errmsg(_db) << std::endl;
+        // Fallback ou arret critique
+        throw std::runtime_error("DB Error");
+    }
+    // ... creation tables
+}
+  \end{lstlisting}
+  \end{column}
+  
+  \begin{column}{0.48\textwidth}
+  \textbf{Exemple : Réseau (Sockets système)}
+  \begin{lstlisting}
+ssize_t UdpSocket::send(...) {
+    ssize_t sent = sendto(_socket, ...);
+    if (sent < 0) {
+        // Enregistrement de l'erreur sans crasher
+        perror("sendto failed");
+        return -1;
+    }
+    return sent;
+}
+  \end{lstlisting}
+  \end{column}
+  \end{columns}
+  
+  \vspace{0.5em}
+  La gestion des cas d'erreur tiers est encapsulée pour ne pas propager d'états invalides dans la logique métier (\texttt{GameInstance}).
+\end{frame}
+
+% ──────────────────────────────────────────────────────────────────────────────
+% SLIDE DE FIN
+% ──────────────────────────────────────────────────────────────────────────────
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge \textbf{Merci de votre attention}}
+  
+  \vspace{1cm}
+  \textbf{R-Type — Bloc 3}
+  \vfill
+\end{frame}
+
+\end{document}
